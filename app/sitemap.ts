@@ -42,43 +42,49 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/legal/hipaa`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  // Dynamic blog posts
-  const blogPosts = await db.blogPost.findMany({
-    where: { isPublished: true },
-    select: { slug: true, updatedAt: true },
-  });
-  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: post.updatedAt,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
+  // Dynamic pages from DB — wrapped in try/catch for build-time when DB isn't available
+  let blogPages: MetadataRoute.Sitemap = [];
+  let comparePages: MetadataRoute.Sitemap = [];
+  let recipePages: MetadataRoute.Sitemap = [];
 
-  // Dynamic comparison pages
-  const comparisons = await db.comparisonPage.findMany({
-    where: { isPublished: true },
-    select: { slug: true, updatedAt: true },
-  });
-  const comparePages: MetadataRoute.Sitemap = comparisons.map((page) => ({
-    url: `${baseUrl}/compare/${page.slug}`,
-    lastModified: page.updatedAt,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
+  try {
+    const blogPosts = await db.blogPost.findMany({
+      where: { isPublished: true },
+      select: { slug: true, updatedAt: true },
+    });
+    blogPages = blogPosts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: post.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
 
-  // Dynamic recipe pages
-  const recipes = await db.recipe.findMany({
-    where: { isPublished: true },
-    select: { slug: true, updatedAt: true },
-  });
-  const recipePages: MetadataRoute.Sitemap = recipes.map((recipe) => ({
-    url: `${baseUrl}/meals/${recipe.slug}`,
-    lastModified: recipe.updatedAt,
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }));
+    const comparisons = await db.comparisonPage.findMany({
+      where: { isPublished: true },
+      select: { slug: true, updatedAt: true },
+    });
+    comparePages = comparisons.map((page) => ({
+      url: `${baseUrl}/compare/${page.slug}`,
+      lastModified: page.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
 
-  // State-specific landing pages
+    const recipes = await db.recipe.findMany({
+      where: { isPublished: true },
+      select: { slug: true, updatedAt: true },
+    });
+    recipePages = recipes.map((recipe) => ({
+      url: `${baseUrl}/meals/${recipe.slug}`,
+      lastModified: recipe.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
+  } catch {
+    // DB not reachable during build — return static pages only
+  }
+
+  // State-specific landing pages (static data, no DB needed)
   const statePages: MetadataRoute.Sitemap = availableStates.map((state) => ({
     url: `${baseUrl}/states/${state.slug}`,
     lastModified: now,

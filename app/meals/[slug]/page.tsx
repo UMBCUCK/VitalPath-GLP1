@@ -155,11 +155,13 @@ export default async function PublicRecipePage({ params }: PageProps) {
                 </thead>
                 <tbody className="divide-y divide-navy-100/20">
                   {[
-                    { weight: 150, protein: 120, calories: 1400 },
-                    { weight: 180, protein: 144, calories: 1600 },
-                    { weight: 200, protein: 160, calories: 1750 },
-                    { weight: 220, protein: 176, calories: 1900 },
-                    { weight: 250, protein: 200, calories: 2100 },
+                    { weight: 120, protein: 96, calories: 1200, label: "120 lbs" },
+                    { weight: 140, protein: 112, calories: 1300, label: "140 lbs" },
+                    { weight: 160, protein: 128, calories: 1450, label: "160 lbs" },
+                    { weight: 180, protein: 144, calories: 1600, label: "180 lbs" },
+                    { weight: 200, protein: 160, calories: 1750, label: "200 lbs" },
+                    { weight: 225, protein: 180, calories: 1950, label: "225 lbs" },
+                    { weight: 250, protein: 200, calories: 2100, label: "250+ lbs" },
                   ].map((row) => (
                     <tr key={row.weight} className="hover:bg-navy-50/20">
                       <td className="py-2 font-medium text-navy">{row.weight} lbs</td>
