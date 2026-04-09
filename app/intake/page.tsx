@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { SectionShell } from "@/components/shared/section-shell";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { useFunnelStore } from "@/hooks/use-funnel-store";
 import { cn } from "@/lib/utils";
 
 type IntakeStep = 1 | 2 | 3;
@@ -33,12 +34,13 @@ const medicalConditions = [
 
 export default function IntakePage() {
   const router = useRouter();
+  const { state: funnelState, update: updateFunnel } = useFunnelStore();
   const [step, setStep] = useState<IntakeStep>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [form, setForm] = useState({
-    // Step 1: Personal
+    // Step 1: Personal — pre-fill from quiz funnel store
     firstName: "",
     lastName: "",
     email: "",
@@ -70,6 +72,19 @@ export default function IntakePage() {
 
   const totalSteps = 3;
   const progress = (step / totalSteps) * 100;
+
+  // Pre-fill from quiz funnel store
+  useEffect(() => {
+    if (funnelState.email || funnelState.quiz) {
+      const quiz = funnelState.quiz as Record<string, string> | undefined;
+      setForm((prev) => ({
+        ...prev,
+        email: funnelState.email || prev.email,
+        firstName: quiz?.firstName || prev.firstName,
+        state: quiz?.state || prev.state,
+      }));
+    }
+  }, [funnelState]);
 
   // Track intake start on mount
   useEffect(() => {

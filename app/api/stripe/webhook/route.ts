@@ -60,11 +60,7 @@ export async function POST(req: NextRequest) {
 
         // Create subscription record
         if (subscriptionId) {
-          const stripeSub = await stripe.subscriptions.retrieve(subscriptionId) as unknown as {
-            current_period_start: number;
-            current_period_end: number;
-            items: { data: Array<{ quantity?: number; price: { unit_amount?: number | null } }> };
-          };
+          const stripeSub = await stripe.subscriptions.retrieve(subscriptionId) as unknown as Stripe.Subscription;
 
           await db.subscription.create({
             data: {
@@ -72,8 +68,8 @@ export async function POST(req: NextRequest) {
               stripeSubscriptionId: subscriptionId,
               status: "ACTIVE",
               interval: "MONTHLY",
-              currentPeriodStart: new Date(stripeSub.current_period_start * 1000),
-              currentPeriodEnd: new Date(stripeSub.current_period_end * 1000),
+              currentPeriodStart: new Date(((stripeSub as any).current_period_start || 0) * 1000),
+              currentPeriodEnd: new Date(((stripeSub as any).current_period_end || 0) * 1000),
               items: {
                 create: stripeSub.items.data.map((item) => {
                   const product = planId

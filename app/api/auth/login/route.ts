@@ -10,10 +10,8 @@ const loginSchema = z.object({
 
 export async function POST(req: NextRequest) {
   // Rate limit: 5 attempts per minute per IP
-  const { success, remaining } = rateLimit(getRateLimitKey(req, "auth-login"), {
+  const { success, remaining } = await rateLimit(getRateLimitKey(req, "auth-login"), {
     maxTokens: 5,
-    refillRate: 5,
-    windowMs: 60000,
   });
 
   if (!success) {

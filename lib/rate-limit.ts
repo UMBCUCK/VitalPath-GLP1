@@ -1,40 +1,39 @@
 /**
- * In-memory token bucket rate limiter.
- * For production, use Redis-backed rate limiting (e.g., @upstash/ratelimit).
+ * Rate limiter with Upstash Redis backend for production.
+ * Falls back to in-memory for local development.
  */
 
-interface TokenBucket {
-  tokens: number;
-  lastRefill: number;
-}
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
-const buckets = new Map<string, TokenBucket>();
+// Use Upstash Redis if configured, otherwise fall back to in-memory
+const hasRedis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
 
-// Clean up old buckets periodically (avoid memory leak)
-setInterval(() => {
+const limiter = hasRedis
+  ? new Ratelimit({
+      redis: new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL!,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+      }),
+      limiter: Ratelimit.slidingWindow(10, "60 s"),
+      analytics: true,
+    })
+  : null;
+
+// In-memory fallback for development
+const memoryBuckets = new Map<string, { tokens: number; lastRefill: number }>();
+
+function memoryRateLimit(key: string, maxTokens = 10, windowMs = 60000) {
   const now = Date.now();
-  for (const [key, bucket] of buckets) {
-    if (now - bucket.lastRefill > 3600000) { // 1 hour
-      buckets.delete(key);
-    }
-  }
-}, 60000);
-
-export function rateLimit(
-  key: string,
-  { maxTokens = 10, refillRate = 10, windowMs = 60000 } = {}
-): { success: boolean; remaining: number } {
-  const now = Date.now();
-  let bucket = buckets.get(key);
+  let bucket = memoryBuckets.get(key);
 
   if (!bucket) {
     bucket = { tokens: maxTokens, lastRefill: now };
-    buckets.set(key, bucket);
+    memoryBuckets.set(key, bucket);
   }
 
-  // Refill tokens based on elapsed time
   const elapsed = now - bucket.lastRefill;
-  const refillAmount = (elapsed / windowMs) * refillRate;
+  const refillAmount = (elapsed / windowMs) * maxTokens;
   bucket.tokens = Math.min(maxTokens, bucket.tokens + refillAmount);
   bucket.lastRefill = now;
 
@@ -47,11 +46,26 @@ export function rateLimit(
 }
 
 /**
- * Helper to extract a rate limit key from a request.
- * Uses IP address or forwarded-for header.
+ * Rate limit a request by key.
+ * Uses Upstash Redis in production, in-memory in development.
  */
-export function getRateLimitKey(req: Request, prefix: string = "api"): string {
+export async function rateLimit(
+  key: string,
+  { maxTokens = 10 } = {}
+): Promise<{ success: boolean; remaining: number }> {
+  if (limiter) {
+    const result = await limiter.limit(key);
+    return { success: result.success, remaining: result.remaining };
+  }
+  return memoryRateLimit(key, maxTokens);
+}
+
+/**
+ * Extract rate limit key from request using IP headers.
+ */
+export function getRateLimitKey(req: Request, prefix = "api"): string {
   const forwarded = req.headers.get("x-forwarded-for");
-  const ip = forwarded?.split(",")[0]?.trim() || "unknown";
+  const realIp = req.headers.get("x-real-ip");
+  const ip = forwarded?.split(",")[0]?.trim() || realIp || "unknown";
   return `${prefix}:${ip}`;
 }

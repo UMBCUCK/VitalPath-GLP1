@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Clock, Flame, Target, Users, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, Flame, Target, Users, Check, Pill } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
@@ -144,6 +144,75 @@ export default async function PublicRecipePage({ params }: PageProps) {
               <p className="text-sm leading-relaxed text-graphite-600">{tips}</p>
             </div>
           )}
+
+          {/* Weight-loss portion guide */}
+          <div className="mt-10 rounded-2xl border border-navy-100/40 bg-white p-6">
+            <h3 className="text-base font-bold text-navy mb-1">Weight-Loss Portion Guide</h3>
+            <p className="text-xs text-graphite-400 mb-4">
+              How this recipe fits into your daily targets based on body weight (0.8g protein per lb, ~500 cal deficit from TDEE).
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-navy-100/40">
+                    <th className="py-2 text-left font-semibold text-navy">Body Weight</th>
+                    <th className="py-2 text-center font-semibold text-navy">Daily Protein</th>
+                    <th className="py-2 text-center font-semibold text-navy">Daily Calories</th>
+                    <th className="py-2 text-center font-semibold text-navy">This Recipe = % of Daily</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-navy-100/20">
+                  {[
+                    { weight: 150, protein: 120, calories: 1400 },
+                    { weight: 180, protein: 144, calories: 1600 },
+                    { weight: 200, protein: 160, calories: 1750 },
+                    { weight: 220, protein: 176, calories: 1900 },
+                    { weight: 250, protein: 200, calories: 2100 },
+                  ].map((row) => (
+                    <tr key={row.weight} className="hover:bg-navy-50/20">
+                      <td className="py-2 font-medium text-navy">{row.weight} lbs</td>
+                      <td className="py-2 text-center text-graphite-600">{row.protein}g</td>
+                      <td className="py-2 text-center text-graphite-600">{row.calories.toLocaleString()}</td>
+                      <td className="py-2 text-center">
+                        <span className="font-semibold text-teal">
+                          {Math.round(((recipe.proteinG || 0) / row.protein) * 100)}% protein
+                        </span>
+                        <span className="text-graphite-400 mx-1">/</span>
+                        <span className="text-graphite-500">
+                          {Math.round(((recipe.calories || 0) / row.calories) * 100)}% cal
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-[11px] text-graphite-400">
+              Targets based on moderate activity with 500-calorie deficit for ~1 lb/week weight loss.
+              For your personalized target, use our{" "}
+              <Link href="/calculators/protein" className="text-teal hover:underline">protein calculator</Link>
+              {" "}and{" "}
+              <Link href="/calculators/tdee" className="text-teal hover:underline">TDEE calculator</Link>.
+            </p>
+          </div>
+
+          {/* GLP-1 context */}
+          <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50/30 p-6">
+            <div className="flex items-start gap-3">
+              <Pill className="mt-0.5 h-5 w-5 shrink-0 text-teal" />
+              <div>
+                <h3 className="text-sm font-bold text-navy">For GLP-1 patients</h3>
+                <p className="mt-1 text-xs leading-relaxed text-graphite-500">
+                  {recipe.calories && recipe.calories <= 300
+                    ? "This is a perfect light option for days when your appetite is reduced. Even a small portion delivers meaningful protein. Pair with bone broth for additional hydration and protein."
+                    : recipe.calories && recipe.calories <= 450
+                    ? "A moderate-calorie meal that provides a strong protein foundation. If your appetite is suppressed, eat half now and save half for later — you'll still get a solid protein serving from each portion."
+                    : "This is a full-size meal. On reduced-appetite days, split it into two smaller servings eaten 3-4 hours apart. Prioritize finishing the protein portion first, then eat the sides as appetite allows."
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* CTA */}
           <div className="mt-12 rounded-2xl bg-gradient-to-r from-teal-50 to-sage p-8 text-center">
