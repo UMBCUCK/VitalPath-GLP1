@@ -311,3 +311,122 @@ export function BreadcrumbJsonLd({
     />
   );
 }
+
+// Blog hub / collection page schema
+export function CollectionPageJsonLd({
+  name,
+  description,
+  url,
+}: {
+  name: string;
+  description: string;
+  url: string;
+}) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name,
+    description,
+    url: `${BASE_URL}${url}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: siteConfig.name,
+      url: BASE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: BASE_URL,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+// Medical web page schema — boosts E-E-A-T signals for health content
+export function MedicalWebPageJsonLd({
+  name,
+  description,
+  url,
+  lastReviewed,
+  medicalAudience,
+}: {
+  name: string;
+  description: string;
+  url: string;
+  lastReviewed?: string;
+  medicalAudience?: string;
+}) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "MedicalWebPage",
+    name,
+    description,
+    url: `${BASE_URL}${url}`,
+    lastReviewed: lastReviewed || new Date().toISOString().split("T")[0],
+    medicalAudience: {
+      "@type": "MedicalAudience",
+      audienceType: medicalAudience || "Patient",
+    },
+    reviewedBy: {
+      "@type": "Organization",
+      name: `${siteConfig.name} Medical Team`,
+      url: BASE_URL,
+    },
+    isPartOf: {
+      "@type": "WebSite",
+      name: siteConfig.name,
+      url: BASE_URL,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+// Video testimonial schema for rich SERP snippets
+export function VideoObjectJsonLd({
+  name,
+  description,
+  thumbnailUrl,
+  uploadDate,
+  duration,
+}: {
+  name: string;
+  description: string;
+  thumbnailUrl: string;
+  uploadDate?: string;
+  duration?: string;
+}) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name,
+    description,
+    thumbnailUrl,
+    uploadDate: uploadDate || new Date().toISOString().split("T")[0],
+    duration: duration || "PT2M",
+    contentUrl: `${BASE_URL}/results`,
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: BASE_URL,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}

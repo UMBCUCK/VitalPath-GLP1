@@ -40,7 +40,7 @@ export const beforeAfterImages = [
   {
     // Jessica T., 38 — mom who found her energy again
     before: { src: unsplash("photo-1499557354967-2b2d8910bcca", 400, 75), alt: "Woman in quiet, reflective moment at home" },
-    after: { src: unsplash("photo-1515023115894-bacee4e35a7e", 400, 75), alt: "Woman laughing outdoors in golden light" },
+    after: { src: unsplash("photo-1552508744-1696d4464960", 400, 75), alt: "Woman laughing outdoors in golden light" },
   },
   {
     // David K., 56 — got his health markers back on track
@@ -132,6 +132,34 @@ export const medicationShowcaseImages = {
     alt: "Tirzepatide — dual GIP/GLP-1 medication",
     blurDataURL: BLUR_COOL,
   },
+};
+
+// ─── CTA SECTION (final conversion push) ───────────────────
+export const ctaBackgroundImage = {
+  src: unsplash("photo-1506126613408-eca07ce68773", 1200, 70),
+  alt: "",
+  blurDataURL: BLUR_DARK,
+};
+
+// ─── PROBLEM SECTION ───────────────────────────────────────
+export const problemImage = {
+  src: unsplash("photo-1499557354967-2b2d8910bcca", 500),
+  alt: "Person reflecting on their health journey",
+  blurDataURL: BLUR_WARM,
+};
+
+// ─── PROCESS SECTION (3 steps) ─────────────────────────────
+export const processImages = [
+  { src: unsplash("photo-1516321318423-f06f85e504b3", 400, 75), alt: "Person completing online health assessment on phone" },
+  { src: unsplashFace("photo-1559839734-2b71ea197ec2", 400, 75), alt: "Licensed medical provider reviewing health profile" },
+  { src: unsplash("photo-1586528116311-ad8dd3c8310d", 400, 75), alt: "Medication package ready for delivery" },
+];
+
+// ─── GUARANTEE SECTION ─────────────────────────────────────
+export const guaranteeImage = {
+  src: unsplash("photo-1576091160399-112ba8d25d1d", 600, 75),
+  alt: "Caring healthcare team supporting patients",
+  blurDataURL: BLUR_WARM,
 };
 
 // ─── SOLUTION SECTION ──────────────────────────────────────

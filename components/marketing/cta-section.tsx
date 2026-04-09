@@ -1,13 +1,27 @@
+import Image from "next/image";
 import { ArrowRight, Clock, Shield, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
 import { TrackedLink } from "@/components/shared/tracked-link";
 import { siteConfig } from "@/lib/site";
+import { ctaBackgroundImage } from "@/lib/images";
 
 export function CtaSection() {
   return (
-    <section className="bg-navy-gradient py-20 lg:py-28">
-      <SectionShell className="text-center">
+    <section className="relative overflow-hidden bg-navy-gradient py-20 lg:py-28">
+      {/* Background image with dark overlay */}
+      <Image
+        src={ctaBackgroundImage.src}
+        alt={ctaBackgroundImage.alt}
+        fill
+        className="object-cover opacity-15"
+        sizes="100vw"
+        placeholder="blur"
+        blurDataURL={ctaBackgroundImage.blurDataURL}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-navy/80 via-navy/70 to-navy/90" />
+
+      <SectionShell className="relative z-10 text-center">
         {/* Urgency — health-based, not fake scarcity */}
         <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-5 py-2">
           <Clock className="h-4 w-4 text-gold" />

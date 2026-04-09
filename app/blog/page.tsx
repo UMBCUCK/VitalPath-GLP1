@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { MarketingShell } from "@/components/layout/marketing-shell";
+import { CollectionPageJsonLd } from "@/components/seo/json-ld";
 import { db } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
@@ -37,6 +38,11 @@ export default async function BlogPage() {
 
   return (
     <MarketingShell>
+      <CollectionPageJsonLd
+        name="VitalPath Blog & Education"
+        description="Expert insights on GLP-1 weight management, nutrition, and healthy habits."
+        url="/blog"
+      />
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">
           <Badge variant="default" className="mb-6">Education Hub</Badge>

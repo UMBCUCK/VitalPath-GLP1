@@ -1,8 +1,10 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ShieldCheck, RefreshCw, HeartHandshake, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
 import { AnimateOnView } from "@/components/shared/animate-on-view";
+import { guaranteeImage } from "@/lib/images";
 
 const guarantees = [
   {
@@ -36,11 +38,28 @@ export function GuaranteeSection() {
     <section className="py-16 lg:py-20">
       <SectionShell>
         <AnimateOnView>
-          <div className="rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-50/30 via-white to-sage/20 p-8 sm:p-12">
-            <div className="text-center mb-10">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 mb-4">
-                <ShieldCheck className="h-8 w-8 text-teal" />
+          <div className="overflow-hidden rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-50/30 via-white to-sage/20">
+            {/* Care team photo banner */}
+            <div className="relative h-48 w-full sm:h-56">
+              <Image
+                src={guaranteeImage.src}
+                alt={guaranteeImage.alt}
+                fill
+                className="object-cover"
+                sizes="100vw"
+                placeholder="blur"
+                blurDataURL={guaranteeImage.blurDataURL}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent" />
+              <div className="absolute bottom-4 left-0 right-0 text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-premium-lg">
+                  <ShieldCheck className="h-7 w-7 text-teal" />
+                </div>
               </div>
+            </div>
+
+            <div className="p-8 sm:p-12">
+            <div className="text-center mb-10">
               <h2 className="text-2xl font-bold text-navy sm:text-3xl">
                 Our promise to you
               </h2>
@@ -71,6 +90,7 @@ export function GuaranteeSection() {
                 </Button>
               </Link>
               <p className="mt-2 text-xs text-graphite-400">Free assessment &middot; No commitment &middot; Cancel anytime</p>
+            </div>
             </div>
           </div>
         </AnimateOnView>

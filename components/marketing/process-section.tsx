@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ArrowRight, ClipboardCheck, Stethoscope, Package, Clock } from "lucide-react";
 import { processSteps } from "@/lib/content";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { AnimateOnView } from "@/components/shared/animate-on-view";
 import { TrackedLink } from "@/components/shared/tracked-link";
+import { processImages } from "@/lib/images";
 
 const iconMap = { ClipboardCheck, Stethoscope, Package } as const;
 
@@ -23,18 +25,34 @@ export function ProcessSection() {
             const Icon = iconMap[step.icon as keyof typeof iconMap];
             return (
               <AnimateOnView key={step.step} delay={i * 0.15}>
-                <div className="relative flex flex-col rounded-2xl border border-navy-100/60 bg-white p-8 shadow-premium transition-all duration-300 hover:shadow-premium-lg">
-                  {/* Step number */}
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-teal to-atlantic text-white text-xl font-bold shadow-glow">
-                      {step.step}
+                <div className="relative flex flex-col overflow-hidden rounded-2xl border border-navy-100/60 bg-white shadow-premium transition-all duration-300 hover:shadow-premium-lg">
+                  {/* Step image */}
+                  {processImages[i] && (
+                    <div className="relative h-40 w-full">
+                      <Image
+                        src={processImages[i].src}
+                        alt={processImages[i].alt}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
+                      {/* Step number on image */}
+                      <div className="absolute bottom-3 left-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-atlantic text-white text-lg font-bold shadow-glow">
+                        {step.step}
+                      </div>
                     </div>
+                  )}
+
+                  <div className="flex flex-col p-8 pt-4">
+                  {/* Step icon */}
+                  <div className="flex items-center gap-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50">
                       <Icon className="h-5 w-5 text-teal" />
                     </div>
                   </div>
 
-                  <h3 className="mt-6 text-xl font-bold text-navy">{step.title}</h3>
+                  <h3 className="mt-4 text-xl font-bold text-navy">{step.title}</h3>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-graphite-500">
                     {step.description}
                   </p>
@@ -42,6 +60,7 @@ export function ProcessSection() {
                   {/* Time estimate badge */}
                   <div className="mt-5 inline-flex self-start rounded-full bg-teal-50 px-3 py-1">
                     <span className="text-xs font-semibold text-teal">{step.timeEstimate}</span>
+                  </div>
                   </div>
 
                   {/* Connector arrow (hidden on mobile) */}

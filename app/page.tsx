@@ -7,7 +7,7 @@ import { PersonaSection } from "@/components/marketing/persona-section";
 import { SolutionSection } from "@/components/marketing/solution-section";
 import { ProcessSection } from "@/components/marketing/process-section";
 import { Disclaimer } from "@/components/shared/disclaimer";
-import { OrganizationJsonLd, FAQPageJsonLd, HowToJsonLd, ProductJsonLd } from "@/components/seo/json-ld";
+import { OrganizationJsonLd, FAQPageJsonLd, HowToJsonLd, ProductJsonLd, MedicalWebPageJsonLd } from "@/components/seo/json-ld";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { siteConfig } from "@/lib/site";
 import { faqs } from "@/lib/content";
@@ -72,8 +72,14 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <MarketingShell>
-      {/* Rich structured data for SEO */}
+      {/* Rich structured data for SEO — 6 schema types for maximum SERP features */}
       <OrganizationJsonLd />
+      <MedicalWebPageJsonLd
+        name="GLP-1 Weight Loss Medication Online — VitalPath"
+        description="Provider-guided GLP-1 weight management with personalized treatment plans, medication if prescribed, and ongoing support. From $279/mo."
+        url="/"
+        medicalAudience="Patient"
+      />
       <FAQPageJsonLd faqs={faqs} />
       <HowToJsonLd
         name="How to Get GLP-1 Weight Loss Medication Online"

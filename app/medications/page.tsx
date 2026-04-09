@@ -10,7 +10,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { FaqSection } from "@/components/marketing/faq-section";
-import { WebPageJsonLd } from "@/components/seo/json-ld";
+import { WebPageJsonLd, MedicalWebPageJsonLd } from "@/components/seo/json-ld";
 import { medications } from "@/lib/medications";
 import { siteConfig } from "@/lib/site";
 
@@ -31,6 +31,12 @@ export default function MedicationsPage() {
         title="GLP-1 Medications for Weight Loss"
         description="Complete guide to GLP-1 weight loss medications including semaglutide and tirzepatide."
         path="/medications"
+      />
+      <MedicalWebPageJsonLd
+        name="GLP-1 Medications for Weight Loss — Complete Guide"
+        description="Provider-reviewed guide comparing semaglutide and tirzepatide for weight management. Clinical data, side effects, dosing, and how to get prescribed online."
+        url="/medications"
+        medicalAudience="Patient"
       />
 
       {/* Hero */}

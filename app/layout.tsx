@@ -17,13 +17,14 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  metadataBase: new URL(siteConfig.url),
+  metadataBase: new URL(siteConfig.url || "http://localhost:3000"),
   openGraph: {
     title: siteConfig.name,
     description: siteConfig.description,
     url: siteConfig.url,
     siteName: siteConfig.name,
     type: "website",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
@@ -31,6 +32,16 @@ export const metadata: Metadata = {
     description: siteConfig.description,
   },
   robots: { index: true, follow: true },
+  other: {
+    "theme-color": "#0E223D",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+  },
+  verification: {
+    // Add when available:
+    // google: "your-google-verification-code",
+  },
+  category: "health",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
