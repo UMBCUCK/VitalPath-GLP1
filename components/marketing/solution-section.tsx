@@ -1,8 +1,10 @@
+import Image from "next/image";
 import { Check, Pill, Activity, ShieldCheck, TrendingUp } from "lucide-react";
 import { solutionPoints } from "@/lib/content";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { AnimateOnView } from "@/components/shared/animate-on-view";
+import { solutionImage } from "@/lib/images";
 
 const solutionIcons = [Pill, Activity, ShieldCheck, TrendingUp];
 
@@ -14,6 +16,20 @@ export function SolutionSection() {
           {/* Left: Visual / Key stat */}
           <AnimateOnView animation="fade-in-left">
             <div className="relative">
+              {/* Lifestyle image strip (desktop only) */}
+              <div className="relative mb-6 hidden overflow-hidden rounded-2xl lg:block">
+                <Image
+                  src={solutionImage.src}
+                  alt={solutionImage.alt}
+                  width={solutionImage.width}
+                  height={solutionImage.height}
+                  className="aspect-[16/9] w-full object-cover"
+                  sizes="(max-width: 1024px) 0px, 50vw"
+                  placeholder="blur"
+                  blurDataURL={solutionImage.blurDataURL}
+                />
+              </div>
+
               {/* Big stat card */}
               <div className="rounded-3xl bg-gradient-to-br from-navy to-atlantic p-10 text-white shadow-premium-xl">
                 <p className="text-sm font-semibold uppercase tracking-widest text-teal-300">

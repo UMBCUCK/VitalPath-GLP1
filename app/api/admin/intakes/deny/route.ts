@@ -9,11 +9,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { intakeId } = await req.json();
+    const { intakeId, reason } = await req.json();
 
     const intake = await db.intakeSubmission.update({
       where: { id: intakeId },
       data: { status: "DENIED", eligibilityResult: "NOT_ELIGIBLE" },
+    });
+
+    // ── Write compliance audit log ──────────────────────────
+    await db.complianceAuditLog.create({
+      data: {
+        actorId: session.userId,
+        actorRole: session.role,
+        action: "INTAKE_DENIED",
+        patientId: intake.userId,
+        intakeId,
+        stateCode: intake.state,
+        clinicalRationale: reason || null,
+        ipAddress: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || null,
+      },
     });
 
     // Notify patient

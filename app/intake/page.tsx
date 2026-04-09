@@ -63,11 +63,23 @@ export default function IntakePage() {
     hasMEN2: false,
     isPregnant: false,
     hasPancreatitis: false,
+    hasGastroparesis: false,
+    hasDiabeticRetinopathy: false,
+    hasGallbladderDisease: false,
+    hasKidneyDisease: false,
+    hasEatingDisorder: false,
+    hasSuicidalIdeation: false,
+
+    // Emergency contact
+    emergencyContactName: "",
+    emergencyContactPhone: "",
+    emergencyContactRelation: "",
 
     // Step 3: Consent
     consentTreatment: false,
     consentHipaa: false,
     consentTelehealth: false,
+    consentMedicationRisks: false,
   });
 
   const totalSteps = 3;
@@ -117,7 +129,9 @@ export default function IntakePage() {
     }));
   }
 
-  const hasContraindication = form.hasThyroidCancer || form.hasMEN2 || form.isPregnant || form.hasPancreatitis;
+  const hasContraindication = form.hasThyroidCancer || form.hasMEN2 || form.isPregnant || form.hasPancreatitis ||
+    form.hasGastroparesis || form.hasDiabeticRetinopathy || form.hasGallbladderDisease ||
+    form.hasKidneyDisease || form.hasEatingDisorder || form.hasSuicidalIdeation;
 
   function nextStep() {
     track(ANALYTICS_EVENTS.INTAKE_STEP_COMPLETE, { step });
@@ -163,9 +177,9 @@ export default function IntakePage() {
 
   const canProceed = () => {
     switch (step) {
-      case 1: return form.firstName && form.lastName && form.email && form.phone && form.dateOfBirth && form.state;
+      case 1: return form.firstName && form.lastName && form.email && form.phone && form.dateOfBirth && form.state && form.emergencyContactName && form.emergencyContactPhone && form.emergencyContactRelation;
       case 2: return form.heightFeet && form.weightLbs && form.medicalHistory.length >= 10;
-      case 3: return form.consentTreatment && form.consentHipaa && form.consentTelehealth;
+      case 3: return form.consentTreatment && form.consentHipaa && form.consentTelehealth && form.consentMedicationRisks;
       default: return false;
     }
   };
@@ -234,6 +248,26 @@ export default function IntakePage() {
                       <option value="">Select your state</option>
                       {US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
+                  </div>
+
+                  {/* Emergency Contact */}
+                  <div className="mt-6 rounded-xl border-2 border-navy-200 bg-navy-50/30 p-5">
+                    <h3 className="text-sm font-bold text-navy mb-3">Emergency Contact</h3>
+                    <p className="text-xs text-graphite-400 mb-4">Required for your safety during treatment.</p>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-navy mb-1">Full Name</label>
+                        <Input value={form.emergencyContactName} onChange={(e) => updateField("emergencyContactName", e.target.value)} placeholder="Emergency contact name" required />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-navy mb-1">Phone Number</label>
+                        <Input type="tel" value={form.emergencyContactPhone} onChange={(e) => updateField("emergencyContactPhone", e.target.value)} placeholder="(555) 123-4567" required />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-navy mb-1">Relationship</label>
+                        <Input value={form.emergencyContactRelation} onChange={(e) => updateField("emergencyContactRelation", e.target.value)} placeholder="e.g., Spouse, Parent, Sibling" required />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -339,6 +373,12 @@ export default function IntakePage() {
                         { key: "hasMEN2", label: "Have you been diagnosed with Multiple Endocrine Neoplasia syndrome type 2 (MEN2)?" },
                         { key: "isPregnant", label: "Are you currently pregnant, planning to become pregnant, or breastfeeding?" },
                         { key: "hasPancreatitis", label: "Do you have a history of pancreatitis?" },
+                        { key: "hasGastroparesis", label: "Have you been diagnosed with gastroparesis (delayed stomach emptying)?" },
+                        { key: "hasDiabeticRetinopathy", label: "Have you been diagnosed with diabetic retinopathy?" },
+                        { key: "hasGallbladderDisease", label: "Do you have current gallbladder disease or a history of gallbladder problems?" },
+                        { key: "hasKidneyDisease", label: "Do you have chronic kidney disease or impaired kidney function?" },
+                        { key: "hasEatingDisorder", label: "Do you have an active eating disorder (anorexia, bulimia, etc.)?" },
+                        { key: "hasSuicidalIdeation", label: "Do you have a history of suicidal thoughts or self-harm?" },
                       ].map((q) => (
                         <label key={q.key} className="flex items-start gap-3 cursor-pointer">
                           <input
@@ -351,6 +391,18 @@ export default function IntakePage() {
                         </label>
                       ))}
                     </div>
+
+                    {form.hasSuicidalIdeation && (
+                      <div className="mt-4 rounded-lg bg-purple-50 border border-purple-200 p-4">
+                        <p className="text-xs font-bold text-purple-800 mb-1">Crisis Resources Available 24/7</p>
+                        <p className="text-xs text-purple-700">
+                          If you or someone you know is in crisis, contact the <strong>988 Suicide &amp; Crisis Lifeline</strong> by
+                          calling or texting <strong>988</strong>. You can also chat at{" "}
+                          <a href="https://988lifeline.org" target="_blank" rel="noopener noreferrer" className="underline font-semibold">988lifeline.org</a>.
+                          In an emergency, call 911.
+                        </p>
+                      </div>
+                    )}
 
                     {hasContraindication && (
                       <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-3">
@@ -396,6 +448,8 @@ export default function IntakePage() {
                           I understand that treatment eligibility is determined by my provider,
                           medication is only available to eligible patients, and compounded
                           medications are not FDA-approved. I understand individual results vary.
+                          I acknowledge that my provider will review my medical history, current
+                          medications, and health conditions before making any prescribing decisions.
                         </p>
                       </div>
                     </label>
@@ -412,9 +466,11 @@ export default function IntakePage() {
                         <p className="text-sm font-semibold text-navy">HIPAA Authorization</p>
                         <p className="mt-1 text-xs text-graphite-400 leading-relaxed">
                           I authorize VitalPath and its affiliated providers and pharmacies to
-                          use and disclose my protected health information for treatment,
+                          use and disclose my protected health information (PHI) for treatment,
                           payment, and healthcare operations as described in the{" "}
                           <a href="/legal/hipaa" className="underline text-teal">HIPAA Notice</a>.
+                          I understand I may revoke this authorization in writing at any time,
+                          except to the extent that action has already been taken in reliance on it.
                         </p>
                       </div>
                     </label>
@@ -433,7 +489,33 @@ export default function IntakePage() {
                           I consent to receive healthcare services via telehealth technology.
                           I understand the limitations of telehealth, including that the provider
                           cannot physically examine me, and that I may be referred for in-person
-                          care if clinically appropriate.
+                          care if clinically appropriate. I understand that telehealth consultations
+                          are not a substitute for emergency medical care. In case of a medical
+                          emergency, I will call 911 or go to my nearest emergency room.
+                          I understand that my provider is licensed in the state where I receive care.
+                        </p>
+                      </div>
+                    </label>
+
+                    {/* Medication Risks Consent */}
+                    <label className="flex items-start gap-3 cursor-pointer rounded-xl border-2 border-amber-200 bg-amber-50/30 p-4 transition-all hover:border-amber-300">
+                      <input
+                        type="checkbox"
+                        checked={form.consentMedicationRisks}
+                        onChange={(e) => updateField("consentMedicationRisks", e.target.checked)}
+                        className="mt-0.5 h-5 w-5 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-navy">Medication Risk Acknowledgment</p>
+                        <p className="mt-1 text-xs text-graphite-400 leading-relaxed">
+                          I acknowledge that GLP-1 receptor agonist medications carry potential risks
+                          and side effects including but not limited to: nausea, vomiting, diarrhea,
+                          constipation, abdominal pain, headache, fatigue, injection site reactions,
+                          pancreatitis, thyroid tumors (including medullary thyroid carcinoma),
+                          gallbladder problems, kidney problems, hypoglycemia, and allergic reactions.
+                          I understand that compounded semaglutide/tirzepatide are not FDA-approved
+                          products and are prepared by state-licensed compounding pharmacies.
+                          I have been informed of these risks and consent to treatment.
                         </p>
                       </div>
                     </label>

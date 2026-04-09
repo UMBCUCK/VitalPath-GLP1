@@ -52,6 +52,24 @@ export default function HipaaPage() {
           </section>
 
           <section>
+            <h2 className="text-lg font-bold text-navy">Breach Notification</h2>
+            <p>A breach of Protected Health Information (PHI) occurs when there is an unauthorized acquisition, access, use, or disclosure of unsecured PHI that compromises the security or privacy of the information. Not every security incident constitutes a breach — an impermissible use or disclosure of PHI is presumed to be a breach unless VitalPath demonstrates that there is a low probability that the PHI has been compromised based on a risk assessment.</p>
+            <p className="mt-2"><strong>Notification to Affected Individuals:</strong> In accordance with HIPAA 45 CFR 164.404, VitalPath will notify affected individuals without unreasonable delay and in no case later than 60 calendar days from the date of discovery of a breach of unsecured PHI. Notifications will be sent in writing to the individual&apos;s last known address or, if agreed upon in advance, by email.</p>
+            <p className="mt-2"><strong>Notification to the Department of Health and Human Services (HHS):</strong> For breaches affecting 500 or more individuals, VitalPath will notify the HHS Secretary without unreasonable delay and contemporaneously with the individual notice. For breaches affecting fewer than 500 individuals, VitalPath will maintain a log and report these breaches to HHS annually within 60 days of the end of the calendar year in which the breach was discovered.</p>
+            <p className="mt-2"><strong>Content of Breach Notifications:</strong> All breach notifications will include:</p>
+            <ul className="mt-2 space-y-2">
+              <li>A brief description of the breach, including the date of the breach and the date of its discovery</li>
+              <li>A description of the types of unsecured PHI involved (e.g., name, date of birth, diagnosis, medication information)</li>
+              <li>Steps individuals should take to protect themselves from potential harm resulting from the breach</li>
+              <li>A description of what VitalPath is doing to investigate the breach, mitigate harm, and prevent future occurrences</li>
+              <li>Contact information for individuals to ask questions, including a toll-free phone number, email address, and mailing address</li>
+            </ul>
+            <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
+              <p className="text-xs font-semibold text-amber-800">[LEGAL REVIEW REQUIRED — exact breach notification timelines and obligations should be verified by legal counsel]</p>
+            </div>
+          </section>
+
+          <section>
             <h2 className="text-lg font-bold text-navy">Complaints</h2>
             <p>If you believe your privacy rights have been violated, you may file a complaint with VitalPath at privacy@vitalpath.com or with the U.S. Department of Health and Human Services Office for Civil Rights. You will not be penalized for filing a complaint.</p>
           </section>

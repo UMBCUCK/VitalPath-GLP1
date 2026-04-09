@@ -38,6 +38,9 @@ model User {
   notifications    Notification[]
   sessions         Session[]
   adminActions     AdminAuditLog[]
+  credentials      ProviderCredential[]
+  consentRecords   ConsentRecord[]
+  adverseEvents    AdverseEventReport[]
 
   @@index([email])
   @@index([role])
@@ -146,9 +149,16 @@ model IntakeSubmission {
   conditions     Json?    // array of conditions
 
   // Consent
-  consentGiven   Boolean
-  consentDate    DateTime @default(now())
-  hipaaConsent   Boolean  @default(false)
+  consentGiven           Boolean
+  consentDate            DateTime @default(now())
+  hipaaConsent           Boolean  @default(false)
+  telehealthConsentGiven Boolean  @default(false)
+  consentVersion         String?
+
+  // Emergency contact
+  emergencyContactName     String?
+  emergencyContactPhone    String?
+  emergencyContactRelation String?
 
   // Telehealth
   telehealthReferralId String?
@@ -444,6 +454,10 @@ model Claim {
   approvedAt     DateTime?
   reviewNotes    String?
 
+  // Compliance review
+  complianceReviewedAt DateTime?
+  complianceReviewedBy String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -550,6 +564,9 @@ model TreatmentPlan {
   providerName      String?
   providerVendor    String?         // openloop | wheel | custom
   providerRefId     String?
+  credentialId      String?         // ProviderCredential used for approval
+  stateVerifiedAt   DateTime?       // When state-license was verified
+  clinicalRationale String?         // Provider's documented reason
 
   // Medication
   medicationName    String?
@@ -910,6 +927,16 @@ model StateAvailability {
   restrictions    String?
   telehealthNotes String?
 
+  // State-specific telehealth compliance
+  requiresPhysicalExam          Boolean @default(false)
+  requiresPreexistingRelationship Boolean @default(false)
+  allowsQuestionnaireOnly       Boolean @default(true)
+  informedConsentRequirement    String? // EVERY_VISIT | INITIAL_ONLY | STANDARD
+  audioOnlyAllowed              Boolean @default(true)
+  storeAndForwardAllowed        Boolean @default(true)
+  prescriptiveAuthNotes         String?
+  cpomRestrictions              String?
+
   @@index([isAvailable])
 }
 
@@ -1021,5 +1048,102 @@ model AdminAuditLog {
 
   @@index([userId])
   @@index([entity])
+  @@index([createdAt])
+}
+
+// ─── PROVIDER CREDENTIALS ───────────────────────────────────
+
+model ProviderCredential {
+  id            String   @id @default(cuid())
+  userId        String
+  licenseNumber String
+  licenseState  String
+  licenseType   String   // MD, DO, NP, PA
+  deaNumber     String?
+  npiNumber     String?
+  expiresAt     DateTime
+  verifiedAt    DateTime?
+  verifiedBy    String?
+  isActive      Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, licenseState])
+  @@index([licenseState])
+  @@index([isActive])
+}
+
+// ─── CONSENT RECORDS ────────────────────────────────────────
+
+model ConsentRecord {
+  id             String      @id @default(cuid())
+  userId         String
+  intakeId       String?
+  consentType    ConsentType
+  consentVersion String
+  consentText    String      // Full text of what was consented to
+  signedAt       DateTime    @default(now())
+  ipAddress      String?
+  userAgent      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([consentType])
+}
+
+enum ConsentType {
+  TREATMENT
+  HIPAA
+  TELEHEALTH
+  MEDICATION_RISKS
+  STATE_SPECIFIC
+}
+
+// ─── ADVERSE EVENT REPORTS ──────────────────────────────────
+
+model AdverseEventReport {
+  id             String    @id @default(cuid())
+  userId         String
+  reportedAt     DateTime  @default(now())
+  severity       String    // MILD, MODERATE, SEVERE, LIFE_THREATENING
+  description    String
+  medicationName String?
+  onsetDate      DateTime?
+  actionTaken    String?
+  resolvedAt     DateTime?
+  reviewedBy     String?
+  reviewedAt     DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([severity])
+  @@index([reportedAt])
+}
+
+// ─── COMPLIANCE AUDIT LOG ───────────────────────────────────
+
+model ComplianceAuditLog {
+  id                String   @id @default(cuid())
+  actorId           String
+  actorRole         String
+  action            String   // INTAKE_APPROVED, INTAKE_DENIED, PRESCRIPTION_CREATED
+  patientId         String
+  intakeId          String?
+  credentialId      String?
+  stateCode         String?
+  clinicalRationale String?
+  details           Json?
+  ipAddress         String?
+
+  createdAt DateTime @default(now())
+
+  @@index([actorId])
+  @@index([patientId])
+  @@index([action])
   @@index([createdAt])
 }

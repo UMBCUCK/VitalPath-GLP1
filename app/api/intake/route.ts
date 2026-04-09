@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { createTelehealthService } from "@/lib/services/telehealth";
 import { createEmailService, emailTemplates } from "@/lib/services/email";
 import { trackServerEvent } from "@/lib/analytics";
+import { CONSENT_VERSIONS } from "@/lib/consent-versions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +20,18 @@ export async function POST(req: NextRequest) {
     }
 
     const data = parsed.data;
+
+    // ── State availability enforcement ──────────────────────
+    const stateRecord = await db.stateAvailability.findUnique({
+      where: { stateCode: data.state },
+    });
+    if (!stateRecord || !stateRecord.isAvailable) {
+      return NextResponse.json(
+        { error: "We are not currently available in your state. Please check our states page for availability." },
+        { status: 400 }
+      );
+    }
+
     const session = await getSession();
 
     // Create or find user
@@ -41,6 +54,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Determine contraindication status (all 10 flags)
+    const hasContraindication =
+      data.hasThyroidCancer || data.hasMEN2 || data.isPregnant || data.hasPancreatitis ||
+      data.hasGastroparesis || data.hasDiabeticRetinopathy || data.hasGallbladderDisease ||
+      data.hasKidneyDisease || data.hasEatingDisorder || data.hasSuicidalIdeation;
+
+    const eligibilityResult = hasContraindication ? "ALTERNATIVE_PATH" : "PENDING_REVIEW";
+
     // Create intake submission
     const intake = await db.intakeSubmission.upsert({
       where: { userId },
@@ -61,10 +82,13 @@ export async function POST(req: NextRequest) {
         conditions: data.conditions || [],
         consentGiven: data.consentTreatment,
         hipaaConsent: data.consentHipaa,
+        telehealthConsentGiven: data.consentTelehealth,
+        consentVersion: CONSENT_VERSIONS.TREATMENT.version,
+        emergencyContactName: data.emergencyContactName,
+        emergencyContactPhone: data.emergencyContactPhone,
+        emergencyContactRelation: data.emergencyContactRelation,
         status: "SUBMITTED",
-        eligibilityResult: (data.hasThyroidCancer || data.hasMEN2 || data.isPregnant || data.hasPancreatitis)
-          ? "ALTERNATIVE_PATH"
-          : "PENDING_REVIEW",
+        eligibilityResult,
       },
       create: {
         userId,
@@ -84,11 +108,37 @@ export async function POST(req: NextRequest) {
         conditions: data.conditions || [],
         consentGiven: data.consentTreatment,
         hipaaConsent: data.consentHipaa,
+        telehealthConsentGiven: data.consentTelehealth,
+        consentVersion: CONSENT_VERSIONS.TREATMENT.version,
+        emergencyContactName: data.emergencyContactName,
+        emergencyContactPhone: data.emergencyContactPhone,
+        emergencyContactRelation: data.emergencyContactRelation,
         status: "SUBMITTED",
-        eligibilityResult: (data.hasThyroidCancer || data.hasMEN2 || data.isPregnant || data.hasPancreatitis)
-          ? "ALTERNATIVE_PATH"
-          : "PENDING_REVIEW",
+        eligibilityResult,
       },
+    });
+
+    // ── Create versioned consent records ─────────────────────
+    const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || null;
+    const userAgent = req.headers.get("user-agent") || null;
+
+    const consentEntries = [
+      { type: "TREATMENT" as const, version: CONSENT_VERSIONS.TREATMENT.version, text: CONSENT_VERSIONS.TREATMENT.text },
+      { type: "HIPAA" as const, version: CONSENT_VERSIONS.HIPAA.version, text: CONSENT_VERSIONS.HIPAA.text },
+      { type: "TELEHEALTH" as const, version: CONSENT_VERSIONS.TELEHEALTH.version, text: CONSENT_VERSIONS.TELEHEALTH.text },
+      { type: "MEDICATION_RISKS" as const, version: CONSENT_VERSIONS.MEDICATION_RISKS.version, text: CONSENT_VERSIONS.MEDICATION_RISKS.text },
+    ];
+
+    await db.consentRecord.createMany({
+      data: consentEntries.map((c) => ({
+        userId,
+        intakeId: intake.id,
+        consentType: c.type,
+        consentVersion: c.version,
+        consentText: c.text,
+        ipAddress,
+        userAgent,
+      })),
     });
 
     // Update patient profile
@@ -102,7 +152,7 @@ export async function POST(req: NextRequest) {
         medications: data.medications,
         allergies: data.allergies,
         medicalHistory: data.medicalHistory,
-        contraindications: data.hasThyroidCancer || data.hasMEN2 || data.isPregnant || data.hasPancreatitis,
+        contraindications: hasContraindication,
       },
       create: {
         userId,
@@ -113,7 +163,7 @@ export async function POST(req: NextRequest) {
         medications: data.medications,
         allergies: data.allergies,
         medicalHistory: data.medicalHistory,
-        contraindications: data.hasThyroidCancer || data.hasMEN2 || data.isPregnant || data.hasPancreatitis,
+        contraindications: hasContraindication,
       },
     });
 

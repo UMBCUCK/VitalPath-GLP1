@@ -1,10 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Award, GraduationCap, Clock, ShieldCheck, ArrowRight } from "lucide-react";
 import { providers } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { AnimateOnView } from "@/components/shared/animate-on-view";
+import { providerImages } from "@/lib/images";
 
 export function ProviderSection() {
   return (
@@ -20,9 +22,11 @@ export function ProviderSection() {
           {providers.map((provider, i) => (
             <AnimateOnView key={provider.name} delay={i * 0.12}>
               <div className="flex flex-col items-center rounded-2xl border border-navy-100/60 bg-white p-8 text-center shadow-premium transition-all duration-300 hover:shadow-premium-lg">
-                {/* Avatar placeholder */}
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-navy to-atlantic text-2xl font-bold text-white shadow-glow">
-                  {provider.initials}
+                {/* Provider photo */}
+                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-navy to-atlantic text-2xl font-bold text-white shadow-glow">
+                  {providerImages[i] ? (
+                    <Image src={providerImages[i].src} alt={providerImages[i].alt} width={80} height={80} className="h-20 w-20 rounded-full object-cover" />
+                  ) : provider.initials}
                 </div>
 
                 <h3 className="mt-5 text-lg font-bold text-navy">{provider.name}</h3>

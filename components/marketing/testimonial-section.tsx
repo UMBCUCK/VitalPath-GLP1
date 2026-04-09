@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Star, Quote, ChevronLeft, ChevronRight, BadgeCheck, MapPin } from "lucide-react";
 import { testimonials } from "@/lib/content";
 import { SectionShell } from "@/components/shared/section-shell";
@@ -9,6 +10,7 @@ import { AnimateOnView } from "@/components/shared/animate-on-view";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { testimonialAvatars } from "@/lib/images";
 
 // Color palette for avatar backgrounds
 const avatarColors = [
@@ -133,8 +135,10 @@ export function TestimonialSection() {
             <Quote className="absolute right-6 top-6 h-12 w-12 text-teal-100 hidden sm:block" />
 
             <div className="flex flex-wrap items-center gap-3">
-              <div className={cn("flex h-14 w-14 items-center justify-center rounded-full text-white text-lg font-bold", avatarColors[0])}>
-                {testimonials[0].name.charAt(0)}
+              <div className={cn("flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full text-white text-lg font-bold", avatarColors[0])}>
+                {testimonialAvatars[0] ? (
+                  <Image src={testimonialAvatars[0].src} alt={testimonialAvatars[0].alt} width={56} height={56} className="h-14 w-14 rounded-full object-cover" />
+                ) : testimonials[0].name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -197,8 +201,10 @@ export function TestimonialSection() {
             >
               {/* Header */}
               <div className="flex items-start gap-3">
-                <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white text-sm font-bold", avatarColors[(1 + page * perPage + i) % avatarColors.length])}>
-                  {t.name.charAt(0)}
+                <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full text-white text-sm font-bold", avatarColors[(1 + page * perPage + i) % avatarColors.length])}>
+                  {testimonialAvatars[1 + page * perPage + i] ? (
+                    <Image src={testimonialAvatars[1 + page * perPage + i].src} alt={testimonialAvatars[1 + page * perPage + i].alt} width={48} height={48} className="h-12 w-12 rounded-full object-cover" />
+                  ) : t.name.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">

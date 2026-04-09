@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Shield, Star, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { siteConfig } from "@/lib/site";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { heroImage } from "@/lib/images";
 import { useEffect, useRef, useState } from "react";
 
 function AnimatedCounter({ target, suffix = "" }: { target: string; suffix?: string }) {
@@ -109,131 +111,151 @@ export function HeroSection() {
       <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-atlantic/5 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pt-20 lg:px-8 lg:pt-24">
-        <div className="mx-auto max-w-4xl text-center">
-          {/* Live viewer count + Urgency Eyebrow */}
-          <div className="animate-fade-in-up flex flex-col items-center gap-3 mb-6">
-            <LiveViewerCount />
-            <Badge variant="gold" className="gap-1.5 px-4 py-1.5 text-sm">
-              <Clock className="h-3.5 w-3.5" />
-              Same-day provider evaluation available
-            </Badge>
-          </div>
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          {/* Left: Text content */}
+          <div className="text-center lg:text-left">
+            {/* Live viewer count + Urgency Eyebrow */}
+            <div className="animate-fade-in-up flex flex-col items-center gap-3 mb-6 lg:items-start">
+              <LiveViewerCount />
+              <Badge variant="gold" className="gap-1.5 px-4 py-1.5 text-sm">
+                <Clock className="h-3.5 w-3.5" />
+                Same-day provider evaluation available
+              </Badge>
+            </div>
 
-          {/* Headline — loss-framed for 24% higher CTR */}
-          <h1
-            className="animate-fade-in-up text-4xl font-bold tracking-tight text-navy sm:text-5xl lg:text-6xl xl:text-7xl"
-            style={{ animationDelay: "0.1s" }}
-          >
-            Every month without treatment is{" "}
-            <span className="bg-gradient-to-r from-teal to-atlantic bg-clip-text text-transparent">
-              another month your biology wins
-            </span>
-          </h1>
+            {/* Headline — loss-framed for 24% higher CTR */}
+            <h1
+              className="animate-fade-in-up text-4xl font-bold tracking-tight text-navy sm:text-5xl lg:text-6xl"
+              style={{ animationDelay: "0.1s" }}
+            >
+              Every month without treatment is{" "}
+              <span className="bg-gradient-to-r from-teal to-atlantic bg-clip-text text-transparent">
+                another month your biology wins
+              </span>
+            </h1>
 
-          {/* Subheadline — solution + price anchor */}
-          <p
-            className="animate-fade-in-up mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-graphite-500 sm:text-xl"
-            style={{ animationDelay: "0.2s" }}
-          >
-            GLP-1 medication works with your biology to end the cycle. Prescribed online by licensed providers.{" "}
-            <span className="font-semibold text-navy">
-              Starting at $279/mo
-            </span>{" "}
-            <span className="text-graphite-400 line-through">vs $1,349+/mo retail</span>
-            {" "}&mdash; that&apos;s{" "}
-            <span className="font-semibold text-teal">79% less</span> than brand-name pricing.
-          </p>
+            {/* Subheadline — solution + price anchor */}
+            <p
+              className="animate-fade-in-up mt-6 max-w-2xl text-lg leading-relaxed text-graphite-500 sm:text-xl lg:mx-0 mx-auto"
+              style={{ animationDelay: "0.2s" }}
+            >
+              GLP-1 medication works with your biology to end the cycle. Prescribed online by licensed providers.{" "}
+              <span className="font-semibold text-navy">
+                Starting at $279/mo
+              </span>{" "}
+              <span className="text-graphite-400 line-through">vs $1,349+/mo retail</span>
+              {" "}&mdash; that&apos;s{" "}
+              <span className="font-semibold text-teal">79% less</span> than brand-name pricing.
+            </p>
 
-          {/* Primary CTA — "See If I Qualify" is #1 converter */}
-          <div
-            className="animate-fade-in-up mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
-            style={{ animationDelay: "0.3s" }}
-          >
-            <Link href="/quiz" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_qualify", location: "hero" })}>
-              <Button size="xl" className="gap-2 w-full sm:w-auto text-lg px-12 h-16 rounded-2xl shadow-glow hover:shadow-premium-lg transition-all duration-300 hover:scale-[1.02]">
-                See If I Qualify
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="/pricing" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_pricing", location: "hero" })}>
-              <Button variant="outline" size="xl" className="w-full sm:w-auto">
-                View Plans & Pricing
-              </Button>
-            </Link>
-          </div>
+            {/* Primary CTA — "See If I Qualify" is #1 converter */}
+            <div
+              className="animate-fade-in-up mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start"
+              style={{ animationDelay: "0.3s" }}
+            >
+              <Link href="/quiz" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_qualify", location: "hero" })}>
+                <Button size="xl" className="gap-2 w-full sm:w-auto text-lg px-12 h-16 rounded-2xl shadow-glow hover:shadow-premium-lg transition-all duration-300 hover:scale-[1.02]">
+                  See If I Qualify
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="/pricing" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_pricing", location: "hero" })}>
+                <Button variant="outline" size="xl" className="w-full sm:w-auto">
+                  View Plans & Pricing
+                </Button>
+              </Link>
+            </div>
 
-          {/* Quick trust signals under CTA */}
-          <div
-            className="animate-fade-in-up mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-graphite-400"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <span className="flex items-center gap-1.5">
-              <Check className="h-4 w-4 text-teal" /> No appointment needed
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Check className="h-4 w-4 text-teal" /> Free 2-day shipping
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Check className="h-4 w-4 text-teal" /> Cancel anytime
-            </span>
-          </div>
+            {/* Quick trust signals under CTA */}
+            <div
+              className="animate-fade-in-up mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-graphite-400 lg:justify-start"
+              style={{ animationDelay: "0.4s" }}
+            >
+              <span className="flex items-center gap-1.5">
+                <Check className="h-4 w-4 text-teal" /> No appointment needed
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-4 w-4 text-teal" /> Free 2-day shipping
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-4 w-4 text-teal" /> Cancel anytime
+              </span>
+            </div>
 
-          {/* Member count social proof */}
-          <p
-            className="animate-fade-in-up mt-4 text-xs text-graphite-400"
-            style={{ animationDelay: "0.45s" }}
-          >
-            Join <span className="font-semibold text-navy">18,000+</span> members already seeing results
-          </p>
+            {/* Member count social proof */}
+            <p
+              className="animate-fade-in-up mt-4 text-xs text-graphite-400"
+              style={{ animationDelay: "0.45s" }}
+            >
+              Join <span className="font-semibold text-navy">18,000+</span> members already seeing results
+            </p>
 
-          {/* Social proof bar — immediately builds trust */}
-          <div
-            className="animate-fade-in-up mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-graphite-500"
-            style={{ animationDelay: "0.5s" }}
-          >
-            <div className="flex items-center gap-1.5">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className="h-4 w-4 fill-gold text-gold" />
-                ))}
+            {/* Social proof bar — immediately builds trust */}
+            <div
+              className="animate-fade-in-up mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-graphite-500 lg:justify-start"
+              style={{ animationDelay: "0.5s" }}
+            >
+              <div className="flex items-center gap-1.5">
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Star key={i} className="h-4 w-4 fill-gold text-gold" />
+                  ))}
+                </div>
+                <span className="font-semibold text-navy">{siteConfig.socialProof.rating}</span>
+                <span>from {siteConfig.socialProof.reviewCount} reviews</span>
               </div>
-              <span className="font-semibold text-navy">{siteConfig.socialProof.rating}</span>
-              <span>from {siteConfig.socialProof.reviewCount} reviews</span>
-            </div>
-            <div className="hidden h-4 w-px bg-navy-200 sm:block" />
-            <div>
-              <span className="font-semibold text-navy">{siteConfig.socialProof.memberCount}</span>{" "}
-              patients served
-            </div>
-            <div className="hidden h-4 w-px bg-navy-200 sm:block" />
-            <div className="flex items-center gap-1.5">
-              <Shield className="h-4 w-4 text-teal" />
-              HIPAA Compliant
+              <div className="hidden h-4 w-px bg-navy-200 sm:block" />
+              <div>
+                <span className="font-semibold text-navy">{siteConfig.socialProof.memberCount}</span>{" "}
+                patients served
+              </div>
+              <div className="hidden h-4 w-px bg-navy-200 sm:block" />
+              <div className="flex items-center gap-1.5">
+                <Shield className="h-4 w-4 text-teal" />
+                HIPAA Compliant
+              </div>
             </div>
           </div>
 
-          {/* Animated stat counters */}
-          <div
-            className="animate-fade-in-up mt-16 grid grid-cols-2 gap-6 sm:grid-cols-4"
-            style={{ animationDelay: "0.6s" }}
-          >
-            {[
-              { value: "18,000+", label: "Patients served" },
-              { value: "4.9", label: "Average rating", suffix: "/5" },
-              { value: "15-20%", label: "Avg body weight lost (25-50 lbs)*" },
-              { value: "94%", label: "Would recommend" },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-2xl border border-navy-100/60 bg-white/80 backdrop-blur-sm p-4 shadow-premium"
-              >
-                <p className="text-2xl font-bold text-navy sm:text-3xl">
-                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-                </p>
-                <p className="mt-1 text-xs text-graphite-400">{stat.label}</p>
-              </div>
-            ))}
+          {/* Right: Hero image (hidden on mobile) */}
+          <div className="relative hidden lg:block animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
+            <Image
+              src={heroImage.src}
+              alt={heroImage.alt}
+              width={heroImage.width}
+              height={heroImage.height}
+              priority
+              placeholder="blur"
+              blurDataURL={heroImage.blurDataURL}
+              sizes="(max-width: 1024px) 0px, 50vw"
+              className="rounded-3xl object-cover shadow-premium-xl"
+            />
+            {/* Decorative ring */}
+            <div className="absolute -inset-3 -z-10 rounded-[2rem] bg-gradient-to-br from-teal/10 to-atlantic/10" />
           </div>
+        </div>
+
+        {/* Animated stat counters — full width below both columns */}
+        <div
+          className="animate-fade-in-up mt-16 grid grid-cols-2 gap-6 sm:grid-cols-4"
+          style={{ animationDelay: "0.6s" }}
+        >
+          {[
+            { value: "18,000+", label: "Patients served" },
+            { value: "4.9", label: "Average rating", suffix: "/5" },
+            { value: "15-20%", label: "Avg body weight lost (25-50 lbs)*" },
+            { value: "94%", label: "Would recommend" },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-2xl border border-navy-100/60 bg-white/80 backdrop-blur-sm p-4 shadow-premium"
+            >
+              <p className="text-2xl font-bold text-navy sm:text-3xl">
+                <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+              </p>
+              <p className="mt-1 text-xs text-graphite-400">{stat.label}</p>
+            </div>
+          ))}
         </div>
       </div>
 

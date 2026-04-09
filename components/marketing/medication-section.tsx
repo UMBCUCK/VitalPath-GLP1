@@ -1,9 +1,11 @@
+import Image from "next/image";
 import { Check, ShieldCheck, Thermometer, Clock, Pill } from "lucide-react";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { AnimateOnView } from "@/components/shared/animate-on-view";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { medicationImage } from "@/lib/images";
 
 const features = [
   {
@@ -51,19 +53,31 @@ export function MedicationSection() {
             <div className="relative">
               {/* Medication card */}
               <div className="rounded-3xl border border-navy-100/60 bg-white p-8 shadow-premium-lg sm:p-10">
-                {/* Product visual placeholder */}
-                <div className="relative mx-auto aspect-square max-w-xs rounded-2xl bg-gradient-to-br from-teal-50 via-white to-sage/30 p-8 flex flex-col items-center justify-center">
-                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-teal to-atlantic shadow-glow">
-                    <Pill className="h-12 w-12 text-white" />
+                {/* Product visual */}
+                <div className="relative mx-auto aspect-square max-w-xs overflow-hidden rounded-2xl bg-gradient-to-br from-teal-50 via-white to-sage/30">
+                  <Image
+                    src={medicationImage.src}
+                    alt={medicationImage.alt}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 80vw, 320px"
+                    placeholder="blur"
+                    blurDataURL={medicationImage.blurDataURL}
+                  />
+                  {/* Overlay for text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-transparent to-white/50 z-[1]" />
+
+                  {/* Product info overlay */}
+                  <div className="absolute inset-x-0 bottom-0 z-[2] p-6 text-center">
+                    <p className="text-lg font-bold text-navy">Semaglutide</p>
+                    <p className="text-sm text-graphite-500">Compounded GLP-1 injection</p>
                   </div>
-                  <p className="mt-4 text-lg font-bold text-navy">Semaglutide</p>
-                  <p className="text-sm text-graphite-400">Compounded GLP-1 injection</p>
 
                   {/* Floating badges */}
-                  <div className="absolute top-4 left-4">
+                  <div className="absolute top-4 left-4 z-[2]">
                     <Badge variant="default" className="text-[10px]">Rx Only</Badge>
                   </div>
-                  <div className="absolute top-4 right-4">
+                  <div className="absolute top-4 right-4 z-[2]">
                     <Badge variant="success" className="text-[10px]">US Pharmacy</Badge>
                   </div>
                 </div>

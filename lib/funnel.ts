@@ -55,11 +55,23 @@ export const intakeSchema = z.object({
   hasMEN2: z.boolean().default(false),
   isPregnant: z.boolean().default(false),
   hasPancreatitis: z.boolean().default(false),
+  hasGastroparesis: z.boolean().default(false),
+  hasDiabeticRetinopathy: z.boolean().default(false),
+  hasGallbladderDisease: z.boolean().default(false),
+  hasKidneyDisease: z.boolean().default(false),
+  hasEatingDisorder: z.boolean().default(false),
+  hasSuicidalIdeation: z.boolean().default(false),
+
+  // Emergency contact
+  emergencyContactName: z.string().min(2, "Emergency contact name is required"),
+  emergencyContactPhone: z.string().min(10, "Emergency contact phone is required"),
+  emergencyContactRelation: z.string().min(2, "Emergency contact relationship is required"),
 
   // Consent
   consentTreatment: z.boolean().refine((v) => v, "You must consent to proceed"),
   consentHipaa: z.boolean().refine((v) => v, "HIPAA consent is required"),
   consentTelehealth: z.boolean().refine((v) => v, "Telehealth consent is required"),
+  consentMedicationRisks: z.boolean().refine((v) => v, "Medication risk acknowledgment is required"),
 });
 
 export type IntakeValues = z.infer<typeof intakeSchema>;

@@ -58,7 +58,34 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-navy">7. Contact Us</h2>
+            <h2 className="text-lg font-bold text-navy">7. Your State Privacy Rights</h2>
+            <p>Depending on your state of residence, you may have additional privacy rights under state law. This section outlines rights available to residents of specific states.</p>
+
+            <div className="mt-4">
+              <h3 className="text-base font-bold text-navy">California (CCPA/CPRA)</h3>
+              <p className="mt-1">If you are a California resident, the California Consumer Privacy Act (CCPA) as amended by the California Privacy Rights Act (CPRA) provides you with the following rights regarding your personal information:</p>
+              <ul className="mt-2 space-y-2">
+                <li><strong>Right to Know:</strong> You have the right to request that we disclose the categories and specific pieces of personal information we have collected about you, the categories of sources from which it was collected, the business or commercial purpose for collecting it, and the categories of third parties with whom we share it.</li>
+                <li><strong>Right to Delete:</strong> You have the right to request the deletion of your personal information, subject to certain exceptions (such as legal retention requirements for health records).</li>
+                <li><strong>Right to Opt-Out of Sale:</strong> You have the right to opt out of the sale or sharing of your personal information. VitalPath does not sell personal information as defined under the CCPA/CPRA.</li>
+                <li><strong>Right to Correct:</strong> You have the right to request correction of inaccurate personal information that we maintain about you.</li>
+                <li><strong>Right to Non-Discrimination:</strong> You have the right not to be discriminated against for exercising any of your CCPA/CPRA rights. We will not deny you services, charge different prices, or provide a different quality of service because you exercised your privacy rights.</li>
+              </ul>
+              <p className="mt-2">To exercise any of these rights, contact us at privacy@vitalpath.com with the subject line &quot;California Privacy Rights Request.&quot; We will verify your identity before processing your request and respond within 45 days as required by law.</p>
+            </div>
+
+            <div className="mt-4">
+              <h3 className="text-base font-bold text-navy">Virginia (VCDPA), Colorado (CPA), and Connecticut (CTDPA)</h3>
+              <p className="mt-1">If you are a resident of Virginia, Colorado, or Connecticut, you may have similar privacy rights under your state&apos;s respective privacy law, including the right to access, correct, and delete your personal data, as well as the right to opt out of targeted advertising and the sale of personal data. To exercise your rights under these state laws, please contact us at privacy@vitalpath.com.</p>
+            </div>
+
+            <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
+              <p className="text-xs font-semibold text-amber-800">[LEGAL REVIEW REQUIRED — state privacy compliance requires legal counsel review to ensure all applicable state privacy laws are addressed and response procedures meet statutory requirements]</p>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-bold text-navy">8. Contact Us</h2>
             <p>For privacy-related questions or to exercise your rights, contact us at privacy@vitalpath.com or (888) 509-2745.</p>
           </section>
         </div>

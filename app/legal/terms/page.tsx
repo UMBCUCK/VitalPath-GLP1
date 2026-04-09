@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SectionShell } from "@/components/shared/section-shell";
 import { Badge } from "@/components/ui/badge";
 import { MarketingShell } from "@/components/layout/marketing-shell";
@@ -62,6 +63,52 @@ export default function TermsPage() {
             <section>
               <h2 className="text-lg font-bold text-navy">9. Contact</h2>
               <p>Questions about these Terms should be directed to our support team at care@vitalpath.com or (888) 509-2745.</p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-navy">10. Dispute Resolution</h2>
+              <p><strong>Informal Resolution:</strong> Before initiating any formal dispute proceedings, you agree to first contact VitalPath at care@vitalpath.com and allow a 30-day period for informal resolution. During this period, both parties will attempt in good faith to resolve the dispute through direct communication.</p>
+              <p className="mt-2"><strong>Binding Arbitration:</strong> If informal resolution is unsuccessful, any dispute, controversy, or claim arising out of or relating to these Terms or your use of the Services shall be resolved through binding arbitration administered by the American Arbitration Association in accordance with its Consumer Arbitration Rules. The arbitration shall be conducted in the State of Delaware.</p>
+              <p className="mt-2"><strong>Governing Law and Venue:</strong> These Terms shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflict of law provisions. Any legal proceedings not subject to arbitration shall be brought exclusively in the state or federal courts located in Delaware.</p>
+              <p className="mt-2"><strong>Class Action Waiver:</strong> You agree that any dispute resolution proceedings will be conducted only on an individual basis and not in a class, consolidated, or representative action. You waive any right to participate in a class action lawsuit or class-wide arbitration against VitalPath.</p>
+              <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
+                <p className="text-xs font-semibold text-amber-800">[LEGAL REVIEW REQUIRED — arbitration clauses, class action waivers, and governing law provisions require legal counsel review for enforceability in all applicable jurisdictions]</p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-navy">11. Telehealth Limitations</h2>
+              <p>VitalPath&apos;s telehealth services are only available to residents of states where we are licensed and operational. A current list of available states can be found on our <Link href="/states" className="text-teal underline hover:text-teal/80">States page</Link>.</p>
+              <p className="mt-2">Telehealth services are not intended to replace in-person medical care when clinically indicated. Your assigned provider may determine that an in-person evaluation or examination is necessary and refer you to a local healthcare provider. In such cases, you are responsible for seeking and scheduling in-person care.</p>
+              <p className="mt-2">By using VitalPath, you acknowledge that telehealth has inherent limitations, including the inability to perform a physical examination, and that your provider&apos;s recommendations are based on the information you provide.</p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-navy">12. Emergency Situations</h2>
+              <p className="font-semibold text-red-700">VitalPath is NOT an emergency medical service. Do not use VitalPath for medical emergencies.</p>
+              <p className="mt-2">If you are experiencing a medical emergency, call 911 or go to your nearest emergency room immediately. VitalPath does not provide emergency care, crisis intervention, or urgent medical services.</p>
+              <p className="mt-2">If you experience severe side effects from any medication prescribed through VitalPath, contact your assigned provider immediately through the platform&apos;s messaging system during business hours, or call our care line at (888) 509-2745. For symptoms that are life-threatening or require immediate medical attention, call 911 without delay.</p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-navy">13. Medication Policies</h2>
+              <p>GLP-1 receptor agonist medications prescribed through VitalPath are not DEA-controlled substances and do not require special handling or monitoring associated with controlled substance prescriptions.</p>
+              <p className="mt-2"><strong>Compounded Medications:</strong> Compounded versions of GLP-1 medications are prepared by state-licensed 503A and 503B compounding pharmacies pursuant to individual prescriptions from licensed healthcare providers. Compounded medications are not FDA-approved products. They are prepared in accordance with applicable federal and state compounding regulations.</p>
+              <p className="mt-2"><strong>Branded Medications:</strong> Based on your provider&apos;s independent medical judgment, FDA-approved branded GLP-1 medications may be prescribed as an alternative to compounded formulations. Your provider will determine the most appropriate medication option based on your individual health profile and treatment goals.</p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-navy">14. Corporate Practice of Medicine</h2>
+              <p>VitalPath is a technology platform that facilitates access to independent, licensed healthcare providers. VitalPath does not practice medicine, render medical advice, or direct the clinical decisions of any healthcare provider.</p>
+              <p className="mt-2">All medical decisions, including but not limited to diagnosis, treatment plans, medication selection, dosing, and ongoing care management, are made by your assigned healthcare provider in the exercise of their independent medical judgment. VitalPath does not interfere with, override, or influence the provider-patient relationship.</p>
+              <p className="mt-2">Healthcare providers accessible through the VitalPath platform may be employed by, contracted with, or affiliated with independent medical groups or professional corporations that are separate legal entities from VitalPath.</p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-navy">15. State-Specific Provisions</h2>
+              <p>Certain states provide additional consumer rights and protections that may apply to your use of VitalPath&apos;s Services.</p>
+              <p className="mt-2"><strong>California Residents:</strong> If you are a California resident, you may have additional rights under the California Consumer Privacy Act (CCPA) and the California Privacy Rights Act (CPRA), including the right to know, delete, and opt out of the sale of personal information. For details, please see our <a href="/legal/privacy" className="text-teal underline hover:text-teal/80">Privacy Policy</a>.</p>
+              <p className="mt-2"><strong>Telehealth Regulations:</strong> Telehealth laws and regulations vary by state. Patients are encouraged to review their state&apos;s telehealth regulations to understand any additional rights or limitations that may apply. VitalPath complies with all applicable state telehealth laws in the jurisdictions where we operate.</p>
             </section>
           </div>
         </div>

@@ -218,6 +218,32 @@ export default async function TreatmentPage() {
         </CardContent>
       </Card>
 
+      {/* Emergency Information */}
+      <Card className="border-2 border-red-300 bg-red-50/30">
+        <CardContent className="p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-100">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div className="flex-1 space-y-2">
+              <h3 className="text-sm font-bold text-red-800">Emergency Information</h3>
+              <p className="text-sm font-semibold text-red-700">
+                If you are experiencing a medical emergency, call 911 immediately.
+              </p>
+              <p className="text-xs text-red-600/90 leading-relaxed">
+                For severe side effects, contact your provider through secure messaging or call our care line:{" "}
+                <a href="tel:8885092745" className="font-semibold underline">(888) 509-2745</a>
+              </p>
+              <Link href="/dashboard/report-event">
+                <Button variant="outline" size="sm" className="mt-1 border-red-300 text-red-700 hover:bg-red-100 hover:text-red-800 gap-1.5 text-xs">
+                  Report a side effect or adverse event
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <p className="text-xs text-graphite-300 text-center">
         Compounded medications are not FDA-approved. They are prepared by state-licensed pharmacies
         based on individual prescriptions from licensed providers.

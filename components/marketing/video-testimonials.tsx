@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Play, Star, BadgeCheck, Quote, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
@@ -9,6 +10,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { AnimateOnView } from "@/components/shared/animate-on-view";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { videoThumbnails, videoThumbnailsMini } from "@/lib/images";
 
 // Video testimonial placeholders — replace with real video URLs when available
 const videos = [
@@ -65,23 +67,35 @@ export function VideoTestimonials() {
           <div className="lg:col-span-3">
             <AnimateOnView>
               <div className={cn(
-                "relative aspect-video w-full rounded-2xl bg-gradient-to-br overflow-hidden cursor-pointer group",
-                active.thumbnail
+                "relative aspect-video w-full rounded-2xl overflow-hidden cursor-pointer group",
+                !videoThumbnails[activeVideo] && `bg-gradient-to-br ${active.thumbnail}`
               )}>
+                {/* Thumbnail image */}
+                {videoThumbnails[activeVideo] && (
+                  <Image
+                    src={videoThumbnails[activeVideo].src}
+                    alt={videoThumbnails[activeVideo].alt}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    placeholder="blur"
+                    blurDataURL={videoThumbnails[activeVideo].blurDataURL}
+                  />
+                )}
                 {/* Play button overlay */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors z-[1]">
                   <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/90 shadow-premium-xl group-hover:scale-110 transition-transform">
                     <Play className="h-8 w-8 text-navy ml-1" />
                   </div>
                 </div>
 
                 {/* Duration badge */}
-                <div className="absolute bottom-4 right-4 rounded-lg bg-black/60 px-2.5 py-1">
+                <div className="absolute bottom-4 right-4 z-[2] rounded-lg bg-black/60 px-2.5 py-1">
                   <span className="text-xs font-medium text-white">{active.duration}</span>
                 </div>
 
                 {/* Name overlay */}
-                <div className="absolute bottom-4 left-4">
+                <div className="absolute bottom-4 left-4 z-[2]">
                   <div className="flex items-center gap-2 rounded-lg bg-black/60 px-3 py-2">
                     <BadgeCheck className="h-4 w-4 text-teal-300" />
                     <span className="text-sm font-semibold text-white">
@@ -126,13 +140,22 @@ export function VideoTestimonials() {
               >
                 {/* Mini thumbnail */}
                 <div className={cn(
-                  "relative h-16 w-24 shrink-0 rounded-lg bg-gradient-to-br overflow-hidden",
-                  video.thumbnail
+                  "relative h-16 w-24 shrink-0 rounded-lg overflow-hidden",
+                  !videoThumbnailsMini[i] && `bg-gradient-to-br ${video.thumbnail}`
                 )}>
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  {videoThumbnailsMini[i] && (
+                    <Image
+                      src={videoThumbnailsMini[i].src}
+                      alt={videoThumbnailsMini[i].alt}
+                      fill
+                      className="object-cover"
+                      sizes="96px"
+                    />
+                  )}
+                  <div className="absolute inset-0 z-[1] flex items-center justify-center bg-black/10">
                     <Play className="h-5 w-5 text-white/80" />
                   </div>
-                  <div className="absolute bottom-1 right-1 rounded bg-black/60 px-1 py-0.5">
+                  <div className="absolute bottom-1 right-1 z-[1] rounded bg-black/60 px-1 py-0.5">
                     <span className="text-[10px] text-white">{video.duration}</span>
                   </div>
                 </div>

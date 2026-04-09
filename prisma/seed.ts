@@ -8,6 +8,10 @@ async function main() {
   if (isClean) {
     console.log("Cleaning database...");
     // Delete in dependency order
+    await prisma.complianceAuditLog.deleteMany();
+    await prisma.adverseEventReport.deleteMany();
+    await prisma.consentRecord.deleteMany();
+    await prisma.providerCredential.deleteMany();
     await prisma.adminAuditLog.deleteMany();
     await prisma.analyticsEvent.deleteMany();
     await prisma.mealPlanItem.deleteMany();
@@ -63,7 +67,7 @@ async function main() {
 
   // ─── Provider User ──────────────────────────────────────
   const providerPassword = await hash("provider1", 12);
-  await prisma.user.upsert({
+  const provider = await prisma.user.upsert({
     where: { email: "dr.chen@vitalpath.com" },
     update: {},
     create: {
@@ -75,6 +79,27 @@ async function main() {
     },
   });
   console.log("Provider user: dr.chen@vitalpath.com");
+
+  // ─── Provider Credentials ──────────────────────────────
+  const credentialStates = ["TX", "CA", "FL", "NY", "IL", "PA", "OH", "GA", "NC", "VA"];
+  for (const st of credentialStates) {
+    await prisma.providerCredential.upsert({
+      where: { userId_licenseState: { userId: provider.id, licenseState: st } },
+      update: {},
+      create: {
+        userId: provider.id,
+        licenseNumber: `MD-${st}-${Math.floor(100000 + Math.random() * 900000)}`,
+        licenseState: st,
+        licenseType: "MD",
+        deaNumber: `FC${Math.floor(1000000 + Math.random() * 9000000)}`,
+        npiNumber: `${Math.floor(1000000000 + Math.random() * 9000000000)}`,
+        expiresAt: new Date(Date.now() + 365 * 86400000),
+        verifiedAt: new Date(),
+        isActive: true,
+      },
+    });
+  }
+  console.log(`Seeded ${credentialStates.length} provider credentials for Dr. Chen`);
 
   // ─── Demo Patient ───────────────────────────────────────
   const patientPassword = await hash("demo1234", 12);
@@ -153,15 +178,59 @@ async function main() {
   });
 
   // ─── State Availability ──────────────────────────────────
-  const availableStates = ["AL","AZ","CA","CO","CT","FL","GA","IL","IN","MA","MD","MI","MN","NC","NJ","NV","NY","OH","OR","PA","TN","TX","VA","WA"];
-  for (const code of availableStates) {
+  const stateData: Record<string, { name: string; available: boolean; requiresPhysicalExam?: boolean; requiresPreexistingRelationship?: boolean; informedConsentRequirement?: string; cpomRestrictions?: string }> = {
+    AL: { name: "Alabama", available: true }, AK: { name: "Alaska", available: false },
+    AZ: { name: "Arizona", available: true }, AR: { name: "Arkansas", available: false },
+    CA: { name: "California", available: true, cpomRestrictions: "CPOM state — providers must operate under MSO structure" },
+    CO: { name: "Colorado", available: true }, CT: { name: "Connecticut", available: true },
+    DE: { name: "Delaware", available: false }, FL: { name: "Florida", available: true },
+    GA: { name: "Georgia", available: true }, HI: { name: "Hawaii", available: false },
+    ID: { name: "Idaho", available: false }, IL: { name: "Illinois", available: true },
+    IN: { name: "Indiana", available: true, informedConsentRequirement: "EVERY_VISIT" },
+    IA: { name: "Iowa", available: false }, KS: { name: "Kansas", available: false },
+    KY: { name: "Kentucky", available: false }, LA: { name: "Louisiana", available: false },
+    ME: { name: "Maine", available: false }, MD: { name: "Maryland", available: true },
+    MA: { name: "Massachusetts", available: true, informedConsentRequirement: "INITIAL_ONLY" },
+    MI: { name: "Michigan", available: true }, MN: { name: "Minnesota", available: true },
+    MS: { name: "Mississippi", available: false }, MO: { name: "Missouri", available: false },
+    MT: { name: "Montana", available: false }, NE: { name: "Nebraska", available: false },
+    NV: { name: "Nevada", available: true }, NH: { name: "New Hampshire", available: false },
+    NJ: { name: "New Jersey", available: true }, NM: { name: "New Mexico", available: false },
+    NY: { name: "New York", available: true, cpomRestrictions: "CPOM state — requires professional corporation or authorized entity" },
+    NC: { name: "North Carolina", available: true }, ND: { name: "North Dakota", available: false },
+    OH: { name: "Ohio", available: true }, OK: { name: "Oklahoma", available: false },
+    OR: { name: "Oregon", available: true }, PA: { name: "Pennsylvania", available: true },
+    RI: { name: "Rhode Island", available: false }, SC: { name: "South Carolina", available: false },
+    SD: { name: "South Dakota", available: false }, TN: { name: "Tennessee", available: true },
+    TX: { name: "Texas", available: true, cpomRestrictions: "CPOM state — requires compliant MSO/PC arrangement", informedConsentRequirement: "INITIAL_ONLY" },
+    UT: { name: "Utah", available: false }, VT: { name: "Vermont", available: false },
+    VA: { name: "Virginia", available: true }, WA: { name: "Washington", available: true },
+    WV: { name: "West Virginia", available: false }, WI: { name: "Wisconsin", available: false },
+    WY: { name: "Wyoming", available: false }, DC: { name: "District of Columbia", available: false },
+  };
+  for (const [code, info] of Object.entries(stateData)) {
     await prisma.stateAvailability.upsert({
       where: { stateCode: code },
-      update: { isAvailable: true },
-      create: { stateCode: code, stateName: code, isAvailable: true },
+      update: {
+        stateName: info.name,
+        isAvailable: info.available,
+        requiresPhysicalExam: info.requiresPhysicalExam ?? false,
+        requiresPreexistingRelationship: info.requiresPreexistingRelationship ?? false,
+        informedConsentRequirement: info.informedConsentRequirement ?? "STANDARD",
+        cpomRestrictions: info.cpomRestrictions ?? null,
+      },
+      create: {
+        stateCode: code,
+        stateName: info.name,
+        isAvailable: info.available,
+        requiresPhysicalExam: info.requiresPhysicalExam ?? false,
+        requiresPreexistingRelationship: info.requiresPreexistingRelationship ?? false,
+        informedConsentRequirement: info.informedConsentRequirement ?? "STANDARD",
+        cpomRestrictions: info.cpomRestrictions ?? null,
+      },
     });
   }
-  console.log(`Seeded ${availableStates.length} states`);
+  console.log(`Seeded ${Object.keys(stateData).length} states (all 50 + DC)`);
 
   // ─── Products ────────────────────────────────────────────
   const products = [

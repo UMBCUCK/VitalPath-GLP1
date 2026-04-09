@@ -14,6 +14,7 @@ import { faqs } from "@/lib/content";
 import { plans } from "@/lib/pricing";
 
 // Lazy load below-fold sections to reduce initial JS bundle (~40% faster LCP)
+const MedicationShowcase = dynamic_import(() => import("@/components/marketing/medication-showcase").then(m => ({ default: m.MedicationShowcase })));
 const MedicationSection = dynamic_import(() => import("@/components/marketing/medication-section").then(m => ({ default: m.MedicationSection })));
 const EligibilityChecker = dynamic_import(() => import("@/components/marketing/eligibility-checker").then(m => ({ default: m.EligibilityChecker })));
 const ComparisonSection = dynamic_import(() => import("@/components/marketing/comparison-section").then(m => ({ default: m.ComparisonSection })));
@@ -103,6 +104,7 @@ export default function HomePage() {
 
       {/* SOLUTION: Show the way out */}
       <SolutionSection />
+      <MedicationShowcase />
       <MedicationSection />
 
       {/* ACTION: Make it easy */}

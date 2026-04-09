@@ -17,6 +17,8 @@ import {
   Activity,
   Search,
   Send,
+  Stethoscope,
+  ClipboardCheck,
 } from "lucide-react";
 
 const adminNav = [
@@ -33,6 +35,8 @@ const adminNav = [
   { label: "Meal Plans", href: "/admin/meal-plans", icon: Calendar },
   { label: "Blog", href: "/admin/blog", icon: FileText },
   { label: "States", href: "/admin/states", icon: MapPin },
+  { label: "Providers", href: "/admin/providers", icon: Stethoscope },
+  { label: "Compliance", href: "/admin/compliance", icon: ClipboardCheck },
   { label: "Coupons", href: "/admin/coupons", icon: Tag },
   { label: "Referrals", href: "/admin/referrals", icon: Share2 },
   { label: "Emails", href: "/admin/email-preview", icon: Mail },

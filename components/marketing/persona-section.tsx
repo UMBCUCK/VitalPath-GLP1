@@ -1,10 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { AnimateOnView } from "@/components/shared/animate-on-view";
 import { cn } from "@/lib/utils";
+import { personaImages } from "@/lib/images";
 
 const personas = [
   {
@@ -63,6 +65,11 @@ export function PersonaSection() {
                 persona.color,
                 persona.borderColor,
               )}>
+                {personaImages[i] && (
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 border-white shadow-premium">
+                    <Image src={personaImages[i].src} alt={personaImages[i].alt} width={48} height={48} className="h-12 w-12 rounded-full object-cover" />
+                  </div>
+                )}
                 <h3 className="text-xl font-bold text-navy">{persona.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-graphite-500">
                   {persona.description}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, ShieldCheck, ArrowRight } from "lucide-react";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
@@ -10,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/lib/site";
+import { beforeAfterImages, beforeAfterBlur } from "@/lib/images";
 
 // Before/after entries — placeholder images until real patient photos are collected
 // Replace src paths with actual patient photos (with signed consent + HIPAA release)
@@ -86,38 +88,63 @@ function WeightCard({
   type,
   weight,
   lbs,
+  imageSrc,
+  imageAlt,
 }: {
   type: "before" | "after";
   weight: number;
   lbs: number;
+  imageSrc?: string;
+  imageAlt?: string;
 }) {
   return (
     <div
       className={cn(
-        "relative flex aspect-[3/4] w-full flex-col items-center justify-center rounded-2xl",
-        type === "before"
+        "relative flex aspect-[3/4] w-full flex-col items-center justify-center overflow-hidden rounded-2xl",
+        !imageSrc && (type === "before"
           ? "bg-gradient-to-br from-graphite-100 to-graphite-200"
-          : "bg-gradient-to-br from-teal-50 to-teal-100"
+          : "bg-gradient-to-br from-teal-50 to-teal-100")
       )}
     >
-      <p className={cn(
-        "text-4xl font-bold sm:text-5xl",
-        type === "before" ? "text-graphite-500" : "text-teal"
-      )}>
-        {weight}
-      </p>
-      <p className={cn(
-        "text-sm font-medium",
-        type === "before" ? "text-graphite-400" : "text-teal-600"
-      )}>lbs</p>
-      {type === "after" && (
-        <div className="mt-3 rounded-full bg-teal px-3 py-1">
-          <span className="text-xs font-bold text-white">-{lbs} lbs</span>
-        </div>
+      {/* Background image layer */}
+      {imageSrc && (
+        <>
+          <Image
+            src={imageSrc}
+            alt={imageAlt || `${type} lifestyle photo`}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 40vw, 220px"
+            placeholder="blur"
+            blurDataURL={type === "before" ? beforeAfterBlur.before : beforeAfterBlur.after}
+          />
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-black/40 z-[1]" />
+        </>
       )}
+
+      {/* Content */}
+      <div className="relative z-[2] flex flex-col items-center">
+        <p className={cn(
+          "text-4xl font-bold sm:text-5xl drop-shadow-md",
+          imageSrc ? "text-white" : (type === "before" ? "text-graphite-500" : "text-teal")
+        )}>
+          {weight}
+        </p>
+        <p className={cn(
+          "text-sm font-medium",
+          imageSrc ? "text-white/80" : (type === "before" ? "text-graphite-400" : "text-teal-600")
+        )}>lbs</p>
+        {type === "after" && (
+          <div className="mt-3 rounded-full bg-teal px-3 py-1">
+            <span className="text-xs font-bold text-white">-{lbs} lbs</span>
+          </div>
+        )}
+      </div>
+
       <div
         className={cn(
-          "absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-bold",
+          "absolute top-3 left-3 z-[2] rounded-full px-3 py-1 text-xs font-bold",
           type === "before"
             ? "bg-graphite-600 text-white"
             : "bg-teal text-white"
@@ -164,11 +191,15 @@ export function BeforeAfterSection() {
                     type="before"
                     weight={item.startWeight}
                     lbs={item.lbs}
+                    imageSrc={beforeAfterImages[current]?.before.src}
+                    imageAlt={beforeAfterImages[current]?.before.alt}
                   />
                   <WeightCard
                     type="after"
                     weight={item.currentWeight}
                     lbs={item.lbs}
+                    imageSrc={beforeAfterImages[current]?.after.src}
+                    imageAlt={beforeAfterImages[current]?.after.alt}
                   />
                 </div>
 
@@ -218,7 +249,7 @@ export function BeforeAfterSection() {
                   {/* Verified badge */}
                   <div className="mt-4 flex items-center gap-2 text-xs text-graphite-400">
                     <ShieldCheck className="h-4 w-4 text-teal" />
-                    Verified member &middot; Photos shared with consent
+                    Verified member &middot; Illustrative lifestyle images
                   </div>
                 </div>
               </div>
