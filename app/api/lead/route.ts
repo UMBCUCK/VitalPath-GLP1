@@ -2,8 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { leadSchema } from "@/lib/funnel";
 import { db } from "@/lib/db";
 import { trackServerEvent } from "@/lib/analytics";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { safeError } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 10 lead captures per minute per IP
+  const { success } = await rateLimit(getRateLimitKey(req, "lead"), {
+    maxTokens: 10,
+  });
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": "60" } }
+    );
+  }
+
   try {
     const body = await req.json();
     const parsed = leadSchema.safeParse(body);
@@ -38,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("[Lead API] Failed to capture lead");
+    safeError("[Lead API]", error);
     return NextResponse.json({ error: "Failed to capture lead" }, { status: 500 });
   }
 }

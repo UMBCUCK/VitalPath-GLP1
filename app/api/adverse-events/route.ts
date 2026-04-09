@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { safeError } from "@/lib/logger";
 
 const adverseEventSchema = z.object({
   severity: z.enum(["MILD", "MODERATE", "SEVERE", "LIFE_THREATENING"]),
@@ -11,6 +13,17 @@ const adverseEventSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 5 adverse event reports per minute per IP
+  const { success } = await rateLimit(getRateLimitKey(req, "adverse-events"), {
+    maxTokens: 5,
+  });
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": "60" } }
+    );
+  }
+
   try {
     const session = await getSession();
     if (!session) {
@@ -66,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("[Adverse Events API]", error);
+    safeError("[Adverse Events API]", error);
     return NextResponse.json(
       { error: "Failed to submit adverse event report" },
       { status: 500 }

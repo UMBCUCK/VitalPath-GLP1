@@ -71,6 +71,15 @@ export const ANALYTICS_EVENTS = {
   // Lead capture
   LEAD_CAPTURE: "lead_capture",
   EMAIL_SUBSCRIBE: "email_subscribe",
+
+  // Unified Qualify flow
+  QUALIFY_START: "qualify_start",
+  QUALIFY_STEP_COMPLETE: "qualify_step_complete",
+  QUALIFY_BMI_CALCULATED: "qualify_bmi_calculated",
+  QUALIFY_PROJECTION_VIEWED: "qualify_projection_viewed",
+  QUALIFY_CONTRAINDICATION_FLAG: "qualify_contraindication_flag",
+  QUALIFY_COMPLETE: "qualify_complete",
+  QUALIFY_ABANDON: "qualify_abandon",
 } as const;
 
 // ─── Track function ─────────────────────────────────────────

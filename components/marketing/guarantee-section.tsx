@@ -59,38 +59,37 @@ export function GuaranteeSection() {
             </div>
 
             <div className="p-8 sm:p-12">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-                Our promise to you
-              </h2>
-              <p className="mt-2 text-base text-graphite-500">
-                We&apos;re confident this works. That&apos;s why we make it risk-free to start.
-              </p>
-            </div>
+              <div className="text-center mb-10">
+                <h2 className="text-2xl font-bold text-navy sm:text-3xl">
+                  Our promise to you
+                </h2>
+                <p className="mt-2 text-base text-graphite-500">
+                  We&apos;re confident this works. That&apos;s why we make it risk-free to start.
+                </p>
+              </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {guarantees.map((g, i) => (
-                <div key={g.title} className="text-center">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-premium">
-                    <g.icon className="h-6 w-6 text-teal" />
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {guarantees.map((g) => (
+                  <div key={g.title} className="text-center">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-premium">
+                      <g.icon className="h-6 w-6 text-teal" />
+                    </div>
+                    <h3 className="mt-4 text-sm font-bold text-navy">{g.title}</h3>
+                    <p className="mt-2 text-xs leading-relaxed text-graphite-500">
+                      {g.description}
+                    </p>
                   </div>
-                  <h3 className="mt-4 text-sm font-bold text-navy">{g.title}</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-graphite-500">
-                    {g.description}
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {/* CTA after risk reversal */}
-            <div className="mt-8 text-center">
-              <Link href="/quiz">
-                <Button size="lg" className="gap-2">
-                  Start Risk-Free <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <p className="mt-2 text-xs text-graphite-400">Free assessment &middot; No commitment &middot; Cancel anytime</p>
-            </div>
+              <div className="mt-8 text-center">
+                <Link href="/quiz">
+                  <Button size="lg" className="gap-2">
+                    Start Risk-Free <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <p className="mt-2 text-xs text-graphite-400">Free assessment &middot; No commitment &middot; Cancel anytime</p>
+              </div>
             </div>
           </div>
         </AnimateOnView>

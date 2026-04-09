@@ -53,9 +53,13 @@ export async function PUT(req: NextRequest) {
   try {
     await requireAdmin();
     const body = await req.json();
-    const { id, ...data } = body;
+    const { id, ...rest } = body;
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-    const product = await db.product.update({ where: { id }, data });
+    const parsed = productSchema.partial().safeParse(rest);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid data" }, { status: 400 });
+    }
+    const product = await db.product.update({ where: { id }, data: parsed.data });
     return NextResponse.json({ product });
   } catch (error) {
     if (error instanceof Error && error.message === "FORBIDDEN") {

@@ -9,21 +9,30 @@ import { Redis } from "@upstash/redis";
 // Use Upstash Redis if configured, otherwise fall back to in-memory
 const hasRedis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
 
-const limiter = hasRedis
-  ? new Ratelimit({
+// Cache of Upstash limiters keyed by "maxTokens:windowSeconds"
+const upstashLimiters = new Map<string, Ratelimit>();
+
+function getUpstashLimiter(maxTokens: number, windowSeconds: number): Ratelimit {
+  const key = `${maxTokens}:${windowSeconds}`;
+  let limiter = upstashLimiters.get(key);
+  if (!limiter) {
+    limiter = new Ratelimit({
       redis: new Redis({
         url: process.env.UPSTASH_REDIS_REST_URL!,
         token: process.env.UPSTASH_REDIS_REST_TOKEN!,
       }),
-      limiter: Ratelimit.slidingWindow(10, "60 s"),
+      limiter: Ratelimit.slidingWindow(maxTokens, `${windowSeconds} s`),
       analytics: true,
-    })
-  : null;
+    });
+    upstashLimiters.set(key, limiter);
+  }
+  return limiter;
+}
 
 // In-memory fallback for development
 const memoryBuckets = new Map<string, { tokens: number; lastRefill: number }>();
 
-function memoryRateLimit(key: string, maxTokens = 10, windowMs = 60000) {
+function memoryRateLimit(key: string, maxTokens: number, windowMs: number) {
   const now = Date.now();
   let bucket = memoryBuckets.get(key);
 
@@ -51,13 +60,14 @@ function memoryRateLimit(key: string, maxTokens = 10, windowMs = 60000) {
  */
 export async function rateLimit(
   key: string,
-  { maxTokens = 10 } = {}
+  { maxTokens = 10, windowSeconds = 60 } = {}
 ): Promise<{ success: boolean; remaining: number }> {
-  if (limiter) {
+  if (hasRedis) {
+    const limiter = getUpstashLimiter(maxTokens, windowSeconds);
     const result = await limiter.limit(key);
     return { success: result.success, remaining: result.remaining };
   }
-  return memoryRateLimit(key, maxTokens);
+  return memoryRateLimit(key, maxTokens, windowSeconds * 1000);
 }
 
 /**

@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "fallback-secret-for-initial-deploy"
-);
-
-const COOKIE_NAME = "vp-session";
+import { JWT_SECRET, COOKIE_NAME } from "@/lib/constants";
 
 const protectedRoutes = ["/dashboard"];
 const adminRoutes = ["/admin"];

@@ -2,14 +2,8 @@ import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
+import { JWT_SECRET, COOKIE_NAME, SESSION_DURATION } from "@/lib/constants";
 import type { UserRole } from "@prisma/client";
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "vitalpath-dev-secret-change-in-production"
-);
-
-const COOKIE_NAME = "vp-session";
-const SESSION_DURATION = 30 * 24 * 60 * 60; // 30 days in seconds
 
 // ─── Password helpers ───────────────────────────────────────
 

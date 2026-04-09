@@ -37,7 +37,6 @@ export function ProcessSection() {
                         sizes="(max-width: 1024px) 100vw, 33vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
-                      {/* Step number on image */}
                       <div className="absolute bottom-3 left-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-atlantic text-white text-lg font-bold shadow-glow">
                         {step.step}
                       </div>
@@ -45,25 +44,22 @@ export function ProcessSection() {
                   )}
 
                   <div className="flex flex-col p-8 pt-4">
-                  {/* Step icon */}
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50">
-                      <Icon className="h-5 w-5 text-teal" />
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50">
+                        <Icon className="h-5 w-5 text-teal" />
+                      </div>
+                    </div>
+
+                    <h3 className="mt-4 text-xl font-bold text-navy">{step.title}</h3>
+                    <p className="mt-3 flex-1 text-sm leading-relaxed text-graphite-500">
+                      {step.description}
+                    </p>
+
+                    <div className="mt-5 inline-flex self-start rounded-full bg-teal-50 px-3 py-1">
+                      <span className="text-xs font-semibold text-teal">{step.timeEstimate}</span>
                     </div>
                   </div>
 
-                  <h3 className="mt-4 text-xl font-bold text-navy">{step.title}</h3>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-graphite-500">
-                    {step.description}
-                  </p>
-
-                  {/* Time estimate badge */}
-                  <div className="mt-5 inline-flex self-start rounded-full bg-teal-50 px-3 py-1">
-                    <span className="text-xs font-semibold text-teal">{step.timeEstimate}</span>
-                  </div>
-                  </div>
-
-                  {/* Connector arrow (hidden on mobile) */}
                   {i < processSteps.length - 1 && (
                     <div className="absolute -right-4 top-1/2 z-10 hidden lg:block">
                       <ArrowRight className="h-6 w-6 text-teal-300" />
@@ -75,7 +71,6 @@ export function ProcessSection() {
           })}
         </div>
 
-        {/* Total timeline summary */}
         <AnimateOnView className="mt-8 text-center" delay={0.4}>
           <div className="mx-auto inline-flex items-center gap-3 rounded-full border border-teal-100 bg-teal-50/50 px-6 py-3">
             <Clock className="h-4 w-4 text-teal" />
@@ -85,7 +80,6 @@ export function ProcessSection() {
           </div>
         </AnimateOnView>
 
-        {/* CTA under steps */}
         <AnimateOnView className="mt-8 text-center" delay={0.5}>
           <TrackedLink href="/quiz" cta="process_assessment" location="process_section">
             <Button size="xl" className="gap-2 px-10">

@@ -114,3 +114,94 @@ export function recommendPlan(quiz: Partial<QuizValues>): "essential" | "premium
   if (score >= 4) return "premium";
   return "essential";
 }
+
+// ─── Enhanced Plan Recommendation (Qualify Flow) ────────────
+
+export interface QualifyRecommendInput {
+  bmi?: number;
+  activityLevel?: string;
+  eatingPattern?: string;
+  primaryGoal?: string;
+  conditionsCount?: number;
+  hasContraindication?: boolean;
+}
+
+export function recommendPlanFromQualify(input: QualifyRecommendInput): "essential" | "premium" | "complete" {
+  let score = 0;
+
+  // Activity + eating patterns
+  if (input.activityLevel === "sedentary") score += 2;
+  if (input.eatingPattern === "emotional-eating" || input.eatingPattern === "irregular") score += 2;
+
+  // Goal complexity
+  if (input.primaryGoal === "body-recomposition") score += 1;
+  if (input.primaryGoal === "maintenance") score += 1;
+  if (input.primaryGoal === "guided-support") score += 2;
+
+  // BMI-based (higher BMI benefits from more comprehensive support)
+  if (input.bmi && input.bmi >= 40) score += 2;
+  else if (input.bmi && input.bmi >= 35) score += 1;
+
+  // Medical complexity
+  if (input.conditionsCount && input.conditionsCount >= 3) score += 1;
+  if (input.hasContraindication) score += 1;
+
+  if (score >= 7) return "complete";
+  if (score >= 4) return "premium";
+  return "essential";
+}
+
+// ─── Qualify Schema ─────────────────────────────────────────
+
+export const qualifySchema = z.object({
+  // Step 1: BMI
+  heightFeet: z.number().min(3).max(8),
+  heightInches: z.number().min(0).max(11),
+  weightLbs: z.number().min(80).max(700),
+  age: z.number().min(18).max(120),
+  sex: z.enum(["male", "female"]),
+
+  // Step 2: Goals
+  primaryGoal: z.enum(["weight-loss", "body-recomposition", "energy-metabolism", "maintenance", "guided-support"]),
+  activityLevel: z.enum(["sedentary", "light", "moderate", "active"]),
+  eatingPattern: z.enum(["regular-meals", "irregular", "snack-heavy", "skip-meals", "emotional-eating"]),
+
+  // Step 3: Medical
+  conditions: z.array(z.string()).optional(),
+  medications: z.string().optional(),
+  allergies: z.string().optional(),
+
+  // Step 4: Contraindications
+  hasThyroidCancer: z.boolean().default(false),
+  hasMEN2: z.boolean().default(false),
+  isPregnant: z.boolean().default(false),
+  hasPancreatitis: z.boolean().default(false),
+  hasGastroparesis: z.boolean().default(false),
+  hasDiabeticRetinopathy: z.boolean().default(false),
+  hasGallbladderDisease: z.boolean().default(false),
+  hasKidneyDisease: z.boolean().default(false),
+  hasEatingDisorder: z.boolean().default(false),
+  hasSuicidalIdeation: z.boolean().default(false),
+
+  // Step 6: Personal
+  firstName: z.string().min(2),
+  lastName: z.string().min(2),
+  email: z.string().email(),
+  phone: z.string().min(10),
+  dateOfBirth: z.string().min(8),
+  state: z.string().min(2),
+  emergencyContactName: z.string().min(2),
+  emergencyContactPhone: z.string().min(10),
+  emergencyContactRelation: z.string().min(2),
+  goalWeightLbs: z.number().optional(),
+  medicalHistory: z.string().min(10),
+
+  // Step 7: Consent
+  consentTreatment: z.boolean().refine((v) => v, "You must consent to proceed"),
+  consentHipaa: z.boolean().refine((v) => v, "HIPAA consent is required"),
+  consentTelehealth: z.boolean().refine((v) => v, "Telehealth consent is required"),
+  consentMedicationRisks: z.boolean().refine((v) => v, "Medication risk acknowledgment is required"),
+
+  // Enrichment (for analytics/patient profile)
+  recommendedPlan: z.string().optional(),
+});

@@ -3,6 +3,14 @@ import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
+import { safeError } from "@/lib/logger";
+
+const ALLOWED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp"]);
+const MIME_TO_EXT: Record<string, string[]> = {
+  "image/jpeg": ["jpg", "jpeg"],
+  "image/png": ["png"],
+  "image/webp": ["webp"],
+};
 
 // GET — list user's photos
 export async function GET() {
@@ -33,9 +41,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ error: "File must be an image" }, { status: 400 });
+    // Validate MIME type against whitelist
+    const allowedExts = MIME_TO_EXT[file.type];
+    if (!allowedExts) {
+      return NextResponse.json(
+        { error: "File must be a JPEG, PNG, or WebP image" },
+        { status: 400 }
+      );
     }
 
     // Validate file size (10MB max)
@@ -43,18 +55,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "File must be under 10MB" }, { status: 400 });
     }
 
-    // Save to local uploads directory (swap to S3/R2 in production)
-    const uploadsDir = join(process.cwd(), "public", "uploads", session.userId);
+    // Validate and sanitize file extension
+    const rawExt = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
+    if (!ALLOWED_EXTENSIONS.has(rawExt) || !allowedExts.includes(rawExt)) {
+      return NextResponse.json(
+        { error: "File extension does not match its type" },
+        { status: 400 }
+      );
+    }
+
+    // Save to non-public uploads directory
+    const uploadsDir = join(process.cwd(), "uploads", session.userId);
     await mkdir(uploadsDir, { recursive: true });
 
-    const ext = file.name.split(".").pop() || "jpg";
-    const filename = `${type.toLowerCase()}_${Date.now()}.${ext}`;
+    const filename = `${type.toLowerCase()}_${Date.now()}.${rawExt}`;
     const filepath = join(uploadsDir, filename);
 
     const bytes = await file.arrayBuffer();
     await writeFile(filepath, Buffer.from(bytes));
 
-    const imageUrl = `/uploads/${session.userId}/${filename}`;
+    const imageUrl = `/api/photos/serve?path=${session.userId}/${filename}`;
 
     // Create DB record
     const photo = await db.progressPhoto.create({
@@ -71,7 +91,7 @@ export async function POST(req: NextRequest) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.error("[Photos API]", error);
+    safeError("[Photos API]", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }

@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { safeError } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 10 coupon validations per minute per IP
+  const { success } = await rateLimit(getRateLimitKey(req, "coupon-validate"), {
+    maxTokens: 10,
+  });
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": "60" } }
+    );
+  }
+
   try {
     const { code, planSlug } = await req.json();
 
@@ -29,7 +42,12 @@ export async function POST(req: NextRequest) {
 
     // Check plan applicability
     if (coupon.applicablePlans && planSlug) {
-      const plans = JSON.parse(coupon.applicablePlans as string) as string[];
+      let plans: string[] = [];
+      try {
+        plans = JSON.parse(coupon.applicablePlans as string) as string[];
+      } catch {
+        plans = [];
+      }
       if (plans.length > 0 && !plans.includes(planSlug)) {
         return NextResponse.json({ valid: false, error: "This coupon doesn't apply to your selected plan" });
       }
@@ -46,7 +64,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("[Coupon Validate]", error);
+    safeError("[Coupon Validate]", error);
     return NextResponse.json({ error: "Validation failed" }, { status: 500 });
   }
 }

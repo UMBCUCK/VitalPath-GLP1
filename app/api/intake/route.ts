@@ -6,8 +6,21 @@ import { createTelehealthService } from "@/lib/services/telehealth";
 import { createEmailService, emailTemplates } from "@/lib/services/email";
 import { trackServerEvent } from "@/lib/analytics";
 import { CONSENT_VERSIONS } from "@/lib/consent-versions";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { safeError } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 5 intake submissions per minute per IP
+  const { success } = await rateLimit(getRateLimitKey(req, "intake"), {
+    maxTokens: 5,
+  });
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many submissions. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": "60" } }
+    );
+  }
+
   try {
     const body = await req.json();
     const parsed = intakeSchema.safeParse(body);
@@ -192,7 +205,7 @@ export async function POST(req: NextRequest) {
 
       await telehealth.requestConsultation(patient.id, "GLP-1 weight management evaluation");
     } catch (err) {
-      console.error("[Intake] Telehealth service error:", err);
+      safeError("[Intake] Telehealth service error", err);
     }
 
     // Send welcome email
@@ -201,14 +214,14 @@ export async function POST(req: NextRequest) {
       const template = emailTemplates.welcome(data.firstName);
       await emailService.send({ to: data.email, ...template });
     } catch (err) {
-      console.error("[Intake] Email send error:", err);
+      safeError("[Intake] Email send error", err);
     }
 
     await trackServerEvent("SubmitIntake", { email: data.email }, { state: data.state });
 
     return NextResponse.json({ ok: true, intakeId: intake.id });
   } catch (error) {
-    console.error("[Intake API]", error);
+    safeError("[Intake API]", error);
     return NextResponse.json({ error: "Intake submission failed" }, { status: 500 });
   }
 }
