@@ -6,6 +6,7 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { db } from "@/lib/db";
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Compare Weight Management Programs",

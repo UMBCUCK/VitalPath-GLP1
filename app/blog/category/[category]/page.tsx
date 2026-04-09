@@ -9,6 +9,7 @@ import { MarketingShell } from "@/components/layout/marketing-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
+export const dynamic = "force-dynamic";
 
 const categories = {
   medication: {
