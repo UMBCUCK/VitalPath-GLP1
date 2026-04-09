@@ -1,0 +1,1025 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── AUTH & USERS ───────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  phone         String?
+  passwordHash  String?
+  firstName     String?
+  lastName      String?
+  dateOfBirth   DateTime?
+  role          UserRole  @default(PATIENT)
+  avatarUrl     String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  profile          PatientProfile?
+  subscriptions    Subscription[]
+  orders           Order[]
+  intakeSubmission IntakeSubmission?
+  quizSubmission   QuizSubmission?
+  progressEntries  ProgressEntry[]
+  progressPhotos   ProgressPhoto[]
+  messages         Message[]
+  referralCode     ReferralCode?
+  referralsGiven   Referral[]       @relation("Referrer")
+  referralsUsed    Referral[]       @relation("Referred")
+  notifications    Notification[]
+  sessions         Session[]
+  adminActions     AdminAuditLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+enum UserRole {
+  PATIENT
+  PROVIDER
+  ADMIN
+  SUPPORT
+}
+
+// ─── PATIENT PROFILE ────────────────────────────────────────
+
+model PatientProfile {
+  id               String  @id @default(cuid())
+  userId           String  @unique
+  heightInches     Int?
+  weightLbs        Float?
+  goalWeightLbs    Float?
+  state            String? // US state for availability
+  insuranceType    String? // cash_pay | insurance
+  stripeCustomerId String? @unique
+
+  // Medical
+  medications      String?
+  allergies        String?
+  medicalHistory   String?
+  contraindications Boolean @default(false)
+
+  // Telehealth vendor refs
+  telehealthPatientId String?
+  pharmacyPatientId   String?
+
+  // Preferences
+  mealPlanPreference String? // standard | high_protein | low_effort | family
+  notifyEmail        Boolean @default(true)
+  notifySms          Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+  @@index([state])
+}
+
+// ─── QUIZ & INTAKE ──────────────────────────────────────────
+
+model QuizSubmission {
+  id              String   @id @default(cuid())
+  userId          String?  @unique
+  sessionId       String?  // for anonymous users
+  weightRange     String
+  primaryGoal     String
+  frustration     String?
+  eatingHabits    String?
+  activityLevel   String
+  timelineMonths  Int?
+  supportPrefs    Json     // array of support preferences
+  recommendedPlan String?  // slug of recommended plan
+  completedAt     DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([sessionId])
+}
+
+model IntakeSubmission {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  status         IntakeStatus @default(PENDING)
+
+  // Personal
+  firstName      String
+  lastName       String
+  email          String
+  phone          String
+  dateOfBirth    String
+  state          String
+
+  // Medical
+  heightFeet     Int
+  heightInches   Int
+  weightLbs      Float
+  goalWeightLbs  Float?
+  medications    String?
+  allergies      String?
+  medicalHistory String
+  conditions     Json?    // array of conditions
+
+  // Consent
+  consentGiven   Boolean
+  consentDate    DateTime @default(now())
+  hipaaConsent   Boolean  @default(false)
+
+  // Telehealth
+  telehealthReferralId String?
+  providerAssignedId   String?
+  eligibilityResult    EligibilityResult?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([state])
+}
+
+enum IntakeStatus {
+  PENDING
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  DENIED
+  NEEDS_INFO
+  EXPIRED
+}
+
+enum EligibilityResult {
+  ELIGIBLE
+  NOT_ELIGIBLE
+  PENDING_REVIEW
+  ALTERNATIVE_PATH
+}
+
+// ─── PRODUCTS & SUBSCRIPTIONS ───────────────────────────────
+
+model Product {
+  id            String      @id @default(cuid())
+  name          String
+  slug          String      @unique
+  description   String?
+  longDescription String?
+  type          ProductType
+  category      ProductCategory
+  isActive      Boolean     @default(true)
+  isAddon       Boolean     @default(false)
+  sortOrder     Int         @default(0)
+
+  // Pricing
+  priceMonthly      Int         // cents
+  priceQuarterly    Int?        // cents
+  priceAnnual       Int?        // cents
+  stripePriceIdMonthly   String?
+  stripePriceIdQuarterly String?
+  stripePriceIdAnnual    String?
+  stripeProductId        String?
+
+  // Display
+  features      Json?       // array of feature strings
+  badge         String?     // "Most Popular", "Best Value"
+  iconName      String?     // lucide icon name
+  imageUrl      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  bundleItems   BundleItem[]   @relation("ParentBundle")
+  inBundles     BundleItem[]   @relation("BundledProduct")
+  subscriptions SubscriptionItem[]
+  orderItems    OrderItem[]
+  upsellOffers  UpsellOffer[]
+
+  @@index([slug])
+  @@index([type])
+  @@index([isActive])
+}
+
+model BundleItem {
+  id        String @id @default(cuid())
+  bundleId  String
+  productId String
+  sortOrder Int    @default(0)
+
+  bundle  Product @relation("ParentBundle", fields: [bundleId], references: [id], onDelete: Cascade)
+  product Product @relation("BundledProduct", fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([bundleId, productId])
+}
+
+enum ProductType {
+  MEMBERSHIP      // core subscription
+  ADDON           // add-on subscription
+  BUNDLE          // grouped products
+  SUPPLEMENT      // physical product
+  CONTENT         // digital content/recipes
+  LAB             // lab work
+  COACHING        // coaching sessions
+}
+
+enum ProductCategory {
+  WEIGHT_MANAGEMENT
+  METABOLIC_SUPPORT
+  NUTRITION
+  HYDRATION_PROTEIN
+  DIGESTIVE
+  MENS_HEALTH
+  HAIR_SKIN
+  HEALTHY_AGING
+  LABS
+  COACHING
+  MEAL_PLANS
+}
+
+// ─── SUBSCRIPTIONS ──────────────────────────────────────────
+
+model Subscription {
+  id                 String             @id @default(cuid())
+  userId             String
+  stripeSubscriptionId String?          @unique
+  status             SubscriptionStatus @default(ACTIVE)
+  interval           BillingInterval    @default(MONTHLY)
+
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAt           DateTime?
+  canceledAt         DateTime?
+  cancelReason       String?
+
+  // Save offer
+  saveOfferApplied   Boolean  @default(false)
+  saveOfferType      String?  // pause | downgrade | discount
+  pausedUntil        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items SubscriptionItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([stripeSubscriptionId])
+}
+
+model SubscriptionItem {
+  id             String @id @default(cuid())
+  subscriptionId String
+  productId      String
+  quantity       Int    @default(1)
+  priceInCents   Int
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  product      Product      @relation(fields: [productId], references: [id])
+
+  @@unique([subscriptionId, productId])
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  PAST_DUE
+  CANCELED
+  EXPIRED
+  TRIALING
+}
+
+enum BillingInterval {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+// ─── ORDERS & SHIPMENTS ─────────────────────────────────────
+
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  stripePaymentId String?
+  status          OrderStatus @default(PENDING)
+  totalCents      Int
+  subtotalCents   Int
+  discountCents   Int         @default(0)
+  taxCents        Int         @default(0)
+
+  // Shipping
+  shippingName    String?
+  shippingAddress Json?
+  trackingNumber  String?
+  carrier         String?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+
+  // Pharmacy
+  pharmacyOrderId String?
+  pharmacyVendor  String?
+
+  couponId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coupon  Coupon?     @relation(fields: [couponId], references: [id])
+  items   OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int    @default(1)
+  unitCents Int
+  totalCents Int
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELED
+  REFUNDED
+}
+
+// ─── UPSELL OFFERS ──────────────────────────────────────────
+
+model UpsellOffer {
+  id           String       @id @default(cuid())
+  productId    String
+  triggerEvent UpsellTrigger
+  headline     String
+  description  String?
+  discountPct  Int?         // e.g., 20 for 20% off first month
+  isActive     Boolean      @default(true)
+  sortOrder    Int          @default(0)
+  showOnce     Boolean      @default(false)
+
+  // Targeting
+  targetPlans  Json?        // array of plan slugs
+  targetStates Json?        // array of state codes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([triggerEvent])
+  @@index([isActive])
+}
+
+enum UpsellTrigger {
+  POST_CHECKOUT
+  POST_INTAKE
+  DASHBOARD_VIEW
+  MILESTONE_REACHED
+  REFILL_REMINDER
+  CANCELLATION_FLOW
+}
+
+// ─── CLAIM ENGINE ───────────────────────────────────────────
+
+model Claim {
+  id             String         @id @default(cuid())
+  text           String
+  category       ClaimCategory
+  status         ClaimStatus    @default(DRAFT)
+
+  // Control
+  allowedChannels Json          // array: homepage, pricing, checkout, email, sms, ad, upsell, product, dashboard
+  disclosureText  String?
+  citationSource  String?
+  citationUrl     String?
+
+  // Flags
+  numericClaim       Boolean @default(false)
+  requiresFootnote   Boolean @default(false)
+  requiresModal      Boolean @default(false)
+  requiresLegalReview Boolean @default(false)
+  requiresMedicalReview Boolean @default(false)
+  stateRestrictions  Json?   // array of restricted state codes
+
+  // Risk
+  riskLevel      RiskLevel @default(LOW)
+  riskNotes      String?
+
+  // Approval
+  approvedBy     String?
+  approvedAt     DateTime?
+  reviewNotes    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([status])
+}
+
+enum ClaimCategory {
+  STUDY_TETHERED_NUMERIC
+  NON_NUMERIC_SUPPORT
+  OPERATIONAL_TRUST
+  LIFESTYLE_ADHERENCE
+  TESTIMONIAL_RESULTS
+  SUPPLEMENT_SUPPORT
+}
+
+enum ClaimStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  RETIRED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ─── PROGRESS TRACKING ──────────────────────────────────────
+
+model ProgressEntry {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime @default(now())
+  weightLbs   Float?
+  waistInches Float?
+  hipsInches  Float?
+  chestInches Float?
+  armInches   Float?
+  thighInches Float?
+  bmi         Float?
+  notes       String?
+
+  // Daily tracking
+  waterOz     Int?
+  proteinG    Int?
+  steps       Int?
+  sleepHours  Float?
+  moodRating  Int?     // 1-5
+  energyRating Int?    // 1-5
+
+  // Medication
+  medicationTaken Boolean?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([date])
+}
+
+model ProgressPhoto {
+  id        String    @id @default(cuid())
+  userId    String
+  imageUrl  String
+  type      PhotoType
+  date      DateTime  @default(now())
+  isPublic  Boolean   @default(false)
+  caption   String?
+
+  // Gallery moderation
+  galleryApproved Boolean @default(false)
+  consentGiven    Boolean @default(false)
+  disclosureText  String?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([galleryApproved])
+}
+
+enum PhotoType {
+  FRONT
+  SIDE
+  BACK
+  CUSTOM
+}
+
+// ─── TREATMENT & PHARMACY ───────────────────────────────────
+
+model TreatmentPlan {
+  id                String          @id @default(cuid())
+  userId            String
+  intakeId          String?
+  status            TreatmentStatus @default(PENDING)
+
+  // Provider
+  providerName      String?
+  providerVendor    String?         // openloop | wheel | custom
+  providerRefId     String?
+
+  // Medication
+  medicationName    String?
+  medicationDose    String?
+  medicationFreq    String?
+  pharmacyVendor    String?
+  pharmacyRefId     String?
+  is503A            Boolean         @default(false)
+  is503B            Boolean         @default(false)
+  isBrandMed        Boolean         @default(false)
+
+  // Timeline
+  prescribedAt      DateTime?
+  nextRefillDate    DateTime?
+  nextCheckInDate   DateTime?
+
+  notes             String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([intakeId])
+  @@index([status])
+}
+
+enum TreatmentStatus {
+  PENDING
+  PRESCRIBED
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  DISCONTINUED
+}
+
+// ─── MESSAGING ──────────────────────────────────────────────
+
+model Message {
+  id         String      @id @default(cuid())
+  userId     String
+  threadId   String?
+  direction  MessageDir
+  channel    MessageChannel
+  subject    String?
+  body       String
+  isRead     Boolean     @default(false)
+  metadata   Json?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, threadId])
+  @@index([userId, isRead])
+}
+
+enum MessageDir {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageChannel {
+  APP
+  EMAIL
+  SMS
+}
+
+// ─── REFERRALS & COUPONS ────────────────────────────────────
+
+model ReferralCode {
+  id          String @id @default(cuid())
+  userId      String @unique
+  code        String @unique
+  tier        ReferralTier @default(STANDARD)
+
+  // Payout config (can override global)
+  payoutCents Int?
+  payoutType  PayoutType @default(CREDIT)
+  payoutCap   Int?       // max total payout in cents
+
+  totalReferred Int @default(0)
+  totalEarned   Int @default(0) // cents
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referrals Referral[]
+
+  @@index([code])
+}
+
+model Referral {
+  id            String        @id @default(cuid())
+  referralCodeId String
+  referrerId    String
+  referredId    String?
+  referredEmail String?
+  status        ReferralStatus @default(PENDING)
+  payoutCents   Int?
+  paidAt        DateTime?
+  utmSource     String?
+  utmMedium     String?
+  utmCampaign   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  referralCode ReferralCode @relation(fields: [referralCodeId], references: [id])
+  referrer     User         @relation("Referrer", fields: [referrerId], references: [id])
+  referred     User?        @relation("Referred", fields: [referredId], references: [id])
+
+  @@index([referralCodeId])
+  @@index([referrerId])
+  @@index([status])
+}
+
+enum ReferralTier {
+  STANDARD
+  SILVER
+  GOLD
+  AMBASSADOR
+}
+
+enum PayoutType {
+  CREDIT
+  CASH
+}
+
+enum ReferralStatus {
+  PENDING
+  CONVERTED
+  PAID
+  EXPIRED
+  FLAGGED
+}
+
+model Coupon {
+  id            String     @id @default(cuid())
+  code          String     @unique
+  type          CouponType
+  valueCents    Int?       // for fixed amount
+  valuePct      Int?       // for percentage
+  maxUses       Int?
+  usedCount     Int        @default(0)
+  minOrderCents Int?
+  expiresAt     DateTime?
+  isActive      Boolean    @default(true)
+
+  // Targeting
+  applicablePlans Json?    // array of plan slugs
+  applicableProducts Json? // array of product slugs
+  firstMonthOnly Boolean   @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+
+  @@index([code])
+  @@index([isActive])
+}
+
+enum CouponType {
+  FIXED_AMOUNT
+  PERCENTAGE
+  FREE_MONTH
+  FREE_ADDON
+}
+
+// ─── CONTENT & RECIPES ──────────────────────────────────────
+
+model Recipe {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  imageUrl    String?
+  prepMinutes Int?
+  cookMinutes Int?
+  servings    Int?
+  calories    Int?
+  proteinG    Int?
+  carbsG      Int?
+  fatG        Int?
+  fiberG      Int?
+
+  // Content
+  ingredients Json     // array of ingredients
+  instructions Json    // array of instruction steps
+  tips        String?
+
+  // Categorization
+  category    RecipeCategory
+  tags        Json?    // array of tags
+  difficulty  String?  // easy | medium | advanced
+  isGlp1Friendly Boolean @default(true)
+
+  // Access
+  tierRequired String? // null = free, "premium", "complete"
+  isPublished  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  mealPlanItems MealPlanItem[]
+
+  @@index([slug])
+  @@index([category])
+  @@index([isPublished])
+}
+
+enum RecipeCategory {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+  SMOOTHIE
+  MEAL_PREP
+  HIGH_PROTEIN
+  LOW_EFFORT
+  FAMILY
+}
+
+model MealPlan {
+  id          String  @id @default(cuid())
+  title       String
+  slug        String  @unique
+  description String?
+  weekNumber  Int
+  year        Int
+  mode        String  // standard | high_protein | low_effort | family
+
+  // Access
+  tierRequired String? // null = free, "premium", "complete"
+  isPublished  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items MealPlanItem[]
+
+  @@unique([weekNumber, year, mode])
+  @@index([isPublished])
+}
+
+model MealPlanItem {
+  id         String @id @default(cuid())
+  mealPlanId String
+  recipeId   String
+  dayOfWeek  Int    // 0-6
+  mealType   String // breakfast | lunch | dinner | snack
+  sortOrder  Int    @default(0)
+
+  mealPlan MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  recipe   Recipe   @relation(fields: [recipeId], references: [id])
+
+  @@unique([mealPlanId, dayOfWeek, mealType])
+}
+
+// ─── RESULTS GALLERY ────────────────────────────────────────
+
+model ResultStory {
+  id             String   @id @default(cuid())
+  displayName    String
+  age            Int?
+  state          String?
+  headline       String
+  story          String
+  startWeight    Float?
+  currentWeight  Float?
+  timeMonths     Int?
+  rating         Int?     // 1-5
+  photoBeforeUrl String?
+  photoAfterUrl  String?
+
+  // Moderation
+  status         ClaimStatus @default(DRAFT)
+  consentGiven   Boolean     @default(false)
+  consentDate    DateTime?
+  disclosureText String?
+  moderatedBy    String?
+  moderatedAt    DateTime?
+
+  // Display
+  featured       Boolean  @default(false)
+  sortOrder      Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([featured])
+}
+
+// ─── LEADS ──────────────────────────────────────────────────
+
+model Lead {
+  id        String  @id @default(cuid())
+  email     String  @unique
+  name      String?
+  phone     String?
+  source    String? // quiz_abandon | checkout_abandon | footer | popup | calculator | referral
+  utmSource String?
+  utmMedium String?
+  utmCampaign String?
+  state     String?
+  metadata  Json?
+
+  // Lifecycle
+  convertedAt DateTime?
+  userId      String?
+
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([source])
+}
+
+// ─── NOTIFICATIONS ──────────────────────────────────────────
+
+model Notification {
+  id       String           @id @default(cuid())
+  userId   String
+  type     NotificationType
+  title    String
+  body     String?
+  link     String?
+  isRead   Boolean          @default(false)
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+}
+
+enum NotificationType {
+  SHIPMENT_UPDATE
+  REFILL_REMINDER
+  MILESTONE
+  CHECK_IN
+  PROVIDER_MESSAGE
+  OFFER
+  SYSTEM
+}
+
+// ─── STATE AVAILABILITY ─────────────────────────────────────
+
+model StateAvailability {
+  id              String  @id @default(cuid())
+  stateCode       String  @unique
+  stateName       String
+  isAvailable     Boolean @default(false)
+  launchDate      DateTime?
+  restrictions    String?
+  telehealthNotes String?
+
+  @@index([isAvailable])
+}
+
+// ─── CALCULATOR SETTINGS ────────────────────────────────────
+
+model CalculatorSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value Json
+
+  updatedAt DateTime @updatedAt
+}
+
+// ─── REFERRAL SETTINGS (admin-editable) ─────────────────────
+
+model ReferralSetting {
+  id                   String @id @default(cuid())
+  defaultPayoutCents   Int    @default(5000) // $50 default
+  payoutType           PayoutType @default(CREDIT)
+  payoutCapCents       Int?
+  bonusTiers           Json?  // { referrals: 5, bonusCents: 2500 }
+  campaignOverrides    Json?  // per-campaign payout overrides
+  isActive             Boolean @default(true)
+
+  updatedAt DateTime @updatedAt
+}
+
+// ─── ANALYTICS EVENTS ───────────────────────────────────────
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  eventName  String
+  userId     String?
+  sessionId  String?
+  properties Json?
+  timestamp  DateTime @default(now())
+
+  @@index([eventName])
+  @@index([userId])
+  @@index([timestamp])
+}
+
+// ─── BLOG / CONTENT ─────────────────────────────────────────
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String   // markdown or HTML
+  imageUrl    String?
+  author      String?
+  category    String?  // education | nutrition | medication | lifestyle | news
+  tags        Json?    // array of tags
+  isPublished Boolean  @default(false)
+  publishedAt DateTime?
+  seoTitle    String?
+  seoDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isPublished])
+  @@index([category])
+}
+
+// ─── COMPARISON PAGES ───────────────────────────────────────
+
+model ComparisonPage {
+  id              String  @id @default(cuid())
+  slug            String  @unique
+  title           String
+  seoTitle        String?
+  seoDescription  String?
+  heroHeadline    String
+  heroDescription String?
+  overviewLeft    String? // our side
+  overviewRight   String? // competitor side
+  features        Json    // array of { feature, us, them } rows
+  pricingUs       String?
+  pricingThem     String?
+  keyDifferences  Json?   // array of difference strings
+  ctaHeadline     String?
+  ctaDescription  String?
+  isPublished     Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isPublished])
+}
+
+// ─── ADMIN AUDIT LOG ────────────────────────────────────────
+
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  ipAddress String?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+}

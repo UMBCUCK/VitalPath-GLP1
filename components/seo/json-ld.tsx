@@ -1,0 +1,313 @@
+import { siteConfig } from "@/lib/site";
+
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "development" ? "http://localhost:3000" : "");
+
+export function OrganizationJsonLd() {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "MedicalBusiness",
+    name: siteConfig.name,
+    description: siteConfig.description,
+    url: BASE_URL,
+    telephone: siteConfig.support.phone,
+    email: siteConfig.support.email,
+    medicalSpecialty: "Weight Management",
+    availableService: {
+      "@type": "MedicalTherapy",
+      name: "GLP-1 Weight Management Program",
+      description: "Provider-guided weight management with personalized treatment plans and ongoing support.",
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: siteConfig.socialProof.rating,
+      reviewCount: 2400,
+      bestRating: 5,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+export function FAQPageJsonLd({ faqs }: { faqs: readonly { question: string; answer: string }[] }) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+export function ArticleJsonLd({
+  title,
+  description,
+  slug,
+  datePublished,
+  dateModified,
+  author,
+}: {
+  title: string;
+  description: string;
+  slug: string;
+  datePublished: string;
+  dateModified?: string;
+  author?: string | null;
+}) {
+  const authorName = author || siteConfig.name;
+  const isDoctor = authorName.includes("Dr.") || authorName.includes("MD");
+
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: title,
+    description,
+    url: `${BASE_URL}/blog/${slug}`,
+    datePublished,
+    dateModified: dateModified || datePublished,
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: BASE_URL,
+    },
+    author: isDoctor
+      ? {
+          "@type": "Person",
+          name: authorName,
+          jobTitle: "Medical Director",
+          worksFor: { "@type": "Organization", name: siteConfig.name },
+        }
+      : {
+          "@type": "Organization",
+          name: authorName,
+          url: BASE_URL,
+        },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/blog/${slug}`,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+export function WebPageJsonLd({
+  title,
+  description,
+  path,
+}: {
+  title: string;
+  description: string;
+  path: string;
+}) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: title,
+    description,
+    url: `${BASE_URL}${path}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: siteConfig.name,
+      url: BASE_URL,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+export function HowToJsonLd({
+  name,
+  description,
+  steps,
+}: {
+  name: string;
+  description: string;
+  steps: Array<{ title: string; description: string }>;
+}) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name,
+    description,
+    step: steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.title,
+      text: s.description,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+export function ProductJsonLd({
+  name,
+  description,
+  priceCurrency,
+  price,
+  url,
+}: {
+  name: string;
+  description: string;
+  priceCurrency?: string;
+  price: number;
+  url: string;
+}) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name,
+    description,
+    brand: { "@type": "Organization", name: siteConfig.name },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: priceCurrency || "USD",
+      price: price.toFixed(2),
+      url: `${BASE_URL}${url}`,
+      availability: "https://schema.org/InStock",
+      seller: { "@type": "Organization", name: siteConfig.name },
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: siteConfig.socialProof.rating,
+      reviewCount: 2400,
+      bestRating: 5,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+export function RecipeJsonLd({
+  name,
+  description,
+  prepTime,
+  cookTime,
+  servings,
+  calories,
+  protein,
+  ingredients,
+  instructions,
+  slug,
+}: {
+  name: string;
+  description: string;
+  prepTime: number;
+  cookTime: number;
+  servings: number;
+  calories: number;
+  protein: number;
+  ingredients: string[];
+  instructions: string[];
+  slug: string;
+}) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    name,
+    description,
+    prepTime: `PT${prepTime}M`,
+    cookTime: `PT${cookTime}M`,
+    totalTime: `PT${prepTime + cookTime}M`,
+    recipeYield: `${servings} serving${servings > 1 ? "s" : ""}`,
+    recipeCategory: "Weight Loss",
+    recipeCuisine: "American",
+    keywords: "high protein, weight loss, GLP-1 friendly, healthy",
+    nutrition: {
+      "@type": "NutritionInformation",
+      calories: `${calories} calories`,
+      proteinContent: `${protein}g`,
+    },
+    recipeIngredient: ingredients,
+    recipeInstructions: instructions.map((step, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      text: step,
+    })),
+    author: {
+      "@type": "Organization",
+      name: siteConfig.name,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: BASE_URL,
+    },
+    url: `${BASE_URL}/dashboard/meals/${slug}`,
+    datePublished: "2026-01-01",
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: 4.8,
+      reviewCount: 24,
+      bestRating: 5,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+export function BreadcrumbJsonLd({
+  items,
+}: {
+  items: Array<{ name: string; href: string }>;
+}) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      item: `${BASE_URL}${item.href}`,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}

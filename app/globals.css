@@ -1,0 +1,221 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 33% 98%;
+    --foreground: 213 22% 22%;
+    --card: 0 0% 100%;
+    --card-foreground: 213 22% 22%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 213 22% 22%;
+    --primary: 186 59% 30%;
+    --primary-foreground: 210 33% 98%;
+    --secondary: 150 16% 89%;
+    --secondary-foreground: 213 22% 22%;
+    --muted: 40 30% 94%;
+    --muted-foreground: 213 12% 45%;
+    --accent: 37 33% 57%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 16% 90%;
+    --input: 210 16% 90%;
+    --ring: 186 59% 30%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+/* Skip to content */
+.skip-to-content {
+  @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-navy focus:text-white focus:rounded-lg;
+}
+
+/* Premium card hover */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-premium-lg hover:-translate-y-0.5;
+}
+
+/* Section divider gradient */
+.section-divider {
+  @apply h-px w-full;
+  background: linear-gradient(90deg, transparent, #1F6F78 20%, #B79B6C 50%, #1F6F78 80%, transparent);
+  opacity: 0.2;
+}
+
+/* Gradient text */
+.gradient-text {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #0E223D 0%, #1F6F78 50%, #163A63 100%);
+}
+
+.gradient-text-gold {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #B79B6C 0%, #D2BA8A 50%, #B79B6C 100%);
+}
+
+/* Premium backgrounds */
+.bg-premium-gradient {
+  background: linear-gradient(180deg, #FAFCFD 0%, #F5EFE7 50%, #DDE9E3 100%);
+}
+
+.bg-navy-gradient {
+  background: linear-gradient(180deg, #0E223D 0%, #163A63 100%);
+}
+
+.bg-subtle-grid {
+  background-image:
+    linear-gradient(rgba(14, 34, 61, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 34, 61, 0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-navy-200 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-navy-300;
+}
+
+/* Focus ring */
+.focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2;
+}
+
+/* Calculator specific */
+.calculator-input {
+  @apply w-full rounded-xl border border-navy-100 bg-white px-4 py-3 text-navy-800 text-lg font-medium
+    placeholder:text-navy-300
+    focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal
+    transition-all duration-200;
+}
+
+.calculator-result {
+  @apply rounded-2xl bg-gradient-to-br from-teal-50 to-sage p-6 border border-teal-100;
+}
+
+/* Quiz progress */
+.quiz-progress {
+  @apply h-1.5 rounded-full bg-sage transition-all duration-500 ease-out;
+}
+.quiz-progress-fill {
+  @apply h-full rounded-full bg-gradient-to-r from-teal to-atlantic transition-all duration-500 ease-out;
+}
+
+/* Print styles */
+@media print {
+  header, footer, nav, .print\\:hidden, button { display: none !important; }
+  body { background: white !important; color: black !important; font-size: 12pt; }
+  .shadow-premium, .shadow-premium-md, .shadow-premium-lg { box-shadow: none !important; }
+  a { text-decoration: none; color: inherit; }
+}
+
+/* Entrance animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out both;
+}
+.animate-fade-in-left {
+  animation: fadeInLeft 0.5s ease-out both;
+}
+
+/* Stagger delays for children */
+.stagger-1 { animation-delay: 0.08s; }
+.stagger-2 { animation-delay: 0.16s; }
+.stagger-3 { animation-delay: 0.24s; }
+.stagger-4 { animation-delay: 0.32s; }
+.stagger-5 { animation-delay: 0.40s; }
+
+/* FAQ accordion */
+.faq-answer {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.2s ease, opacity 0.2s ease;
+}
+.faq-answer[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.faq-answer > div {
+  overflow: hidden;
+}
+
+/* Accessibility: visible focus indicators */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-teal;
+}
+
+/* Mobile touch targets — minimum 44px for all interactive elements */
+@media (max-width: 640px) {
+  button, a, input, select, [role="button"] {
+    min-height: 44px;
+  }
+
+  /* Prevent horizontal overflow on small screens */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Range slider thumb size for mobile */
+  input[type="range"]::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Smooth reveal for lazy-loaded sections */
+.lazy-section {
+  @apply transition-opacity duration-300;
+}
+
+/* High-contrast mode support */
+@media (prefers-contrast: high) {
+  .shadow-premium, .shadow-glow, .shadow-gold-glow {
+    box-shadow: 0 0 0 2px currentColor !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in-left,
+  .animate-pulse,
+  .animate-spin,
+  .animate-ping {
+    animation: none !important;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
