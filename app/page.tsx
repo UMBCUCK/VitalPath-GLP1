@@ -1,5 +1,3 @@
-export const dynamic = "force-static";
-
 import type { Metadata } from "next";
 import dynamic_import from "next/dynamic";
 import { HeroSection } from "@/components/marketing/hero-section";
