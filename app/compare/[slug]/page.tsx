@@ -11,15 +11,7 @@ import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 
-export const revalidate = 3600;
-
-export async function generateStaticParams() {
-  const pages = await db.comparisonPage.findMany({
-    where: { isPublished: true },
-    select: { slug: true },
-  });
-  return pages.map((p) => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
 type PageProps = { params: Promise<{ slug: string }> };
 

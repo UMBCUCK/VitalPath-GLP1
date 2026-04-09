@@ -11,15 +11,7 @@ import { providers } from "@/lib/content";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 
-export const revalidate = 3600;
-
-export async function generateStaticParams() {
-  const posts = await db.blogPost.findMany({
-    where: { isPublished: true },
-    select: { slug: true },
-  });
-  return posts.map((post) => ({ slug: post.slug }));
-}
+export const dynamic = "force-dynamic";
 
 type PageProps = { params: Promise<{ slug: string }> };
 

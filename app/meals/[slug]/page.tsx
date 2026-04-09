@@ -9,15 +9,7 @@ import { RecipeJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 
-export const revalidate = 3600;
-
-export async function generateStaticParams() {
-  const recipes = await db.recipe.findMany({
-    where: { isPublished: true },
-    select: { slug: true },
-  });
-  return recipes.map((r) => ({ slug: r.slug }));
-}
+export const dynamic = "force-dynamic";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
