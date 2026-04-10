@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { safeError } from "@/lib/logger";
+import { stripe } from "@/lib/stripe";
+import { safeError, safeLog } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,7 +27,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No active subscription" }, { status: 400 });
     }
 
-    // Update the subscription item to the new plan
+    // Upgrade in Stripe — swap the price on the subscription with proration
+    if (subscription.stripeSubscriptionId && targetProduct.stripePriceIdMonthly) {
+      try {
+        const stripeSub = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
+        const currentItem = stripeSub.items.data[0];
+
+        if (currentItem) {
+          await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+            items: [{
+              id: currentItem.id,
+              price: targetProduct.stripePriceIdMonthly,
+            }],
+            proration_behavior: "create_prorations", // Customer gets credit for unused time
+          });
+          safeLog("[Upgrade]", "Stripe subscription upgraded with proration", {
+            from: subscription.items[0]?.product?.name || "unknown",
+            to: targetProduct.name,
+          });
+        }
+      } catch (stripeErr) {
+        safeError("[Upgrade] Stripe upgrade failed", stripeErr);
+        return NextResponse.json({ error: "Failed to upgrade payment. Please try again." }, { status: 500 });
+      }
+    }
+
+    // Update local database
     const currentItem = subscription.items[0];
     if (currentItem) {
       await db.subscriptionItem.update({
@@ -52,6 +78,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     safeError("[Upgrade API]", error);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to upgrade plan" }, { status: 500 });
   }
 }

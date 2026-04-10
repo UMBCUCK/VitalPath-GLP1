@@ -21,14 +21,14 @@ import { MarketingShell } from "@/components/layout/marketing-shell";
 export const metadata: Metadata = {
   title: "Health Calculators",
   description:
-    "Free health calculators: BMI, TDEE, protein intake, hydration, goal timeline, and more. Evidence-based tools to support your health decisions.",
+    "Free health calculators: BMI, TDEE, protein intake, hydration, weight loss timeline, and more. Evidence-based tools to support your health decisions.",
 };
 
 const calculators = [
   {
     icon: Scale,
     title: "BMI Calculator",
-    description: "Calculate your body mass index and understand what it means for your health profile.",
+    description: "Interactive gauge shows your BMI on a color-coded spectrum with population context.",
     href: "/calculators/bmi",
     color: "from-teal-50 to-sage",
     iconColor: "text-teal",
@@ -37,7 +37,7 @@ const calculators = [
   {
     icon: Flame,
     title: "TDEE Calculator",
-    description: "Estimate your total daily energy expenditure based on your activity level and metabolism.",
+    description: "See your daily calories with animated macro breakdown charts for each goal.",
     href: "/calculators/tdee",
     color: "from-gold-50 to-linen",
     iconColor: "text-gold-600",
@@ -46,7 +46,7 @@ const calculators = [
   {
     icon: Target,
     title: "Protein Calculator",
-    description: "Find your ideal daily protein range based on body weight, activity, and goals.",
+    description: "Get your protein target with food equivalents and a visual daily meal schedule.",
     href: "/calculators/protein",
     color: "from-atlantic/5 to-navy-50",
     iconColor: "text-atlantic",
@@ -55,47 +55,35 @@ const calculators = [
   {
     icon: Droplets,
     title: "Hydration Calculator",
-    description: "Calculate optimal daily water intake based on your weight and activity level.",
+    description: "Animated water fill shows your daily goal with a time-of-day drinking schedule.",
     href: "/calculators/hydration",
     color: "from-blue-50 to-teal-50",
     iconColor: "text-blue-500",
     tag: null,
   },
-  {
-    icon: TrendingUp,
-    title: "Goal Timeline Estimator",
-    description: "Estimate a realistic timeline to reach your goal weight based on healthy, sustainable progress.",
-    href: "/calculators/timeline",
-    color: "from-emerald-50 to-sage",
-    iconColor: "text-emerald-600",
-    tag: "Coming Soon",
-  },
+];
+
+const comingSoon = [
   {
     icon: DollarSign,
-    title: "Subscription Value Calculator",
+    title: "Subscription Value",
     description: "See the total value of what's included in each membership plan.",
-    href: "/calculators/value",
     color: "from-gold-50 to-linen-100",
     iconColor: "text-gold-700",
-    tag: "Coming Soon",
   },
   {
     icon: Users,
-    title: "Referral Earnings Calculator",
-    description: "Estimate how much you can earn by sharing VitalPath with friends and family.",
-    href: "/calculators/referrals",
+    title: "Referral Earnings",
+    description: "Estimate how much you can earn by sharing VitalPath.",
     color: "from-teal-50 to-blue-50",
     iconColor: "text-teal-600",
-    tag: "Coming Soon",
   },
   {
     icon: Calculator,
-    title: "Maintenance Cost Estimator",
-    description: "Plan your budget for the maintenance phase of your weight management program.",
-    href: "/calculators/maintenance",
+    title: "Maintenance Cost",
+    description: "Plan your budget for the maintenance phase.",
     color: "from-navy-50 to-sage/50",
     iconColor: "text-navy-500",
-    tag: "Coming Soon",
   },
 ];
 
@@ -114,6 +102,45 @@ export default function CalculatorsPage() {
             Evidence-based tools to help you understand your body, plan your nutrition,
             and make informed decisions about your health.
           </p>
+        </SectionShell>
+      </section>
+
+      {/* Featured: Timeline Calculator */}
+      <section className="py-12 border-b border-navy-100/40">
+        <SectionShell>
+          <Link
+            href="/calculators/timeline"
+            className="group block rounded-2xl bg-gradient-to-r from-navy to-atlantic p-8 sm:p-10 text-white shadow-premium-lg hover:shadow-premium-xl transition-all duration-300 hover:-translate-y-0.5"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+              <div className="flex-1">
+                <Badge variant="gold" className="mb-3">
+                  New
+                </Badge>
+                <h2 className="text-2xl sm:text-3xl font-bold">
+                  Weight Loss Timeline Calculator
+                </h2>
+                <p className="mt-3 text-white/70 max-w-lg">
+                  See your personalized week-by-week projection with interactive sliders.
+                  Compare GLP-1 results versus diet alone — powered by clinical trial data.
+                </p>
+                <div className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white/10 px-5 py-2.5 text-sm font-semibold text-white group-hover:bg-white/20 transition-colors">
+                  Try It Now
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
+              <div className="hidden sm:flex flex-col items-center gap-2 opacity-80">
+                <TrendingUp className="h-16 w-16 text-teal-300" />
+                <div className="flex gap-1">
+                  <div className="h-8 w-1.5 rounded-full bg-teal-400/50" />
+                  <div className="h-12 w-1.5 rounded-full bg-teal-400/60" />
+                  <div className="h-16 w-1.5 rounded-full bg-teal-400/70" />
+                  <div className="h-10 w-1.5 rounded-full bg-gold/50" />
+                  <div className="h-6 w-1.5 rounded-full bg-gold/40" />
+                </div>
+              </div>
+            </div>
+          </Link>
         </SectionShell>
       </section>
 
@@ -146,45 +173,58 @@ export default function CalculatorsPage() {
         </SectionShell>
       </section>
 
+      {/* Main calculators grid */}
       <section className="py-16">
         <SectionShell>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {calculators.map((calc) => {
-              const isComingSoon = calc.tag === "Coming Soon";
-              const classes = `group flex flex-col rounded-2xl border border-navy-100/60 bg-white p-6 shadow-premium transition-all duration-300 ${
-                isComingSoon ? "opacity-60 cursor-default" : "hover:shadow-premium-lg hover:-translate-y-0.5"
-              }`;
-
-              const cardContent = (
-                <>
-                  <div className="flex items-start justify-between">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${calc.color}`}>
-                      <calc.icon className={`h-6 w-6 ${calc.iconColor}`} />
-                    </div>
-                    {calc.tag && (
-                      <Badge variant={calc.tag === "Most Popular" ? "gold" : "secondary"} className="text-[10px]">
-                        {calc.tag}
-                      </Badge>
-                    )}
+            {calculators.map((calc) => (
+              <Link
+                key={calc.title}
+                href={calc.href}
+                className="group flex flex-col rounded-2xl border border-navy-100/60 bg-white p-6 shadow-premium transition-all duration-300 hover:shadow-premium-lg hover:-translate-y-0.5"
+              >
+                <div className="flex items-start justify-between">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${calc.color}`}>
+                    <calc.icon className={`h-6 w-6 ${calc.iconColor}`} />
                   </div>
-                  <h3 className="mt-4 text-base font-bold text-navy">{calc.title}</h3>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-graphite-400">
-                    {calc.description}
-                  </p>
-                  {!isComingSoon && (
-                    <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-teal">
-                      Calculate now <ArrowRight className="h-3.5 w-3.5" />
-                    </div>
+                  {calc.tag && (
+                    <Badge variant={calc.tag === "Most Popular" ? "gold" : "secondary"} className="text-[10px]">
+                      {calc.tag}
+                    </Badge>
                   )}
-                </>
-              );
+                </div>
+                <h3 className="mt-4 text-base font-bold text-navy">{calc.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-graphite-400">
+                  {calc.description}
+                </p>
+                <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-teal">
+                  Calculate now <ArrowRight className="h-3.5 w-3.5" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
 
-              return isComingSoon ? (
-                <div key={calc.title} className={classes}>{cardContent}</div>
-              ) : (
-                <Link key={calc.title} href={calc.href} className={classes}>{cardContent}</Link>
-              );
-            })}
+      {/* Coming soon section */}
+      <section className="py-10 border-t border-navy-100/40">
+        <SectionShell>
+          <p className="text-xs font-semibold uppercase tracking-wider text-graphite-400 mb-4">More tools coming soon</p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {comingSoon.map((calc) => (
+              <div
+                key={calc.title}
+                className="flex items-center gap-4 rounded-xl border border-navy-100/40 bg-white/60 p-4 opacity-60"
+              >
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${calc.color} shrink-0`}>
+                  <calc.icon className={`h-5 w-5 ${calc.iconColor}`} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-navy">{calc.title}</h3>
+                  <p className="text-xs text-graphite-400">{calc.description}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </SectionShell>
       </section>

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { stripe } from "@/lib/stripe";
 import { sendLifecycleEmail, cancellationSaveOffer } from "@/lib/services/lifecycle-emails";
-import { safeError } from "@/lib/logger";
+import { safeError, safeLog } from "@/lib/logger";
 
 export async function POST() {
   try {
@@ -16,9 +17,27 @@ export async function POST() {
       return NextResponse.json({ error: "No active subscription" }, { status: 400 });
     }
 
+    // Cancel in Stripe FIRST — this is the source of truth
+    if (subscription.stripeSubscriptionId) {
+      try {
+        await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+          cancel_at_period_end: true, // Don't cancel immediately — let them use until period ends
+        });
+        safeLog("[Cancel]", "Stripe subscription set to cancel at period end");
+      } catch (stripeErr) {
+        safeError("[Cancel] Stripe cancellation failed", stripeErr);
+        // Don't block local cancel if Stripe fails — webhook will sync later
+      }
+    }
+
+    // Update local database
     await db.subscription.update({
       where: { id: subscription.id },
-      data: { status: "CANCELED", canceledAt: new Date() },
+      data: {
+        status: "CANCELED",
+        canceledAt: new Date(),
+        cancelAt: subscription.currentPeriodEnd, // Access continues until period ends
+      },
     });
 
     // Send cancellation save offer email
@@ -28,12 +47,15 @@ export async function POST() {
       await sendLifecycleEmail(user.email, template, ["cancellation"]);
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      accessUntil: subscription.currentPeriodEnd?.toISOString(),
+    });
   } catch (error) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     safeError("[Cancel API]", error);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to cancel subscription" }, { status: 500 });
   }
 }

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { safeError } from "@/lib/logger";
+import { stripe } from "@/lib/stripe";
+import { safeError, safeLog } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,9 +20,30 @@ export async function POST(req: NextRequest) {
     const pausedUntil = new Date();
     pausedUntil.setMonth(pausedUntil.getMonth() + Math.min(3, months));
 
+    // Pause in Stripe — stops billing while keeping the subscription object
+    if (subscription.stripeSubscriptionId) {
+      try {
+        await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+          pause_collection: {
+            behavior: "void", // Don't generate invoices while paused
+            resumes_at: Math.floor(pausedUntil.getTime() / 1000),
+          },
+        });
+        safeLog("[Pause]", "Stripe subscription paused", { months });
+      } catch (stripeErr) {
+        safeError("[Pause] Stripe pause failed", stripeErr);
+      }
+    }
+
+    // Update local database
     await db.subscription.update({
       where: { id: subscription.id },
-      data: { status: "PAUSED", pausedUntil, saveOfferApplied: true, saveOfferType: "pause" },
+      data: {
+        status: "PAUSED",
+        pausedUntil,
+        saveOfferApplied: true,
+        saveOfferType: "pause",
+      },
     });
 
     return NextResponse.json({ ok: true, pausedUntil });
@@ -30,6 +52,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     safeError("[Pause API]", error);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to pause subscription" }, { status: 500 });
   }
 }

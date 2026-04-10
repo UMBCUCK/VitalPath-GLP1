@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Droplets, Info } from "lucide-react";
+import { ArrowRight, Info } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { calculateHydration } from "@/lib/utils";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { WaterFill } from "@/components/calculators/water-fill";
+import { AnimatedCounter } from "@/components/calculators/animated-counter";
 
 export default function HydrationCalculatorPage() {
   const [weight, setWeight] = useState("");
@@ -22,6 +25,17 @@ export default function HydrationCalculatorPage() {
     setResult(oz);
     track(ANALYTICS_EVENTS.CALCULATOR_COMPLETE, { calculator: "hydration" });
   }
+
+  const bottles = result ? Math.round(result / 16.9) : 0;
+
+  const timeSlots = result
+    ? [
+        { time: "Morning", pct: 0.25, tip: "Start with water before coffee" },
+        { time: "Midday", pct: 0.3, tip: "Sip consistently with meals" },
+        { time: "Afternoon", pct: 0.25, tip: "Refill after any exercise" },
+        { time: "Evening", pct: 0.2, tip: "Moderate before bedtime" },
+      ]
+    : [];
 
   return (
     <>
@@ -75,55 +89,109 @@ export default function HydrationCalculatorPage() {
               </Button>
             </div>
 
-            {result && (
-              <div className="mt-8 calculator-result">
-                <div className="text-center">
-                  <Droplets className="mx-auto h-8 w-8 text-teal" />
-                  <p className="mt-2 text-sm font-medium text-teal-700">Daily Water Goal</p>
-                  <p className="mt-1 text-5xl font-bold text-navy">{result} oz</p>
-                  <p className="mt-1 text-sm text-graphite-400">
-                    That&apos;s about {Math.round(result / 8)} glasses or {(result * 0.0296).toFixed(1)}L
-                  </p>
-                </div>
+            <AnimatePresence>
+              {result && (
+                <motion.div
+                  className="mt-8 calculator-result"
+                  initial={{ opacity: 0, y: 20, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {/* Water fill visual */}
+                  <WaterFill
+                    percentage={Math.min((result / 150) * 100, 100)}
+                    ozValue={result}
+                    size={180}
+                    className="mx-auto"
+                  />
 
-                <div className="mt-6 rounded-xl bg-white/80 p-4">
-                  <p className="text-sm font-medium text-navy mb-3">Spread throughout your day</p>
-                  <div className="space-y-2">
-                    {[
-                      { time: "Morning", amount: Math.round(result * 0.25), tip: "Start with water before coffee" },
-                      { time: "Midday", amount: Math.round(result * 0.3), tip: "Sip consistently with meals" },
-                      { time: "Afternoon", amount: Math.round(result * 0.25), tip: "Refill after any exercise" },
-                      { time: "Evening", amount: Math.round(result * 0.2), tip: "Moderate before bedtime" },
-                    ].map((slot) => (
-                      <div key={slot.time} className="flex items-center justify-between rounded-lg bg-gradient-to-r from-teal-50/50 to-transparent px-4 py-2">
-                        <div>
-                          <p className="text-sm font-medium text-navy">{slot.time}</p>
-                          <p className="text-[11px] text-graphite-400">{slot.tip}</p>
-                        </div>
-                        <p className="text-sm font-bold text-teal">{slot.amount} oz</p>
-                      </div>
-                    ))}
+                  <div className="mt-3 text-center">
+                    <p className="text-sm text-graphite-400">
+                      That&apos;s about <strong className="text-navy">{Math.round(result / 8)} glasses</strong> or{" "}
+                      <strong className="text-navy">{(result * 0.0296).toFixed(1)}L</strong>
+                    </p>
                   </div>
-                </div>
 
-                <div className="mt-4 flex items-start gap-2 rounded-xl bg-white/80 p-4">
-                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-graphite-400" />
-                  <p className="text-xs leading-relaxed text-graphite-400">
-                    Hydration needs vary by individual, climate, and medication. Some GLP-1 medications
-                    may increase the importance of adequate hydration. Follow your provider's guidance.
-                  </p>
-                </div>
+                  {/* Water bottle count */}
+                  <motion.div
+                    className="mt-5 rounded-xl bg-white/80 p-4 text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <p className="text-xs font-medium text-graphite-500 mb-2">
+                      That&apos;s about <strong className="text-navy">{bottles} standard water bottles</strong> (16.9 oz)
+                    </p>
+                    <div className="flex justify-center gap-1 flex-wrap">
+                      {Array.from({ length: Math.min(bottles, 10) }).map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="text-2xl"
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.6 + i * 0.08, type: "spring", stiffness: 300 }}
+                        >
+                          💧
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
 
-                <div className="mt-6 text-center">
-                  <Link href="/qualify">
-                    <Button className="gap-2">
-                      Get hydration tracking tools
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            )}
+                  {/* Hourly timeline */}
+                  <motion.div
+                    className="mt-4 rounded-xl bg-white/80 p-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                  >
+                    <p className="text-sm font-medium text-navy mb-3">Spread throughout your day</p>
+                    <div className="space-y-3">
+                      {timeSlots.map((slot, i) => {
+                        const oz = Math.round(result * slot.pct);
+                        const barPct = slot.pct * 100 * 3.3; // Scale for visual
+                        return (
+                          <div key={slot.time}>
+                            <div className="flex items-center justify-between mb-1">
+                              <div>
+                                <p className="text-sm font-medium text-navy">{slot.time}</p>
+                                <p className="text-[10px] text-graphite-400">{slot.tip}</p>
+                              </div>
+                              <span className="text-sm font-bold text-teal">{oz} oz</span>
+                            </div>
+                            <div className="h-2 rounded-full bg-navy-50 overflow-hidden">
+                              <motion.div
+                                className="h-full rounded-full bg-gradient-to-r from-teal to-teal-600"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${barPct}%` }}
+                                transition={{ duration: 0.6, delay: 0.8 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+
+                  <div className="mt-4 flex items-start gap-2 rounded-xl bg-white/80 p-4">
+                    <Info className="mt-0.5 h-4 w-4 shrink-0 text-graphite-400" />
+                    <p className="text-xs leading-relaxed text-graphite-400">
+                      Hydration needs vary by individual, climate, and medication. Some GLP-1 medications
+                      may increase the importance of adequate hydration. Follow your provider's guidance.
+                    </p>
+                  </div>
+
+                  <div className="mt-6 text-center">
+                    <Link href="/qualify">
+                      <Button className="gap-2">
+                        Get hydration tracking tools
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* SEO content + internal links */}

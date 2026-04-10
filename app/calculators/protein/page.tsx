@@ -3,11 +3,27 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { calculateProtein } from "@/lib/utils";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { AnimatedCounter } from "@/components/calculators/animated-counter";
+
+const foodEquivalents = [
+  { icon: "🍗", name: "Chicken breast", grams: 31, unit: "4oz serving" },
+  { icon: "🥚", name: "Eggs", grams: 6, unit: "per egg" },
+  { icon: "🥛", name: "Greek yogurt", grams: 17, unit: "per cup" },
+  { icon: "💪", name: "Protein shake", grams: 25, unit: "per scoop" },
+];
+
+const mealTimeline = [
+  { time: "Breakfast", hour: "7-8 AM", color: "#F59E0B" },
+  { time: "Lunch", hour: "12-1 PM", color: "#1F6F78" },
+  { time: "Snack", hour: "3-4 PM", color: "#D4A853" },
+  { time: "Dinner", hour: "6-7 PM", color: "#163A63" },
+];
 
 export default function ProteinCalculatorPage() {
   const [weight, setWeight] = useState("");
@@ -23,6 +39,9 @@ export default function ProteinCalculatorPage() {
     setResult(res);
     track(ANALYTICS_EVENTS.CALCULATOR_COMPLETE, { calculator: "protein" });
   }
+
+  const avgProtein = result ? Math.round((result.min + result.max) / 2) : 0;
+  const perMeal = result ? Math.round(avgProtein / 4) : 0;
 
   return (
     <>
@@ -93,53 +112,133 @@ export default function ProteinCalculatorPage() {
               </Button>
             </div>
 
-            {result && (
-              <div className="mt-8 calculator-result">
-                <div className="text-center">
-                  <p className="text-sm font-medium text-teal-700">Daily Protein Target</p>
-                  <p className="mt-1 text-5xl font-bold text-navy">
-                    {result.min}&ndash;{result.max}g
-                  </p>
-                  <p className="mt-1 text-sm text-graphite-400">grams per day</p>
-                </div>
+            <AnimatePresence>
+              {result && (
+                <motion.div
+                  className="mt-8 calculator-result"
+                  initial={{ opacity: 0, y: 20, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-teal-700">Daily Protein Target</p>
+                    <div className="mt-1 text-5xl font-bold text-navy">
+                      <AnimatedCounter value={result.min} />&ndash;<AnimatedCounter value={result.max} />g
+                    </div>
+                    <p className="mt-1 text-sm text-graphite-400">grams per day</p>
+                  </div>
 
-                <div className="mt-6 rounded-xl bg-white/80 p-4">
-                  <p className="text-sm font-medium text-navy mb-3">Spread across your day</p>
-                  <div className="grid grid-cols-3 gap-3 text-center">
-                    <div>
-                      <p className="text-lg font-bold text-navy">{Math.round(result.min / 3)}g</p>
-                      <p className="text-xs text-graphite-400">per meal (3 meals)</p>
+                  {/* Daily timeline */}
+                  <motion.div
+                    className="mt-6 rounded-xl bg-white/80 p-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <p className="text-sm font-semibold text-navy mb-3">Your daily protein schedule</p>
+                    <div className="relative">
+                      {/* Timeline line */}
+                      <div className="absolute left-4 top-3 bottom-3 w-0.5 bg-navy-100" />
+
+                      <div className="space-y-3">
+                        {mealTimeline.map((meal, i) => (
+                          <motion.div
+                            key={meal.time}
+                            className="flex items-center gap-4 pl-1"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.4 + i * 0.1 }}
+                          >
+                            <div
+                              className="h-7 w-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0 z-10"
+                              style={{ backgroundColor: meal.color }}
+                            >
+                              {perMeal}g
+                            </div>
+                            <div className="flex-1 flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-medium text-navy">{meal.time}</p>
+                                <p className="text-[10px] text-graphite-400">{meal.hour}</p>
+                              </div>
+                              <span className="text-sm font-bold text-navy">{perMeal}g</span>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-lg font-bold text-navy">{Math.round(result.min / 4)}g</p>
-                      <p className="text-xs text-graphite-400">per meal (4 meals)</p>
+                  </motion.div>
+
+                  {/* Food equivalents */}
+                  <motion.div
+                    className="mt-4 rounded-xl bg-white/80 p-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    <p className="text-sm font-semibold text-navy mb-3">
+                      That&apos;s equivalent to...
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {foodEquivalents.map((food, i) => {
+                        const count = Math.round(avgProtein / food.grams);
+                        return (
+                          <motion.div
+                            key={food.name}
+                            className="rounded-lg border border-navy-100/40 bg-white p-3 text-center"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.7 + i * 0.08 }}
+                          >
+                            <span className="text-2xl">{food.icon}</span>
+                            <p className="mt-1 text-lg font-bold text-navy">{count}</p>
+                            <p className="text-[10px] text-graphite-400">{food.name}</p>
+                            <p className="text-[9px] text-graphite-300">{food.grams}g {food.unit}</p>
+                          </motion.div>
+                        );
+                      })}
                     </div>
-                    <div>
-                      <p className="text-lg font-bold text-navy">{Math.round(result.min / 5)}g</p>
-                      <p className="text-xs text-graphite-400">per meal (5 meals)</p>
+                  </motion.div>
+
+                  {/* Per-meal breakdown (kept from original) */}
+                  <div className="mt-4 rounded-xl bg-white/80 p-4">
+                    <p className="text-sm font-medium text-navy mb-3">Spread across your day</p>
+                    <div className="grid grid-cols-3 gap-3 text-center">
+                      <div>
+                        <p className="text-lg font-bold text-navy">{Math.round(result.min / 3)}g</p>
+                        <p className="text-xs text-graphite-400">per meal (3 meals)</p>
+                      </div>
+                      <div>
+                        <p className="text-lg font-bold text-navy">{Math.round(result.min / 4)}g</p>
+                        <p className="text-xs text-graphite-400">per meal (4 meals)</p>
+                      </div>
+                      <div>
+                        <p className="text-lg font-bold text-navy">{Math.round(result.min / 5)}g</p>
+                        <p className="text-xs text-graphite-400">per meal (5 meals)</p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-4 flex items-start gap-2 rounded-xl bg-white/80 p-4">
-                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-graphite-400" />
-                  <p className="text-xs leading-relaxed text-graphite-400">
-                    Protein needs vary by individual. During GLP-1-supported weight management,
-                    adequate protein intake is important for preserving lean muscle mass. Your
-                    provider and care team can help personalize your targets.
-                  </p>
-                </div>
+                  <div className="mt-4 flex items-start gap-2 rounded-xl bg-white/80 p-4">
+                    <Info className="mt-0.5 h-4 w-4 shrink-0 text-graphite-400" />
+                    <p className="text-xs leading-relaxed text-graphite-400">
+                      Protein needs vary by individual. During GLP-1-supported weight management,
+                      adequate protein intake is important for preserving lean muscle mass. Your
+                      provider and care team can help personalize your targets.
+                    </p>
+                  </div>
 
-                <div className="mt-6 text-center">
-                  <Link href="/qualify">
-                    <Button className="gap-2">
-                      Get personalized nutrition support
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            )}
+                  <div className="mt-6 text-center">
+                    <Link href="/qualify">
+                      <Button className="gap-2">
+                        Get personalized nutrition support
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* SEO content + internal links */}

@@ -7,11 +7,12 @@ import { safeError } from "@/lib/logger";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { planSlug, addOnSlugs = [], email, interval = "monthly" } = body as {
+    const { planSlug, addOnSlugs = [], email, interval = "monthly", couponCode } = body as {
       planSlug: string;
       addOnSlugs?: string[];
       email?: string;
       interval?: "monthly" | "quarterly" | "annual";
+      couponCode?: string;
     };
 
     // Fetch plan from database
@@ -57,11 +58,11 @@ export async function POST(req: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "development" ? "http://localhost:3000" : "");
 
-    const session = await stripe.checkout.sessions.create({
+    // Build Stripe checkout session options
+    const checkoutOptions: Parameters<typeof stripe.checkout.sessions.create>[0] = {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: lineItems,
-      allow_promotion_codes: true,
       customer_email: email || undefined,
       success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/pricing?canceled=true`,
@@ -71,7 +72,22 @@ export async function POST(req: NextRequest) {
         interval,
         addOns: addOnSlugs.join(","),
       },
-    });
+      subscription_data: {
+        metadata: {
+          planSlug: plan.slug,
+          interval,
+        },
+      },
+    };
+
+    // Apply coupon if provided, otherwise allow Stripe promo codes
+    if (couponCode) {
+      checkoutOptions.discounts = [{ coupon: couponCode }];
+    } else {
+      checkoutOptions.allow_promotion_codes = true;
+    }
+
+    const session = await stripe.checkout.sessions.create(checkoutOptions);
 
     await trackServerEvent("InitiateCheckout", { email }, {
       plan_slug: planSlug,

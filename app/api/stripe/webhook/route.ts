@@ -33,6 +33,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  // Idempotency: check if we already processed this event
+  try {
+    const existing = await db.webhookEvent.findUnique({ where: { id: event.id } });
+    if (existing) {
+      safeLog("[Webhook]", `Duplicate event skipped: ${event.id}`);
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+    // Record event before processing
+    await db.webhookEvent.create({
+      data: { id: event.id, type: event.type, processedAt: new Date() },
+    });
+  } catch {
+    // If webhookEvent table doesn't exist yet, continue without idempotency
+    // This gracefully handles pre-migration deployments
+  }
+
   try {
     switch (event.type) {
       case "checkout.session.completed": {

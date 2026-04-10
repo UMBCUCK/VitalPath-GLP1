@@ -1,11 +1,11 @@
 "use client";
 
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight, ArrowLeft, Check, Shield, Users, Star, Clock,
-  AlertTriangle, Lock, Sparkles, TrendingDown, Activity, Target,
+  AlertTriangle, Lock, Sparkles, TrendingDown, Activity, Target, Zap,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { SectionShell } from "@/components/shared/section-shell";
+import { AnimatedCounter } from "@/components/calculators/animated-counter";
 import { useFunnelStore } from "@/hooks/use-funnel-store";
 import { recommendPlanFromQualify } from "@/lib/funnel";
 import { generateProjection, type ProjectionResult } from "@/lib/weight-projection";
@@ -53,6 +54,15 @@ const eatingPatterns = [
   { value: "emotional-eating", label: "Emotional eating" },
 ];
 
+const previousAttempts = [
+  { value: "none", label: "Nothing yet" },
+  { value: "diet-only", label: "Diet alone" },
+  { value: "exercise", label: "Exercise" },
+  { value: "otc-supplements", label: "OTC supplements" },
+  { value: "rx-medication", label: "Rx medication" },
+  { value: "surgery", label: "Surgery" },
+];
+
 const medicalConditions = [
   "Type 2 Diabetes", "High Blood Pressure", "High Cholesterol", "Sleep Apnea",
   "PCOS", "Hypothyroidism", "Fatty Liver Disease", "Joint Pain / Arthritis",
@@ -85,11 +95,13 @@ const stepProof = [
 
 export default function QualifyPage() {
   const router = useRouter();
-  const { update: updateFunnel } = useFunnelStore();
+  const { state: funnelState, update: updateFunnel } = useFunnelStore();
   const [step, setStep] = useState<QualifyStep>(1);
   const [showExitModal, setShowExitModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [restored, setRestored] = useState(false);
 
   // ─── Projection state (step 5) ─────────────────────────────
   const [projectionStep, setProjectionStep] = useState(0);
@@ -108,6 +120,7 @@ export default function QualifyPage() {
     primaryGoal: "",
     activityLevel: "",
     eatingPattern: "",
+    previousAttempts: "",
     // Step 3: Medical
     conditions: [] as string[],
     medications: "",
@@ -174,6 +187,43 @@ export default function QualifyPage() {
     track(ANALYTICS_EVENTS.QUALIFY_START);
   }, []);
 
+  // ─── Restore saved progress ───────────────────────────────
+  useEffect(() => {
+    if (restored || !funnelState.qualify) return;
+    const q = funnelState.qualify;
+    if (q.currentStep && q.currentStep > 1) {
+      setForm((prev) => ({
+        ...prev,
+        heightFeet: q.heightFeet?.toString() || prev.heightFeet,
+        heightInches: q.heightInches?.toString() || prev.heightInches,
+        weightLbs: q.weightLbs?.toString() || prev.weightLbs,
+        age: q.age?.toString() || prev.age,
+        sex: (q.sex as "" | "male" | "female") || prev.sex,
+        primaryGoal: q.primaryGoal || prev.primaryGoal,
+        activityLevel: q.activityLevel || prev.activityLevel,
+        eatingPattern: q.eatingPattern || prev.eatingPattern,
+        conditions: q.conditions || prev.conditions,
+        medications: q.medications || prev.medications,
+        allergies: q.allergies || prev.allergies,
+        firstName: q.firstName || prev.firstName,
+        lastName: q.lastName || prev.lastName,
+        email: q.email || prev.email,
+        phone: q.phone || prev.phone,
+        dateOfBirth: q.dateOfBirth || prev.dateOfBirth,
+        state: q.state || prev.state,
+        medicalHistory: q.medicalHistory || prev.medicalHistory,
+      }));
+      // Restore to the saved step (but cap at step before projection to avoid stale data)
+      setStep(Math.min(q.currentStep, 4) as QualifyStep);
+    }
+    setRestored(true);
+  }, [funnelState.qualify, restored]);
+
+  // ─── Scroll to top on step change ─────────────────────────
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [step]);
+
   // ─── Exit intent ──────────────────────────────────────────
   const handleBeforeUnload = useCallback((e: BeforeUnloadEvent) => {
     if (step > 1) {
@@ -226,7 +276,18 @@ export default function QualifyPage() {
   }, [step]);
 
   // ─── Helpers ──────────────────────────────────────────────
+  function formatPhone(value: string): string {
+    const digits = value.replace(/\D/g, "").slice(0, 10);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+
   function setField(key: string, value: unknown) {
+    if (key === "phone" || key === "emergencyContactPhone") {
+      setForm((prev) => ({ ...prev, [key]: formatPhone(String(value)) }));
+      return;
+    }
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -367,7 +428,7 @@ export default function QualifyPage() {
   const canProceed = () => {
     switch (step) {
       case 1: return form.heightFeet && form.weightLbs && form.age && form.sex && bmi > 0;
-      case 2: return form.primaryGoal && form.activityLevel && form.eatingPattern;
+      case 2: return form.primaryGoal && form.activityLevel && form.eatingPattern && form.previousAttempts;
       case 3: return true;
       case 4: return true;
       case 5: return projectionRevealed;
@@ -384,13 +445,20 @@ export default function QualifyPage() {
       <section className="min-h-[80vh] bg-gradient-to-b from-cloud to-white py-12">
         <SectionShell className="max-w-2xl">
           {/* Header */}
-          <div className="mb-8 text-center">
+          <div ref={scrollRef} className="mb-8 text-center">
             <Badge variant="default" className="mb-4 gap-1.5">
-              <Shield className="h-3 w-3" />
-              {step <= 4 ? "Quick Health Assessment" : step === 5 ? "Your Results" : "Secure Medical Intake"}
+              {step <= 4 ? <><Shield className="h-3 w-3" /> Quick Health Assessment</> :
+               step === 5 ? <><Sparkles className="h-3 w-3" /> Your Results</> :
+               <><Lock className="h-3 w-3" /> Secure Medical Intake</>}
             </Badge>
             <h1 className="text-2xl font-bold text-navy sm:text-3xl">
-              {step === 5 ? "Your Personalized Projection" : "See if you qualify for GLP-1 treatment"}
+              {step === 1 && "See if you qualify for GLP-1 treatment"}
+              {step === 2 && (form.heightFeet ? `Great${bmi >= 27 ? " — you may qualify!" : ""}. Tell us about your goals.` : "Tell us about your goals")}
+              {step === 3 && `${form.firstName || "Almost there"} — help your provider prepare`}
+              {step === 4 && "Quick safety check"}
+              {step === 5 && "Your Personalized Weight Loss Projection"}
+              {step === 6 && "Let\u2019s get you set up"}
+              {step === 7 && `${form.firstName ? `${form.firstName}, your` : "Your"} recommended plan`}
             </h1>
             <p className="mt-2 text-sm text-graphite-400">
               Step {step} of {TOTAL_STEPS} &middot; {stepNames[step - 1]}
@@ -538,6 +606,17 @@ export default function QualifyPage() {
                         {eatingPatterns.map((e) => (
                           <SelectButton key={e.value} selected={form.eatingPattern === e.value} onClick={() => setField("eatingPattern", e.value)}>
                             {e.label}
+                          </SelectButton>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-navy mb-3">What have you tried before?</label>
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        {previousAttempts.map((p) => (
+                          <SelectButton key={p.value} selected={form.previousAttempts === p.value} onClick={() => setField("previousAttempts", p.value)}>
+                            {p.label}
                           </SelectButton>
                         ))}
                       </div>
@@ -721,29 +800,55 @@ export default function QualifyPage() {
                           </ResponsiveContainer>
                         </div>
 
-                        {/* Milestones */}
+                        {/* Weight Journey Progress Bar */}
+                        <div className="rounded-xl border border-navy-100/60 bg-white p-4">
+                          <div className="flex items-center justify-between text-xs text-graphite-400 mb-2">
+                            <span>Current: <strong className="text-navy">{Math.round(w)} lbs</strong></span>
+                            <span>Projected: <strong className="text-teal">{Math.round(projection.summary.projectedWeightWithPlan)} lbs</strong></span>
+                          </div>
+                          <div className="relative h-4 rounded-full bg-navy-100/40 overflow-hidden">
+                            <motion.div
+                              initial={{ width: "100%" }}
+                              animate={{ width: `${Math.max(15, 100 - (projection.summary.totalLossWithPlan / w) * 100)}%` }}
+                              transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
+                              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-teal to-atlantic"
+                            />
+                          </div>
+                          <p className="mt-2 text-center text-xs text-graphite-500">
+                            <strong className="text-teal">-{Math.round(projection.summary.totalLossWithPlan)} lbs</strong> projected with VitalPath Plan
+                          </p>
+                        </div>
+
+                        {/* Milestones with animated counters */}
                         <div className="grid grid-cols-3 gap-3">
-                          {projection.milestones.map((m) => (
+                          {projection.milestones.map((m, i) => (
                             <div key={m.month} className="rounded-xl border border-navy-100/60 bg-white p-3 text-center">
                               <p className="text-[10px] font-semibold uppercase tracking-wider text-graphite-400">Month {m.month}</p>
-                              <p className="mt-1 text-lg font-bold text-navy">{Math.round(m.weightWithPlan)}</p>
+                              <div className="mt-1 text-lg font-bold text-navy">
+                                <AnimatedCounter value={Math.round(m.weightWithPlan)} duration={1200 + i * 300} />
+                              </div>
                               <p className="text-xs text-graphite-400">lbs</p>
-                              <Badge variant="default" className="mt-1 text-[10px]">-{Math.round(m.totalLostWithPlan)} lbs</Badge>
+                              <Badge variant="default" className="mt-1 text-[10px]">
+                                -<AnimatedCounter value={Math.round(m.totalLostWithPlan)} duration={1200 + i * 300} /> lbs
+                              </Badge>
                             </div>
                           ))}
                         </div>
 
                         {/* Diet plan comparison */}
                         <div className="rounded-xl bg-gradient-to-r from-navy to-atlantic p-5 text-white">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-teal-300 mb-2">VitalPath Plan Advantage</p>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Zap className="h-4 w-4 text-teal-300" />
+                            <p className="text-xs font-semibold uppercase tracking-wider text-teal-300">VitalPath Plan Advantage</p>
+                          </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="rounded-xl bg-white/10 p-3 text-center">
                               <p className="text-xs text-navy-300">Medication only</p>
-                              <p className="text-xl font-bold">-{Math.round(projection.summary.totalLossMedOnly)} lbs</p>
+                              <p className="text-xl font-bold">-<AnimatedCounter value={Math.round(projection.summary.totalLossMedOnly)} duration={1500} /> lbs</p>
                             </div>
-                            <div className="rounded-xl bg-teal/30 p-3 text-center">
+                            <div className="rounded-xl bg-teal/30 p-3 text-center border border-teal/40">
                               <p className="text-xs text-teal-300">With VitalPath Plan</p>
-                              <p className="text-xl font-bold text-teal-200">-{Math.round(projection.summary.totalLossWithPlan)} lbs</p>
+                              <p className="text-xl font-bold text-teal-200">-<AnimatedCounter value={Math.round(projection.summary.totalLossWithPlan)} duration={1500} /> lbs</p>
                             </div>
                           </div>
                           <p className="mt-3 text-center text-sm font-semibold">
@@ -816,9 +921,14 @@ export default function QualifyPage() {
                     <div>
                       <label className="block text-sm font-semibold text-navy mb-1.5">Goal Weight (optional)</label>
                       <div className="relative">
-                        <input type="number" value={form.goalWeightLbs} onChange={(e) => setField("goalWeightLbs", e.target.value)} className="calculator-input pr-12" placeholder="e.g. 165" />
+                        <input type="number" value={form.goalWeightLbs} onChange={(e) => setField("goalWeightLbs", e.target.value)} className="calculator-input pr-12" placeholder={projection ? `Suggested: ${Math.round(projection.summary.projectedWeightWithPlan)}` : "e.g. 165"} />
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-graphite-400">lbs</span>
                       </div>
+                      {projection && !form.goalWeightLbs && (
+                        <button type="button" onClick={() => setField("goalWeightLbs", String(Math.round(projection.summary.projectedWeightWithPlan)))} className="mt-1.5 text-xs text-teal hover:underline">
+                          Use suggested goal: {Math.round(projection.summary.projectedWeightWithPlan)} lbs (based on your projection)
+                        </button>
+                      )}
                     </div>
 
                     {/* Emergency Contact */}
@@ -904,7 +1014,7 @@ export default function QualifyPage() {
 
                     {/* 4 Required Consents */}
                     <div className="space-y-3">
-                      <label className="flex items-start gap-3 cursor-pointer rounded-xl border-2 border-navy-200 p-4 transition-all hover:border-navy-300">
+                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentTreatment ? "border-teal bg-teal-50/30" : "border-navy-200 hover:border-navy-300")}>
                         <input type="checkbox" checked={form.consentTreatment} onChange={(e) => setField("consentTreatment", e.target.checked)} className="mt-0.5 h-5 w-5 rounded border-navy-300 text-teal focus:ring-teal" />
                         <div>
                           <p className="text-sm font-semibold text-navy">Treatment Consent</p>
@@ -919,7 +1029,7 @@ export default function QualifyPage() {
                         </div>
                       </label>
 
-                      <label className="flex items-start gap-3 cursor-pointer rounded-xl border-2 border-navy-200 p-4 transition-all hover:border-navy-300">
+                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentHipaa ? "border-teal bg-teal-50/30" : "border-navy-200 hover:border-navy-300")}>
                         <input type="checkbox" checked={form.consentHipaa} onChange={(e) => setField("consentHipaa", e.target.checked)} className="mt-0.5 h-5 w-5 rounded border-navy-300 text-teal focus:ring-teal" />
                         <div>
                           <p className="text-sm font-semibold text-navy">HIPAA Authorization</p>
@@ -934,7 +1044,7 @@ export default function QualifyPage() {
                         </div>
                       </label>
 
-                      <label className="flex items-start gap-3 cursor-pointer rounded-xl border-2 border-navy-200 p-4 transition-all hover:border-navy-300">
+                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentTelehealth ? "border-teal bg-teal-50/30" : "border-navy-200 hover:border-navy-300")}>
                         <input type="checkbox" checked={form.consentTelehealth} onChange={(e) => setField("consentTelehealth", e.target.checked)} className="mt-0.5 h-5 w-5 rounded border-navy-300 text-teal focus:ring-teal" />
                         <div>
                           <p className="text-sm font-semibold text-navy">Telehealth Consent</p>
@@ -949,8 +1059,8 @@ export default function QualifyPage() {
                         </div>
                       </label>
 
-                      <label className="flex items-start gap-3 cursor-pointer rounded-xl border-2 border-amber-200 bg-amber-50/30 p-4 transition-all hover:border-amber-300">
-                        <input type="checkbox" checked={form.consentMedicationRisks} onChange={(e) => setField("consentMedicationRisks", e.target.checked)} className="mt-0.5 h-5 w-5 rounded border-amber-300 text-amber-600 focus:ring-amber-500" />
+                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentMedicationRisks ? "border-teal bg-teal-50/30" : "border-amber-200 bg-amber-50/30 hover:border-amber-300")}>
+                        <input type="checkbox" checked={form.consentMedicationRisks} onChange={(e) => setField("consentMedicationRisks", e.target.checked)} className={cn("mt-0.5 h-5 w-5 rounded", form.consentMedicationRisks ? "border-teal text-teal focus:ring-teal" : "border-amber-300 text-amber-600 focus:ring-amber-500")} />
                         <div>
                           <p className="text-sm font-semibold text-navy">Medication Risk Acknowledgment</p>
                           <p className="mt-1 text-xs text-graphite-400 leading-relaxed">

@@ -11,7 +11,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
-import type { MonthlyDataPoint } from "@/lib/weight-projection";
 
 interface TimelineDataPoint {
   month: number;

@@ -303,11 +303,12 @@ model Subscription {
 }
 
 model SubscriptionItem {
-  id             String @id @default(cuid())
+  id             String  @id @default(cuid())
   subscriptionId String
   productId      String
-  quantity       Int    @default(1)
+  quantity       Int     @default(1)
   priceInCents   Int
+  stripeItemId   String? // Stripe subscription item ID (si_xxx)
 
   subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   product      Product      @relation(fields: [productId], references: [id])
@@ -885,6 +886,16 @@ model Lead {
 
   @@index([email])
   @@index([source])
+}
+
+// ─── WEBHOOK EVENTS (idempotency tracking) ─────────────────
+
+model WebhookEvent {
+  id          String   @id // Stripe event ID (evt_xxx)
+  type        String   // e.g. "checkout.session.completed"
+  processedAt DateTime @default(now())
+
+  @@index([type])
 }
 
 // ─── NOTIFICATIONS ──────────────────────────────────────────
