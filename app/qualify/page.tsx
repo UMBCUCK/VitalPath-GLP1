@@ -102,6 +102,7 @@ export default function QualifyPage() {
   const [error, setError] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const [restored, setRestored] = useState(false);
+  const hasInteracted = useRef(false);
 
   // ─── Projection state (step 5) ─────────────────────────────
   const [projectionStep, setProjectionStep] = useState(0);
@@ -189,9 +190,15 @@ export default function QualifyPage() {
 
   // ─── Restore saved progress ───────────────────────────────
   useEffect(() => {
-    if (restored || !funnelState.qualify) return;
-    const q = funnelState.qualify;
-    if (q.currentStep && q.currentStep > 1) {
+    if (restored) return;
+    setRestored(true);
+    try {
+      const raw = localStorage.getItem("vitalpath-funnel");
+      if (!raw) return;
+      const stored = JSON.parse(raw);
+      const q = stored?.qualify;
+      if (!q?.heightFeet || !q?.currentStep || q.currentStep <= 1) return;
+
       setForm((prev) => ({
         ...prev,
         heightFeet: q.heightFeet?.toString() || prev.heightFeet,
@@ -213,11 +220,11 @@ export default function QualifyPage() {
         state: q.state || prev.state,
         medicalHistory: q.medicalHistory || prev.medicalHistory,
       }));
-      // Restore to the saved step (but cap at step before projection to avoid stale data)
       setStep(Math.min(q.currentStep, 4) as QualifyStep);
+    } catch {
+      // ignore parse errors
     }
-    setRestored(true);
-  }, [funnelState.qualify, restored]);
+  }, [restored]);
 
   // ─── Scroll to top on step change ─────────────────────────
   useEffect(() => {
@@ -249,6 +256,7 @@ export default function QualifyPage() {
 
   // ─── Persist to funnel store ──────────────────────────────
   useEffect(() => {
+    if (!hasInteracted.current) return; // Only persist after user navigates a step
     updateFunnel({
       qualify: {
         currentStep: step,
@@ -313,6 +321,7 @@ export default function QualifyPage() {
     }
 
     track(ANALYTICS_EVENTS.QUALIFY_STEP_COMPLETE, { step, stepName: stepNames[step - 1] });
+    hasInteracted.current = true;
 
     if (step === 4) {
       // Generate projection before showing step 5
@@ -763,17 +772,24 @@ export default function QualifyPage() {
 
                         {/* Chart */}
                         <div className="rounded-xl border border-navy-100/60 bg-white p-4">
-                          <div className="flex items-center gap-4 mb-3 text-xs">
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-3 text-xs">
                             <span className="flex items-center gap-1.5">
-                              <span className="h-2.5 w-6 rounded-full bg-teal" /> Medication Only
+                              <span className="h-2 w-5 rounded-full bg-graphite-300" /> Diet &amp; Exercise Only
                             </span>
                             <span className="flex items-center gap-1.5">
-                              <span className="h-2.5 w-6 rounded-full bg-gold" /> Medication + VitalPath Plan
+                              <span className="h-2.5 w-5 rounded-full bg-teal" /> GLP-1 Medication
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2.5 w-5 rounded-full bg-gold" /> GLP-1 + VitalPath Plan
                             </span>
                           </div>
-                          <ResponsiveContainer width="100%" height={260}>
+                          <ResponsiveContainer width="100%" height={280}>
                             <AreaChart data={projection.monthlyData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                               <defs>
+                                <linearGradient id="gradDiet" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#8896AB" stopOpacity={0.08} />
+                                  <stop offset="100%" stopColor="#8896AB" stopOpacity={0.01} />
+                                </linearGradient>
                                 <linearGradient id="gradMed" x1="0" y1="0" x2="0" y2="1">
                                   <stop offset="0%" stopColor="#0D9488" stopOpacity={0.15} />
                                   <stop offset="100%" stopColor="#0D9488" stopOpacity={0.02} />
@@ -790,12 +806,13 @@ export default function QualifyPage() {
                                 contentStyle={{ borderRadius: "12px", border: "1px solid #E8EDF4", fontSize: "12px" }}
                                 formatter={(value: number, name: string) => [
                                   `${Math.round(value)} lbs`,
-                                  name === "medicationOnly" ? "Medication Only" : "With VitalPath Plan",
+                                  name === "dietExercise" ? "Diet & Exercise Only" : name === "medicationOnly" ? "GLP-1 Medication" : "GLP-1 + VitalPath Plan",
                                 ]}
                                 labelStyle={{ fontWeight: 600, marginBottom: 4 }}
                               />
+                              <Area type="monotone" dataKey="dietExercise" stroke="#8896AB" strokeWidth={1.5} fill="url(#gradDiet)" dot={false} strokeDasharray="4 4" />
                               <Area type="monotone" dataKey="medicationOnly" stroke="#0D9488" strokeWidth={2} fill="url(#gradMed)" dot={false} />
-                              <Area type="monotone" dataKey="withPlan" stroke="#D4A853" strokeWidth={2.5} fill="url(#gradPlan)" dot={false} strokeDasharray="6 3" />
+                              <Area type="monotone" dataKey="withPlan" stroke="#D4A853" strokeWidth={2.5} fill="url(#gradPlan)" dot={false} />
                             </AreaChart>
                           </ResponsiveContainer>
                         </div>
@@ -835,24 +852,28 @@ export default function QualifyPage() {
                           ))}
                         </div>
 
-                        {/* Diet plan comparison */}
+                        {/* 3-way comparison */}
                         <div className="rounded-xl bg-gradient-to-r from-navy to-atlantic p-5 text-white">
                           <div className="flex items-center gap-2 mb-3">
                             <Zap className="h-4 w-4 text-teal-300" />
-                            <p className="text-xs font-semibold uppercase tracking-wider text-teal-300">VitalPath Plan Advantage</p>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-teal-300">Why medication matters</p>
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-3 gap-3">
+                            <div className="rounded-xl bg-white/5 p-3 text-center">
+                              <p className="text-[10px] text-navy-300">Diet &amp; Exercise</p>
+                              <p className="text-lg font-bold text-graphite-300">-<AnimatedCounter value={Math.round(projection.summary.totalLossDietExercise)} duration={1200} /> lbs</p>
+                            </div>
                             <div className="rounded-xl bg-white/10 p-3 text-center">
-                              <p className="text-xs text-navy-300">Medication only</p>
-                              <p className="text-xl font-bold">-<AnimatedCounter value={Math.round(projection.summary.totalLossMedOnly)} duration={1500} /> lbs</p>
+                              <p className="text-[10px] text-navy-300">GLP-1 Medication</p>
+                              <p className="text-lg font-bold">-<AnimatedCounter value={Math.round(projection.summary.totalLossMedOnly)} duration={1500} /> lbs</p>
                             </div>
                             <div className="rounded-xl bg-teal/30 p-3 text-center border border-teal/40">
-                              <p className="text-xs text-teal-300">With VitalPath Plan</p>
-                              <p className="text-xl font-bold text-teal-200">-<AnimatedCounter value={Math.round(projection.summary.totalLossWithPlan)} duration={1500} /> lbs</p>
+                              <p className="text-[10px] text-teal-300">GLP-1 + VitalPath</p>
+                              <p className="text-lg font-bold text-teal-200">-<AnimatedCounter value={Math.round(projection.summary.totalLossWithPlan)} duration={1500} /> lbs</p>
                             </div>
                           </div>
                           <p className="mt-3 text-center text-sm font-semibold">
-                            That&apos;s <span className="text-teal-300">{Math.round(projection.summary.extraLossFromPlan)} extra pounds</span> with the VitalPath diet &amp; coaching plan
+                            <span className="text-teal-300">{Math.round(projection.summary.totalLossWithPlan / Math.max(1, projection.summary.totalLossDietExercise))}x more</span> weight loss than diet &amp; exercise alone
                           </p>
                         </div>
 

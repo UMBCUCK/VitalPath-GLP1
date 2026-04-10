@@ -20,6 +20,7 @@ export interface ProjectionParams {
 export interface MonthlyDataPoint {
   month: number;
   date: string; // "Jun 2026"
+  dietExercise: number; // diet & exercise only (no medication) — placebo arm baseline
   medicationOnly: number; // projected weight (rounded to 1 decimal)
   withPlan: number; // projected weight with VitalPath plan
 }
@@ -34,10 +35,13 @@ export interface Milestone {
 }
 
 export interface ProjectionSummary {
+  totalLossDietExercise: number;
   totalLossMedOnly: number;
   totalLossWithPlan: number;
   extraLossFromPlan: number;
+  extraLossVsDietExercise: number;
   timelineMonths: number;
+  projectedWeightDietExercise: number;
   projectedWeightMedOnly: number;
   projectedWeightWithPlan: number;
   targetDate: string;
@@ -77,11 +81,16 @@ function formatMonthDate(monthsFromNow: number): string {
 
 // ─── Core Algorithm ────────────────────────────────────────
 
-const DECAY_FACTOR = 0.92;
-const MED_ONLY_BASE_RATE = 0.02; // 2% of body weight in month 1
-const WITH_PLAN_BASE_RATE = 0.025; // 2.5% of body weight in month 1
-const MED_ONLY_CAP = 0.15; // 15% total body weight cap
-const WITH_PLAN_CAP = 0.20; // 20% total body weight cap
+// Gentler decay (5%/month) so curves continue declining through month 12-16,
+// matching STEP/SURMOUNT trial data where loss continues until week 60-72.
+const DECAY_FACTOR = 0.95;
+const DIET_EXERCISE_BASE_RATE = 0.005; // 0.5% of body weight in month 1 (placebo arm data)
+const DIET_EXERCISE_DECAY = 0.88; // decays faster — people plateau quickly without medication
+const DIET_EXERCISE_CAP = 0.05; // 5% total cap (STEP/SURMOUNT placebo arms: ~2.4-3.1%)
+const MED_ONLY_BASE_RATE = 0.015; // 1.5% of body weight in month 1 (lower rate, gentler taper = same total)
+const WITH_PLAN_BASE_RATE = 0.019; // 1.9% of body weight in month 1
+const MED_ONLY_CAP = 0.15; // 15% total body weight cap — reached around month 12-14
+const WITH_PLAN_CAP = 0.20; // 20% total body weight cap — reached around month 14-16
 const MONTHS = 18;
 
 export function generateProjection(params: ProjectionParams): ProjectionResult {
@@ -92,12 +101,15 @@ export function generateProjection(params: ProjectionParams): ProjectionResult {
   const sexMod = getSexMod(sex);
   const combinedMod = activityMod * ageMod * sexMod;
 
+  const maxLossDietExercise = currentWeight * DIET_EXERCISE_CAP;
   const maxLossMedOnly = currentWeight * MED_ONLY_CAP;
   const maxLossWithPlan = currentWeight * WITH_PLAN_CAP;
 
   const monthlyData: MonthlyDataPoint[] = [];
+  let cumulativeDietExercise = 0;
   let cumulativeMedOnly = 0;
   let cumulativeWithPlan = 0;
+  let weightDietExercise = currentWeight;
   let weightMedOnly = currentWeight;
   let weightWithPlan = currentWeight;
 
@@ -105,11 +117,21 @@ export function generateProjection(params: ProjectionParams): ProjectionResult {
   monthlyData.push({
     month: 0,
     date: formatMonthDate(0),
+    dietExercise: round1(currentWeight),
     medicationOnly: round1(currentWeight),
     withPlan: round1(currentWeight),
   });
 
   for (let m = 1; m <= MONTHS; m++) {
+    // Diet & exercise only (no medication — placebo arm baseline)
+    const monthlyLossDiet = currentWeight * DIET_EXERCISE_BASE_RATE * Math.pow(DIET_EXERCISE_DECAY, m - 1) * activityMod;
+    if (cumulativeDietExercise + monthlyLossDiet <= maxLossDietExercise) {
+      cumulativeDietExercise += monthlyLossDiet;
+    } else {
+      cumulativeDietExercise = maxLossDietExercise;
+    }
+    weightDietExercise = currentWeight - cumulativeDietExercise;
+
     // Medication only
     const monthlyLossMed = currentWeight * MED_ONLY_BASE_RATE * Math.pow(DECAY_FACTOR, m - 1) * combinedMod;
     if (cumulativeMedOnly + monthlyLossMed <= maxLossMedOnly) {
@@ -131,6 +153,7 @@ export function generateProjection(params: ProjectionParams): ProjectionResult {
     monthlyData.push({
       month: m,
       date: formatMonthDate(m),
+      dietExercise: round1(weightDietExercise),
       medicationOnly: round1(weightMedOnly),
       withPlan: round1(weightWithPlan),
     });
@@ -176,11 +199,16 @@ export function generateProjection(params: ProjectionParams): ProjectionResult {
 
   const bmi = (currentWeight / (heightInches * heightInches)) * 703;
 
+  const finalDietExercise = monthlyData[MONTHS].dietExercise;
+
   const summary: ProjectionSummary = {
+    totalLossDietExercise: round1(currentWeight - finalDietExercise),
     totalLossMedOnly: round1(currentWeight - finalMedOnly),
     totalLossWithPlan: round1(currentWeight - finalWithPlan),
     extraLossFromPlan: round1((currentWeight - finalWithPlan) - (currentWeight - finalMedOnly)),
+    extraLossVsDietExercise: round1((currentWeight - finalWithPlan) - (currentWeight - finalDietExercise)),
     timelineMonths,
+    projectedWeightDietExercise: finalDietExercise,
     projectedWeightMedOnly: finalMedOnly,
     projectedWeightWithPlan: finalWithPlan,
     targetDate: formatMonthDate(timelineMonths),
