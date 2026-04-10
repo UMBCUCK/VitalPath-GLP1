@@ -103,6 +103,8 @@ export default function QualifyPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [restored, setRestored] = useState(false);
   const hasInteracted = useRef(false);
+  const [answeredScreening, setAnsweredScreening] = useState<Record<string, boolean>>({});
+  const [allScreeningAnswered, setAllScreeningAnswered] = useState(false);
 
   // ─── Projection state (step 5) ─────────────────────────────
   const [projectionStep, setProjectionStep] = useState(0);
@@ -439,7 +441,7 @@ export default function QualifyPage() {
       case 1: return form.heightFeet && form.weightLbs && form.age && form.sex && bmi > 0;
       case 2: return form.primaryGoal && form.activityLevel && form.eatingPattern && form.previousAttempts;
       case 3: return true;
-      case 4: return true;
+      case 4: return allScreeningAnswered || contraindications.every(c => answeredScreening[c.key]);
       case 5: return projectionRevealed;
       case 6: return form.firstName && form.lastName && form.email && form.phone && form.dateOfBirth && form.state && form.emergencyContactName && form.emergencyContactPhone && form.emergencyContactRelation && form.medicalHistory.length >= 10;
       case 7: return form.consentTreatment && form.consentHipaa && form.consentTelehealth && form.consentMedicationRisks;
@@ -475,8 +477,29 @@ export default function QualifyPage() {
             </p>
           </div>
 
-          {/* Progress */}
-          <Progress value={progress} className="mb-8" />
+          {/* Step Progress Indicator */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between">
+              {[1, 2, 3, 4, 5, 6, 7].map((s) => (
+                <div key={s} className="flex items-center">
+                  <div className={cn(
+                    "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all",
+                    s < step ? "bg-teal text-white" :
+                    s === step ? "bg-navy text-white ring-2 ring-navy/20 ring-offset-2" :
+                    "bg-navy-100/60 text-graphite-400"
+                  )}>
+                    {s < step ? <Check className="h-3.5 w-3.5" /> : s}
+                  </div>
+                  {s < 7 && (
+                    <div className={cn(
+                      "h-0.5 w-full min-w-[16px] sm:min-w-[32px] transition-all",
+                      s < step ? "bg-teal" : "bg-navy-100/60"
+                    )} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Step Content */}
           <div className="rounded-2xl border border-navy-100/60 bg-white p-6 shadow-premium-md sm:p-8">
@@ -687,20 +710,70 @@ export default function QualifyPage() {
                         <span className="text-sm font-bold text-amber-800">FDA Safety Screening</span>
                       </div>
                       <p className="text-xs text-amber-700 mb-4">
-                        Certain conditions may affect safe use of GLP-1 medications. Please answer honestly — this protects your health.
+                        Certain conditions may affect safe use of GLP-1 medications. Please select <strong>Yes</strong> or <strong>No</strong> for each question.
                       </p>
+
+                      {/* Quick "None apply" shortcut */}
+                      {!allScreeningAnswered && !hasContraindication && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            contraindications.forEach((c) => setField(c.key, false));
+                            setAllScreeningAnswered(true);
+                          }}
+                          className="mb-4 w-full rounded-xl border-2 border-teal bg-teal-50 px-4 py-3 text-sm font-medium text-teal-800 transition-all hover:bg-teal-100"
+                        >
+                          <Check className="mr-2 inline h-4 w-4" />
+                          None of these apply to me
+                        </button>
+                      )}
+
                       <div className="space-y-3">
-                        {contraindications.map((q) => (
-                          <label key={q.key} className="flex items-start gap-3 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={form[q.key as keyof typeof form] as boolean}
-                              onChange={(e) => setField(q.key, e.target.checked)}
-                              className="mt-0.5 h-4 w-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
-                            />
-                            <span className="text-xs text-amber-800">{q.label}</span>
-                          </label>
-                        ))}
+                        {contraindications.map((q) => {
+                          const val = form[q.key as keyof typeof form] as boolean;
+                          const answered = answeredScreening[q.key] || allScreeningAnswered;
+                          return (
+                            <div key={q.key} className={cn(
+                              "rounded-xl border-2 px-4 py-3 transition-all",
+                              !answered ? "border-amber-200 bg-white" :
+                              val ? "border-red-300 bg-red-50" : "border-teal-200 bg-teal-50/30"
+                            )}>
+                              <p className="text-xs text-amber-900 mb-2">{q.label}</p>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setField(q.key, true);
+                                    setAnsweredScreening((prev) => ({ ...prev, [q.key]: true }));
+                                  }}
+                                  className={cn(
+                                    "flex-1 rounded-lg border-2 px-3 py-1.5 text-xs font-semibold transition-all",
+                                    val && answered
+                                      ? "border-red-400 bg-red-100 text-red-700"
+                                      : "border-navy-200 text-graphite-500 hover:border-navy-300"
+                                  )}
+                                >
+                                  Yes
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setField(q.key, false);
+                                    setAnsweredScreening((prev) => ({ ...prev, [q.key]: true }));
+                                  }}
+                                  className={cn(
+                                    "flex-1 rounded-lg border-2 px-3 py-1.5 text-xs font-semibold transition-all",
+                                    !val && answered
+                                      ? "border-teal bg-teal-50 text-teal-700"
+                                      : "border-navy-200 text-graphite-500 hover:border-navy-300"
+                                  )}
+                                >
+                                  No
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
 
                       {form.hasSuicidalIdeation && (

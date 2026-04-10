@@ -61,6 +61,15 @@ const calculators = [
     iconColor: "text-blue-500",
     tag: null,
   },
+  {
+    icon: TrendingUp,
+    title: "Timeline Calculator",
+    description: "See your projected weight loss curve with GLP-1 vs diet alone comparison.",
+    href: "/calculators/timeline",
+    color: "from-emerald-50 to-sage",
+    iconColor: "text-emerald-600",
+    tag: null,
+  },
 ];
 
 const comingSoon = [
@@ -105,38 +114,36 @@ export default function CalculatorsPage() {
         </SectionShell>
       </section>
 
-      {/* Featured: Timeline Calculator */}
+      {/* Featured: Complete Health Profile */}
       <section className="py-12 border-b border-navy-100/40">
         <SectionShell>
           <Link
-            href="/calculators/timeline"
-            className="group block rounded-2xl bg-gradient-to-r from-navy to-atlantic p-8 sm:p-10 text-white shadow-premium-lg hover:shadow-premium-xl transition-all duration-300 hover:-translate-y-0.5"
+            href="/calculators/complete"
+            className="group block rounded-2xl bg-gradient-to-r from-teal to-atlantic p-8 sm:p-10 text-white shadow-premium-lg hover:shadow-premium-xl transition-all duration-300 hover:-translate-y-0.5"
           >
             <div className="flex flex-col sm:flex-row sm:items-center gap-6">
               <div className="flex-1">
                 <Badge variant="gold" className="mb-3">
-                  New
+                  Recommended
                 </Badge>
                 <h2 className="text-2xl sm:text-3xl font-bold">
-                  Weight Loss Timeline Calculator
+                  Complete Health Profile
                 </h2>
                 <p className="mt-3 text-white/70 max-w-lg">
-                  See your personalized week-by-week projection with interactive sliders.
-                  Compare GLP-1 results versus diet alone — powered by clinical trial data.
+                  Enter your stats once and get BMI, daily calories, protein, hydration, and
+                  your weight loss timeline — all in one place. Save results to your account.
                 </p>
                 <div className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white/10 px-5 py-2.5 text-sm font-semibold text-white group-hover:bg-white/20 transition-colors">
-                  Try It Now
+                  Get All My Numbers
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
-              <div className="hidden sm:flex flex-col items-center gap-2 opacity-80">
-                <TrendingUp className="h-16 w-16 text-teal-300" />
-                <div className="flex gap-1">
-                  <div className="h-8 w-1.5 rounded-full bg-teal-400/50" />
-                  <div className="h-12 w-1.5 rounded-full bg-teal-400/60" />
-                  <div className="h-16 w-1.5 rounded-full bg-teal-400/70" />
-                  <div className="h-10 w-1.5 rounded-full bg-gold/50" />
-                  <div className="h-6 w-1.5 rounded-full bg-gold/40" />
+              <div className="hidden sm:flex flex-col items-center gap-3 opacity-80">
+                <div className="grid grid-cols-2 gap-2 text-center">
+                  <div className="rounded-lg bg-white/10 px-3 py-2"><Scale className="mx-auto h-5 w-5 text-white/80 mb-0.5" /><p className="text-[9px]">BMI</p></div>
+                  <div className="rounded-lg bg-white/10 px-3 py-2"><Flame className="mx-auto h-5 w-5 text-white/80 mb-0.5" /><p className="text-[9px]">TDEE</p></div>
+                  <div className="rounded-lg bg-white/10 px-3 py-2"><Target className="mx-auto h-5 w-5 text-white/80 mb-0.5" /><p className="text-[9px]">Protein</p></div>
+                  <div className="rounded-lg bg-white/10 px-3 py-2"><Droplets className="mx-auto h-5 w-5 text-white/80 mb-0.5" /><p className="text-[9px]">Water</p></div>
                 </div>
               </div>
             </div>

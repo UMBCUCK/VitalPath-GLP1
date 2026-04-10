@@ -11,7 +11,7 @@ import { MilestoneShare } from "@/components/dashboard/milestone-share";
 import { AnnualNudge } from "@/components/dashboard/annual-nudge";
 import {
   TrendingDown, Droplets, Target, Package, Calendar, ArrowRight,
-  Utensils, Camera, MessageCircle, Gift, ChevronRight, Pill, Scale, Bell,
+  Utensils, Camera, MessageCircle, Gift, ChevronRight, Pill, Scale, Bell, Calculator,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
@@ -119,6 +119,48 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           </Link>
         ))}
       </div>
+
+      {/* My Health Numbers */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Calculator className="h-4 w-4 text-teal" /> My Health Numbers
+            </CardTitle>
+            <Link href="/calculators/complete">
+              <Button variant="ghost" size="sm" className="gap-1 text-xs">
+                Update <ChevronRight className="h-3 w-3" />
+              </Button>
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="rounded-xl bg-gradient-to-br from-teal-50 to-sage p-3 text-center">
+              <Scale className="mx-auto h-4 w-4 text-teal mb-1" />
+              <p className="text-lg font-bold text-navy">
+                {stats.currentWeight > 0 ? (((stats.currentWeight / ((stats.startWeight > 60 ? Math.round(Math.sqrt(stats.startWeight * 703 / 25) * 12) : 68) ** 2)) * 703).toFixed(1)) : "—"}
+              </p>
+              <p className="text-[10px] text-graphite-400">BMI</p>
+            </div>
+            <div className="rounded-xl bg-gradient-to-br from-gold-50 to-linen p-3 text-center">
+              <Target className="mx-auto h-4 w-4 text-gold-600 mb-1" />
+              <p className="text-lg font-bold text-navy">{stats.proteinTarget || "—"}g</p>
+              <p className="text-[10px] text-graphite-400">Protein goal</p>
+            </div>
+            <div className="rounded-xl bg-gradient-to-br from-blue-50 to-teal-50 p-3 text-center">
+              <Droplets className="mx-auto h-4 w-4 text-blue-500 mb-1" />
+              <p className="text-lg font-bold text-navy">{stats.waterTarget || "—"}oz</p>
+              <p className="text-[10px] text-graphite-400">Water goal</p>
+            </div>
+            <Link href="/calculators/complete" className="rounded-xl bg-gradient-to-br from-navy-50 to-sage/30 p-3 text-center hover:shadow-sm transition-shadow">
+              <Calculator className="mx-auto h-4 w-4 text-atlantic mb-1" />
+              <p className="text-sm font-semibold text-teal">Calculate</p>
+              <p className="text-[10px] text-graphite-400">All numbers</p>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Daily tracking */}
