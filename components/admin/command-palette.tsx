@@ -29,13 +29,21 @@ interface SearchResult {
 }
 
 const quickActions = [
-  { label: "Go to Dashboard", href: "/admin", icon: BarChart3 },
-  { label: "Go to Customers", href: "/admin/customers", icon: Users },
-  { label: "Go to Revenue", href: "/admin/revenue", icon: DollarSign },
-  { label: "Go to Products", href: "/admin/products", icon: Package },
-  { label: "Go to Settings", href: "/admin/settings", icon: Settings },
+  { label: "Dashboard", href: "/admin", icon: BarChart3 },
+  { label: "Revenue & MRR", href: "/admin/revenue", icon: DollarSign },
+  { label: "Customers", href: "/admin/customers", icon: Users },
+  { label: "Products & Pricing", href: "/admin/products", icon: Package },
+  { label: "Subscriptions", href: "/admin/subscriptions", icon: DollarSign },
+  { label: "Analytics & Funnel", href: "/admin/analytics", icon: BarChart3 },
+  { label: "Blog CMS", href: "/admin/blog", icon: FileText },
+  { label: "Recipes & Meals", href: "/admin/recipes", icon: ChefHat },
+  { label: "Campaigns", href: "/admin/campaigns", icon: ArrowRight },
+  { label: "Reports & Exports", href: "/admin/reports", icon: BarChart3 },
+  { label: "Experiments", href: "/admin/experiments", icon: Package },
+  { label: "Automations", href: "/admin/automations", icon: ArrowRight },
+  { label: "Settings", href: "/admin/settings", icon: Settings },
   { label: "Create Coupon", href: "/admin/coupons", icon: Plus },
-  { label: "New Blog Post", href: "/admin/blog", icon: FileText },
+  { label: "New Blog Post", href: "/admin/blog", icon: Plus },
 ];
 
 const typeIcons: Record<string, typeof Users> = {

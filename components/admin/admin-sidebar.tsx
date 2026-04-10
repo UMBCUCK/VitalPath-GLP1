@@ -38,6 +38,8 @@ import {
   Lightbulb,
   ScanLine,
   HeartPulse,
+  Brain,
+  Store,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -61,12 +63,14 @@ const navGroups: NavGroup[] = [
       { label: "Activity Feed", href: "/admin/activity", icon: Activity },
       { label: "Query Engine", href: "/admin/query", icon: Search },
       { label: "AI Insights", href: "/admin/insights", icon: Lightbulb },
+      { label: "AI Reports", href: "/admin/ai-reports", icon: Brain },
     ],
   },
   {
     title: "Financial",
     items: [
       { label: "Revenue", href: "/admin/revenue", icon: DollarSign },
+      { label: "Products & Pricing", href: "/admin/products", icon: CreditCard },
       { label: "Subscriptions", href: "/admin/subscriptions", icon: Wallet },
       { label: "Payments", href: "/admin/payments", icon: CreditCard },
     ],
@@ -86,6 +90,7 @@ const navGroups: NavGroup[] = [
       { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
       { label: "Campaigns", href: "/admin/campaigns", icon: Send },
       { label: "Referrals", href: "/admin/referrals", icon: Share2 },
+      { label: "Resellers", href: "/admin/resellers", icon: Store },
       { label: "Cohorts", href: "/admin/cohorts", icon: GitCompareArrows },
       { label: "Widgets", href: "/admin/widgets", icon: Code2 },
       { label: "Coupons", href: "/admin/coupons", icon: Tag },

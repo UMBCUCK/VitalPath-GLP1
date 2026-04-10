@@ -13,6 +13,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { siteConfig } from "@/lib/site";
+import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "GLP-1 for Men | Visceral Fat, Metabolic Health & Weight Loss",
@@ -76,8 +77,17 @@ const faqs = [
 ];
 
 export default function MenPage() {
+  const faqJsonLd = faqs.map((f) => ({ question: f.q, answer: f.a }));
+
   return (
     <MarketingShell>
+      <FAQPageJsonLd faqs={faqJsonLd} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Men's Health", href: "/men" },
+        ]}
+      />
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">

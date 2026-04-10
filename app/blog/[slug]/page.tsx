@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Clock, ArrowRight, Award, Building2 } from "lucide-react";
+import { ArrowLeft, Clock, ArrowRight, Award, Building2, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
@@ -24,6 +24,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: post.seoTitle || post.title,
     description: post.seoDescription || post.excerpt || undefined,
     openGraph: { title: post.title, description: post.excerpt || undefined },
+    other: {
+      'article:published_time': post.publishedAt?.toISOString() ?? '',
+      'article:modified_time': post.updatedAt.toISOString(),
+      'article:author': 'VitalPath Medical Team',
+      'article:section': post.category ?? 'Health',
+    },
   };
 }
 
@@ -181,6 +187,18 @@ export default async function BlogPostPage({ params }: PageProps) {
               {post.excerpt}
             </p>
           )}
+
+          {/* Medically Reviewed banner */}
+          <div className="mb-6 flex items-center gap-3 rounded-xl border border-teal-100 bg-teal-50/50 px-4 py-3">
+            <Shield className="h-4 w-4 text-teal shrink-0" />
+            <div>
+              <p className="text-xs font-semibold text-teal-800">Medically Reviewed</p>
+              <p className="text-xs text-teal-700">Content reviewed by VitalPath&apos;s licensed medical team for clinical accuracy.</p>
+            </div>
+            <div className="ml-auto text-xs text-graphite-400">
+              {post.updatedAt.toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+            </div>
+          </div>
 
           {/* Table of Contents */}
           {headings.length >= 3 && (

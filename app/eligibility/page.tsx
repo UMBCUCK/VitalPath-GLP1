@@ -11,6 +11,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { siteConfig } from "@/lib/site";
 import { MarketingShell } from "@/components/layout/marketing-shell";
+import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "Eligibility",
@@ -20,6 +21,12 @@ export const metadata: Metadata = {
 export default function EligibilityPage() {
   return (
     <MarketingShell>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Eligibility", href: "/eligibility" },
+        ]}
+      />
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">
           <Badge variant="default" className="mb-6 gap-1.5">

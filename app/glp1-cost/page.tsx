@@ -13,6 +13,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { siteConfig } from "@/lib/site";
+import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "How Much Does GLP-1 Medication Cost in 2026?",
@@ -92,8 +93,17 @@ const faqs = [
 ];
 
 export default function GLP1CostPage() {
+  const faqJsonLd = faqs.map((f) => ({ question: f.q, answer: f.a }));
+
   return (
     <MarketingShell>
+      <FAQPageJsonLd faqs={faqJsonLd} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "GLP-1 Cost Guide", href: "/glp1-cost" },
+        ]}
+      />
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">

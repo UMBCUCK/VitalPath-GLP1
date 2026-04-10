@@ -13,6 +13,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { siteConfig } from "@/lib/site";
+import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "Semaglutide for Weight Loss | How It Works, Dosing, and Results",
@@ -68,8 +69,17 @@ const doseSteps = [
 ];
 
 export default function SemaglutidePage() {
+  const faqJsonLd = faqs.map((f) => ({ question: f.q, answer: f.a }));
+
   return (
     <MarketingShell>
+      <FAQPageJsonLd faqs={faqJsonLd} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Semaglutide", href: "/semaglutide" },
+        ]}
+      />
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-white py-20">
         <SectionShell className="max-w-4xl text-center">
