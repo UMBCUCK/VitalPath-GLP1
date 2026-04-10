@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  User, CreditCard, Bell, Shield, LogOut, Pause, ArrowDown, Tag,
-  AlertTriangle, Check, ChevronRight, X,
+  User, CreditCard, Bell, LogOut, Pause, ArrowDown, Tag,
+  AlertTriangle, Check, ChevronRight, Sparkles, TrendingUp, Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { ResellerPromoModal } from "@/components/dashboard/reseller-promo-modal";
 
 type CancelStep = "none" | "reason" | "offer" | "confirm" | "done";
 
@@ -32,6 +33,15 @@ export default function SettingsPage() {
   const [cancelStep, setCancelStep] = useState<CancelStep>("none");
   const [cancelReason, setCancelReason] = useState("");
   const [saveOfferAccepted, setSaveOfferAccepted] = useState(false);
+  const [showResellerModal, setShowResellerModal] = useState(false);
+  const [resellerStatus, setResellerStatus] = useState<{ applied: boolean; appliedAt: string | null; status: string | null }>({ applied: false, appliedAt: null, status: null });
+
+  useEffect(() => {
+    fetch("/api/reseller/apply")
+      .then((r) => r.json())
+      .then(setResellerStatus)
+      .catch(() => {});
+  }, []);
 
   async function saveProfile() {
     await fetch("/api/user/profile", {
@@ -78,6 +88,12 @@ export default function SettingsPage() {
   }
 
   return (
+    <>
+    <ResellerPromoModal
+      open={showResellerModal}
+      onClose={() => setShowResellerModal(false)}
+      onApplied={() => setResellerStatus({ applied: true, appliedAt: new Date().toISOString(), status: "pending" })}
+    />
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-navy">Settings</h2>
 
@@ -129,6 +145,74 @@ export default function SettingsPage() {
               <input type="checkbox" defaultChecked={n.default} className="mt-1 h-4 w-4 rounded border-navy-300 text-teal focus:ring-teal" />
             </label>
           ))}
+        </CardContent>
+      </Card>
+
+      {/* Partner Program */}
+      <Card className={cn(
+        "overflow-hidden transition-all",
+        !resellerStatus.applied && "ring-2 ring-gold/40"
+      )}>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-gold-600" /> Partner Program
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {resellerStatus.applied ? (
+            <div className="flex items-start gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50">
+                <Zap className="h-5 w-5 text-teal" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className="text-sm font-bold text-navy">Reseller application submitted</p>
+                  <Badge variant="warning" className="text-xs">Pending review</Badge>
+                </div>
+                <p className="text-xs text-graphite-400">
+                  Applied{" "}
+                  {resellerStatus.appliedAt
+                    ? new Date(resellerStatus.appliedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                    : "recently"}
+                  . We typically respond within 1–2 business days.
+                </p>
+                <p className="text-xs text-teal mt-2 font-medium">
+                  Once approved, your commission rate upgrades automatically to $150/referral.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-navy/95 to-atlantic p-5 text-white">
+              <div
+                className="absolute inset-0 opacity-[0.06]"
+                style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }}
+              />
+              <div className="relative">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="h-4 w-4 text-gold-300" />
+                  <span className="text-xs font-bold text-white/60 uppercase tracking-wider">Make money with VitalPath</span>
+                </div>
+                <p className="text-lg font-bold mb-1">Earn $150–$250 per referral</p>
+                <p className="text-sm text-white/70 mb-4 max-w-sm">
+                  Upgrade to our Reseller program and unlock 3× higher commissions, a custom branded page, and a full marketing kit.
+                </p>
+                <div className="flex flex-wrap gap-3 mb-5">
+                  {["3× commissions", "Custom landing page", "Marketing kit", "Partner support"].map((b) => (
+                    <span key={b} className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
+                      <Check className="h-3 w-3 text-gold-300" /> {b}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setShowResellerModal(true)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-navy shadow-lg hover:bg-white/90 transition-colors"
+                >
+                  Apply Now — it&apos;s free
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -275,5 +359,6 @@ export default function SettingsPage() {
         </Button>
       </div>
     </div>
+    </>
   );
 }

@@ -296,7 +296,7 @@ export default function WomenPage() {
       <section className="py-8 border-t border-navy-100/40">
         <SectionShell>
           <p className="mx-auto max-w-3xl text-center text-xs text-graphite-300 leading-relaxed">
-            {siteConfig.compliance.disclaimer} Clinical data cited from published peer-reviewed research. Individual results vary. Treatment eligibility determined by a licensed medical provider.
+            {siteConfig.compliance.shortDisclaimer} Clinical data cited from published peer-reviewed research. Individual results vary. Treatment eligibility determined by a licensed medical provider.
           </p>
         </SectionShell>
       </section>

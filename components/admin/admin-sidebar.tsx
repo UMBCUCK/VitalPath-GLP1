@@ -34,6 +34,10 @@ import {
   Route,
   FlaskConical,
   FileBarChart,
+  Search,
+  Lightbulb,
+  ScanLine,
+  HeartPulse,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -55,6 +59,8 @@ const navGroups: NavGroup[] = [
     items: [
       { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
       { label: "Activity Feed", href: "/admin/activity", icon: Activity },
+      { label: "Query Engine", href: "/admin/query", icon: Search },
+      { label: "AI Insights", href: "/admin/insights", icon: Lightbulb },
     ],
   },
   {
@@ -69,6 +75,7 @@ const navGroups: NavGroup[] = [
     title: "Patients",
     items: [
       { label: "Customers", href: "/admin/customers", icon: Users },
+      { label: "Telehealth", href: "/admin/telehealth", icon: HeartPulse },
       { label: "Providers", href: "/admin/providers", icon: Stethoscope },
       { label: "Segments", href: "/admin/segments", icon: UsersRound },
     ],
@@ -99,6 +106,7 @@ const navGroups: NavGroup[] = [
     items: [
       { label: "Claims Engine", href: "/admin/claims", icon: ShieldCheck },
       { label: "Compliance Log", href: "/admin/compliance", icon: ClipboardCheck },
+      { label: "Scanner", href: "/admin/compliance/scanner", icon: ScanLine },
       { label: "States", href: "/admin/states", icon: MapPin },
       { label: "Adverse Events", href: "/admin/adverse-events", icon: AlertTriangle },
     ],

@@ -323,7 +323,7 @@ export default function GLP1CostPage() {
         <SectionShell>
           <p className="mx-auto max-w-3xl text-center text-xs text-graphite-300 leading-relaxed">
             <Info className="inline h-3.5 w-3.5 mr-1" />
-            {siteConfig.compliance.disclaimer} Pricing is subject to change. Brand-name drug prices from manufacturer websites as of early 2026. Treatment eligibility is determined by a licensed medical provider.
+            {siteConfig.compliance.shortDisclaimer} Pricing is subject to change. Brand-name drug prices from manufacturer websites as of early 2026. Treatment eligibility is determined by a licensed medical provider.
           </p>
         </SectionShell>
       </section>

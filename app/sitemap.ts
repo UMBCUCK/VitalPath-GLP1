@@ -42,9 +42,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/men`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${baseUrl}/glp1-cost`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${baseUrl}/compare`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/calculators/timeline`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/calculators/complete`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${baseUrl}/legal/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${baseUrl}/legal/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${baseUrl}/legal/hipaa`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${baseUrl}/legal/baa`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${baseUrl}/accessibility`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
 
   // Dynamic pages from DB — wrapped in try/catch for build-time when DB isn't available

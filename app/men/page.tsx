@@ -273,7 +273,7 @@ export default function MenPage() {
       <section className="py-8 border-t border-navy-100/40">
         <SectionShell>
           <p className="mx-auto max-w-3xl text-center text-xs text-graphite-300 leading-relaxed">
-            {siteConfig.compliance.disclaimer} Clinical data cited from published peer-reviewed research including SURMOUNT-1, STEP-1, and SELECT trials. Individual results vary. Treatment eligibility determined by a licensed medical provider.
+            {siteConfig.compliance.shortDisclaimer} Clinical data cited from published peer-reviewed research including SURMOUNT-1, STEP-1, and SELECT trials. Individual results vary. Treatment eligibility determined by a licensed medical provider.
           </p>
         </SectionShell>
       </section>

@@ -40,13 +40,16 @@ export const siteConfig = {
     footer: {
       programs: [
         { label: "Weight Management", href: "/pricing" },
-        { label: "Semaglutide", href: "/medications/semaglutide" },
-        { label: "Tirzepatide", href: "/medications/tirzepatide" },
+        { label: "Semaglutide", href: "/semaglutide" },
+        { label: "Tirzepatide", href: "/tirzepatide" },
+        { label: "For Women (PCOS & Menopause)", href: "/women" },
+        { label: "For Men (Visceral Fat)", href: "/men" },
         { label: "Maintenance Program", href: "/maintenance" },
         { label: "Compare Programs", href: "/compare" },
       ],
       resources: [
         { label: "GLP-1 Weight Loss Guide", href: "/guide" },
+        { label: "GLP-1 Cost & Pricing", href: "/glp1-cost" },
         { label: "Free Tools & Calculators", href: "/tools" },
         { label: "Meal Plans & Recipes", href: "/meals" },
         { label: "Glossary", href: "/glossary" },

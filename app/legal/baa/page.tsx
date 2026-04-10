@@ -1,10 +1,7 @@
-export const dynamic = "force-static";
-
 import type { Metadata } from "next";
 import { SectionShell } from "@/components/shared/section-shell";
 import { Badge } from "@/components/ui/badge";
 import { Shield } from "lucide-react";
-import { MarketingShell } from "@/components/layout/marketing-shell";
 
 export const metadata: Metadata = {
   title: "Business Associate Agreements",
