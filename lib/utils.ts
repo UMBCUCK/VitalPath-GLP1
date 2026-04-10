@@ -97,6 +97,42 @@ export function calculateHydration(
   return Math.round(base + additions[activityLevel]);
 }
 
+export function calculateMacros(
+  calories: number,
+  goal: "lose" | "maintain" | "gain"
+): { protein: { grams: number; pct: number }; carbs: { grams: number; pct: number }; fat: { grams: number; pct: number } } {
+  const splits = {
+    lose: { protein: 0.4, carbs: 0.3, fat: 0.3 },
+    maintain: { protein: 0.3, carbs: 0.4, fat: 0.3 },
+    gain: { protein: 0.25, carbs: 0.45, fat: 0.3 },
+  };
+  const s = splits[goal];
+  return {
+    protein: { grams: Math.round((calories * s.protein) / 4), pct: s.protein * 100 },
+    carbs: { grams: Math.round((calories * s.carbs) / 4), pct: s.carbs * 100 },
+    fat: { grams: Math.round((calories * s.fat) / 9), pct: s.fat * 100 },
+  };
+}
+
+export function generateDietAloneProjection(
+  currentWeight: number,
+  months: number
+): number[] {
+  // Conservative model: 0.5% body weight/month, decaying, capped at 8%
+  const maxLoss = currentWeight * 0.08;
+  const baseRate = 0.005;
+  const decay = 0.95;
+  const weights: number[] = [currentWeight];
+  let cumLoss = 0;
+
+  for (let m = 1; m <= months; m++) {
+    const loss = currentWeight * baseRate * Math.pow(decay, m - 1);
+    cumLoss = Math.min(cumLoss + loss, maxLoss);
+    weights.push(Math.round((currentWeight - cumLoss) * 10) / 10);
+  }
+  return weights;
+}
+
 export function absoluteUrl(path: string): string {
   const base = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "development" ? "http://localhost:3000" : "");
   return `${base}${path}`;

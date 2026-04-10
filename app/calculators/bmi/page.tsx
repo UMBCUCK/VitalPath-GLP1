@@ -3,18 +3,45 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { calculateBMI, bmiCategory } from "@/lib/utils";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { AnimatedGauge, type GaugeZone } from "@/components/calculators/animated-gauge";
+import { AnimatedCounter } from "@/components/calculators/animated-counter";
+
+const bmiZones: GaugeZone[] = [
+  { from: 0, to: 18.5, color: "#60A5FA", label: "Underweight" },
+  { from: 18.5, to: 25, color: "#10B981", label: "Normal" },
+  { from: 25, to: 30, color: "#F59E0B", label: "Overweight" },
+  { from: 30, to: 35, color: "#F97316", label: "Obese I" },
+  { from: 35, to: 40, color: "#EF4444", label: "Obese II" },
+  { from: 40, to: 55, color: "#B91C1C", label: "Obese III" },
+];
+
+// CDC population distribution by BMI category (approximate)
+const populationStats: Record<string, string> = {
+  Underweight: "1.5% of U.S. adults",
+  "Normal weight": "31% of U.S. adults",
+  Overweight: "34% of U.S. adults",
+  "Obesity Class I": "20% of U.S. adults",
+  "Obesity Class II": "9% of U.S. adults",
+  "Obesity Class III": "5.5% of U.S. adults",
+};
 
 export default function BMICalculatorPage() {
   const [heightFeet, setHeightFeet] = useState("");
   const [heightInches, setHeightInches] = useState("");
   const [weight, setWeight] = useState("");
-  const [result, setResult] = useState<{ bmi: number; category: string } | null>(null);
+  const [result, setResult] = useState<{
+    bmi: number;
+    category: string;
+    healthyWeight: { min: number; max: number };
+    toLose: number;
+  } | null>(null);
 
   function handleCalculate() {
     const ft = parseInt(heightFeet);
@@ -26,7 +53,18 @@ export default function BMICalculatorPage() {
     const totalInches = ft * 12 + inc;
     const bmi = calculateBMI(w, totalInches);
     const category = bmiCategory(bmi);
-    setResult({ bmi: Math.round(bmi * 10) / 10, category });
+
+    // Calculate healthy weight range for this height
+    const healthyMin = Math.round((18.5 * totalInches * totalInches) / 703);
+    const healthyMax = Math.round((24.9 * totalInches * totalInches) / 703);
+    const toLose = bmi >= 25 ? Math.round(w - healthyMax) : 0;
+
+    setResult({
+      bmi: Math.round(bmi * 10) / 10,
+      category,
+      healthyWeight: { min: healthyMin, max: healthyMax },
+      toLose,
+    });
 
     track(ANALYTICS_EVENTS.CALCULATOR_COMPLETE, {
       calculator: "bmi",
@@ -34,15 +72,6 @@ export default function BMICalculatorPage() {
       bmi_category: category,
     });
   }
-
-  const bmiRanges = [
-    { label: "Underweight", range: "< 18.5", color: "bg-blue-100 text-blue-700" },
-    { label: "Normal weight", range: "18.5 - 24.9", color: "bg-emerald-100 text-emerald-700" },
-    { label: "Overweight", range: "25 - 29.9", color: "bg-amber-100 text-amber-700" },
-    { label: "Obesity Class I", range: "30 - 34.9", color: "bg-orange-100 text-orange-700" },
-    { label: "Obesity Class II", range: "35 - 39.9", color: "bg-red-100 text-red-700" },
-    { label: "Obesity Class III", range: "40+", color: "bg-red-200 text-red-800" },
-  ];
 
   return (
     <>
@@ -126,54 +155,92 @@ export default function BMICalculatorPage() {
             </div>
 
             {/* Result */}
-            {result && (
-              <div className="mt-8 calculator-result">
-                <div className="text-center">
-                  <p className="text-sm font-medium text-teal-700">Your BMI</p>
-                  <p className="mt-1 text-5xl font-bold text-navy">{result.bmi}</p>
-                  <Badge
-                    variant={result.bmi < 25 ? "success" : result.bmi < 30 ? "warning" : "destructive"}
-                    className="mt-3"
+            <AnimatePresence>
+              {result && (
+                <motion.div
+                  className="mt-8 calculator-result"
+                  initial={{ opacity: 0, y: 20, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {/* Animated Gauge */}
+                  <AnimatedGauge
+                    value={result.bmi}
+                    min={12}
+                    max={50}
+                    zones={bmiZones}
+                    size={280}
+                    label={result.category}
+                    className="mx-auto"
+                  />
+
+                  {/* Population context */}
+                  <motion.div
+                    className="mt-5 rounded-xl bg-white/80 p-4 text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
                   >
-                    {result.category}
-                  </Badge>
-                </div>
+                    <p className="text-sm text-graphite-500">
+                      <span className="font-semibold text-navy">{populationStats[result.category]}</span>{" "}
+                      are in this BMI range
+                    </p>
+                  </motion.div>
 
-                {/* BMI ranges */}
-                <div className="mt-6 space-y-2">
-                  {bmiRanges.map((r) => (
-                    <div
-                      key={r.label}
-                      className={cn(
-                        "flex items-center justify-between rounded-lg px-4 py-2 text-sm transition-all",
-                        result.category === r.label ? r.color + " font-semibold ring-2 ring-offset-1 ring-navy-200" : "bg-white text-graphite-500"
-                      )}
+                  {/* Healthy weight insight */}
+                  {result.toLose > 0 ? (
+                    <motion.div
+                      className="mt-4 rounded-xl border border-teal-100 bg-teal-50/60 p-4"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 }}
                     >
-                      <span>{r.label}</span>
-                      <span className="font-mono text-xs">{r.range}</span>
-                    </div>
-                  ))}
-                </div>
+                      <p className="text-sm text-graphite-600 text-center">
+                        Healthy weight for your height:{" "}
+                        <strong className="text-navy">{result.healthyWeight.min}&ndash;{result.healthyWeight.max} lbs</strong>
+                      </p>
+                      <p className="mt-2 text-center text-2xl font-bold text-teal">
+                        <AnimatedCounter value={result.toLose} /> lbs
+                      </p>
+                      <p className="text-xs text-graphite-400 text-center mt-1">to reach the healthy BMI range</p>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 text-center"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 }}
+                    >
+                      <p className="text-sm font-medium text-emerald-700">
+                        You&apos;re within the healthy weight range for your height
+                      </p>
+                      <p className="text-xs text-graphite-400 mt-1">
+                        Healthy range: {result.healthyWeight.min}&ndash;{result.healthyWeight.max} lbs
+                      </p>
+                    </motion.div>
+                  )}
 
-                <div className="mt-6 flex items-start gap-2 rounded-xl bg-white/80 p-4">
-                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-graphite-400" />
-                  <p className="text-xs leading-relaxed text-graphite-400">
-                    BMI is a screening tool, not a diagnostic measure. It does not account for
-                    muscle mass, bone density, body composition, or other health factors. A licensed
-                    provider considers multiple factors when evaluating treatment options.
-                  </p>
-                </div>
+                  <div className="mt-6 flex items-start gap-2 rounded-xl bg-white/80 p-4">
+                    <Info className="mt-0.5 h-4 w-4 shrink-0 text-graphite-400" />
+                    <p className="text-xs leading-relaxed text-graphite-400">
+                      BMI is a screening tool, not a diagnostic measure. It does not account for
+                      muscle mass, bone density, body composition, or other health factors. A licensed
+                      provider considers multiple factors when evaluating treatment options.
+                    </p>
+                  </div>
 
-                <div className="mt-6 text-center">
-                  <Link href="/qualify">
-                    <Button className="gap-2">
-                      See if you qualify for treatment
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            )}
+                  <div className="mt-6 text-center">
+                    <Link href="/qualify">
+                      <Button className="gap-2">
+                        See if you qualify for treatment
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* SEO content + internal links */}

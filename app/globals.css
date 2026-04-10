@@ -116,6 +116,48 @@
   @apply rounded-2xl bg-gradient-to-br from-teal-50 to-sage p-6 border border-teal-100;
 }
 
+/* Weight slider */
+.weight-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+}
+.weight-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #1F6F78;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(31,111,120,0.3);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.weight-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 12px rgba(31,111,120,0.45);
+}
+.weight-slider::-webkit-slider-thumb:active {
+  transform: scale(1.05);
+}
+.weight-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #1F6F78;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(31,111,120,0.3);
+  cursor: pointer;
+}
+.weight-slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid #1F6F78;
+  outline-offset: 2px;
+}
+
 /* Quiz progress */
 .quiz-progress {
   @apply h-1.5 rounded-full bg-sage transition-all duration-500 ease-out;
