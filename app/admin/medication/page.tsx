@@ -11,7 +11,6 @@ import { MedicationClient } from "./medication-client";
 
 async function getCatalog() {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return await (db as any).medicationCatalog.findMany({
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     });

@@ -22,7 +22,6 @@ export default async function ResellerNetworkDetailPage({ params }: PageProps) {
   const { id } = await params;
 
   // Query the full reseller profile directly to get all network fields
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const resellerRaw = await (db.resellerProfile as any).findUnique({ where: { id } });
   if (!resellerRaw) redirect("/admin/reseller-network");
 

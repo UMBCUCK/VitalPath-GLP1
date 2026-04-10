@@ -5,7 +5,6 @@ import { db } from "@/lib/db";
 // Requires: npx prisma db push to create the MedicationCatalog table
 export async function GET() {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const medications = await (db as any).medicationCatalog.findMany({
       where: { isActive: true },
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],

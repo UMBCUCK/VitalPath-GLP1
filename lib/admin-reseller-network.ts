@@ -4,12 +4,8 @@ import { db } from "@/lib/db";
 // `npx prisma generate` to be run after schema updates. If you see
 // TS errors on fields like referredByResellerId, networkDepth, etc.,
 // run `npx prisma generate` to regenerate the Prisma client.
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const resellerDb = db.resellerProfile as any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const commissionDb = db.commission as any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const networkEventDb = (db as any).resellerNetworkEvent;
 
 // ── Types ─────────────────────────────────────────────────────

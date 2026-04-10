@@ -28,7 +28,6 @@ export async function GET(req: NextRequest) {
   if (authError) return authError;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const medications = await (db as any).medicationCatalog.findMany({
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     });
@@ -50,7 +49,6 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const med = await (db as any).medicationCatalog.create({
       data: {
         ...parsed.data,
@@ -83,7 +81,6 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const med = await (db as any).medicationCatalog.update({
       where: { id },
       data: {
@@ -107,7 +104,6 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (db as any).medicationCatalog.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch {

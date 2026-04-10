@@ -26,8 +26,6 @@ export async function searchAuditTrail(params: SearchParams) {
     from,
     to,
   } = params;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = {};
 
   if (adminId) where.userId = adminId;
@@ -84,7 +82,6 @@ export async function getEntityTimeline(entity: string, entityId: string) {
 // ─── Audit stats ────────────────────────────────────────────
 
 export async function getAuditStats(from?: Date, to?: Date) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dateFilter: any = {};
   if (from || to) {
     dateFilter.createdAt = {};
