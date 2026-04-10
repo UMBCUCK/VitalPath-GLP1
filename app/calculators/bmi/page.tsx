@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -42,6 +42,7 @@ export default function BMICalculatorPage() {
     healthyWeight: { min: number; max: number };
     toLose: number;
   } | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   function handleCalculate() {
     const ft = parseInt(heightFeet);
@@ -71,6 +72,8 @@ export default function BMICalculatorPage() {
       bmi_result: Math.round(bmi * 10) / 10,
       bmi_category: category,
     });
+
+    setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   }
 
   return (
@@ -158,6 +161,7 @@ export default function BMICalculatorPage() {
             <AnimatePresence>
               {result && (
                 <motion.div
+                  ref={resultRef}
                   className="mt-8 calculator-result"
                   initial={{ opacity: 0, y: 20, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}

@@ -27,6 +27,10 @@ import {
   Settings,
   UserCog,
   ChevronDown,
+  Code2,
+  GitCompareArrows,
+  Zap,
+  Gauge,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -72,6 +76,8 @@ const navGroups: NavGroup[] = [
       { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
       { label: "Campaigns", href: "/admin/campaigns", icon: Send },
       { label: "Referrals", href: "/admin/referrals", icon: Share2 },
+      { label: "Cohorts", href: "/admin/cohorts", icon: GitCompareArrows },
+      { label: "Widgets", href: "/admin/widgets", icon: Code2 },
       { label: "Coupons", href: "/admin/coupons", icon: Tag },
     ],
   },
@@ -95,6 +101,8 @@ const navGroups: NavGroup[] = [
   {
     title: "System",
     items: [
+      { label: "Operations", href: "/admin/operations", icon: Gauge },
+      { label: "Bulk Operations", href: "/admin/bulk-operations", icon: Zap },
       { label: "Webhooks", href: "/admin/webhooks", icon: Webhook },
       { label: "Admin Users", href: "/admin/users", icon: UserCog },
       { label: "Settings", href: "/admin/settings", icon: Settings },

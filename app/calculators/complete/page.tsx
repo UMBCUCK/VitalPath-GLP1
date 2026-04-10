@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowLeft,
   Info,
   Save,
   Check,
@@ -16,6 +15,8 @@ import {
   Calendar,
   Zap,
   LogIn,
+  Copy,
+  Loader2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -97,6 +98,9 @@ export default function CompleteCalculatorPage() {
   const [saved, setSaved] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const [calculating, setCalculating] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   // Pre-fill from account on mount
   useEffect(() => {
@@ -126,6 +130,7 @@ export default function CompleteCalculatorPage() {
     const inc = parseInt(heightInches || "0");
     const a = parseInt(age);
     if (isNaN(ft) || isNaN(a)) return;
+    setCalculating(true);
 
     const totalInches = ft * 12 + inc;
     const bmi = calculateBMI(currentWeight, totalInches);
@@ -180,6 +185,27 @@ export default function CompleteCalculatorPage() {
 
     setSaved(false);
     track(ANALYTICS_EVENTS.CALCULATOR_COMPLETE, { calculator: "complete" });
+    setTimeout(() => {
+      setCalculating(false);
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 300);
+  }
+
+  function copyResults() {
+    if (!results) return;
+    const text = [
+      `My Health Profile (VitalPath)`,
+      `BMI: ${results.bmi} (${results.bmiCategory})`,
+      `Daily Calories (TDEE): ${results.tdee}`,
+      `Weight Loss Target: ${results.tdee - 500} cal/day`,
+      `Protein: ${results.protein.min}-${results.protein.max}g/day`,
+      `Water: ${results.waterOz}oz/day (${Math.round(results.waterOz / 8)} glasses)`,
+      `Macros (loss): ${results.macros.protein.grams}g protein, ${results.macros.carbs.grams}g carbs, ${results.macros.fat.grams}g fat`,
+      results.weeksToGoal > 0 ? `Projected timeline: ~${results.weeksToGoal} weeks to goal` : "",
+    ].filter(Boolean).join("\n");
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   async function handleSave() {
@@ -304,8 +330,14 @@ export default function CompleteCalculatorPage() {
                 </div>
               </div>
 
-              <Button size="lg" className="w-full text-lg py-6" onClick={calculateAll}>
-                Get My Health Profile
+              <Button size="lg" className="w-full text-lg py-6" onClick={calculateAll} disabled={calculating}>
+                {calculating ? (
+                  <><Loader2 className="h-5 w-5 animate-spin mr-2" /> Calculating...</>
+                ) : results ? (
+                  "Recalculate"
+                ) : (
+                  "Get My Health Profile"
+                )}
               </Button>
             </div>
           </div>
@@ -316,12 +348,44 @@ export default function CompleteCalculatorPage() {
       <AnimatePresence>
         {results && (
           <motion.div
+            ref={resultsRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
           >
+            {/* Sticky section nav */}
+            <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-navy-100/30 py-2.5">
+              <SectionShell className="max-w-3xl">
+                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+                  {[
+                    { id: "bmi", icon: Scale, label: "BMI" },
+                    { id: "tdee", icon: Flame, label: "Calories" },
+                    { id: "protein", icon: Target, label: "Protein" },
+                    { id: "hydration", icon: Droplets, label: "Water" },
+                    { id: "timeline", icon: TrendingDown, label: "Timeline" },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => document.getElementById(`section-${s.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                      className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-graphite-500 hover:bg-teal-50 hover:text-teal transition-colors whitespace-nowrap shrink-0"
+                    >
+                      <s.icon className="h-3.5 w-3.5" />
+                      {s.label}
+                    </button>
+                  ))}
+                  <div className="flex-1" />
+                  <button
+                    onClick={copyResults}
+                    className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium text-graphite-500 hover:bg-teal-50 hover:text-teal transition-colors shrink-0"
+                  >
+                    {copied ? <><Check className="h-3.5 w-3.5" /> Copied</> : <><Copy className="h-3.5 w-3.5" /> Copy</>}
+                  </button>
+                </div>
+              </SectionShell>
+            </div>
+
             {/* ─── BMI Section ─── */}
-            <section className="py-10 border-t border-navy-100/30">
+            <section id="section-bmi" className="py-10 border-t border-navy-100/30 scroll-mt-16">
               <SectionShell className="max-w-3xl">
                 <div className="flex items-center gap-2 mb-6">
                   <Scale className="h-5 w-5 text-teal" />
@@ -351,7 +415,7 @@ export default function CompleteCalculatorPage() {
             </section>
 
             {/* ─── TDEE + Macros Section ─── */}
-            <section className="py-10 border-t border-navy-100/30 bg-navy-50/10">
+            <section id="section-tdee" className="py-10 border-t border-navy-100/30 bg-navy-50/10 scroll-mt-16">
               <SectionShell className="max-w-3xl">
                 <div className="flex items-center gap-2 mb-6">
                   <Flame className="h-5 w-5 text-gold-600" />
@@ -395,7 +459,7 @@ export default function CompleteCalculatorPage() {
             </section>
 
             {/* ─── Protein Section ─── */}
-            <section className="py-10 border-t border-navy-100/30">
+            <section id="section-protein" className="py-10 border-t border-navy-100/30 scroll-mt-16">
               <SectionShell className="max-w-3xl">
                 <div className="flex items-center gap-2 mb-6">
                   <Target className="h-5 w-5 text-atlantic" />
@@ -438,7 +502,7 @@ export default function CompleteCalculatorPage() {
             </section>
 
             {/* ─── Hydration Section ─── */}
-            <section className="py-10 border-t border-navy-100/30 bg-navy-50/10">
+            <section id="section-hydration" className="py-10 border-t border-navy-100/30 bg-navy-50/10 scroll-mt-16">
               <SectionShell className="max-w-3xl">
                 <div className="flex items-center gap-2 mb-6">
                   <Droplets className="h-5 w-5 text-blue-500" />
@@ -466,7 +530,7 @@ export default function CompleteCalculatorPage() {
             </section>
 
             {/* ─── Timeline Section ─── */}
-            <section className="py-10 border-t border-navy-100/30">
+            <section id="section-timeline" className="py-10 border-t border-navy-100/30 scroll-mt-16">
               <SectionShell className="max-w-3xl">
                 <div className="flex items-center gap-2 mb-6">
                   <TrendingDown className="h-5 w-5 text-teal" />

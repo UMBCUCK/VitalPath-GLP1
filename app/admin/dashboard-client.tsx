@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import {
   DollarSign,
@@ -45,6 +46,13 @@ interface DashboardData {
 }
 
 export function DashboardClient({ data }: { data: DashboardData }) {
+  // Fire-and-forget: evaluate smart alert rules on dashboard load
+  useEffect(() => {
+    fetch("/api/admin/alerts/evaluate", { method: "POST" }).catch(() => {
+      // Silent failure — alerts are non-critical
+    });
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* Critical alert banner */}

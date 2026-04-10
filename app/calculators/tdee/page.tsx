@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,6 +37,7 @@ export default function TDEECalculatorPage() {
   const [activity, setActivity] = useState<"sedentary" | "light" | "moderate" | "active" | "very_active">("moderate");
   const [result, setResult] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<MacroTab>("lose");
+  const resultRef = useRef<HTMLDivElement>(null);
 
   function handleCalculate() {
     const ft = parseInt(heightFeet);
@@ -54,6 +55,8 @@ export default function TDEECalculatorPage() {
       calculator: "tdee",
       tdee_result: tdee,
     });
+
+    setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   }
 
   const calorieTargets = result
@@ -181,6 +184,7 @@ export default function TDEECalculatorPage() {
             <AnimatePresence>
               {result && calorieTargets && (
                 <motion.div
+                  ref={resultRef}
                   className="mt-8 calculator-result"
                   initial={{ opacity: 0, y: 20, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}

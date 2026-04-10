@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import {
   LayoutDashboard, TrendingUp, Pill, Utensils, Share2, Settings,
-  MessageCircle, Camera, ClipboardCheck,
+  MessageCircle, Camera, ClipboardCheck, ShoppingBag,
 } from "lucide-react";
 import { NotificationBell } from "@/app/dashboard/notification-bell";
 import { StreakBadges } from "@/components/dashboard/streak-badges";
@@ -15,6 +15,7 @@ const dashboardNav = [
   { label: "Check-In", href: "/dashboard/check-in", icon: ClipboardCheck },
   { label: "Treatment", href: "/dashboard/treatment", icon: Pill },
   { label: "Meals & Recipes", href: "/dashboard/meals", icon: Utensils },
+  { label: "Shop", href: "/dashboard/shop", icon: ShoppingBag },
   { label: "Photos", href: "/dashboard/photos", icon: Camera },
   { label: "Messages", href: "/dashboard/messages", icon: MessageCircle },
   { label: "Referrals", href: "/dashboard/referrals", icon: Share2 },

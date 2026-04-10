@@ -65,7 +65,13 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  // Allow embed pages to be loaded in iframes from any origin
+  const response = NextResponse.next();
+  if (pathname.startsWith("/embed/")) {
+    response.headers.set("X-Frame-Options", "ALLOWALL");
+    response.headers.set("Content-Security-Policy", "frame-ancestors *");
+  }
+  return response;
 }
 
 export const config = {

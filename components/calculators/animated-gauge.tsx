@@ -43,7 +43,7 @@ export function AnimatedGauge({
   className = "",
 }: AnimatedGaugeProps) {
   const ref = useRef<SVGSVGElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-30px" });
+  const isInView = useInView(ref, { once: true, margin: "100px" });
   const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {

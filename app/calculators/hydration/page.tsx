@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,6 +16,7 @@ export default function HydrationCalculatorPage() {
   const [weight, setWeight] = useState("");
   const [activity, setActivity] = useState<"low" | "moderate" | "high">("moderate");
   const [result, setResult] = useState<number | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   function handleCalculate() {
     const w = parseFloat(weight);
@@ -24,6 +25,7 @@ export default function HydrationCalculatorPage() {
     const oz = calculateHydration(w, activity);
     setResult(oz);
     track(ANALYTICS_EVENTS.CALCULATOR_COMPLETE, { calculator: "hydration" });
+    setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   }
 
   const bottles = result ? Math.round(result / 16.9) : 0;
@@ -92,6 +94,7 @@ export default function HydrationCalculatorPage() {
             <AnimatePresence>
               {result && (
                 <motion.div
+                  ref={resultRef}
                   className="mt-8 calculator-result"
                   initial={{ opacity: 0, y: 20, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}

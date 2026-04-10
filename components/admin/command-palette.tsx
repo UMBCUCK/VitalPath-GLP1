@@ -190,8 +190,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-navy truncate">{item.label}</p>
-                      {"sublabel" in item && item.sublabel && (
-                        <p className="text-xs text-graphite-400 truncate">{item.sublabel}</p>
+                      {"sublabel" in item && (item as SearchResult).sublabel && (
+                        <p className="text-xs text-graphite-400 truncate">{(item as SearchResult).sublabel}</p>
                       )}
                     </div>
                     {!isQuickAction && (

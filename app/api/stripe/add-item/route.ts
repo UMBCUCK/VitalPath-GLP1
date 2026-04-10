@@ -17,6 +17,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Product slug required" }, { status: 400 });
     }
 
+    // Gate: verify patient has approved intake (defense-in-depth)
+    const intake = await db.intakeSubmission.findFirst({
+      where: { userId: session.userId },
+      orderBy: { createdAt: "desc" },
+      select: { status: true },
+    });
+    if (!intake || intake.status !== "APPROVED") {
+      return NextResponse.json({ error: "Treatment not yet approved by provider" }, { status: 403 });
+    }
+
     // Find the add-on product
     const product = await db.product.findUnique({ where: { slug: productSlug } });
     if (!product || !product.isActive) {

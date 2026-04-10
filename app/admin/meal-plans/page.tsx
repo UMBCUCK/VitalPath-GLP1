@@ -1,25 +1,47 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { MealPlanClient } from "./meal-plan-client";
+import { MealPlansClient } from "./meal-plans-client";
 
 export default async function MealPlansPage() {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") redirect("/login");
 
-  const recipes = await db.recipe.findMany({
-    where: { isPublished: true },
-    orderBy: { category: "asc" },
-    select: { id: true, title: true, slug: true, category: true, calories: true, proteinG: true, prepMinutes: true },
-  });
+  const [mealPlans, recipes, totalMealPlans] = await Promise.all([
+    db.mealPlan.findMany({
+      orderBy: [{ year: "desc" }, { weekNumber: "desc" }],
+      include: {
+        items: {
+          include: {
+            recipe: {
+              select: { id: true, title: true, category: true, calories: true, proteinG: true },
+            },
+          },
+          orderBy: [{ dayOfWeek: "asc" }, { sortOrder: "asc" }],
+        },
+      },
+    }),
+    db.recipe.findMany({
+      where: { isPublished: true },
+      orderBy: { category: "asc" },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        category: true,
+        calories: true,
+        proteinG: true,
+        prepMinutes: true,
+      },
+    }),
+    db.mealPlan.count(),
+  ]);
 
-  const mealPlans = await db.mealPlan.findMany({
-    orderBy: [{ year: "desc" }, { weekNumber: "desc" }],
-    take: 10,
-    include: {
-      items: { include: { recipe: { select: { title: true, category: true } } } },
-    },
-  });
-
-  return <MealPlanClient recipes={recipes} mealPlans={mealPlans} />;
+  return (
+    <MealPlansClient
+      initialMealPlans={JSON.parse(JSON.stringify(mealPlans))}
+      recipes={JSON.parse(JSON.stringify(recipes))}
+      total={totalMealPlans}
+    />
+  );
 }

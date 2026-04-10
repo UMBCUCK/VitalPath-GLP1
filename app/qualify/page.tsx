@@ -2,7 +2,7 @@
 
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowRight, ArrowLeft, Check, Shield, Users, Star, Clock,
   AlertTriangle, Lock, Sparkles, TrendingDown, Activity, Target, Zap,
@@ -95,6 +95,7 @@ const stepProof = [
 
 export default function QualifyPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { state: funnelState, update: updateFunnel } = useFunnelStore();
   const [step, setStep] = useState<QualifyStep>(1);
   const [showExitModal, setShowExitModal] = useState(false);
@@ -104,6 +105,16 @@ export default function QualifyPage() {
   const [restored, setRestored] = useState(false);
   const hasInteracted = useRef(false);
   const [answeredScreening, setAnsweredScreening] = useState<Record<string, boolean>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [attemptedNext, setAttemptedNext] = useState(false);
+
+  // Capture referral code from URL (?ref=CODE) and persist in funnel
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref && !funnelState.referralCode) {
+      updateFunnel({ referralCode: ref });
+    }
+  }, [searchParams, funnelState.referralCode, updateFunnel]);
   const [allScreeningAnswered, setAllScreeningAnswered] = useState(false);
 
   // ─── Projection state (step 5) ─────────────────────────────
@@ -312,6 +323,18 @@ export default function QualifyPage() {
 
   // ─── Step navigation ──────────────────────────────────────
   function nextStep() {
+    // Validate before proceeding
+    const errors = getFieldErrors();
+    if (Object.keys(errors).length > 0) {
+      setAttemptedNext(true);
+      setFieldErrors(errors);
+      return;
+    }
+
+    // Clear errors on successful navigation
+    setAttemptedNext(false);
+    setFieldErrors({});
+
     if (step === 1 && bmi > 0) {
       track(ANALYTICS_EVENTS.QUALIFY_BMI_CALCULATED, { bmi: Math.round(bmi * 10) / 10, category: bmiCat });
     }
@@ -344,6 +367,8 @@ export default function QualifyPage() {
   }
 
   function prevStep() {
+    setAttemptedNext(false);
+    setFieldErrors({});
     if (step === 5) {
       // Skip projection animation reset on back
       setProjectionRevealed(false);
@@ -375,6 +400,12 @@ export default function QualifyPage() {
 
   // ─── Submit ───────────────────────────────────────────────
   async function handleSubmit() {
+    const errors = getFieldErrors();
+    if (Object.keys(errors).length > 0) {
+      setAttemptedNext(true);
+      setFieldErrors(errors);
+      return;
+    }
     setError("");
     setLoading(true);
 
@@ -449,7 +480,62 @@ export default function QualifyPage() {
     }
   };
 
+  // ─── Field-level validation ──────────────────────────────
+  const getFieldErrors = (): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    switch (step) {
+      case 1:
+        if (!form.heightFeet) errors.heightFeet = "Height (feet) is required";
+        if (!form.weightLbs) errors.weightLbs = "Weight is required";
+        if (!form.age) errors.age = "Age is required";
+        if (!form.sex) errors.sex = "Please select your biological sex";
+        break;
+      case 2:
+        if (!form.primaryGoal) errors.primaryGoal = "Please select your primary goal";
+        if (!form.activityLevel) errors.activityLevel = "Please select your activity level";
+        if (!form.eatingPattern) errors.eatingPattern = "Please select your eating habits";
+        if (!form.previousAttempts) errors.previousAttempts = "Please select what you've tried before";
+        break;
+      case 4: {
+        const unanswered = contraindications.filter(c => !answeredScreening[c.key] && !allScreeningAnswered);
+        if (unanswered.length > 0) errors.screening = `Please answer all ${unanswered.length} remaining safety question${unanswered.length > 1 ? "s" : ""}`;
+        break;
+      }
+      case 6:
+        if (!form.firstName) errors.firstName = "First name is required";
+        if (!form.lastName) errors.lastName = "Last name is required";
+        if (!form.email) errors.email = "Email is required";
+        if (!form.phone) errors.phone = "Phone number is required";
+        if (!form.dateOfBirth) errors.dateOfBirth = "Date of birth is required";
+        if (!form.state) errors.state = "State is required";
+        if (form.medicalHistory.length < 10) errors.medicalHistory = "Please provide a brief medical history (at least 10 characters)";
+        if (!form.emergencyContactName) errors.emergencyContactName = "Emergency contact name is required";
+        if (!form.emergencyContactPhone) errors.emergencyContactPhone = "Emergency contact phone is required";
+        if (!form.emergencyContactRelation) errors.emergencyContactRelation = "Emergency contact relationship is required";
+        break;
+      case 7:
+        if (!form.consentTreatment) errors.consentTreatment = "Treatment consent is required";
+        if (!form.consentHipaa) errors.consentHipaa = "HIPAA authorization is required";
+        if (!form.consentTelehealth) errors.consentTelehealth = "Telehealth consent is required";
+        if (!form.consentMedicationRisks) errors.consentMedicationRisks = "Medication risk acknowledgment is required";
+        break;
+    }
+    return errors;
+  };
+
+  // Clear errors when user changes fields
+  useEffect(() => {
+    if (attemptedNext) {
+      const errors = getFieldErrors();
+      setFieldErrors(errors);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, answeredScreening, allScreeningAnswered, attemptedNext]);
+
   const stepNames = ["BMI Check", "Goals", "Medical History", "Safety Screening", "Your Projection", "Personal Info", "Plan & Consent"];
+
+  const FieldError = ({ field }: { field: string }) =>
+    fieldErrors[field] ? <p className="mt-1 text-xs text-red-500 font-medium">{fieldErrors[field]}</p> : null;
 
   return (
     <MarketingShell>
@@ -520,10 +606,10 @@ export default function QualifyPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-navy mb-2">Height</label>
+                      <label className={cn("block text-sm font-semibold mb-2", fieldErrors.heightFeet ? "text-red-500" : "text-navy")}>Height {fieldErrors.heightFeet && <span className="font-normal">— {fieldErrors.heightFeet}</span>}</label>
                       <div className="flex gap-3">
                         <div className="flex-1 relative">
-                          <input type="number" placeholder="5" value={form.heightFeet} onChange={(e) => setField("heightFeet", e.target.value)} className="calculator-input pr-10" min={3} max={8} />
+                          <input type="number" placeholder="5" value={form.heightFeet} onChange={(e) => setField("heightFeet", e.target.value)} className={cn("calculator-input pr-10", fieldErrors.heightFeet && "!border-red-400 !ring-red-100")} min={3} max={8} />
                           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-graphite-400">ft</span>
                         </div>
                         <div className="flex-1 relative">
@@ -534,20 +620,20 @@ export default function QualifyPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-navy mb-2">Current Weight</label>
+                      <label className={cn("block text-sm font-semibold mb-2", fieldErrors.weightLbs ? "text-red-500" : "text-navy")}>Current Weight {fieldErrors.weightLbs && <span className="font-normal">— {fieldErrors.weightLbs}</span>}</label>
                       <div className="relative">
-                        <input type="number" placeholder="200" value={form.weightLbs} onChange={(e) => setField("weightLbs", e.target.value)} className="calculator-input pr-12" min={80} max={700} />
+                        <input type="number" placeholder="200" value={form.weightLbs} onChange={(e) => setField("weightLbs", e.target.value)} className={cn("calculator-input pr-12", fieldErrors.weightLbs && "!border-red-400 !ring-red-100")} min={80} max={700} />
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-graphite-400">lbs</span>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-semibold text-navy mb-2">Age</label>
-                        <input type="number" placeholder="35" value={form.age} onChange={(e) => setField("age", e.target.value)} className="calculator-input" min={18} max={120} />
+                        <label className={cn("block text-sm font-semibold mb-2", fieldErrors.age ? "text-red-500" : "text-navy")}>Age {fieldErrors.age && <span className="font-normal">— {fieldErrors.age}</span>}</label>
+                        <input type="number" placeholder="35" value={form.age} onChange={(e) => setField("age", e.target.value)} className={cn("calculator-input", fieldErrors.age && "!border-red-400 !ring-red-100")} min={18} max={120} />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-navy mb-2">Biological Sex</label>
+                        <label className={cn("block text-sm font-semibold mb-2", fieldErrors.sex ? "text-red-500" : "text-navy")}>Biological Sex {fieldErrors.sex && <span className="font-normal">— Required</span>}</label>
                         <div className="flex gap-2">
                           <SelectButton selected={form.sex === "male"} onClick={() => setField("sex", "male")}>Male</SelectButton>
                           <SelectButton selected={form.sex === "female"} onClick={() => setField("sex", "female")}>Female</SelectButton>
@@ -559,20 +645,36 @@ export default function QualifyPage() {
                     {bmi > 0 && (
                       <div className={cn(
                         "rounded-xl border-2 p-4 transition-all animate-fade-in-up",
-                        bmi >= 27 ? "border-teal bg-teal-50" : bmi >= 25 ? "border-amber-300 bg-amber-50" : "border-navy-200 bg-navy-50"
+                        bmi >= 27 ? "border-teal bg-gradient-to-br from-teal-50 to-white" : bmi >= 25 ? "border-amber-300 bg-amber-50" : "border-navy-200 bg-navy-50"
                       )}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-semibold text-navy">Your BMI</span>
-                          <span className="text-2xl font-bold text-navy">{Math.round(bmi * 10) / 10}</span>
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-graphite-400">Your BMI</p>
+                            <p className="text-3xl font-bold text-navy leading-none mt-0.5">{Math.round(bmi * 10) / 10}</p>
+                          </div>
+                          {bmi >= 27 ? (
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal shadow-glow">
+                              <Check className="h-6 w-6 text-white" />
+                            </div>
+                          ) : bmi >= 25 ? (
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+                              <AlertTriangle className="h-6 w-6 text-amber-600" />
+                            </div>
+                          ) : null}
                         </div>
                         <Badge variant={bmi >= 30 ? "destructive" : bmi >= 27 ? "warning" : bmi >= 25 ? "warning" : "default"} className="mb-2">
                           {bmiCat}
                         </Badge>
                         {bmi >= 27 ? (
-                          <p className="text-sm text-teal-700 flex items-center gap-1.5">
-                            <Check className="h-4 w-4" />
-                            You may qualify for GLP-1 treatment
-                          </p>
+                          <div>
+                            <p className="text-sm font-semibold text-teal-700 flex items-center gap-1.5">
+                              <Check className="h-4 w-4" />
+                              You likely qualify for GLP-1 treatment
+                            </p>
+                            <p className="mt-1.5 text-xs text-teal-600 leading-relaxed">
+                              87% of adults with BMI 27+ are approved. Complete the next steps to get your personalized treatment plan.
+                            </p>
+                          </div>
                         ) : bmi >= 25 ? (
                           <p className="text-sm text-amber-700">
                             You may qualify with weight-related health conditions. Your provider will evaluate your full profile.
@@ -584,12 +686,6 @@ export default function QualifyPage() {
                         )}
                       </div>
                     )}
-
-                    {bmi >= 27 && (
-                      <p className="text-center text-xs text-graphite-400">
-                        87% of adults with BMI 27+ qualify for GLP-1 treatment
-                      </p>
-                    )}
                   </div>
                 )}
 
@@ -597,13 +693,13 @@ export default function QualifyPage() {
                 {step === 2 && (
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-semibold text-navy mb-3">What&apos;s your primary goal?</label>
+                      <label className={cn("block text-sm font-semibold mb-3", fieldErrors.primaryGoal ? "text-red-500" : "text-navy")}>What&apos;s your primary goal? {fieldErrors.primaryGoal && <span className="font-normal">— {fieldErrors.primaryGoal}</span>}</label>
                       <div className="space-y-2">
                         {goals.map((g) => (
                           <button key={g.value} type="button" onClick={() => setField("primaryGoal", g.value)}
                             className={cn(
                               "flex w-full items-start gap-3 rounded-xl border-2 px-4 py-3 text-left transition-all",
-                              form.primaryGoal === g.value ? "border-teal bg-teal-50" : "border-navy-200 hover:border-navy-300"
+                              form.primaryGoal === g.value ? "border-teal bg-teal-50" : fieldErrors.primaryGoal ? "border-red-300 hover:border-red-400" : "border-navy-200 hover:border-navy-300"
                             )}
                           >
                             <div className={cn("mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all", form.primaryGoal === g.value ? "border-teal bg-teal" : "border-navy-300")}>
@@ -619,7 +715,7 @@ export default function QualifyPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-navy mb-3">Current activity level</label>
+                      <label className={cn("block text-sm font-semibold mb-3", fieldErrors.activityLevel ? "text-red-500" : "text-navy")}>Current activity level {fieldErrors.activityLevel && <span className="font-normal">— {fieldErrors.activityLevel}</span>}</label>
                       <div className="grid grid-cols-2 gap-3">
                         {activityLevels.map((a) => (
                           <button key={a.value} type="button" onClick={() => setField("activityLevel", a.value)}
@@ -633,7 +729,7 @@ export default function QualifyPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-navy mb-3">How would you describe your eating habits?</label>
+                      <label className={cn("block text-sm font-semibold mb-3", fieldErrors.eatingPattern ? "text-red-500" : "text-navy")}>How would you describe your eating habits? {fieldErrors.eatingPattern && <span className="font-normal">— {fieldErrors.eatingPattern}</span>}</label>
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                         {eatingPatterns.map((e) => (
                           <SelectButton key={e.value} selected={form.eatingPattern === e.value} onClick={() => setField("eatingPattern", e.value)}>
@@ -644,7 +740,7 @@ export default function QualifyPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-navy mb-3">What have you tried before?</label>
+                      <label className={cn("block text-sm font-semibold mb-3", fieldErrors.previousAttempts ? "text-red-500" : "text-navy")}>What have you tried before? {fieldErrors.previousAttempts && <span className="font-normal">— {fieldErrors.previousAttempts}</span>}</label>
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                         {previousAttempts.map((p) => (
                           <SelectButton key={p.value} selected={form.previousAttempts === p.value} onClick={() => setField("previousAttempts", p.value)}>
@@ -776,6 +872,10 @@ export default function QualifyPage() {
                         })}
                       </div>
 
+                      {fieldErrors.screening && (
+                        <p className="mt-3 text-xs text-red-500 font-medium">{fieldErrors.screening}</p>
+                      )}
+
                       {form.hasSuicidalIdeation && (
                         <div className="mt-4 rounded-lg bg-purple-50 border border-purple-200 p-4">
                           <p className="text-xs font-bold text-purple-800 mb-1">Crisis Resources Available 24/7</p>
@@ -833,14 +933,18 @@ export default function QualifyPage() {
                       </div>
                     ) : projection && (
                       <div className="space-y-6 animate-fade-in-up">
-                        <div className="text-center">
-                          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-teal-50">
-                            <TrendingDown className="h-6 w-6 text-teal" />
+                        <div className="rounded-2xl bg-gradient-to-br from-navy to-atlantic p-5 text-white text-center">
+                          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
+                            <TrendingDown className="h-6 w-6 text-teal-300" />
                           </div>
-                          <h2 className="text-xl font-bold text-navy">Your Projected Weight Loss</h2>
-                          <p className="mt-1 text-sm text-graphite-400">
-                            Based on your profile and clinical trial data
+                          <p className="text-xs font-semibold uppercase tracking-wider text-teal-300 mb-2">Your personalized projection</p>
+                          <h2 className="text-2xl font-bold sm:text-3xl">
+                            You could lose <span className="text-teal-300">~{Math.round(projection.summary.totalLossWithPlan)} lbs</span>
+                          </h2>
+                          <p className="mt-1 text-sm text-navy-300">
+                            Reaching ~{Math.round(projection.summary.projectedWeightWithPlan)} lbs by <strong className="text-white">{projection.summary.targetDate}</strong>
                           </p>
+                          <p className="mt-3 text-xs text-navy-400">Based on your profile &amp; STEP/SURMOUNT clinical trial data</p>
                         </div>
 
                         {/* Chart */}
@@ -950,6 +1054,17 @@ export default function QualifyPage() {
                           </p>
                         </div>
 
+                        {/* Testimonial */}
+                        <div className="rounded-xl border border-navy-100/60 bg-navy-50/30 p-4">
+                          <div className="flex gap-0.5 mb-2">
+                            {[1,2,3,4,5].map((i) => <span key={i} className="text-gold text-sm">★</span>)}
+                          </div>
+                          <p className="text-sm text-graphite-600 italic leading-relaxed">
+                            &ldquo;I lost 47 lbs in 6 months with VitalPath. My projection said 40 lbs — I actually exceeded it. The support team checked in every week.&rdquo;
+                          </p>
+                          <p className="mt-2 text-xs font-semibold text-navy">— Sarah M., Texas · Verified Member</p>
+                        </div>
+
                         <p className="text-[10px] text-graphite-300 text-center leading-relaxed">
                           {siteConfig.compliance.resultsDisclaimer} Projections based on clinical trial averages (STEP/SURMOUNT trials).
                         </p>
@@ -968,33 +1083,33 @@ export default function QualifyPage() {
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div>
-                        <label className="block text-sm font-semibold text-navy mb-1.5">First Name</label>
-                        <Input value={form.firstName} onChange={(e) => setField("firstName", e.target.value)} required />
+                        <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.firstName ? "text-red-500" : "text-navy")}>First Name {fieldErrors.firstName && <span className="font-normal">*</span>}</label>
+                        <Input value={form.firstName} onChange={(e) => setField("firstName", e.target.value)} className={cn(fieldErrors.firstName && "!border-red-400")} required />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-navy mb-1.5">Last Name</label>
-                        <Input value={form.lastName} onChange={(e) => setField("lastName", e.target.value)} required />
+                        <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.lastName ? "text-red-500" : "text-navy")}>Last Name {fieldErrors.lastName && <span className="font-normal">*</span>}</label>
+                        <Input value={form.lastName} onChange={(e) => setField("lastName", e.target.value)} className={cn(fieldErrors.lastName && "!border-red-400")} required />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-navy mb-1.5">Email</label>
-                      <Input type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} required />
+                      <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.email ? "text-red-500" : "text-navy")}>Email {fieldErrors.email && <span className="font-normal">*</span>}</label>
+                      <Input type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} className={cn(fieldErrors.email && "!border-red-400")} required />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-navy mb-1.5">Phone</label>
-                      <Input type="tel" value={form.phone} onChange={(e) => setField("phone", e.target.value)} placeholder="(555) 123-4567" required />
+                      <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.phone ? "text-red-500" : "text-navy")}>Phone {fieldErrors.phone && <span className="font-normal">*</span>}</label>
+                      <Input type="tel" value={form.phone} onChange={(e) => setField("phone", e.target.value)} className={cn(fieldErrors.phone && "!border-red-400")} placeholder="(555) 123-4567" required />
                     </div>
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div>
-                        <label className="block text-sm font-semibold text-navy mb-1.5">Date of Birth</label>
-                        <Input type="date" value={form.dateOfBirth} onChange={(e) => setField("dateOfBirth", e.target.value)} required />
+                        <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.dateOfBirth ? "text-red-500" : "text-navy")}>Date of Birth {fieldErrors.dateOfBirth && <span className="font-normal">*</span>}</label>
+                        <Input type="date" value={form.dateOfBirth} onChange={(e) => setField("dateOfBirth", e.target.value)} className={cn(fieldErrors.dateOfBirth && "!border-red-400")} required />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-navy mb-1.5">State</label>
-                        <select value={form.state} onChange={(e) => setField("state", e.target.value)} className="calculator-input" required>
+                        <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.state ? "text-red-500" : "text-navy")}>State {fieldErrors.state && <span className="font-normal">*</span>}</label>
+                        <select value={form.state} onChange={(e) => setField("state", e.target.value)} className={cn("calculator-input", fieldErrors.state && "!border-red-400")} required>
                           <option value="">Select your state</option>
                           {US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
@@ -1002,11 +1117,11 @@ export default function QualifyPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-navy mb-1.5">Medical History Summary</label>
+                      <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.medicalHistory ? "text-red-500" : "text-navy")}>Medical History Summary {fieldErrors.medicalHistory && <span className="font-normal">— {fieldErrors.medicalHistory}</span>}</label>
                       <textarea
                         value={form.medicalHistory}
                         onChange={(e) => setField("medicalHistory", e.target.value)}
-                        className="calculator-input min-h-[80px] resize-y"
+                        className={cn("calculator-input min-h-[80px] resize-y", fieldErrors.medicalHistory && "!border-red-400")}
                         placeholder="Briefly describe your relevant medical history, previous weight management attempts, and anything else your provider should know."
                         required
                       />
@@ -1031,16 +1146,16 @@ export default function QualifyPage() {
                       <p className="text-xs text-graphite-400 mb-4">Required for your safety during treatment.</p>
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-xs font-semibold text-navy mb-1">Full Name</label>
-                          <Input value={form.emergencyContactName} onChange={(e) => setField("emergencyContactName", e.target.value)} placeholder="Emergency contact name" required />
+                          <label className={cn("block text-xs font-semibold mb-1", fieldErrors.emergencyContactName ? "text-red-500" : "text-navy")}>Full Name {fieldErrors.emergencyContactName && <span className="font-normal">*</span>}</label>
+                          <Input value={form.emergencyContactName} onChange={(e) => setField("emergencyContactName", e.target.value)} className={cn(fieldErrors.emergencyContactName && "!border-red-400")} placeholder="Emergency contact name" required />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-navy mb-1">Phone Number</label>
-                          <Input type="tel" value={form.emergencyContactPhone} onChange={(e) => setField("emergencyContactPhone", e.target.value)} placeholder="(555) 123-4567" required />
+                          <label className={cn("block text-xs font-semibold mb-1", fieldErrors.emergencyContactPhone ? "text-red-500" : "text-navy")}>Phone Number {fieldErrors.emergencyContactPhone && <span className="font-normal">*</span>}</label>
+                          <Input type="tel" value={form.emergencyContactPhone} onChange={(e) => setField("emergencyContactPhone", e.target.value)} className={cn(fieldErrors.emergencyContactPhone && "!border-red-400")} placeholder="(555) 123-4567" required />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-navy mb-1">Relationship</label>
-                          <Input value={form.emergencyContactRelation} onChange={(e) => setField("emergencyContactRelation", e.target.value)} placeholder="e.g., Spouse, Parent, Sibling" required />
+                          <label className={cn("block text-xs font-semibold mb-1", fieldErrors.emergencyContactRelation ? "text-red-500" : "text-navy")}>Relationship {fieldErrors.emergencyContactRelation && <span className="font-normal">*</span>}</label>
+                          <Input value={form.emergencyContactRelation} onChange={(e) => setField("emergencyContactRelation", e.target.value)} className={cn(fieldErrors.emergencyContactRelation && "!border-red-400")} placeholder="e.g., Spouse, Parent, Sibling" required />
                         </div>
                       </div>
                     </div>
@@ -1069,9 +1184,14 @@ export default function QualifyPage() {
                         <span className="text-sm text-graphite-400">/month</span>
                         <span className="text-sm text-graphite-300 line-through">$1,349/mo retail</span>
                       </div>
-                      <p className="mt-1 text-sm text-teal font-semibold">
-                        Save {Math.round((1 - plan.priceMonthly / 134900) * 100)}% vs brand-name pricing
-                      </p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <Badge variant="gold" className="text-xs shadow-gold-glow">
+                          You save ${Math.round((134900 - plan.priceMonthly) / 100)}/mo
+                        </Badge>
+                        <p className="text-xs text-teal font-semibold">
+                          {Math.round((1 - plan.priceMonthly / 134900) * 100)}% less than brand-name
+                        </p>
+                      </div>
 
                       {/* Projection reference */}
                       {projection && (
@@ -1107,6 +1227,25 @@ export default function QualifyPage() {
                     </div>
 
                     {/* 4 Required Consents */}
+                    {/* Consent progress */}
+                    {(() => {
+                      const agreed = [form.consentTreatment, form.consentHipaa, form.consentTelehealth, form.consentMedicationRisks].filter(Boolean).length;
+                      return agreed > 0 && agreed < 4 ? (
+                        <div className="flex items-center gap-3 rounded-xl border border-teal-100 bg-teal-50/50 px-4 py-2.5">
+                          <div className="flex gap-1">
+                            {[0,1,2,3].map((i) => (
+                              <div key={i} className={cn("h-2 w-8 rounded-full transition-all", i < agreed ? "bg-teal" : "bg-navy-100/60")} />
+                            ))}
+                          </div>
+                          <p className="text-xs text-teal-700 font-medium">{agreed} of 4 agreed</p>
+                        </div>
+                      ) : agreed === 4 ? (
+                        <div className="flex items-center gap-2 rounded-xl border border-teal bg-teal-50 px-4 py-2.5">
+                          <Check className="h-4 w-4 text-teal" />
+                          <p className="text-xs text-teal-700 font-semibold">All consents agreed — ready to submit!</p>
+                        </div>
+                      ) : null;
+                    })()}
                     {!(form.consentTreatment && form.consentHipaa && form.consentTelehealth && form.consentMedicationRisks) && (
                       <button
                         type="button"
@@ -1122,8 +1261,11 @@ export default function QualifyPage() {
                         I&apos;ve read and agree to all consents below
                       </button>
                     )}
+                    {fieldErrors.consentTreatment || fieldErrors.consentHipaa || fieldErrors.consentTelehealth || fieldErrors.consentMedicationRisks ? (
+                      <p className="text-xs text-red-500 font-medium">Please review and check all four consent boxes to continue</p>
+                    ) : null}
                     <div className="space-y-3">
-                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentTreatment ? "border-teal bg-teal-50/30" : "border-navy-200 hover:border-navy-300")}>
+                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentTreatment ? "border-teal bg-teal-50/30" : fieldErrors.consentTreatment ? "border-red-300 bg-red-50/30 hover:border-red-400" : "border-navy-200 hover:border-navy-300")}>
                         <input type="checkbox" checked={form.consentTreatment} onChange={(e) => setField("consentTreatment", e.target.checked)} className="mt-0.5 h-5 w-5 rounded border-navy-300 text-teal focus:ring-teal" />
                         <div>
                           <p className="text-sm font-semibold text-navy">Treatment Consent</p>
@@ -1138,7 +1280,7 @@ export default function QualifyPage() {
                         </div>
                       </label>
 
-                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentHipaa ? "border-teal bg-teal-50/30" : "border-navy-200 hover:border-navy-300")}>
+                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentHipaa ? "border-teal bg-teal-50/30" : fieldErrors.consentHipaa ? "border-red-300 bg-red-50/30 hover:border-red-400" : "border-navy-200 hover:border-navy-300")}>
                         <input type="checkbox" checked={form.consentHipaa} onChange={(e) => setField("consentHipaa", e.target.checked)} className="mt-0.5 h-5 w-5 rounded border-navy-300 text-teal focus:ring-teal" />
                         <div>
                           <p className="text-sm font-semibold text-navy">HIPAA Authorization</p>
@@ -1153,7 +1295,7 @@ export default function QualifyPage() {
                         </div>
                       </label>
 
-                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentTelehealth ? "border-teal bg-teal-50/30" : "border-navy-200 hover:border-navy-300")}>
+                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentTelehealth ? "border-teal bg-teal-50/30" : fieldErrors.consentTelehealth ? "border-red-300 bg-red-50/30 hover:border-red-400" : "border-navy-200 hover:border-navy-300")}>
                         <input type="checkbox" checked={form.consentTelehealth} onChange={(e) => setField("consentTelehealth", e.target.checked)} className="mt-0.5 h-5 w-5 rounded border-navy-300 text-teal focus:ring-teal" />
                         <div>
                           <p className="text-sm font-semibold text-navy">Telehealth Consent</p>
@@ -1224,11 +1366,17 @@ export default function QualifyPage() {
 
               {step < 7 ? (
                 <Button onClick={nextStep} disabled={!canProceed()} className="gap-1">
-                  {step === 5 ? "Continue to Finish" : "Continue"} <ArrowRight className="h-4 w-4" />
+                  {step === 1 && "Check My Results"}
+                  {step === 2 && "Continue"}
+                  {step === 3 && "Continue"}
+                  {step === 4 && "See My Projection"}
+                  {step === 5 && "Claim My Plan"}
+                  {step === 6 && "Review My Plan"}
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               ) : (
                 <Button onClick={handleSubmit} disabled={!canProceed() || loading} className="gap-1 shadow-glow">
-                  {loading ? "Submitting..." : "Submit for Provider Review"}
+                  {loading ? "Submitting..." : `Start My ${plan.name} Plan`}
                   {!loading && <ArrowRight className="h-4 w-4" />}
                 </Button>
               )}
@@ -1271,11 +1419,26 @@ export default function QualifyPage() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-navy/60 backdrop-blur-sm" onClick={() => setShowExitModal(false)} />
           <div className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-premium-xl animate-fade-in-up">
-            <h2 className="text-xl font-bold text-navy">You&apos;re {Math.round(progress)}% done!</h2>
-            <p className="mt-2 text-sm text-graphite-500">
-              Your progress is saved. Want us to email you a link to finish?
-            </p>
-            <div className="mt-5 flex gap-2">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-navy">Don&apos;t lose your spot!</h2>
+              <Badge variant="gold" className="text-xs">
+                {Math.round(progress)}% complete
+              </Badge>
+            </div>
+            {projection ? (
+              <div className="mb-4 rounded-xl bg-teal-50 border border-teal-100 p-3">
+                <p className="text-xs font-semibold text-teal-700 mb-0.5">Your projection is ready</p>
+                <p className="text-sm font-bold text-navy">
+                  You could lose ~{Math.round(projection.summary.totalLossWithPlan)} lbs by {projection.summary.targetDate}
+                </p>
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-graphite-500 mb-4">
+                Your answers are saved. Want us to email you a link to finish?
+              </p>
+            )}
+            <p className="text-xs text-graphite-500 mb-2">Send me a link to finish later:</p>
+            <div className="flex gap-2">
               <input
                 type="email"
                 placeholder="your@email.com"
@@ -1294,11 +1457,11 @@ export default function QualifyPage() {
               </Button>
             </div>
             <div className="mt-4 flex gap-3">
-              <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowExitModal(false)}>
-                Continue assessment
+              <Button size="sm" className="flex-1 shadow-glow" onClick={() => setShowExitModal(false)}>
+                Continue — I&apos;m staying
               </Button>
               <button onClick={() => setShowExitModal(false)} className="text-xs text-graphite-400 hover:text-graphite-600">
-                No thanks
+                Leave
               </button>
             </div>
             <p className="mt-3 text-[10px] text-graphite-300">

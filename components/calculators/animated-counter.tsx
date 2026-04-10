@@ -21,22 +21,24 @@ export function AnimatedCounter({
   className = "",
 }: AnimatedCounterProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const isInView = useInView(ref, { once: true, margin: "100px" });
   const [display, setDisplay] = useState("0");
-  const hasAnimated = useRef(false);
+  const prevValue = useRef(0);
 
   useEffect(() => {
-    if (!isInView || hasAnimated.current) return;
-    hasAnimated.current = true;
+    if (!isInView) return;
 
-    // Respect prefers-reduced-motion
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) {
       setDisplay(value.toFixed(decimals));
+      prevValue.current = value;
       return;
     }
 
-    const controls = animate(0, value, {
+    const from = prevValue.current;
+    prevValue.current = value;
+
+    const controls = animate(from, value, {
       duration: duration / 1000,
       ease: [0.16, 1, 0.3, 1],
       onUpdate(latest) {

@@ -1,8 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Search, PanelLeftClose, PanelLeft, LogOut } from "lucide-react";
+import { Search, PanelLeftClose, PanelLeft } from "lucide-react";
 import { AdminNotificationBell } from "./admin-notification-bell";
+import { DarkModeToggle } from "./dark-mode-toggle";
 import { cn } from "@/lib/utils";
 
 interface AdminHeaderProps {
@@ -70,6 +71,7 @@ export function AdminHeader({ sidebarCollapsed, onToggleSidebar, onOpenCommandPa
           </kbd>
         </button>
 
+        <DarkModeToggle />
         <AdminNotificationBell />
 
         <div className="flex items-center gap-2 border-l border-navy-100/40 pl-3 ml-1">

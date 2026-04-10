@@ -203,7 +203,11 @@ model Product {
   category      ProductCategory
   isActive      Boolean     @default(true)
   isAddon       Boolean     @default(false)
+  isMarketplace Boolean     @default(false) // visible in post-approval patient shop
+  isFeatured    Boolean     @default(false) // highlighted in shop
   sortOrder     Int         @default(0)
+  marketplaceOrder Int      @default(0)     // sort within marketplace
+  marketplaceDesc  String?                  // longer marketing description for shop
 
   // Pricing
   priceMonthly      Int         // cents

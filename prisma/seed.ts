@@ -45,6 +45,9 @@ async function main() {
     await prisma.stateAvailability.deleteMany();
     await prisma.calculatorSetting.deleteMany();
     await prisma.referralSetting.deleteMany();
+    await prisma.adminAlert.deleteMany();
+    await prisma.campaign.deleteMany();
+    await prisma.adminSavedView.deleteMany();
     console.log("✓ Database cleaned\n");
   }
 
@@ -363,6 +366,29 @@ async function main() {
     });
   }
   console.log("Set mock Stripe price IDs");
+
+  // ─── Admin Alerts (demo) ──────────────────────────────────
+  await prisma.adminAlert.deleteMany();
+  await prisma.adminAlert.createMany({
+    data: [
+      { type: "PAYMENT_FAILED", severity: "WARNING", title: "Payment failed for Jordan Miller", body: "Subscription past due - retry recommended", link: "/admin/payments" },
+      { type: "CREDENTIAL_EXPIRING", severity: "INFO", title: "Provider license expiring in 28 days", body: "Dr. Sarah Chen - TX license", link: "/admin/providers" },
+      { type: "INTAKE_QUEUE_HIGH", severity: "INFO", title: "3 intakes pending review", link: "/admin/customers" },
+    ],
+  });
+  console.log("Admin alerts seeded");
+
+  // ─── Campaigns (demo) ──────────────────────────────────────
+  await prisma.campaign.deleteMany();
+  await prisma.campaign.createMany({
+    data: [
+      { name: "Win-Back Q1", type: "REACTIVATION", status: "ACTIVE", trigger: "Canceled 30-60 days ago", offerText: "Come back for 20% off", emailSubject: "We miss you!", sentCount: 145, openedCount: 67, clickedCount: 23, convertedCount: 8, revenueGenerated: 318400, startedAt: new Date("2026-01-15") },
+      { name: "Past Due Recovery", type: "RECOVERY", status: "ACTIVE", trigger: "Payment failed 3+ days", emailSubject: "Update your payment method", sentCount: 52, openedCount: 38, clickedCount: 19, convertedCount: 14, revenueGenerated: 556200, startedAt: new Date("2026-02-01") },
+      { name: "Premium Upgrade", type: "UPGRADE", status: "PAUSED", trigger: "Essential plan for 60+ days", offerText: "Upgrade to Premium", emailSubject: "Unlock Premium features", sentCount: 89, openedCount: 41, clickedCount: 15, convertedCount: 4, revenueGenerated: 159600, startedAt: new Date("2026-03-01"), pausedAt: new Date("2026-03-20") },
+      { name: "Monthly Check-in", type: "ENGAGEMENT", status: "DRAFT", trigger: "Active 30+ days, no progress logged in 7d", emailSubject: "How's your journey going?" },
+    ],
+  });
+  console.log("Campaigns seeded");
 
   console.log("\n✅ Seed complete!");
   console.log("  Admin login:   admin@vitalpath.com / admin123");

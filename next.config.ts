@@ -4,7 +4,36 @@ const nextConfig: NextConfig = {
   output: "standalone",
   outputFileTracingRoot: process.cwd(),
   poweredByHeader: false,
+  compress: true,
+  experimental: {
+    // Tree-shake icon/component libraries — eliminates unused exports at build time
+    optimizePackageImports: [
+      "lucide-react",
+      "framer-motion",
+      "recharts",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-select",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-label",
+      "@radix-ui/react-checkbox",
+      "@radix-ui/react-switch",
+      "@radix-ui/react-progress",
+      "@radix-ui/react-separator",
+      "@radix-ui/react-slot",
+    ],
+  },
   images: {
+    // Prefer AVIF (45% smaller than WebP), fall back to WebP
+    formats: ["image/avif", "image/webp"],
+    // Cache optimized images for 30 days
+    minimumCacheTTL: 2592000,
+    // Responsive breakpoints aligned with Tailwind
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "*.stripe.com" },

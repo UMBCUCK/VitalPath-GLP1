@@ -62,6 +62,7 @@ export interface FunnelState {
   email?: string;
   step?: string;
   qualify?: QualifyFlowState;
+  referralCode?: string;
 }
 
 export function useFunnelStore() {

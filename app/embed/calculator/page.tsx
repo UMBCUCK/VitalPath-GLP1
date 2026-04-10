@@ -116,11 +116,31 @@ export default function EmbedCalculatorPage() {
     });
     setStep("results");
 
-    // Notify parent window about calculation for analytics
+    // Notify parent window about calculation + resize iframe
     if (window.parent !== window) {
       window.parent.postMessage({ type: "vitalpath-calculator", event: "calculated", ref: refCode }, "*");
+      // Give time for results to render, then send height for auto-resize
+      setTimeout(() => {
+        window.parent.postMessage({
+          type: "vitalpath-resize",
+          height: document.documentElement.scrollHeight,
+        }, "*");
+      }, 500);
     }
   }
+
+  // Auto-resize iframe on step/results change
+  useEffect(() => {
+    if (window.parent !== window) {
+      const timer = setTimeout(() => {
+        window.parent.postMessage({
+          type: "vitalpath-resize",
+          height: document.documentElement.scrollHeight,
+        }, "*");
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [step, results]);
 
   const isDark = theme === "dark";
   const bg = isDark ? "bg-[#1a1f2e]" : "bg-white";

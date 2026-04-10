@@ -96,9 +96,12 @@ model PatientProfile {
   notifySms          Boolean @default(false)
 
   // Computed scores (cached)
-  healthScore    Int?
-  lifecycleStage String? // LEAD | QUIZ_COMPLETE | INTAKE_PENDING | ACTIVE_NEW | ACTIVE_ESTABLISHED | AT_RISK | CHURNED
-  lastScoredAt   DateTime?
+  healthScore       Int?
+  lifecycleStage    String? // LEAD | QUIZ_COMPLETE | INTAKE_PENDING | ACTIVE_NEW | ACTIVE_ESTABLISHED | AT_RISK | CHURNED
+  lastScoredAt      DateTime?
+  churnRisk         Int?       // 0-100 churn probability
+  churnRiskFactors  Json?      // { engagement, payment, inactivity, lifecycle, healthInverse }
+  lastChurnScoredAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -208,7 +211,11 @@ model Product {
   category      ProductCategory
   isActive      Boolean     @default(true)
   isAddon       Boolean     @default(false)
+  isMarketplace Boolean     @default(false)
+  isFeatured    Boolean     @default(false)
   sortOrder     Int         @default(0)
+  marketplaceOrder Int      @default(0)
+  marketplaceDesc  String?
 
   // Pricing
   priceMonthly      Int         // cents
@@ -1212,6 +1219,29 @@ model Campaign {
 
   @@index([status])
   @@index([type])
+}
+
+// ─── BULK OPERATIONS ────────────────────────────────────────
+
+model BulkOperation {
+  id             String    @id @default(cuid())
+  type           String    // RETRY_PAYMENTS, SEND_CAMPAIGN, RECALC_SCORES, APPLY_COUPON
+  status         String    @default("PENDING") // PENDING, RUNNING, COMPLETED, FAILED, CANCELED
+  targetSegment  String?
+  targetFilter   Json?
+  affectedCount  Int       @default(0)
+  processedCount Int       @default(0)
+  errorCount     Int       @default(0)
+  errorDetails   Json?
+  initiatedBy    String
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
 }
 
 // ─── ADMIN SAVED VIEWS ──────────────────────────────────────

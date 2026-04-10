@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -30,6 +30,7 @@ export default function ProteinCalculatorPage() {
   const [activity, setActivity] = useState<"low" | "moderate" | "high">("moderate");
   const [goal, setGoal] = useState<"maintain" | "lose" | "gain">("lose");
   const [result, setResult] = useState<{ min: number; max: number } | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   function handleCalculate() {
     const w = parseFloat(weight);
@@ -38,6 +39,7 @@ export default function ProteinCalculatorPage() {
     const res = calculateProtein(w, activity, goal);
     setResult(res);
     track(ANALYTICS_EVENTS.CALCULATOR_COMPLETE, { calculator: "protein" });
+    setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   }
 
   const avgProtein = result ? Math.round((result.min + result.max) / 2) : 0;
@@ -115,6 +117,7 @@ export default function ProteinCalculatorPage() {
             <AnimatePresence>
               {result && (
                 <motion.div
+                  ref={resultRef}
                   className="mt-8 calculator-result"
                   initial={{ opacity: 0, y: 20, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}

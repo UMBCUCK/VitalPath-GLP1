@@ -19,7 +19,7 @@ interface Customer {
   weightLost: number;
 }
 
-export function AdminCustomersClient({ customers }: { customers: Customer[] }) {
+export function AdminCustomersClient({ customers, total }: { customers: Customer[]; total?: number }) {
   const [tab, setTab] = useState<TabType>("all");
   const [search, setSearch] = useState("");
 
