@@ -2,11 +2,20 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminMobileNav } from "@/components/admin/admin-mobile-nav";
-import { CommandPalette } from "@/components/admin/command-palette";
-import { KeyboardShortcutsModal } from "@/components/admin/keyboard-shortcuts-modal";
+
+// Only rendered when user presses Cmd+K or ? — defer their JS until needed
+const CommandPalette = dynamic(() =>
+  import("@/components/admin/command-palette").then((m) => ({ default: m.CommandPalette })),
+  { ssr: false }
+);
+const KeyboardShortcutsModal = dynamic(() =>
+  import("@/components/admin/keyboard-shortcuts-modal").then((m) => ({ default: m.KeyboardShortcutsModal })),
+  { ssr: false }
+);
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

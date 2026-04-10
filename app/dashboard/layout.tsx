@@ -33,10 +33,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
     }),
     db.message.count({ where: { userId: session.userId, isRead: false, direction: "INBOUND" } }),
     db.notification.count({ where: { userId: session.userId, isRead: false } }),
+    // Only fetch the last 90 days worth of dates — enough to compute a streak
+    // without over-fetching. Uses a raw date boundary instead of take:90 so
+    // the DB can use the (userId, date) index more efficiently.
     db.progressEntry.findMany({
-      where: { userId: session.userId },
+      where: {
+        userId: session.userId,
+        date: { gte: new Date(Date.now() - 90 * 86400000) },
+      },
       orderBy: { date: "desc" },
-      take: 90,
       select: { date: true, moodRating: true },
     }),
   ]);

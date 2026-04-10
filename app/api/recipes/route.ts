@@ -14,5 +14,10 @@ export async function GET(req: NextRequest) {
     orderBy: { category: "asc" },
   });
 
-  return NextResponse.json({ recipes });
+  return NextResponse.json({ recipes }, {
+    headers: {
+      // Cache at CDN for 5 minutes; browsers revalidate after 60s
+      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
+    },
+  });
 }

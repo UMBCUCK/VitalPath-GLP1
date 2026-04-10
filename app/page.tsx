@@ -1,3 +1,6 @@
+// Note: Do NOT add force-static here — Railway standalone mode requires
+// server rendering for pages with next/dynamic imports.
+
 import type { Metadata } from "next";
 import dynamic_import from "next/dynamic";
 import { HeroSection } from "@/components/marketing/hero-section";

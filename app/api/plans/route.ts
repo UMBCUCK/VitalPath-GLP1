@@ -42,18 +42,14 @@ export async function GET() {
       }),
     ]);
 
-    return NextResponse.json({
-      plans,
-      addOns,
-      source: "database",
-    });
+    const cacheHeaders = {
+      // Cache at CDN for 5 minutes; browsers can serve stale for up to 1 min
+      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
+    };
+    return NextResponse.json({ plans, addOns, source: "database" }, { headers: cacheHeaders });
   } catch {
     // Fallback: return empty arrays — checkout will use hardcoded lib/pricing.ts
-    return NextResponse.json({
-      plans: [],
-      addOns: [],
-      source: "fallback",
-    });
+    return NextResponse.json({ plans: [], addOns: [], source: "fallback" });
   }
 }
 // force rebuild 1775784112
