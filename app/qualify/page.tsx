@@ -466,20 +466,6 @@ export default function QualifyPage() {
     }
   }
 
-  // ─── Step validation ──────────────────────────────────────
-  const canProceed = () => {
-    switch (step) {
-      case 1: return form.heightFeet && form.weightLbs && form.age && form.sex && bmi > 0;
-      case 2: return form.primaryGoal && form.activityLevel && form.eatingPattern && form.previousAttempts;
-      case 3: return true;
-      case 4: return allScreeningAnswered || contraindications.every(c => answeredScreening[c.key]);
-      case 5: return projectionRevealed;
-      case 6: return form.firstName && form.lastName && form.email && form.phone && form.dateOfBirth && form.state && form.emergencyContactName && form.emergencyContactPhone && form.emergencyContactRelation && form.medicalHistory.length >= 10;
-      case 7: return form.consentTreatment && form.consentHipaa && form.consentTelehealth && form.consentMedicationRisks;
-      default: return false;
-    }
-  };
-
   // ─── Field-level validation ──────────────────────────────
   const getFieldErrors = (): Record<string, string> => {
     const errors: Record<string, string> = {};
@@ -533,9 +519,6 @@ export default function QualifyPage() {
   }, [form, answeredScreening, allScreeningAnswered, attemptedNext]);
 
   const stepNames = ["BMI Check", "Goals", "Medical History", "Safety Screening", "Your Projection", "Personal Info", "Plan & Consent"];
-
-  const FieldError = ({ field }: { field: string }) =>
-    fieldErrors[field] ? <p className="mt-1 text-xs text-red-500 font-medium">{fieldErrors[field]}</p> : null;
 
   return (
     <MarketingShell>
@@ -1310,7 +1293,7 @@ export default function QualifyPage() {
                         </div>
                       </label>
 
-                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentMedicationRisks ? "border-teal bg-teal-50/30" : "border-amber-200 bg-amber-50/30 hover:border-amber-300")}>
+                      <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentMedicationRisks ? "border-teal bg-teal-50/30" : fieldErrors.consentMedicationRisks ? "border-red-300 bg-red-50/30 hover:border-red-400" : "border-amber-200 bg-amber-50/30 hover:border-amber-300")}>
                         <input type="checkbox" checked={form.consentMedicationRisks} onChange={(e) => setField("consentMedicationRisks", e.target.checked)} className={cn("mt-0.5 h-5 w-5 rounded", form.consentMedicationRisks ? "border-teal text-teal focus:ring-teal" : "border-amber-300 text-amber-600 focus:ring-amber-500")} />
                         <div>
                           <p className="text-sm font-semibold text-navy">Medication Risk Acknowledgment</p>
@@ -1344,18 +1327,9 @@ export default function QualifyPage() {
             )}
 
             {/* Navigation */}
-            {/* Validation hint */}
-            {!canProceed() && step !== 5 && (
-              <p className="mt-4 text-center text-xs text-amber-600">
-                {step === 1 && "Please fill in your height, weight, age, and select your sex"}
-                {step === 2 && "Please select your goal, activity level, eating habits, and previous attempts"}
-                {step === 4 && "Please answer Yes or No for all safety questions (or use the shortcut above)"}
-                {step === 6 && (
-                  form.medicalHistory.length < 10
-                    ? "Please fill in all fields including a brief medical history (at least 10 characters)"
-                    : "Please fill in all required fields including emergency contact"
-                )}
-                {step === 7 && "Please review and check all four consent boxes to continue"}
+            {attemptedNext && Object.keys(fieldErrors).length > 0 && (
+              <p className="mt-4 text-center text-xs text-red-500 font-medium">
+                Please fill in the highlighted fields above to continue
               </p>
             )}
 
@@ -1365,7 +1339,7 @@ export default function QualifyPage() {
               </Button>
 
               {step < 7 ? (
-                <Button onClick={nextStep} disabled={!canProceed()} className="gap-1">
+                <Button onClick={nextStep} disabled={step === 5 && !projectionRevealed} className="gap-1">
                   {step === 1 && "Check My Results"}
                   {step === 2 && "Continue"}
                   {step === 3 && "Continue"}
@@ -1375,7 +1349,7 @@ export default function QualifyPage() {
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               ) : (
-                <Button onClick={handleSubmit} disabled={!canProceed() || loading} className="gap-1 shadow-glow">
+                <Button onClick={handleSubmit} disabled={loading} className="gap-1 shadow-glow">
                   {loading ? "Submitting..." : `Start My ${plan.name} Plan`}
                   {!loading && <ArrowRight className="h-4 w-4" />}
                 </Button>

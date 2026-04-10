@@ -1,8 +1,10 @@
 import { redirect, notFound } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { getPatientNotes } from "@/lib/admin-notes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PatientNotes } from "@/components/admin/patient-notes";
 import { ArrowLeft, User, Pill, Scale, MessageCircle, CreditCard, Share2, TrendingDown } from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
@@ -34,6 +36,8 @@ export default async function PatientDetailPage({ params }: PageProps) {
     where: { userId: id },
     orderBy: { createdAt: "desc" },
   });
+
+  const notesData = await getPatientNotes(id, 1, 50);
 
   const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
   const startWeight = user.profile?.weightLbs || 0;
@@ -157,6 +161,9 @@ export default async function PatientDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Patient Notes */}
+      <PatientNotes patientId={id} initialNotes={notesData.notes} />
     </div>
   );
 }

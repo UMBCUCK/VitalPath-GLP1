@@ -4,18 +4,15 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { MobileStickyCta } from "@/components/layout/mobile-sticky-cta";
 import { AnnouncementBar } from "@/components/marketing/announcement-bar";
 
-// Lazy-load engagement widgets — not needed for initial render or LCP
+// Lazy-load engagement widgets — deferred JS chunk, not needed for initial render
 const StickyDesktopCta = dynamic(() =>
-  import("@/components/marketing/sticky-desktop-cta").then((m) => ({ default: m.StickyDesktopCta })),
-  { ssr: false }
+  import("@/components/marketing/sticky-desktop-cta").then((m) => ({ default: m.StickyDesktopCta }))
 );
 const SocialProofToasts = dynamic(() =>
-  import("@/components/marketing/social-proof-toasts").then((m) => ({ default: m.SocialProofToasts })),
-  { ssr: false }
+  import("@/components/marketing/social-proof-toasts").then((m) => ({ default: m.SocialProofToasts }))
 );
 const ExitIntentModal = dynamic(() =>
-  import("@/components/marketing/exit-intent-modal").then((m) => ({ default: m.ExitIntentModal })),
-  { ssr: false }
+  import("@/components/marketing/exit-intent-modal").then((m) => ({ default: m.ExitIntentModal }))
 );
 
 export function MarketingShell({ children }: { children: React.ReactNode }) {

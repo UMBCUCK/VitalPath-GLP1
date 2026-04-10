@@ -21,7 +21,12 @@ const productSchema = z.object({
   marketplaceOrder: z.number().default(0),
   marketplaceDesc: z.string().optional().nullable(),
   badge: z.string().optional().nullable(),
-  features: z.array(z.string()).optional(),
+  features: z.array(
+    z.union([
+      z.string(),
+      z.object({ text: z.string(), bold: z.boolean().optional(), size: z.string().optional() }),
+    ])
+  ).optional(),
   sortOrder: z.number().default(0),
   iconName: z.string().optional().nullable(),
   imageUrl: z.string().optional().nullable(),

@@ -31,6 +31,9 @@ import {
   GitCompareArrows,
   Zap,
   Gauge,
+  Route,
+  FlaskConical,
+  FileBarChart,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -79,6 +82,8 @@ const navGroups: NavGroup[] = [
       { label: "Cohorts", href: "/admin/cohorts", icon: GitCompareArrows },
       { label: "Widgets", href: "/admin/widgets", icon: Code2 },
       { label: "Coupons", href: "/admin/coupons", icon: Tag },
+      { label: "Journey", href: "/admin/journey", icon: Route },
+      { label: "Experiments", href: "/admin/experiments", icon: FlaskConical },
     ],
   },
   {
@@ -103,7 +108,9 @@ const navGroups: NavGroup[] = [
     items: [
       { label: "Operations", href: "/admin/operations", icon: Gauge },
       { label: "Bulk Operations", href: "/admin/bulk-operations", icon: Zap },
+      { label: "Automations", href: "/admin/automations", icon: Zap },
       { label: "Webhooks", href: "/admin/webhooks", icon: Webhook },
+      { label: "Reports", href: "/admin/reports", icon: FileBarChart },
       { label: "Admin Users", href: "/admin/users", icon: UserCog },
       { label: "Settings", href: "/admin/settings", icon: Settings },
     ],

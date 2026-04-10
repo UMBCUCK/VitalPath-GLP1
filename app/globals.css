@@ -261,3 +261,21 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* content-visibility: auto defers rendering of off-screen sections until needed.
+   This is one of the largest single CSS wins for LCP and INP on long pages.
+   Apply to every marketing section below the fold. */
+.below-fold-section {
+  content-visibility: auto;
+  /* contain-intrinsic-size tells the browser how tall this section is before
+     rendering, preventing layout shift when it becomes visible. 600px is a
+     safe estimate; adjust per section if CLS appears. */
+  contain-intrinsic-size: auto 600px;
+}
+
+/* Promote animated/blurred decorative elements to their own GPU compositing
+   layer so they don't trigger main-thread repaints during scroll. */
+.gpu-layer {
+  will-change: transform;
+  transform: translateZ(0);
+}

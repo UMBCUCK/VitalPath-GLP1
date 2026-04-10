@@ -173,6 +173,10 @@ model IntakeSubmission {
   providerAssignedId   String?
   eligibilityResult    EligibilityResult?
 
+  // Assignment
+  assignedToId String?  // admin user id
+  assignedAt   DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -180,6 +184,7 @@ model IntakeSubmission {
 
   @@index([status])
   @@index([state])
+  @@index([assignedToId])
 }
 
 enum IntakeStatus {
@@ -1255,4 +1260,146 @@ model AdminSavedView {
   createdAt DateTime @default(now())
 
   @@index([adminId, page])
+}
+
+// ─── AUTOMATION RULES ───────────────────────────────────────
+
+model AutomationRule {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  triggerType     String    // SCHEDULE, EVENT, THRESHOLD
+  conditions      Json      // [{ field, operator, value }]
+  actions         Json      // [{ type, params }]
+  isActive        Boolean   @default(true)
+  cooldownMinutes Int       @default(60)
+  lastTriggeredAt DateTime?
+  triggerCount    Int       @default(0)
+  createdBy       String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  executions AutomationExecution[]
+
+  @@index([isActive])
+  @@index([triggerType])
+}
+
+model AutomationExecution {
+  id        String   @id @default(cuid())
+  ruleId    String
+  status    String   @default("SUCCESS") // SUCCESS, FAILED, SKIPPED
+  details   Json?    // { conditionResults, actionsExecuted, errors }
+  createdAt DateTime @default(now())
+
+  rule AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([ruleId])
+  @@index([createdAt])
+}
+
+// ─── REPORT SCHEDULES ───────────────────────────────────────
+
+model ReportSchedule {
+  id            String    @id @default(cuid())
+  name          String
+  templateKey   String    // MONTHLY_BOARD, WEEKLY_OPS, COMPLIANCE_AUDIT, CUSTOM
+  frequency     String    // DAILY, WEEKLY, MONTHLY
+  recipients    Json      // array of email addresses
+  config        Json?     // custom report sections/filters
+  isActive      Boolean   @default(true)
+  lastSentAt    DateTime?
+  nextSendAt    DateTime?
+  createdBy     String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([isActive])
+  @@index([nextSendAt])
+}
+
+// ─── ADMIN PERMISSIONS & NOTES ──────────────────────────────
+
+model AdminPermission {
+  id          String   @id @default(cuid())
+  userId      String
+  role        String   // SUPER_ADMIN, MANAGER, EDITOR, VIEWER
+  pages       Json?    // array of allowed page keys, null = all
+  actions     Json?    // array of allowed action keys, null = all
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId])
+  @@index([role])
+}
+
+model AdminNote {
+  id        String   @id @default(cuid())
+  authorId  String
+  patientId String
+  content   String
+  isPinned  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([authorId])
+}
+
+// ─── EXPERIMENTS (A/B TESTING) ──────────────────────────────
+
+model Experiment {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  status      String    @default("DRAFT") // DRAFT, RUNNING, PAUSED, COMPLETED
+  metric      String    // conversion_rate, revenue, retention, engagement
+  variants    Json      // [{ id, name, weight }]
+  results     Json?     // computed results
+  startedAt   DateTime?
+  endedAt     DateTime?
+  createdBy   String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  assignments ExperimentAssignment[]
+
+  @@index([status])
+}
+
+model ExperimentAssignment {
+  id           String    @id @default(cuid())
+  experimentId String
+  userId       String?
+  sessionId    String?
+  variantId    String
+  convertedAt  DateTime?
+  revenue      Int?      // cents
+  createdAt    DateTime  @default(now())
+
+  experiment Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+
+  @@unique([experimentId, userId])
+  @@index([experimentId])
+  @@index([variantId])
+}
+
+// ─── API KEYS ───────────────────────────────────────────────
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  name        String
+  keyHash     String    @unique // bcrypt hash of the key
+  keyPrefix   String    // first 8 chars for display (vp_live_xxxx...)
+  scopes      Json      // array of allowed scopes
+  rateLimit   Int       @default(1000) // requests per hour
+  isActive    Boolean   @default(true)
+  lastUsedAt  DateTime?
+  usageCount  Int       @default(0)
+  expiresAt   DateTime?
+  createdBy   String
+  createdAt   DateTime  @default(now())
+
+  @@index([keyHash])
+  @@index([isActive])
 }
