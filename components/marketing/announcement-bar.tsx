@@ -22,8 +22,8 @@ export function AnnouncementBar() {
           {" "}<span className="font-bold">79% less</span> than brand-name retail.
           {" "}
           <Link
-            href="/quiz"
-            onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { location: "announcement_bar", target: "/quiz" })}
+            href="/qualify"
+            onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { location: "announcement_bar", target: "/qualify" })}
             className="inline-flex items-center gap-1 font-bold underline underline-offset-2 decoration-gold hover:decoration-white transition-colors"
           >
             Check eligibility &rarr;

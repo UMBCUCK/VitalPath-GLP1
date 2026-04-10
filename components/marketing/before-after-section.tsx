@@ -307,7 +307,7 @@ export function BeforeAfterSection() {
 
           {/* Post-carousel CTA */}
           <div className="mt-8 text-center">
-            <Link href="/quiz">
+            <Link href="/qualify">
               <Button className="gap-2">
                 Start Your Transformation <ArrowRight className="h-4 w-4" />
               </Button>

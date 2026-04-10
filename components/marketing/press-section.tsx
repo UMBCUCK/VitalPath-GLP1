@@ -52,7 +52,7 @@ export function PressSection() {
 
         {/* CTA after expert validation */}
         <AnimateOnView className="mt-8 text-center" delay={0.35}>
-          <Link href="/quiz">
+          <Link href="/qualify">
             <Button variant="outline" className="gap-2">
               See If You Qualify <ArrowRight className="h-4 w-4" />
             </Button>

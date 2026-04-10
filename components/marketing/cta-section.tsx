@@ -45,7 +45,7 @@ export function CtaSection() {
 
         {/* Main CTA */}
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <TrackedLink href="/quiz" cta="final_cta_qualify" location="cta_section">
+          <TrackedLink href="/qualify" cta="final_cta_qualify" location="cta_section">
             <Button size="xl" variant="gold" className="gap-2 px-12 h-16 text-lg rounded-2xl shadow-gold-glow hover:shadow-premium-lg transition-all duration-300 hover:scale-[1.02]">
               See If I Qualify
               <ArrowRight className="h-5 w-5" />

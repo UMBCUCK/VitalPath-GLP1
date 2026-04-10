@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { loginUser } from "@/lib/auth";
 import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { safeError } from "@/lib/logger";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
     response.headers.set("X-RateLimit-Remaining", String(remaining));
     return response;
   } catch (error) {
-    console.error("[Login API]", error);
+    safeError("[Login API]", error);
     return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { safeError } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("[Deny Intake]", error);
+    safeError("[Deny Intake]", error);
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sendLifecycleEmail, welcomeSequence, quizAbandonment, checkoutAbandonment, refillReminder, milestoneCongrats } from "@/lib/services/lifecycle-emails";
+import { safeError } from "@/lib/logger";
 
 /**
  * Lifecycle trigger endpoint.
@@ -204,7 +205,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ trigger, processed: results.length, results });
   } catch (error) {
-    console.error("[Lifecycle]", error);
+    safeError("[Lifecycle]", error);
     return NextResponse.json({ error: "Lifecycle trigger failed" }, { status: 500 });
   }
 }

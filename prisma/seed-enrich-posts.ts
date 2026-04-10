@@ -126,7 +126,7 @@ async function main() {
 <li><strong>Track your intake</strong> — what gets measured gets managed</li>
 </ul>
 
-<p><em>Want personalized meal plans that adapt weekly? <a href="/quiz">Take the assessment</a> to see if VitalPath Premium is right for you.</em></p>`,
+<p><em>Want personalized meal plans that adapt weekly? <a href="/qualify">Take the assessment</a> to see if VitalPath Premium is right for you.</em></p>`,
     },
     {
       slug: "understanding-compounded-medications",

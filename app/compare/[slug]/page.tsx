@@ -111,7 +111,7 @@ export default async function ComparisonPage({ params }: PageProps) {
         <SectionShell className="text-center max-w-2xl">
           <h2 className="text-2xl font-bold text-navy">{page.ctaHeadline || "See which plan is right for you"}</h2>
           <p className="mt-4 text-graphite-500">{page.ctaDescription || "Take our quick assessment and a licensed provider will evaluate the best approach."}</p>
-          <Link href="/quiz"><Button size="xl" className="mt-8 gap-2">Take the Assessment <ArrowRight className="h-4 w-4" /></Button></Link>
+          <Link href="/qualify"><Button size="xl" className="mt-8 gap-2">Take the Assessment <ArrowRight className="h-4 w-4" /></Button></Link>
           <p className="mt-6 text-xs text-graphite-300">{siteConfig.compliance.shortDisclaimer}</p>
         </SectionShell>
       </section>

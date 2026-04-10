@@ -2,6 +2,7 @@
  * Analytics event architecture.
  * Unified tracking layer that fans out to PostHog, GA4, and Meta CAPI.
  */
+import { safeLog } from "@/lib/logger";
 
 type EventProperties = Record<string, string | number | boolean | null | undefined>;
 
@@ -104,9 +105,9 @@ export function track(eventName: string, properties?: EventProperties): void {
     ).gtag("event", eventName, properties);
   }
 
-  // Server-side: log for Meta CAPI / data pipeline
+  // Server-side: log for Meta CAPI / data pipeline (PII stripped in production)
   if (typeof window === "undefined") {
-    console.log("[Analytics:Server]", eventName, properties);
+    safeLog("[Analytics:Server]", eventName, properties as Record<string, unknown> | undefined);
   }
 }
 
@@ -157,7 +158,7 @@ export async function trackServerEvent(
       }),
     });
   } catch {
-    console.error("[Meta CAPI] Failed to send event:", eventName);
+    safeLog("[Meta CAPI]", `Failed to send event: ${eventName}`);
   }
 }
 

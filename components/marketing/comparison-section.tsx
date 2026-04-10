@@ -117,7 +117,7 @@ export function ComparisonSection() {
             <p className="mt-2 text-sm text-teal-100">
               compared to brand-name GLP-1 retail pricing ($1,349/mo &times; 12 = $16,188 vs VitalPath at $279/mo &times; 12 = $3,348)
             </p>
-            <Link href="/quiz" className="mt-4 inline-block">
+            <Link href="/qualify" className="mt-4 inline-block">
               <Button variant="gold" className="gap-2">
                 See If I Qualify <ArrowRight className="h-4 w-4" />
               </Button>

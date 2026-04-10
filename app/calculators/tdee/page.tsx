@@ -192,7 +192,7 @@ export default function TDEECalculatorPage() {
                   <p className="text-sm text-graphite-600 mb-3">
                     GLP-1 medication makes maintaining a calorie deficit <span className="font-semibold text-navy">significantly easier</span> by reducing appetite and cravings at the source.
                   </p>
-                  <Link href="/quiz">
+                  <Link href="/qualify">
                     <Button className="gap-2">
                       See If You Qualify
                       <ArrowRight className="h-4 w-4" />

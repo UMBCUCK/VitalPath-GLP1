@@ -228,7 +228,7 @@ export default function GuidePage() {
             Plans start at $279/month — up to 79% less than brand-name retail.
           </p>
           <div className="mt-8">
-            <Link href="/quiz">
+            <Link href="/qualify">
               <Button size="xl" className="gap-2 px-10">
                 See If I Qualify
                 <ArrowRight className="h-5 w-5" />

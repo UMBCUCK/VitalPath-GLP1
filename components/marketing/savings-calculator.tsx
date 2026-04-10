@@ -145,7 +145,7 @@ export function SavingsCalculator() {
                 </div>
 
                 {/* CTA */}
-                <Link href="/quiz" className="mt-6">
+                <Link href="/qualify" className="mt-6">
                   <Button size="lg" className="w-full gap-2">
                     See If I Qualify to Save ${savings.toLocaleString()}
                     <ArrowRight className="h-4 w-4" />

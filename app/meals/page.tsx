@@ -57,7 +57,7 @@ export default async function MealsPage() {
             Our plans are designed specifically for patients on GLP-1 treatment.
           </p>
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link href="/quiz"><Button size="xl" className="gap-2">Get Started <ArrowRight className="h-4 w-4" /></Button></Link>
+            <Link href="/qualify"><Button size="xl" className="gap-2">Get Started <ArrowRight className="h-4 w-4" /></Button></Link>
             <Link href="/pricing"><Button size="xl" variant="outline">View Plans</Button></Link>
           </div>
         </SectionShell>

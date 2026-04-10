@@ -214,7 +214,7 @@ export default async function PublicRecipePage({ params }: PageProps) {
             <p className="mt-2 text-sm text-graphite-500">
               VitalPath Premium includes personalized weekly meal plans, grocery lists, and 100+ GLP-1-friendly recipes.
             </p>
-            <Link href="/quiz">
+            <Link href="/qualify">
               <Button className="mt-4 gap-2">
                 See If You Qualify <ArrowRight className="h-4 w-4" />
               </Button>

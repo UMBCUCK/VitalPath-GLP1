@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { safeError } from "@/lib/logger";
 
 const progressSchema = z.object({
   weightLbs: z.number().optional(),
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.error("[Progress API]", error);
+    safeError("[Progress API]", error);
     return NextResponse.json({ error: "Failed to log progress" }, { status: 500 });
   }
 }
@@ -91,7 +92,7 @@ export async function GET(req: NextRequest) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.error("[Progress API]", error);
+    safeError("[Progress API]", error);
     return NextResponse.json({ error: "Failed to fetch progress" }, { status: 500 });
   }
 }

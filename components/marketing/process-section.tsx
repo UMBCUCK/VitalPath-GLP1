@@ -81,7 +81,7 @@ export function ProcessSection() {
         </AnimateOnView>
 
         <AnimateOnView className="mt-8 text-center" delay={0.5}>
-          <TrackedLink href="/quiz" cta="process_assessment" location="process_section">
+          <TrackedLink href="/qualify" cta="process_assessment" location="process_section">
             <Button size="xl" className="gap-2 px-10">
               Start My Assessment
               <ArrowRight className="h-5 w-5" />

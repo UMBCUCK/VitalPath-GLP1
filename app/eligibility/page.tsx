@@ -126,7 +126,7 @@ export default function EligibilityPage() {
             </p>
           </div>
           <div className="mt-6">
-            <Link href="/quiz">
+            <Link href="/qualify">
               <Button size="xl" className="gap-2">Take the Assessment <ArrowRight className="h-4 w-4" /></Button>
             </Link>
           </div>

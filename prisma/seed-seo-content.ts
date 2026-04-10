@@ -381,7 +381,7 @@ async function main() {
 <p><strong>Produce:</strong> Mixed greens, avocados, berries, asparagus, bell peppers, spinach, sweet potatoes, lemons</p>
 <p><strong>Pantry:</strong> Olive oil, chia seeds, granola, bone broth, spices</p>
 
-<p><em>Want personalized meal plans that adapt to your progress? VitalPath Premium includes weekly customized meal plans tailored to GLP-1 patients. <a href="/quiz">Take the assessment</a> to get started.</em></p>`,
+<p><em>Want personalized meal plans that adapt to your progress? VitalPath Premium includes weekly customized meal plans tailored to GLP-1 patients. <a href="/qualify">Take the assessment</a> to get started.</em></p>`,
     },
 
     // 4K searches/mo

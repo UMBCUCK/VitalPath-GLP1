@@ -89,7 +89,7 @@ export function PersonaSection() {
                   </ul>
                 </div>
 
-                <Link href="/quiz" className="mt-6">
+                <Link href="/qualify" className="mt-6">
                   <Button variant="outline" size="sm" className="w-full gap-1.5">
                     That&apos;s me — check eligibility
                     <ArrowRight className="h-3.5 w-3.5" />

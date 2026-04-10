@@ -10,6 +10,7 @@ import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { providers } from "@/lib/content";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
+import DOMPurify from "isomorphic-dompurify";
 
 export const dynamic = "force-dynamic";
 
@@ -125,7 +126,12 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   // TOC
   const headings = extractHeadings(post.content);
-  const contentWithIds = headings.length >= 3 ? injectHeadingIds(post.content, headings) : post.content;
+  const rawContent = headings.length >= 3 ? injectHeadingIds(post.content, headings) : post.content;
+  const contentWithIds = DOMPurify.sanitize(rawContent, {
+    ALLOWED_TAGS: ["h1","h2","h3","h4","h5","h6","p","a","ul","ol","li","strong","em","b","i","br","img","blockquote","pre","code","table","thead","tbody","tr","th","td","span","div","figure","figcaption","hr","sup","sub"],
+    ALLOWED_ATTR: ["id","href","src","alt","class","target","rel","width","height","loading"],
+    ALLOW_DATA_ATTR: false,
+  });
 
   // Author
   const author = getAuthorData(post.author);
@@ -260,7 +266,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           <div className="mt-12 rounded-2xl bg-gradient-to-r from-teal-50 to-sage p-8 text-center">
             <h3 className="text-xl font-bold text-navy">Ready to get started?</h3>
             <p className="mt-2 text-sm text-graphite-500">Take our quick assessment to see if our program is right for you.</p>
-            <Link href="/quiz"><Button className="mt-4 gap-2">Take the Assessment <ArrowRight className="h-4 w-4" /></Button></Link>
+            <Link href="/qualify"><Button className="mt-4 gap-2">Take the Assessment <ArrowRight className="h-4 w-4" /></Button></Link>
           </div>
 
           {/* Related Articles */}

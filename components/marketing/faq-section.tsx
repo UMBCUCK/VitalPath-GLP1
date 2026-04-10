@@ -73,8 +73,8 @@ export function FaqSection({ limit, showHeading = true, showCta = true }: FaqSec
         {showCta && (
           <div className="mt-10 text-center">
             <p className="text-sm text-graphite-500 mb-4">Still have questions? Our care team is here to help.</p>
-            <Link href="/quiz">
-              <Button className="gap-2" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { location: "faq_section", target: "/quiz" })}>
+            <Link href="/qualify">
+              <Button className="gap-2" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { location: "faq_section", target: "/qualify" })}>
                 Start Your Free Assessment <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>

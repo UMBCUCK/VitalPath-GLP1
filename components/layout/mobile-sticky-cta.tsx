@@ -32,7 +32,7 @@ export function MobileStickyCta() {
             <span className="line-through">$1,349</span> retail &middot; Save 79%
           </p>
         </div>
-        <Link href="/quiz" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { location: "mobile_sticky", target: "/quiz" })}>
+        <Link href="/qualify" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { location: "mobile_sticky", target: "/qualify" })}>
           <Button size="sm" className="shrink-0 gap-1.5 px-5 shadow-glow">
             Start Free Assessment
             <ArrowRight className="h-3.5 w-3.5" />

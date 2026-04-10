@@ -131,7 +131,7 @@ export default function ProteinCalculatorPage() {
                 </div>
 
                 <div className="mt-6 text-center">
-                  <Link href="/quiz">
+                  <Link href="/qualify">
                     <Button className="gap-2">
                       Get personalized nutrition support
                       <ArrowRight className="h-4 w-4" />

@@ -153,7 +153,7 @@ export function HeroSection() {
               className="animate-fade-in-up mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start"
               style={{ animationDelay: "0.3s" }}
             >
-              <Link href="/quiz" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_qualify", location: "hero" })}>
+              <Link href="/qualify" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_qualify", location: "hero" })}>
                 <Button size="xl" className="gap-2 w-full sm:w-auto text-lg px-12 h-16 rounded-2xl shadow-glow hover:shadow-premium-lg transition-all duration-300 hover:scale-[1.02]">
                   See If I Qualify
                   <ArrowRight className="h-5 w-5" />

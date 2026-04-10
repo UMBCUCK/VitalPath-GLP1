@@ -151,7 +151,7 @@ export function SiteFooter() {
               )}
               <p className="mt-2 text-xs text-navy-500">
                 No spam. Unsubscribe anytime. Or{" "}
-                <Link href="/quiz" className="text-teal-400 hover:underline">
+                <Link href="/qualify" className="text-teal-400 hover:underline">
                   skip to the assessment &rarr;
                 </Link>
               </p>

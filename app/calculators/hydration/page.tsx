@@ -115,7 +115,7 @@ export default function HydrationCalculatorPage() {
                 </div>
 
                 <div className="mt-6 text-center">
-                  <Link href="/quiz">
+                  <Link href="/qualify">
                     <Button className="gap-2">
                       Get hydration tracking tools
                       <ArrowRight className="h-4 w-4" />

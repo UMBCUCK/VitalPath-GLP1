@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { safeError } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.error("[Pause API]", error);
+    safeError("[Pause API]", error);
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

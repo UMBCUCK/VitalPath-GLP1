@@ -29,7 +29,7 @@ export default async function TreatmentPage() {
               Complete your medical intake to get evaluated by a licensed provider.
               If eligible, your treatment plan will appear here.
             </p>
-            <Link href="/intake">
+            <Link href="/qualify">
               <Button className="mt-6">Complete Intake</Button>
             </Link>
           </CardContent>

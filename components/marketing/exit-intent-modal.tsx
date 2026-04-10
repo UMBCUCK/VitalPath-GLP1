@@ -150,7 +150,7 @@ export function ExitIntentModal() {
             {/* Skip link */}
             <div className="mt-4 text-center">
               <Link
-                href="/quiz"
+                href="/qualify"
                 className="text-sm font-semibold text-teal hover:underline"
                 onClick={handleDismiss}
               >
@@ -170,7 +170,7 @@ export function ExitIntentModal() {
             <p className="mt-2 text-base text-graphite-500">
               Your GLP-1 Starter Guide is on its way. While you wait...
             </p>
-            <Link href="/quiz" className="mt-6 inline-block" onClick={handleDismiss}>
+            <Link href="/qualify" className="mt-6 inline-block" onClick={handleDismiss}>
               <Button size="lg" className="gap-2">
                 Take the Free Assessment
                 <ArrowRight className="h-4 w-4" />

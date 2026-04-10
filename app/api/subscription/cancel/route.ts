@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { sendLifecycleEmail, cancellationSaveOffer } from "@/lib/services/lifecycle-emails";
+import { safeError } from "@/lib/logger";
 
 export async function POST() {
   try {
@@ -32,7 +33,7 @@ export async function POST() {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.error("[Cancel API]", error);
+    safeError("[Cancel API]", error);
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

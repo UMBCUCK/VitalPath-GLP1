@@ -83,7 +83,7 @@ export function GuaranteeSection() {
               </div>
 
               <div className="mt-8 text-center">
-                <Link href="/quiz">
+                <Link href="/qualify">
                   <Button size="lg" className="gap-2">
                     Start Risk-Free <ArrowRight className="h-4 w-4" />
                   </Button>

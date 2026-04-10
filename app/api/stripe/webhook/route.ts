@@ -3,6 +3,7 @@ import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { createEmailService, emailTemplates } from "@/lib/services/email";
 import Stripe from "stripe";
+import { safeError, safeLog } from "@/lib/logger";
 
 const statusMap: Record<string, "ACTIVE" | "PAUSED" | "PAST_DUE" | "CANCELED" | "EXPIRED" | "TRIALING"> = {
   active: "ACTIVE",
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
-    console.error("[Stripe Webhook] Signature verification failed:", err);
+    safeError("[Stripe Webhook] Signature verification failed", err);
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
@@ -39,7 +40,8 @@ export async function POST(req: NextRequest) {
         const email = session.customer_email;
         const customerId = session.customer as string;
         const subscriptionId = session.subscription as string;
-        const planId = session.metadata?.planId;
+        const planSlug = session.metadata?.planSlug;
+        const interval = session.metadata?.interval || "monthly";
 
         if (!email) break;
 
@@ -58,29 +60,35 @@ export async function POST(req: NextRequest) {
           create: { userId: user.id, stripeCustomerId: customerId },
         });
 
+        // Resolve the product from the plan slug stored in checkout metadata
+        const plan = planSlug
+          ? await db.product.findUnique({ where: { slug: planSlug } })
+          : null;
+
         // Create subscription record
         if (subscriptionId) {
           const stripeSub = await stripe.subscriptions.retrieve(subscriptionId) as unknown as Stripe.Subscription;
+
+          const intervalMap: Record<string, "MONTHLY" | "QUARTERLY" | "ANNUAL"> = {
+            monthly: "MONTHLY",
+            quarterly: "QUARTERLY",
+            annual: "ANNUAL",
+          };
 
           await db.subscription.create({
             data: {
               userId: user.id,
               stripeSubscriptionId: subscriptionId,
               status: "ACTIVE",
-              interval: "MONTHLY",
+              interval: intervalMap[interval] || "MONTHLY",
               currentPeriodStart: new Date(((stripeSub as any).current_period_start || 0) * 1000),
               currentPeriodEnd: new Date(((stripeSub as any).current_period_end || 0) * 1000),
               items: {
-                create: stripeSub.items.data.map((item) => {
-                  const product = planId
-                    ? undefined // will link by slug later
-                    : undefined;
-                  return {
-                    productId: product || "unknown",
-                    quantity: item.quantity || 1,
-                    priceInCents: item.price.unit_amount || 0,
-                  };
-                }),
+                create: stripeSub.items.data.map((item) => ({
+                  productId: plan?.id || "unknown",
+                  quantity: item.quantity || 1,
+                  priceInCents: item.price.unit_amount || 0,
+                })),
               },
             },
           });
@@ -91,7 +99,7 @@ export async function POST(req: NextRequest) {
         const template = emailTemplates.welcome(user.firstName || "there");
         await emailService.send({ to: email, ...template });
 
-        console.log("[Webhook] Checkout completed and persisted:", session.id);
+        safeLog("[Webhook]", "Checkout completed and persisted");
         break;
       }
 
@@ -116,7 +124,7 @@ export async function POST(req: NextRequest) {
             },
           });
         }
-        console.log("[Webhook] Subscription updated:", subscription.id, subscription.status);
+        safeLog("[Webhook]", "Subscription updated");
         break;
       }
 
@@ -146,7 +154,7 @@ export async function POST(req: NextRequest) {
             },
           });
         }
-        console.log("[Webhook] Subscription canceled:", subscription.id);
+        safeLog("[Webhook]", "Subscription canceled");
         break;
       }
 
@@ -174,7 +182,7 @@ export async function POST(req: NextRequest) {
             },
           });
         }
-        console.log("[Webhook] Payment succeeded:", invoice.id);
+        safeLog("[Webhook]", "Payment succeeded");
         break;
       }
 
@@ -213,15 +221,15 @@ export async function POST(req: NextRequest) {
             html: `<p>Hi ${profile.user.firstName || "there"},</p><p>Your recent payment could not be processed. Please update your payment method in your dashboard to avoid any interruption to your care.</p>`,
           });
         }
-        console.log("[Webhook] Payment failed:", invoice.id);
+        safeLog("[Webhook]", "Payment failed");
         break;
       }
 
       default:
-        console.log("[Webhook] Unhandled event:", event.type);
+        safeLog("[Webhook]", `Unhandled event: ${event.type}`);
     }
   } catch (err) {
-    console.error("[Webhook] Handler error:", err);
+    safeError("[Webhook] Handler error", err);
     return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
   }
 

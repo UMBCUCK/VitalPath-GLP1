@@ -116,7 +116,7 @@ export function VideoTestimonials() {
                 <p className="text-base italic text-white/80">
                   &ldquo;{active.quote}&rdquo;
                 </p>
-                <Link href="/quiz" className="mt-3 inline-block">
+                <Link href="/qualify" className="mt-3 inline-block">
                   <Button variant="gold" size="sm" className="gap-1.5">
                     Start Your Story <ArrowRight className="h-3.5 w-3.5" />
                   </Button>

@@ -185,7 +185,7 @@ export function EligibilityChecker() {
                   )}
                 </div>
 
-                <Link href="/quiz" className="block">
+                <Link href="/qualify" className="block">
                   <Button size="lg" className="w-full gap-2">
                     {result === "likely"
                       ? "Start My Assessment Now"

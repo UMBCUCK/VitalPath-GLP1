@@ -178,7 +178,7 @@ export function TimelineSection() {
 
           {/* CTA after timeline */}
           <div className="mt-8 text-center">
-            <Link href="/quiz">
+            <Link href="/qualify">
               <Button size="lg" className="gap-2">
                 Start Your Journey Today <ArrowRight className="h-4 w-4" />
               </Button>

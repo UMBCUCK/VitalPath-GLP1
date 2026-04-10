@@ -54,7 +54,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
             Complete your intake and choose a plan to start your weight management journey.
           </p>
           <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link href="/intake"><Button className="gap-2">Complete Intake <ArrowRight className="h-4 w-4" /></Button></Link>
+            <Link href="/qualify"><Button className="gap-2">Complete Intake <ArrowRight className="h-4 w-4" /></Button></Link>
             <Link href="/pricing"><Button variant="outline">View Plans</Button></Link>
           </div>
         </div>

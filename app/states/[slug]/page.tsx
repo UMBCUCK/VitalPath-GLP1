@@ -77,7 +77,7 @@ export default async function StatePage({ params }: PageProps) {
             and access ongoing support — all through telehealth. No clinic visits required.
           </p>
           <div className="mt-10">
-            <Link href="/quiz">
+            <Link href="/qualify">
               <Button size="xl" className="gap-2 px-10">
                 See If I Qualify in {state.code}
                 <ArrowRight className="h-5 w-5" />

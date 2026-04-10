@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
 
 const popularPages = [
-  { icon: Scale, label: "Take the Assessment", href: "/quiz", description: "See if you qualify for GLP-1 treatment" },
+  { icon: Scale, label: "Take the Assessment", href: "/qualify", description: "See if you qualify for GLP-1 treatment" },
   { icon: BookOpen, label: "GLP-1 Guide", href: "/guide", description: "Complete guide to GLP-1 weight loss" },
   { icon: Calculator, label: "BMI Calculator", href: "/calculators/bmi", description: "Check your body mass index" },
   { icon: Utensils, label: "Recipes", href: "/meals", description: "High-protein GLP-1-friendly meals" },
@@ -70,7 +70,7 @@ export default function NotFound() {
 
         {/* CTA */}
         <div className="mt-10">
-          <Link href="/quiz">
+          <Link href="/qualify">
             <Button size="lg" className="gap-2">
               See If I Qualify <ArrowRight className="h-4 w-4" />
             </Button>

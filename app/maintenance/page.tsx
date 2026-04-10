@@ -39,7 +39,7 @@ export default function MaintenancePage() {
             with structured support, adapted nutrition, and ongoing accountability.
           </p>
           <div className="mt-10">
-            <Link href="/quiz"><Button size="xl" className="gap-2">Get Started <ArrowRight className="h-4 w-4" /></Button></Link>
+            <Link href="/qualify"><Button size="xl" className="gap-2">Get Started <ArrowRight className="h-4 w-4" /></Button></Link>
           </div>
         </SectionShell>
       </section>

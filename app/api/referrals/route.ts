@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { safeError } from "@/lib/logger";
 
 function generateCode(length: number = 8): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -65,7 +66,7 @@ export async function GET() {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.error("[Referrals API]", error);
+    safeError("[Referrals API]", error);
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
@@ -111,7 +112,7 @@ export async function POST(req: NextRequest) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.error("[Referrals API]", error);
+    safeError("[Referrals API]", error);
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

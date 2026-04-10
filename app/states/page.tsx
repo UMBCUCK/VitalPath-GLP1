@@ -104,7 +104,7 @@ export default function StatesPage() {
               Don't see your state? We're expanding our provider network regularly.
               Enter your email and we'll notify you when we launch in your area.
             </p>
-            <Link href="/quiz">
+            <Link href="/qualify">
               <Button size="lg" className="gap-2">
                 Check Availability <ArrowRight className="h-4 w-4" />
               </Button>

@@ -172,7 +172,7 @@ export function MedicationShowcase() {
           <p className="mb-6 text-sm text-graphite-500">
             Your provider will recommend the best option based on your health profile, goals, and medical history.
           </p>
-          <Link href="/quiz">
+          <Link href="/qualify">
             <Button size="lg" className="gap-2">
               <DollarSign className="h-4 w-4" />
               See If You Qualify — From $279/mo

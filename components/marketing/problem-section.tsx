@@ -70,7 +70,7 @@ export function ProblemSection() {
                 <p className="mt-3 text-sm font-semibold text-teal">
                   Clinical trials show 15-20% body weight loss &mdash; that&apos;s 25-50 lbs for most patients.
                 </p>
-                <Link href="/quiz" className="mt-4 inline-block">
+                <Link href="/qualify" className="mt-4 inline-block">
                   <Button size="sm" className="gap-1.5">
                     See If You Qualify <ArrowRight className="h-3.5 w-3.5" />
                   </Button>

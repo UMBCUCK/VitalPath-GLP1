@@ -40,8 +40,10 @@ const nextConfig: NextConfig = {
                     "img-src 'self' data: blob: https://images.unsplash.com https://*.stripe.com",
                     "connect-src 'self' https://api.stripe.com https://us.i.posthog.com https://*.google-analytics.com",
                     "frame-src https://js.stripe.com https://hooks.stripe.com",
+                    "object-src 'none'",
                     "base-uri 'self'",
                     "form-action 'self'",
+                    "upgrade-insecure-requests",
                   ].join("; "),
                 },
               ]
