@@ -8,6 +8,7 @@ import { PatientNotes } from "@/components/admin/patient-notes";
 import { ArrowLeft, User, Pill, Scale, MessageCircle, CreditCard, Share2, TrendingDown } from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { SubscriptionControls } from "@/components/admin/subscription-controls";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -43,8 +44,19 @@ export default async function PatientDetailPage({ params }: PageProps) {
   const startWeight = user.profile?.weightLbs || 0;
   const currentWeight = user.progressEntries[0]?.weightLbs || startWeight;
   const weightLost = Math.round((startWeight - currentWeight) * 10) / 10;
-  const activeSub = user.subscriptions.find((s: { status: string }) => s.status === "ACTIVE");
+  const activeSub = user.subscriptions.find((s: { status: string }) => s.status === "ACTIVE")
+    || user.subscriptions[0]; // fallback to most recent
   const totalRevenue = user.orders.reduce((s: number, o: { totalCents: number }) => s + o.totalCents, 0);
+
+  // Fetch reseller name if subscription is linked to one
+  let resellerName: string | null = null;
+  if (activeSub?.referredByReseller) {
+    const reseller = await db.resellerProfile.findUnique({
+      where: { id: activeSub.referredByReseller },
+      select: { displayName: true },
+    });
+    resellerName = reseller?.displayName || null;
+  }
 
   return (
     <div className="space-y-6">
@@ -161,6 +173,26 @@ export default async function PatientDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Subscription Controls */}
+      {activeSub && (
+        <SubscriptionControls
+          subscription={{
+            id: activeSub.id,
+            status: activeSub.status,
+            adminLocked: activeSub.adminLocked,
+            adminNotes: activeSub.adminNotes,
+            commissionDisabled: activeSub.commissionDisabled,
+            referredByReseller: activeSub.referredByReseller,
+            resellerName,
+            interval: activeSub.interval,
+            items: activeSub.items.map((item: { product: { name: string } | null; priceInCents: number }) => ({
+              product: item.product,
+              priceInCents: item.priceInCents,
+            })),
+          }}
+        />
+      )}
 
       {/* Patient Notes */}
       <PatientNotes patientId={id} initialNotes={notesData.notes} />

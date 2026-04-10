@@ -1578,3 +1578,129 @@ model AIReport {
   @@index([reportType])
   @@index([createdAt])
 }
+
+// ─── DYNAMIC PRICING ────────────────────────────────────────
+
+model PricingRule {
+  id            String   @id @default(cuid())
+  name          String
+  productId     String?  // specific product, or null = all
+  ruleType      String   // GEOGRAPHIC, TIME_BASED, SEGMENT, VOLUME
+  conditions    Json     // [{field, operator, value}]
+  adjustment    String   // PERCENTAGE_OFF, FLAT_OFF, OVERRIDE
+  adjustmentValue Int    // cents or percentage * 100
+  priority      Int      @default(0) // higher = checked first
+  isActive      Boolean  @default(true)
+  startsAt      DateTime?
+  endsAt        DateTime?
+  usageCount    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([productId])
+  @@index([ruleType])
+}
+
+// ─── MESSAGE THREADS (COMMUNICATION HUB) ────────────────────
+
+model MessageThread {
+  id            String   @id @default(cuid())
+  patientId     String
+  subject       String?
+  status        String   @default("OPEN") // OPEN, WAITING, RESOLVED, CLOSED
+  assignedTo    String?  // admin userId
+  priority      String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  lastMessageAt DateTime?
+  messageCount  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([status])
+  @@index([assignedTo])
+  @@index([priority])
+}
+
+// ─── DOSAGE TRACKING ────────────────────────────────────────
+
+model DosageSchedule {
+  id              String    @id @default(cuid())
+  userId          String
+  treatmentPlanId String?
+  medicationName  String
+  currentDose     String    // e.g. "0.25mg"
+  targetDose      String    // e.g. "2.4mg"
+  frequency       String    // e.g. "weekly"
+  escalationPlan  Json      // [{week, dose, notes}]
+  currentWeek     Int       @default(1)
+  adherenceRate   Float?    // 0-100%
+  sideEffects     Json?     // [{date, symptom, severity}]
+  status          String    @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED, DISCONTINUED
+  startedAt       DateTime  @default(now())
+  nextDoseDate    DateTime?
+  lastDoseDate    DateTime?
+  providerNotes   String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ─── FINANCIAL RECONCILIATION ───────────────────────────────
+
+model ReconciliationRecord {
+  id                String   @id @default(cuid())
+  periodStart       DateTime
+  periodEnd         DateTime
+  stripeRevenue     Int      // cents from Stripe
+  internalRevenue   Int      // cents from Order table
+  discrepancy       Int      // difference in cents
+  discrepancyPct    Float    // percentage
+  matchedCount      Int      @default(0)
+  unmatchedStripe   Int      @default(0)
+  unmatchedInternal Int      @default(0)
+  details           Json?    // unmatched transaction details
+  status            String   @default("PENDING") // PENDING, REVIEWED, RESOLVED
+  resolvedBy        String?
+  resolvedAt        DateTime?
+  notes             String?
+  createdAt         DateTime @default(now())
+
+  @@index([status])
+  @@index([periodStart])
+}
+
+// ─── CONTENT RECOMMENDATIONS ────────────────────────────────
+
+model ContentRecommendation {
+  id          String   @id @default(cuid())
+  userId      String
+  contentType String   // BLOG_POST, RECIPE, MEAL_PLAN
+  contentId   String
+  score       Float    // relevance score 0-100
+  reason      String   // why recommended
+  wasViewed   Boolean  @default(false)
+  wasClicked  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([contentType])
+  @@index([score])
+}
+
+// ─── RESELLER PORTAL ACCESS ─────────────────────────────────
+
+model ResellerSession {
+  id          String   @id @default(cuid())
+  resellerId  String
+  token       String   @unique
+  expiresAt   DateTime
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([token])
+  @@index([resellerId])
+}

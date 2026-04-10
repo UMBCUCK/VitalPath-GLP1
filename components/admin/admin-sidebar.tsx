@@ -40,6 +40,9 @@ import {
   HeartPulse,
   Brain,
   Store,
+  ShoppingBag,
+  Target,
+  Handshake,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -70,6 +73,7 @@ const navGroups: NavGroup[] = [
     title: "Financial",
     items: [
       { label: "Revenue", href: "/admin/revenue", icon: DollarSign },
+      { label: "Sales", href: "/admin/sales", icon: ShoppingBag },
       { label: "Products & Pricing", href: "/admin/products", icon: CreditCard },
       { label: "Subscriptions", href: "/admin/subscriptions", icon: Wallet },
       { label: "Payments", href: "/admin/payments", icon: CreditCard },
@@ -88,9 +92,10 @@ const navGroups: NavGroup[] = [
     title: "Growth",
     items: [
       { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+      { label: "Conversion", href: "/admin/conversion", icon: Target },
       { label: "Campaigns", href: "/admin/campaigns", icon: Send },
       { label: "Referrals", href: "/admin/referrals", icon: Share2 },
-      { label: "Resellers", href: "/admin/resellers", icon: Store },
+      { label: "Resellers", href: "/admin/resellers", icon: Handshake },
       { label: "Cohorts", href: "/admin/cohorts", icon: GitCompareArrows },
       { label: "Widgets", href: "/admin/widgets", icon: Code2 },
       { label: "Coupons", href: "/admin/coupons", icon: Tag },

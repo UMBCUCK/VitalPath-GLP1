@@ -1,21 +1,19 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Copy, Check, Gift, DollarSign, Users, TrendingUp, Send, Share2,
-  BarChart2, Code2, Sparkles, Mail, ChevronRight,
-  ArrowUpRight, Zap,
+  BarChart2, Code2, Sparkles, Mail, ChevronRight, ArrowUpRight, Zap,
+  Search, SlidersHorizontal, ArrowUpDown, Link2, RefreshCw,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { ResellerPromoModal } from "@/components/dashboard/reseller-promo-modal";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 interface ReferralData {
   code: string;
@@ -41,27 +39,8 @@ const tierThresholds = [
 ];
 
 type Tab = "overview" | "analytics" | "widgets";
-
-function groupByMonth(referrals: ReferralData["referrals"]) {
-  const map: Record<string, { month: string; total: number; converted: number }> = {};
-  referrals.forEach((r) => {
-    const d = new Date(r.createdAt);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const label = d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
-    if (!map[key]) map[key] = { month: label, total: 0, converted: 0 };
-    map[key].total++;
-    if (r.status === "CONVERTED" || r.status === "PAID") map[key].converted++;
-  });
-  return Object.values(map).sort((a, b) => a.month.localeCompare(b.month)).slice(-6);
-}
-
-function statusBreakdown(referrals: ReferralData["referrals"]) {
-  const counts: Record<string, number> = { PENDING: 0, CONVERTED: 0, PAID: 0, EXPIRED: 0, FLAGGED: 0 };
-  referrals.forEach((r) => { counts[r.status] = (counts[r.status] || 0) + 1; });
-  return Object.entries(counts)
-    .filter(([, v]) => v > 0)
-    .map(([status, count]) => ({ status, count }));
-}
+type SortDir = "asc" | "desc";
+type DateRange = "7d" | "30d" | "90d" | "all";
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: "#e9b949",
@@ -71,15 +50,91 @@ const STATUS_COLORS: Record<string, string> = {
   FLAGGED: "#ef4444",
 };
 
+function daysAgo(n: number) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d;
+}
+
+function filterByRange(referrals: ReferralData["referrals"], range: DateRange) {
+  if (range === "all") return referrals;
+  const cutoff = daysAgo(range === "7d" ? 7 : range === "30d" ? 30 : 90);
+  return referrals.filter((r) => new Date(r.createdAt) >= cutoff);
+}
+
+function groupByPeriod(referrals: ReferralData["referrals"], range: DateRange) {
+  const map: Record<string, { label: string; total: number; converted: number }> = {};
+
+  referrals.forEach((r) => {
+    const d = new Date(r.createdAt);
+    let key: string;
+    let label: string;
+
+    if (range === "7d") {
+      key = d.toISOString().slice(0, 10);
+      label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    } else if (range === "30d") {
+      // Group into weekly buckets
+      const weekStart = new Date(d);
+      weekStart.setDate(d.getDate() - d.getDay());
+      key = weekStart.toISOString().slice(0, 10);
+      label = "Wk " + weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    } else {
+      key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      label = d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+    }
+
+    if (!map[key]) map[key] = { label, total: 0, converted: 0 };
+    map[key].total++;
+    if (r.status === "CONVERTED" || r.status === "PAID") map[key].converted++;
+  });
+
+  return Object.entries(map)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, v]) => v)
+    .slice(-12);
+}
+
+function statusBreakdown(referrals: ReferralData["referrals"]) {
+  const counts: Record<string, number> = {};
+  referrals.forEach((r) => { counts[r.status] = (counts[r.status] || 0) + 1; });
+  return Object.entries(counts)
+    .filter(([, v]) => v > 0)
+    .map(([status, count]) => ({ status, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+const DATE_RANGE_OPTIONS: { label: string; value: DateRange }[] = [
+  { label: "Last 7 days", value: "7d" },
+  { label: "Last 30 days", value: "30d" },
+  { label: "Last 90 days", value: "90d" },
+  { label: "All time", value: "all" },
+];
+
+const UTM_SOURCES = ["instagram", "facebook", "twitter", "youtube", "tiktok", "email", "blog", "podcast", "other"];
+
 export default function ReferralDashboardPage() {
   const [data, setData] = useState<ReferralData | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteSent, setInviteSent] = useState(false);
+  const [inviteStatus, setInviteStatus] = useState<"idle" | "sent" | "duplicate" | "error">("idle");
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("overview");
   const [showReseller, setShowReseller] = useState(false);
   const [resellerApplied, setResellerApplied] = useState(false);
+
+  // Overview filters
+  const [historySearch, setHistorySearch] = useState("");
+  const [historyStatus, setHistoryStatus] = useState("ALL");
+  const [historySortDir, setHistorySortDir] = useState<SortDir>("desc");
+
+  // Analytics filters
+  const [dateRange, setDateRange] = useState<DateRange>("30d");
+
+  // UTM builder
+  const [utmCampaign, setUtmCampaign] = useState("");
+  const [utmSource, setUtmSource] = useState("instagram");
+  const [utmMedium, setUtmMedium] = useState("social");
 
   const loadData = useCallback(async () => {
     const [refData, resellerData] = await Promise.all([
@@ -96,6 +151,17 @@ export default function ReferralDashboardPage() {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const referralLink = data ? `${origin}/quiz?ref=${data.code}` : "";
 
+  // UTM-tagged link
+  const utmLink = useMemo(() => {
+    if (!referralLink) return "";
+    const params = new URLSearchParams();
+    if (utmCampaign) params.set("utm_campaign", utmCampaign.toLowerCase().replace(/\s+/g, "_"));
+    if (utmSource) params.set("utm_source", utmSource);
+    if (utmMedium) params.set("utm_medium", utmMedium);
+    const qs = params.toString();
+    return referralLink + (qs ? "&" + qs : "");
+  }, [referralLink, utmCampaign, utmSource, utmMedium]);
+
   function copyText(text: string, key: string) {
     navigator.clipboard.writeText(text);
     setCopied(key);
@@ -110,26 +176,53 @@ export default function ReferralDashboardPage() {
       body: JSON.stringify({ email: inviteEmail }),
     });
     if (res.ok) {
-      setInviteSent(true);
+      setInviteStatus("sent");
       setInviteEmail("");
-      setTimeout(() => setInviteSent(false), 3000);
+      setTimeout(() => setInviteStatus("idle"), 4000);
       const updated = await fetch("/api/referrals").then((r) => r.json());
       setData(updated);
+    } else {
+      const body = await res.json().catch(() => ({}));
+      setInviteStatus(body.error === "Already invited" ? "duplicate" : "error");
+      setTimeout(() => setInviteStatus("idle"), 4000);
     }
   }
 
+  // Derived data
   const currentTier = tierThresholds.reduce(
     (acc, t) => ((data?.totalReferred || 0) >= t.min ? t : acc),
     tierThresholds[0]
   );
   const nextTier = tierThresholds.find((t) => t.min > (data?.totalReferred || 0));
 
-  const monthlyData = data ? groupByMonth(data.referrals) : [];
-  const statusData = data ? statusBreakdown(data.referrals) : [];
-  const conversionRate = data && data.totalReferred > 0
-    ? Math.round(((data.referrals.filter((r) => r.status === "CONVERTED" || r.status === "PAID").length) / data.totalReferred) * 100)
+  // Filtered history
+  const filteredHistory = useMemo(() => {
+    let refs = data?.referrals || [];
+    if (historyStatus !== "ALL") refs = refs.filter((r) => r.status === historyStatus);
+    if (historySearch.trim()) {
+      const q = historySearch.toLowerCase();
+      refs = refs.filter((r) => r.referredEmail?.toLowerCase().includes(q));
+    }
+    refs = [...refs].sort((a, b) => {
+      const diff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      return historySortDir === "desc" ? -diff : diff;
+    });
+    return refs;
+  }, [data, historyStatus, historySearch, historySortDir]);
+
+  // Analytics data filtered by date range
+  const rangedReferrals = useMemo(() => filterByRange(data?.referrals || [], dateRange), [data, dateRange]);
+  const chartData = useMemo(() => groupByPeriod(rangedReferrals, dateRange), [rangedReferrals, dateRange]);
+  const statusData = useMemo(() => statusBreakdown(rangedReferrals), [rangedReferrals]);
+
+  const rangedConverted = rangedReferrals.filter((r) => r.status === "CONVERTED" || r.status === "PAID").length;
+  const rangedPending = rangedReferrals.filter((r) => r.status === "PENDING").length;
+  const rangedEarned = rangedReferrals.reduce((s, r) => s + (r.payoutCents || 0), 0);
+  const conversionRate = rangedReferrals.length > 0
+    ? Math.round((rangedConverted / rangedReferrals.length) * 100)
     : 0;
 
+  // Embed codes
   const badgeEmbedCode = `<a href="${referralLink}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#0a2540;color:#fff;padding:10px 18px;border-radius:999px;font-family:sans-serif;font-size:14px;font-weight:600;text-decoration:none;">
   💊 Try VitalPath — Get started with GLP-1 treatment
 </a>`;
@@ -161,6 +254,7 @@ export default function ReferralDashboardPage() {
       />
 
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-navy">Referral Program</h2>
@@ -203,7 +297,7 @@ export default function ReferralDashboardPage() {
             <CardContent className="flex items-center gap-3 p-4">
               <Gift className="h-5 w-5 text-teal" />
               <div>
-                <p className="text-xs text-graphite-400">Referrals</p>
+                <p className="text-xs text-graphite-400">Total Referrals</p>
                 <p className="text-xl font-bold text-navy">{data?.totalReferred || 0}</p>
               </div>
             </CardContent>
@@ -245,9 +339,7 @@ export default function ReferralDashboardPage() {
               onClick={() => setTab(t)}
               className={cn(
                 "flex-1 rounded-lg px-3 py-2 text-sm font-medium capitalize transition-all",
-                tab === t
-                  ? "bg-white shadow-sm text-navy"
-                  : "text-graphite-400 hover:text-navy"
+                tab === t ? "bg-white shadow-sm text-navy" : "text-graphite-400 hover:text-navy"
               )}
             >
               {t === "widgets" ? "Embed Widgets" : t.charAt(0).toUpperCase() + t.slice(1)}
@@ -278,8 +370,7 @@ export default function ReferralDashboardPage() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a
                     href={`https://twitter.com/intent/tweet?text=I%27ve%20been%20using%20VitalPath%20for%20GLP-1%20weight%20loss.%20Use%20my%20link%20to%20get%20started%3A%20${encodeURIComponent(referralLink)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1.5 rounded-lg bg-[#1da1f2]/10 px-3 py-1.5 text-xs font-semibold text-[#1da1f2] hover:bg-[#1da1f2]/20 transition-colors"
                   >
                     <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.732-8.857L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -287,8 +378,7 @@ export default function ReferralDashboardPage() {
                   </a>
                   <a
                     href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1.5 rounded-lg bg-[#1877f2]/10 px-3 py-1.5 text-xs font-semibold text-[#1877f2] hover:bg-[#1877f2]/20 transition-colors"
                   >
                     <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
@@ -313,24 +403,37 @@ export default function ReferralDashboardPage() {
                 <CardTitle className="text-base">Invite by Email</CardTitle>
               </CardHeader>
               <CardContent>
-                {inviteSent ? (
-                  <div className="flex items-center gap-3 py-2">
-                    <Check className="h-5 w-5 text-teal" />
+                {inviteStatus === "sent" ? (
+                  <div className="flex items-center gap-3 rounded-xl bg-teal-50 border border-teal/20 p-3">
+                    <Check className="h-5 w-5 text-teal shrink-0" />
                     <p className="text-sm font-medium text-navy">Invite recorded! We&apos;ll track the conversion.</p>
                   </div>
+                ) : inviteStatus === "duplicate" ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 p-3">
+                      <Zap className="h-5 w-5 text-amber-500 shrink-0" />
+                      <p className="text-sm text-navy">That email was already invited. Try a different address.</p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setInviteStatus("idle")}>Try again</Button>
+                  </div>
                 ) : (
-                  <div className="flex gap-3">
-                    <Input
-                      type="email"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      placeholder="friend@email.com"
-                      className="flex-1"
-                      onKeyDown={(e) => e.key === "Enter" && sendInvite()}
-                    />
-                    <Button onClick={sendInvite} disabled={!inviteEmail} className="gap-2 shrink-0">
-                      <Send className="h-4 w-4" /> Send Invite
-                    </Button>
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                      <Input
+                        type="email"
+                        value={inviteEmail}
+                        onChange={(e) => setInviteEmail(e.target.value)}
+                        placeholder="friend@email.com"
+                        className="flex-1"
+                        onKeyDown={(e) => e.key === "Enter" && sendInvite()}
+                      />
+                      <Button onClick={sendInvite} disabled={!inviteEmail} className="gap-2 shrink-0">
+                        <Send className="h-4 w-4" /> Send Invite
+                      </Button>
+                    </div>
+                    {inviteStatus === "error" && (
+                      <p className="text-xs text-red-500">Something went wrong. Please try again.</p>
+                    )}
                   </div>
                 )}
               </CardContent>
@@ -357,14 +460,62 @@ export default function ReferralDashboardPage() {
                       style={{ width: `${Math.min(100, ((data?.totalReferred || 0) / nextTier.min) * 100)}%` }}
                     />
                   </div>
+                  <div className="mt-3 flex justify-between text-xs text-graphite-400">
+                    <span>0</span>
+                    {tierThresholds.slice(1).map((t) => (
+                      <span key={t.name} className={cn((data?.totalReferred || 0) >= t.min ? "font-semibold text-navy" : "")}>
+                        {t.min} — {t.name}
+                      </span>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* History */}
+            {/* History with filters */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Referral History</CardTitle>
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <CardTitle className="text-base">Referral History</CardTitle>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {/* Search */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-graphite-400" />
+                      <input
+                        type="text"
+                        value={historySearch}
+                        onChange={(e) => setHistorySearch(e.target.value)}
+                        placeholder="Search email..."
+                        className="h-8 w-40 rounded-lg border border-navy-200 bg-white pl-8 pr-3 text-xs text-navy placeholder:text-graphite-400 focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal/20"
+                      />
+                    </div>
+                    {/* Status filter */}
+                    <div className="relative flex items-center gap-1">
+                      <SlidersHorizontal className="h-3.5 w-3.5 text-graphite-400" />
+                      <select
+                        value={historyStatus}
+                        onChange={(e) => setHistoryStatus(e.target.value)}
+                        className="h-8 rounded-lg border border-navy-200 bg-white pl-2 pr-6 text-xs text-navy focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal/20 appearance-none"
+                      >
+                        <option value="ALL">All statuses</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="CONVERTED">Converted</option>
+                        <option value="PAID">Paid</option>
+                        <option value="EXPIRED">Expired</option>
+                        <option value="FLAGGED">Flagged</option>
+                      </select>
+                    </div>
+                    {/* Sort toggle */}
+                    <button
+                      onClick={() => setHistorySortDir((d) => d === "desc" ? "asc" : "desc")}
+                      className="flex h-8 items-center gap-1.5 rounded-lg border border-navy-200 bg-white px-2.5 text-xs text-graphite-400 hover:text-navy hover:border-navy-300 transition-colors"
+                      title={historySortDir === "desc" ? "Newest first" : "Oldest first"}
+                    >
+                      <ArrowUpDown className="h-3.5 w-3.5" />
+                      {historySortDir === "desc" ? "Newest" : "Oldest"}
+                    </button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 {(data?.referrals?.length || 0) === 0 ? (
@@ -372,45 +523,63 @@ export default function ReferralDashboardPage() {
                     <Gift className="mx-auto h-10 w-10 text-graphite-200" />
                     <p className="mt-3 text-sm text-graphite-400">No referrals yet. Share your link to get started!</p>
                   </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-navy-100/40 text-left">
-                          <th className="pb-3 font-medium text-graphite-400">Email</th>
-                          <th className="pb-3 font-medium text-graphite-400">Status</th>
-                          <th className="pb-3 font-medium text-graphite-400">Earnings</th>
-                          <th className="pb-3 font-medium text-graphite-400">Date</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-navy-100/30">
-                        {data?.referrals?.map((ref) => (
-                          <tr key={ref.id}>
-                            <td className="py-3 text-navy">{ref.referredEmail || "—"}</td>
-                            <td className="py-3">
-                              <Badge
-                                variant={
-                                  ref.status === "CONVERTED" || ref.status === "PAID"
-                                    ? "success"
-                                    : ref.status === "PENDING"
-                                    ? "warning"
-                                    : "secondary"
-                                }
-                              >
-                                {ref.status}
-                              </Badge>
-                            </td>
-                            <td className="py-3 font-medium text-navy">
-                              {ref.payoutCents ? formatPrice(ref.payoutCents) : "—"}
-                            </td>
-                            <td className="py-3 text-graphite-400">
-                              {new Date(ref.createdAt).toLocaleDateString()}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                ) : filteredHistory.length === 0 ? (
+                  <div className="py-8 text-center">
+                    <Search className="mx-auto h-8 w-8 text-graphite-200" />
+                    <p className="mt-3 text-sm text-graphite-400">No referrals match your filters.</p>
+                    <button
+                      onClick={() => { setHistorySearch(""); setHistoryStatus("ALL"); }}
+                      className="mt-2 text-xs text-teal underline"
+                    >
+                      Clear filters
+                    </button>
                   </div>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-navy-100/40 text-left">
+                            <th className="pb-3 font-medium text-graphite-400">Email</th>
+                            <th className="pb-3 font-medium text-graphite-400">Status</th>
+                            <th className="pb-3 font-medium text-graphite-400">Earnings</th>
+                            <th className="pb-3 font-medium text-graphite-400 cursor-pointer select-none" onClick={() => setHistorySortDir((d) => d === "desc" ? "asc" : "desc")}>
+                              <span className="flex items-center gap-1">
+                                Date <ArrowUpDown className="h-3 w-3 opacity-50" />
+                              </span>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-navy-100/30">
+                          {filteredHistory.map((ref) => (
+                            <tr key={ref.id} className="hover:bg-navy-50/20 transition-colors">
+                              <td className="py-3 text-navy">{ref.referredEmail || "—"}</td>
+                              <td className="py-3">
+                                <Badge
+                                  variant={
+                                    ref.status === "CONVERTED" || ref.status === "PAID" ? "success"
+                                    : ref.status === "PENDING" ? "warning"
+                                    : "secondary"
+                                  }
+                                >
+                                  {ref.status}
+                                </Badge>
+                              </td>
+                              <td className="py-3 font-medium text-navy">
+                                {ref.payoutCents ? formatPrice(ref.payoutCents) : "—"}
+                              </td>
+                              <td className="py-3 text-graphite-400">
+                                {new Date(ref.createdAt).toLocaleDateString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="mt-3 text-xs text-graphite-400">
+                      Showing {filteredHistory.length} of {data?.referrals.length} referrals
+                    </p>
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -420,69 +589,87 @@ export default function ReferralDashboardPage() {
         {/* ── ANALYTICS TAB ────────────────────────────────────── */}
         {tab === "analytics" && (
           <div className="space-y-6">
+            {/* Date range filter */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-semibold text-graphite-400 uppercase tracking-wide">Time range:</span>
+              {DATE_RANGE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setDateRange(opt.value)}
+                  className={cn(
+                    "rounded-lg px-3 py-1.5 text-xs font-medium transition-all",
+                    dateRange === opt.value
+                      ? "bg-navy text-white shadow-sm"
+                      : "border border-navy-200 text-graphite-400 hover:border-navy hover:text-navy"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
             {/* KPI row */}
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-4">
+              <Card>
+                <CardContent className="p-5">
+                  <p className="text-xs font-semibold text-graphite-400 uppercase tracking-wide">Referred</p>
+                  <p className="text-3xl font-bold text-navy mt-1">{rangedReferrals.length}</p>
+                  <p className="text-xs text-graphite-400 mt-1">in selected period</p>
+                </CardContent>
+              </Card>
               <Card>
                 <CardContent className="p-5">
                   <p className="text-xs font-semibold text-graphite-400 uppercase tracking-wide">Conversion Rate</p>
                   <p className="text-3xl font-bold text-navy mt-1">{conversionRate}%</p>
-                  <p className="text-xs text-graphite-400 mt-1">
-                    {data?.referrals.filter((r) => r.status === "CONVERTED" || r.status === "PAID").length || 0} of {data?.totalReferred || 0} converted
-                  </p>
+                  <p className="text-xs text-graphite-400 mt-1">{rangedConverted} converted</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-5">
                   <p className="text-xs font-semibold text-graphite-400 uppercase tracking-wide">Pending</p>
-                  <p className="text-3xl font-bold text-navy mt-1">
-                    {data?.referrals.filter((r) => r.status === "PENDING").length || 0}
-                  </p>
+                  <p className="text-3xl font-bold text-navy mt-1">{rangedPending}</p>
                   <p className="text-xs text-graphite-400 mt-1">awaiting checkout</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-5">
-                  <p className="text-xs font-semibold text-graphite-400 uppercase tracking-wide">Avg. per Month</p>
-                  <p className="text-3xl font-bold text-navy mt-1">
-                    {monthlyData.length > 0
-                      ? (data!.totalReferred / Math.max(1, monthlyData.length)).toFixed(1)
-                      : "0"}
-                  </p>
-                  <p className="text-xs text-graphite-400 mt-1">referrals / month</p>
+                  <p className="text-xs font-semibold text-graphite-400 uppercase tracking-wide">Earned</p>
+                  <p className="text-3xl font-bold text-navy mt-1">{formatPrice(rangedEarned)}</p>
+                  <p className="text-xs text-graphite-400 mt-1">in selected period</p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Referrals by month */}
+            {/* Chart */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <BarChart2 className="h-4 w-4 text-teal" /> Referrals by Month
+                  <BarChart2 className="h-4 w-4 text-teal" /> Referrals Over Time
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {monthlyData.length === 0 ? (
+                {rangedReferrals.length === 0 ? (
                   <div className="py-12 text-center">
                     <BarChart2 className="mx-auto h-10 w-10 text-graphite-200" />
-                    <p className="mt-3 text-sm text-graphite-400">Data will appear once you have referrals</p>
+                    <p className="mt-3 text-sm text-graphite-400">No referrals in this period</p>
                   </div>
                 ) : (
                   <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={monthlyData} barGap={4}>
-                      <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} width={24} />
+                    <BarChart data={chartData} barGap={4}>
+                      <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} width={24} allowDecimals={false} />
                       <Tooltip
                         contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,.1)", fontSize: 12 }}
                         cursor={{ fill: "rgba(10,37,64,.04)" }}
                       />
-                      <Bar dataKey="total" name="Referred" fill="#e0f2f0" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="total" name="Referred" fill="#dbeafe" radius={[4, 4, 0, 0]} />
                       <Bar dataKey="converted" name="Converted" fill="#2ab5a5" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
                 <div className="mt-3 flex items-center gap-4 text-xs text-graphite-400">
                   <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-sm bg-[#e0f2f0] border border-[#2ab5a5]/30 inline-block" /> Referred
+                    <span className="h-2.5 w-2.5 rounded-sm bg-[#dbeafe] border border-[#93c5fd] inline-block" /> Referred
                   </span>
                   <span className="flex items-center gap-1.5">
                     <span className="h-2.5 w-2.5 rounded-sm bg-teal inline-block" /> Converted
@@ -494,23 +681,21 @@ export default function ReferralDashboardPage() {
             {/* Status breakdown */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Referral Status Breakdown</CardTitle>
+                <CardTitle className="text-base">Status Breakdown</CardTitle>
               </CardHeader>
               <CardContent>
                 {statusData.length === 0 ? (
-                  <p className="py-6 text-center text-sm text-graphite-400">No referrals yet</p>
+                  <p className="py-6 text-center text-sm text-graphite-400">No referrals in this period</p>
                 ) : (
                   <div className="space-y-3">
                     {statusData.map(({ status, count }) => (
                       <div key={status} className="flex items-center gap-3">
-                        <div className="w-24 shrink-0">
+                        <div className="w-28 shrink-0">
                           <Badge
                             variant={
-                              status === "CONVERTED" || status === "PAID"
-                                ? "success"
-                                : status === "PENDING"
-                                ? "warning"
-                                : "secondary"
+                              status === "CONVERTED" || status === "PAID" ? "success"
+                              : status === "PENDING" ? "warning"
+                              : "secondary"
                             }
                           >
                             {status}
@@ -518,14 +703,17 @@ export default function ReferralDashboardPage() {
                         </div>
                         <div className="flex-1 h-3 rounded-full bg-navy-50/50 overflow-hidden">
                           <div
-                            className="h-full rounded-full transition-all"
+                            className="h-full rounded-full transition-all duration-500"
                             style={{
-                              width: `${Math.round((count / (data?.totalReferred || 1)) * 100)}%`,
+                              width: `${Math.round((count / Math.max(1, rangedReferrals.length)) * 100)}%`,
                               background: STATUS_COLORS[status] || "#9ca3af",
                             }}
                           />
                         </div>
                         <span className="w-8 text-right text-sm font-semibold text-navy">{count}</span>
+                        <span className="w-9 text-right text-xs text-graphite-400">
+                          {Math.round((count / Math.max(1, rangedReferrals.length)) * 100)}%
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -538,25 +726,30 @@ export default function ReferralDashboardPage() {
               <CardContent className="p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold text-graphite-400 uppercase tracking-wide mb-1">Earnings Projection</p>
+                    <p className="text-xs font-semibold text-graphite-400 uppercase tracking-wide mb-1">Annual Projection</p>
                     <p className="text-sm text-graphite-500">
-                      At your current pace, you could earn{" "}
+                      At your pace, you could earn{" "}
                       <span className="font-bold text-navy">
                         {formatPrice(
-                          Math.round((data?.totalReferred || 0) / Math.max(1, monthlyData.length)) * currentTier.payout * 12
+                          Math.round(
+                            (rangedReferrals.length / Math.max(1, dateRange === "7d" ? 1/4 : dateRange === "30d" ? 1 : dateRange === "90d" ? 3 : 12))
+                            * 12 * currentTier.payout
+                          )
                         )}
                       </span>{" "}
-                      this year.
+                      this year at {currentTier.name} tier.
                     </p>
-                    <p className="text-xs text-graphite-400 mt-1">Based on your monthly average at {currentTier.name} tier.</p>
+                    <p className="text-xs text-graphite-400 mt-1">Extrapolated from your {DATE_RANGE_OPTIONS.find(o => o.value === dateRange)?.label.toLowerCase()} activity.</p>
                   </div>
-                  <button
-                    onClick={() => setShowReseller(true)}
-                    className="shrink-0 flex items-center gap-1.5 rounded-lg bg-navy text-white px-3 py-2 text-xs font-semibold hover:bg-atlantic transition-colors"
-                  >
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                    Boost earnings
-                  </button>
+                  {!resellerApplied && (
+                    <button
+                      onClick={() => setShowReseller(true)}
+                      className="shrink-0 flex items-center gap-1.5 rounded-lg bg-navy text-white px-3 py-2 text-xs font-semibold hover:bg-atlantic transition-colors"
+                    >
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                      Boost earnings
+                    </button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -567,8 +760,81 @@ export default function ReferralDashboardPage() {
         {tab === "widgets" && (
           <div className="space-y-6">
             <p className="text-sm text-graphite-400">
-              Embed these widgets on your website, blog, or email to drive referrals. All links include your referral code automatically.
+              Embed these on your website, blog, or email. All links include your referral code automatically.
             </p>
+
+            {/* UTM Campaign Link Builder */}
+            <Card className="border-teal/30">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Link2 className="h-4 w-4 text-teal" /> Campaign Link Builder
+                  <Badge variant="secondary" className="text-xs ml-1">UTM tracking</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-xs text-graphite-400">
+                  Create tracked links for specific campaigns so you can see which channel drives the most conversions.
+                </p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-navy mb-1.5">Campaign name</label>
+                    <Input
+                      value={utmCampaign}
+                      onChange={(e) => setUtmCampaign(e.target.value)}
+                      placeholder="e.g. spring-promo"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-navy mb-1.5">Source</label>
+                    <select
+                      value={utmSource}
+                      onChange={(e) => setUtmSource(e.target.value)}
+                      className="w-full rounded-xl border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+                    >
+                      {UTM_SOURCES.map((s) => (
+                        <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-navy mb-1.5">Medium</label>
+                    <select
+                      value={utmMedium}
+                      onChange={(e) => setUtmMedium(e.target.value)}
+                      className="w-full rounded-xl border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+                    >
+                      <option value="social">Social</option>
+                      <option value="email">Email</option>
+                      <option value="paid">Paid</option>
+                      <option value="organic">Organic</option>
+                      <option value="referral">Referral</option>
+                      <option value="content">Content</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-navy-200 bg-navy-50/30 p-4">
+                  <p className="text-xs font-semibold text-graphite-400 mb-2">Generated link:</p>
+                  <p className="text-xs font-mono text-navy break-all leading-relaxed">{utmLink}</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    className="gap-2"
+                    onClick={() => copyText(utmLink, "utm")}
+                  >
+                    {copied === "utm" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {copied === "utm" ? "Copied!" : "Copy Campaign Link"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5"
+                    onClick={() => { setUtmCampaign(""); setUtmSource("instagram"); setUtmMedium("social"); }}
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" /> Reset
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Pill Badge */}
             <Card>
@@ -580,9 +846,7 @@ export default function ReferralDashboardPage() {
               <CardContent className="space-y-4">
                 <div className="rounded-xl bg-navy-50/30 p-5 flex items-center justify-center">
                   <a
-                    href={referralLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href={referralLink} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-white shadow-md"
                   >
                     💊 Try VitalPath — Get started with GLP-1 treatment
@@ -593,8 +857,7 @@ export default function ReferralDashboardPage() {
                     {badgeEmbedCode}
                   </pre>
                   <Button
-                    size="sm"
-                    variant="outline"
+                    size="sm" variant="outline"
                     className="absolute top-3 right-3 gap-1.5 bg-white/10 border-white/20 text-white hover:bg-white/20 text-xs"
                     onClick={() => copyText(badgeEmbedCode, "badge")}
                   >
@@ -617,10 +880,7 @@ export default function ReferralDashboardPage() {
                   <div className="border border-gray-200 rounded-2xl p-6 max-w-[360px] w-full bg-white shadow-sm">
                     <p className="text-lg font-bold text-navy mb-2">VitalPath GLP-1 Program</p>
                     <p className="text-sm text-graphite-400 mb-4">Medical weight loss with semaglutide — supervised by licensed providers.</p>
-                    <a
-                      href={referralLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <a href={referralLink} target="_blank" rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 rounded-xl bg-teal px-5 py-2.5 text-sm font-semibold text-white"
                     >
                       Start your free assessment <ArrowUpRight className="h-4 w-4" />
@@ -632,8 +892,7 @@ export default function ReferralDashboardPage() {
                     {cardEmbedCode}
                   </pre>
                   <Button
-                    size="sm"
-                    variant="outline"
+                    size="sm" variant="outline"
                     className="absolute top-3 right-3 gap-1.5 bg-white/10 border-white/20 text-white hover:bg-white/20 text-xs"
                     onClick={() => copyText(cardEmbedCode, "card")}
                   >
@@ -662,8 +921,7 @@ export default function ReferralDashboardPage() {
                     {textLinkCode}
                   </pre>
                   <Button
-                    size="sm"
-                    variant="outline"
+                    size="sm" variant="outline"
                     className="absolute top-3 right-3 gap-1.5 bg-white/10 border-white/20 text-white hover:bg-white/20 text-xs"
                     onClick={() => copyText(textLinkCode, "text")}
                   >
@@ -674,7 +932,7 @@ export default function ReferralDashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Share your raw link */}
+            {/* Raw link */}
             <Card className="border-dashed border-navy-200">
               <CardContent className="p-5 flex items-center justify-between gap-4">
                 <div>
