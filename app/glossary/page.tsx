@@ -2,7 +2,7 @@ export const dynamic = "force-static";
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+import { BookOpen, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description:
     "Complete glossary of weight loss and GLP-1 medication terms. Clear definitions for BMI, semaglutide, tirzepatide, metabolic rate, compounding, and 40+ more terms.",
   openGraph: {
-    title: "Weight Loss Glossary: GLP-1, BMI, Semaglutide & More | VitalPath",
+    title: "Weight Loss Glossary: GLP-1, BMI, Semaglutide & More | Nature's Journey",
     description: "Simple definitions for every weight loss and GLP-1 term you need to know.",
   },
 };
@@ -182,6 +182,36 @@ export default function GlossaryPage() {
               </div>
             </div>
           ))}
+        </SectionShell>
+      </section>
+
+      {/* Deep-dive blog links */}
+      <section className="py-12 bg-cloud/40 border-y border-sage/20">
+        <SectionShell className="max-w-4xl">
+          <h2 className="text-lg font-semibold text-navy mb-2">Deeper reading</h2>
+          <p className="text-sm text-graphite-500 mb-6">Articles that explain these terms in clinical context</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { label: "How GLP-1 Receptor Agonists Work", href: "/blog/understanding-glp1", tag: "Science" },
+              { label: "Semaglutide vs Tirzepatide (2026)", href: "/blog/tirzepatide-vs-semaglutide-2026", tag: "Comparison" },
+              { label: "Managing Common Side Effects", href: "/blog/managing-side-effects", tag: "Side Effects" },
+              { label: "Compounded Semaglutide Safety", href: "/blog/compounded-semaglutide-safety", tag: "Safety" },
+              { label: "What to Eat on Semaglutide", href: "/blog/what-to-eat-on-semaglutide", tag: "Nutrition" },
+              { label: "GLP-1 Weight Loss Timeline", href: "/blog/semaglutide-timeline-first-3-months", tag: "Results" },
+            ].map((article) => (
+              <Link
+                key={article.href}
+                href={article.href}
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+              >
+                <div>
+                  <span className="text-xs font-medium text-teal">{article.tag}</span>
+                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-teal transition-colors leading-snug">{article.label}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+              </Link>
+            ))}
+          </div>
         </SectionShell>
       </section>
 

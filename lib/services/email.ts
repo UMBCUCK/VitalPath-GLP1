@@ -23,7 +23,7 @@ class ResendAdapter implements EmailProvider {
 
   constructor() {
     this.apiKey = process.env.RESEND_API_KEY || "";
-    this.from = process.env.EMAIL_FROM || "care@vitalpath.com";
+    this.from = process.env.EMAIL_FROM || "care@naturesjourneyhealth.com";
   }
 
   async send(message: EmailMessage): Promise<{ id: string }> {
@@ -76,11 +76,11 @@ export function createEmailService(): EmailProvider {
 
 export const emailTemplates = {
   welcome: (name: string) => ({
-    subject: "Welcome to VitalPath",
+    subject: "Welcome to Nature's Journey",
     html: `
       <div style="font-family: Inter, system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
         <div style="text-align: center; margin-bottom: 32px;">
-          <h1 style="color: #0E223D; font-size: 28px; margin: 0;">Welcome to VitalPath</h1>
+          <h1 style="color: #0E223D; font-size: 28px; margin: 0;">Welcome to Nature's Journey</h1>
         </div>
         <p style="color: #2E3742; font-size: 16px; line-height: 1.6;">
           Hi ${name},
@@ -101,7 +101,7 @@ export const emailTemplates = {
         </p>
         <hr style="border: none; border-top: 1px solid #E8EDF4; margin: 32px 0;" />
         <p style="color: #97A5B0; font-size: 12px; text-align: center;">
-          VitalPath Health | Clinically informed weight management
+          Nature's Journey Health | Clinically informed weight management
         </p>
       </div>
     `,

@@ -231,7 +231,7 @@ export function IntegrationsClient() {
             API Integration
           </CardTitle>
           <CardDescription>
-            Manage API keys for programmatic access to VitalPath data endpoints.
+            Manage API keys for programmatic access to Nature's Journey data endpoints.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -300,7 +300,7 @@ export function IntegrationsClient() {
             </Badge>
           </CardTitle>
           <CardDescription>
-            Send VitalPath events to external services in real time.
+            Send Nature's Journey events to external services in real time.
           </CardDescription>
         </CardHeader>
         <CardContent>

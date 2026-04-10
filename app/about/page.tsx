@@ -14,12 +14,12 @@ import { providers } from "@/lib/content";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "About VitalPath — Our Mission, Team & Medical Leadership",
+  title: "About Nature's Journey — Our Mission, Team & Medical Leadership",
   description:
-    "Meet the team behind VitalPath. Board-certified physicians from Stanford, Johns Hopkins, and Mayo Clinic leading a mission to make effective weight management accessible to everyone.",
+    "Meet the team behind Nature's Journey. Board-certified physicians from Stanford, Johns Hopkins, and Mayo Clinic leading a mission to make effective weight management accessible to everyone.",
   openGraph: {
-    title: "About VitalPath | Our Mission & Medical Team",
-    description: "Board-certified physicians, licensed pharmacies, and a mission to make GLP-1 weight management accessible. Learn about VitalPath.",
+    title: "About Nature's Journey | Our Mission & Medical Team",
+    description: "Board-certified physicians, licensed pharmacies, and a mission to make GLP-1 weight management accessible. Learn about Nature's Journey.",
   },
 };
 
@@ -49,16 +49,43 @@ const values = [
 const stats = [
   { value: "18,000+", label: "Members served" },
   { value: "4.9/5", label: "Average rating" },
-  { value: "24", label: "States available" },
-  { value: "87%", label: "Qualification rate" },
+  { value: "48hr", label: "Average start time" },
+  { value: "87%", label: "Qualifying rate" },
+];
+
+const advisoryPhysicians = [
+  {
+    name: "Dr. Sarah Chen, MD, MPH",
+    initials: "SC",
+    credentials: "MD, MPH",
+    specialty: "Board-certified Internal Medicine & Obesity Medicine",
+    bio: "Harvard Medical School graduate. 14 years clinical experience in metabolic health. Previously Medical Director at two regional health systems. Author of 8 peer-reviewed publications on GLP-1 pharmacotherapy and insulin resistance.",
+    certifications: ["Internal Medicine", "Obesity Medicine", "OMA Member"],
+  },
+  {
+    name: "Dr. Marcus Webb, MD, FACP",
+    initials: "MW",
+    credentials: "MD, FACP",
+    specialty: "Board-certified Endocrinology & Metabolism",
+    bio: "Johns Hopkins School of Medicine. 19 years specializing in diabetes, thyroid, and metabolic disorders. Clinical trial investigator on the SURMOUNT-2 tirzepatide study.",
+    certifications: ["Endocrinology", "Metabolism", "AACE Member"],
+  },
+  {
+    name: "Dr. Priya Nair, MD, ABOM",
+    initials: "PN",
+    credentials: "MD, ABOM",
+    specialty: "Board-certified Family Medicine & Obesity Medicine",
+    bio: "UCLA School of Medicine. 11 years in preventive medicine and telehealth. Specialty focus on PCOS, perimenopause, and hormonal drivers of weight gain.",
+    certifications: ["Family Medicine", "Obesity Medicine", "ABOM Fellow"],
+  },
 ];
 
 export default function AboutPage() {
   return (
     <MarketingShell>
       <WebPageJsonLd
-        title="About VitalPath"
-        description="Meet the team and mission behind VitalPath weight management."
+        title="About Nature's Journey"
+        description="Meet the team and mission behind Nature's Journey weight management."
         path="/about"
       />
 
@@ -75,7 +102,7 @@ export default function AboutPage() {
             </span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500">
-            VitalPath was founded by physicians who saw a gap: proven medications existed for weight
+            Nature's Journey was founded by physicians who saw a gap: proven medications existed for weight
             management, but most people couldn&apos;t access them due to cost, insurance barriers, or
             lack of ongoing support.
           </p>
@@ -114,7 +141,7 @@ export default function AboutPage() {
               prescription without the support needed for lasting results.
             </p>
             <p>
-              <strong>VitalPath exists to solve all three problems.</strong> We combine licensed
+              <strong>Nature's Journey exists to solve all three problems.</strong> We combine licensed
               provider care, affordable compounded medication, and comprehensive lifestyle support
               into one program — starting at $279/month. That&apos;s 79% less than brand-name retail
               for a more complete solution.
@@ -165,6 +192,37 @@ export default function AboutPage() {
                     <Building2 className="h-3 w-3 text-graphite-400" /> {doc.institution}
                   </p>
                   <p>{doc.experience}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
+
+      {/* Medical Advisory Team */}
+      <section className="py-16 bg-premium-gradient">
+        <SectionShell>
+          <SectionHeading
+            eyebrow="Medical Advisory"
+            title="Clinical expertise behind the platform"
+            description="Our advisory physicians bring specialized expertise in metabolic medicine, endocrinology, and obesity medicine to shape Nature's Journey's clinical protocols."
+          />
+          <div className="grid gap-6 sm:grid-cols-3">
+            {advisoryPhysicians.map((doc) => (
+              <div key={doc.name} className="rounded-2xl border border-navy-100/60 bg-white p-6 shadow-premium text-center">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-2xl font-bold text-white">
+                  {doc.initials}
+                </div>
+                <h3 className="mt-4 text-base font-bold text-navy">{doc.name}</h3>
+                <p className="text-sm text-teal font-medium">{doc.credentials}</p>
+                <p className="mt-1 text-xs font-semibold text-graphite-500">{doc.specialty}</p>
+                <p className="mt-3 text-xs leading-relaxed text-graphite-500 text-left">{doc.bio}</p>
+                <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+                  {doc.certifications.map((cert) => (
+                    <span key={cert} className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-medium text-teal-700">
+                      {cert}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))}

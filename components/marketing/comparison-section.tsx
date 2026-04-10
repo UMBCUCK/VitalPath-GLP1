@@ -25,11 +25,11 @@ export function ComparisonSection() {
       <SectionShell>
         <SectionHeading
           eyebrow="Compare Your Options"
-          title="See how VitalPath stacks up"
+          title="See how Nature's Journey stacks up"
           description="Get the same active ingredients as Ozempic and Wegovy — with comprehensive support — at a fraction of the cost."
         />
 
-        {/* Mobile: VitalPath vs Brand-Name card comparison */}
+        {/* Mobile: Nature's Journey vs Brand-Name card comparison */}
         <AnimateOnView className="lg:hidden">
           <div className="space-y-3">
             {comparisonRows.map((row) => (
@@ -37,7 +37,7 @@ export function ComparisonSection() {
                 <span className="text-sm font-medium text-navy flex-1">{row.feature}</span>
                 <div className="flex gap-6 shrink-0">
                   <div className="text-center w-20">
-                    <div className="text-xs text-teal font-semibold mb-1">VitalPath</div>
+                    <div className="text-xs text-teal font-semibold mb-1">Nature's Journey</div>
                     <CellValue value={row.vitalpath} />
                   </div>
                   <div className="text-center w-20">
@@ -60,7 +60,7 @@ export function ComparisonSection() {
                     Feature
                   </th>
                   <th className="bg-teal-50/50 p-4 text-center">
-                    <div className="text-sm font-bold text-teal">VitalPath</div>
+                    <div className="text-sm font-bold text-teal">Nature's Journey</div>
                     <div className="text-xs text-graphite-400">From $279/mo</div>
                   </th>
                   <th className="p-4 text-center">
@@ -115,7 +115,7 @@ export function ComparisonSection() {
               Save up to $12,840/year
             </p>
             <p className="mt-2 text-sm text-teal-100">
-              compared to brand-name GLP-1 retail pricing ($1,349/mo &times; 12 = $16,188 vs VitalPath at $279/mo &times; 12 = $3,348)
+              compared to brand-name GLP-1 retail pricing ($1,349/mo &times; 12 = $16,188 vs Nature's Journey at $279/mo &times; 12 = $3,348)
             </p>
             <Link href="/qualify" className="mt-4 inline-block">
               <Button variant="gold" className="gap-2">

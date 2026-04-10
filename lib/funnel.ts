@@ -67,6 +67,10 @@ export const intakeSchema = z.object({
   emergencyContactPhone: z.string().min(10, "Emergency contact phone is required"),
   emergencyContactRelation: z.string().min(2, "Emergency contact relationship is required"),
 
+  // Medication preference
+  medicationInterest: z.string().optional(),
+  medicationInterestLabel: z.string().optional(),
+
   // Consent
   consentTreatment: z.boolean().refine((v) => v, "You must consent to proceed"),
   consentHipaa: z.boolean().refine((v) => v, "HIPAA consent is required"),

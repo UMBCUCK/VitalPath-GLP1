@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Info, TrendingDown, Calendar, Target, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,6 +35,7 @@ export default function TimelineCalculatorPage() {
   const [sex, setSex] = useState<"male" | "female">("female");
   const [activity, setActivity] = useState<"sedentary" | "light" | "moderate" | "active">("moderate");
   const [result, setResult] = useState<TimelineResult | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   function handleCalculate() {
     const ft = parseInt(heightFeet);
@@ -92,6 +93,8 @@ export default function TimelineCalculatorPage() {
       goal_weight: goalWeight,
       projected_weeks: Math.round(weeksToGoal),
     });
+
+    setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   }
 
   return (
@@ -222,6 +225,7 @@ export default function TimelineCalculatorPage() {
             <AnimatePresence>
               {result && (
                 <motion.div
+                  ref={resultRef}
                   className="mt-10 space-y-6"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -369,7 +373,7 @@ export default function TimelineCalculatorPage() {
                         <span className="text-gold font-bold">
                           {Math.round(result.projection.summary.extraLossFromPlan)} extra pounds lost
                         </span>{" "}
-                        with the VitalPath plan
+                        with the Nature's Journey plan
                       </p>
                     </div>
                   </motion.div>

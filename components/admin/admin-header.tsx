@@ -78,7 +78,7 @@ export function AdminHeader({ sidebarCollapsed, onToggleSidebar, onOpenCommandPa
           <div className="h-7 w-7 rounded-full bg-navy-100 flex items-center justify-center text-[10px] font-bold text-navy">
             A
           </div>
-          <span className="hidden text-xs text-graphite-400 lg:block">admin@vitalpath.com</span>
+          <span className="hidden text-xs text-graphite-400 lg:block">admin@naturesjourneyhealth.com</span>
         </div>
       </div>
     </header>

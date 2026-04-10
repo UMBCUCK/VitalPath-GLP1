@@ -22,7 +22,7 @@ export interface MonthlyDataPoint {
   date: string; // "Jun 2026"
   dietExercise: number; // diet & exercise only (no medication) — placebo arm baseline
   medicationOnly: number; // projected weight (rounded to 1 decimal)
-  withPlan: number; // projected weight with VitalPath plan
+  withPlan: number; // projected weight with Nature's Journey plan
 }
 
 export interface Milestone {
@@ -141,7 +141,7 @@ export function generateProjection(params: ProjectionParams): ProjectionResult {
     }
     weightMedOnly = currentWeight - cumulativeMedOnly;
 
-    // With VitalPath plan
+    // With Nature's Journey plan
     const monthlyLossPlan = currentWeight * WITH_PLAN_BASE_RATE * Math.pow(DECAY_FACTOR, m - 1) * combinedMod;
     if (cumulativeWithPlan + monthlyLossPlan <= maxLossWithPlan) {
       cumulativeWithPlan += monthlyLossPlan;

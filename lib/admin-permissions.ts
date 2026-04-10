@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // ─── Role hierarchy ─────────────────────────────────────────
 export type AdminRole = "SUPER_ADMIN" | "MANAGER" | "EDITOR" | "VIEWER";

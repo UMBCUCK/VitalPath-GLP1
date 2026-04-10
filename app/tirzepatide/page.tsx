@@ -13,14 +13,14 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { siteConfig } from "@/lib/site";
-import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { FAQPageJsonLd, BreadcrumbJsonLd, DrugJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "Tirzepatide for Weight Loss | How It Works, Results, and Access",
   description:
     "Tirzepatide is the active ingredient in Zepbound and Mounjaro — a dual GIP/GLP-1 agonist that outperforms semaglutide in head-to-head trials. Learn how it works, what results to expect, and how to get started.",
   openGraph: {
-    title: "Tirzepatide for Weight Loss | VitalPath",
+    title: "Tirzepatide for Weight Loss | Nature's Journey",
     description:
       "A complete guide to tirzepatide — clinical data from the SURMOUNT trials, how it compares to semaglutide, dosing, side effects, and how to access it.",
   },
@@ -83,6 +83,14 @@ export default function TirzepatidePage() {
 
   return (
     <MarketingShell>
+      <DrugJsonLd
+        name="Tirzepatide"
+        alternateName="Zepbound, Mounjaro"
+        description="A dual GIP and GLP-1 receptor agonist approved for chronic weight management (Zepbound) and type 2 diabetes (Mounjaro), administered as a once-weekly subcutaneous injection."
+        url="/tirzepatide"
+        administrationRoute="Subcutaneous injection"
+        pregnancyCategory="Contraindicated during pregnancy"
+      />
       <FAQPageJsonLd faqs={faqJsonLd} />
       <BreadcrumbJsonLd
         items={[

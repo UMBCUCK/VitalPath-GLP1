@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Shield, Lock, UserCheck, Phone, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LeafIcon } from "@/components/layout/brand-logo";
 import { siteConfig } from "@/lib/site";
 
 function TwitterIcon({ className }: { className?: string }) {
@@ -64,10 +65,8 @@ export function SiteFooter() {
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand + Contact */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5" aria-label="VitalPath home">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-teal-500">
-                <span className="text-sm font-bold text-white">VP</span>
-              </div>
+            <Link href="/" className="flex items-center gap-2.5" aria-label="Nature's Journey home">
+              <LeafIcon className="h-9 w-9" />
               <span className="text-lg font-bold text-white tracking-tight">{siteConfig.name}</span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-navy-300">{siteConfig.tagline}</p>
@@ -83,7 +82,7 @@ export function SiteFooter() {
               </a>
               <span className="flex items-start gap-2 text-navy-500">
                 <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" aria-hidden="true" />
-                <span>VitalPath Health, Inc.<br />1209 Orange St, Wilmington, DE 19801</span>
+                <span>Nature&apos;s Journey Health, LLC<br />1209 Orange St, Wilmington, DE 19801</span>
               </span>
             </div>
 
@@ -94,7 +93,7 @@ export function SiteFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-navy-400 hover:bg-white/10 hover:text-white transition-colors"
-                aria-label="VitalPath on X (Twitter)"
+                aria-label="Nature's Journey on X (Twitter)"
               >
                 <TwitterIcon className="h-4 w-4" />
               </a>
@@ -103,16 +102,16 @@ export function SiteFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-navy-400 hover:bg-white/10 hover:text-white transition-colors"
-                aria-label="VitalPath on Instagram"
+                aria-label="Nature's Journey on Instagram"
               >
                 <InstagramIcon className="h-4 w-4" />
               </a>
               <a
-                href="https://facebook.com/vitalpathhealth"
+                href="https://facebook.com/naturesjourneyhealth"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-navy-400 hover:bg-white/10 hover:text-white transition-colors"
-                aria-label="VitalPath on Facebook"
+                aria-label="Nature's Journey on Facebook"
               >
                 <FacebookIcon className="h-4 w-4" />
               </a>
@@ -273,7 +272,7 @@ export function SiteFooter() {
           {/* Compliance disclaimer */}
           <p className="text-xs leading-relaxed text-navy-500 max-w-4xl">
             {siteConfig.compliance.shortDisclaimer}{" "}
-            VitalPath facilitates access to independent, licensed healthcare providers and does not practice medicine. GLP-1 medications are only dispensed pursuant to a valid prescription from a licensed provider following a clinical evaluation.
+            Nature&apos;s Journey Health facilitates access to independent, licensed healthcare providers and does not practice medicine. GLP-1 medications are only dispensed pursuant to a valid prescription from a licensed provider following a clinical evaluation.
           </p>
           <p className="mt-3 text-xs leading-relaxed text-navy-600 max-w-4xl">
             *Average weight loss based on clinical trial data for semaglutide and tirzepatide. Individual results vary significantly based on adherence, diet, exercise, and individual health factors. Not all patients achieve these results. Compounded medications are not FDA-approved drug products.
@@ -282,7 +281,7 @@ export function SiteFooter() {
           {/* Bottom row */}
           <div className="mt-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <p className="text-xs text-navy-500">
-              &copy; {new Date().getFullYear()} VitalPath Health, Inc. All rights reserved.
+              &copy; {new Date().getFullYear()} Nature&apos;s Journey Health, LLC. All rights reserved.
             </p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-navy-500">
               <Link href="/legal/terms" className="hover:text-navy-300 transition-colors">Terms</Link>

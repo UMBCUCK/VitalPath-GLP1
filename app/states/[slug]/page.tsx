@@ -11,6 +11,7 @@ import { CtaSection } from "@/components/marketing/cta-section";
 import { FaqSection } from "@/components/marketing/faq-section";
 import { BreadcrumbJsonLd, WebPageJsonLd } from "@/components/seo/json-ld";
 import { allStates } from "@/lib/states";
+import { stateContent } from "@/lib/state-content";
 import { siteConfig } from "@/lib/site";
 import { notFound } from "next/navigation";
 
@@ -26,12 +27,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const state = allStates.find((s) => s.slug === slug);
   if (!state || !state.available) return { title: "State Not Found" };
+
+  const richContent = stateContent.find((s) => s.slug === slug);
+
   return {
-    title: `GLP-1 Weight Loss in ${state.name} — Online Treatment Available`,
-    description: `Get GLP-1 weight loss medication in ${state.name} through telehealth. Licensed providers, compounded semaglutide from $279/mo, free 2-day shipping to ${state.code}. No clinic visits needed.`,
+    title: richContent?.metaTitle ?? `GLP-1 Weight Loss in ${state.name} — Online Treatment Available`,
+    description:
+      richContent?.metaDescription ??
+      `Get GLP-1 weight loss medication in ${state.name} through telehealth. Licensed providers, compounded semaglutide from $279/mo, free 2-day shipping to ${state.code}. No clinic visits needed.`,
     openGraph: {
-      title: `GLP-1 Weight Loss Treatment in ${state.name} | VitalPath`,
-      description: `Online GLP-1 weight management available in ${state.name}. Provider evaluation, medication, meal plans, and coaching — all from home.`,
+      title: richContent?.metaTitle ?? `GLP-1 Weight Loss Treatment in ${state.name} | Nature's Journey`,
+      description:
+        richContent?.metaDescription ??
+        `Online GLP-1 weight management available in ${state.name}. Provider evaluation, medication, meal plans, and coaching — all from home.`,
     },
   };
 }
@@ -40,6 +48,8 @@ export default async function StatePage({ params }: PageProps) {
   const { slug } = await params;
   const state = allStates.find((s) => s.slug === slug);
   if (!state || !state.available) notFound();
+
+  const richContent = stateContent.find((s) => s.slug === slug);
 
   const nearbyStates = allStates
     .filter((s) => s.available && s.slug !== slug)
@@ -59,6 +69,28 @@ export default async function StatePage({ params }: PageProps) {
         description={`Online GLP-1 weight management program available to ${state.name} residents. Licensed providers, medication, and support.`}
         path={`/states/${state.slug}`}
       />
+
+      {/* State-specific MedicalBusiness JSON-LD */}
+      {richContent && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "MedicalBusiness",
+              name: "Nature's Journey",
+              description: `GLP-1 weight loss treatment serving ${richContent.name} patients via telehealth`,
+              areaServed: { "@type": "State", name: richContent.fullName },
+              url: `https://naturesjourneyhealth.com/states/${richContent.slug}`,
+              medicalSpecialty: "Obesity Medicine",
+              availableService: {
+                "@type": "MedicalTherapy",
+                name: "GLP-1 Weight Management",
+              },
+            }),
+          }}
+        />
+      )}
 
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
@@ -99,7 +131,7 @@ export default async function StatePage({ params }: PageProps) {
             How GLP-1 treatment works in {state.name}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-center text-graphite-500">
-            VitalPath is licensed to provide telehealth weight management services in {state.name}.
+            Nature's Journey is licensed to provide telehealth weight management services in {state.name}.
             Here&apos;s how it works:
           </p>
 
@@ -140,7 +172,7 @@ export default async function StatePage({ params }: PageProps) {
             {state.name} GLP-1 treatment pricing
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-center text-graphite-500">
-            Brand-name GLP-1 medications cost $1,349+/month without insurance. VitalPath plans include
+            Brand-name GLP-1 medications cost $1,349+/month without insurance. Nature's Journey plans include
             medication, provider care, and full support — starting at a fraction of retail.
           </p>
 
@@ -171,52 +203,175 @@ export default async function StatePage({ params }: PageProps) {
         </SectionShell>
       </section>
 
-      {/* State-specific content for SEO */}
-      <section className="py-16">
-        <SectionShell className="max-w-3xl">
-          <h2 className="text-2xl font-bold text-navy">
-            About GLP-1 weight loss treatment in {state.name}
-          </h2>
-          <div className="mt-6 space-y-4 text-sm leading-relaxed text-graphite-600">
-            <p>
-              {state.name} residents can now access GLP-1 weight management medication through
-              telehealth — without visiting a clinic, waiting for an appointment, or navigating
-              insurance pre-authorizations. VitalPath partners with licensed providers in {state.name} to
-              deliver comprehensive weight management care entirely online.
-            </p>
-            <p>
-              Our program includes a licensed provider evaluation, compounded GLP-1 medication
-              (semaglutide) if prescribed, free 2-day shipping anywhere in {state.name}, and ongoing
-              clinical support. Plans start at $279/month — up to 79% less than brand-name
-              GLP-1 medications like Ozempic ($935+/mo) or Wegovy ($1,349+/mo).
-            </p>
-            <p>
-              Telehealth weight management is regulated in {state.name}, and all VitalPath providers
-              are licensed and authorized to practice in the state. Medication is prepared by
-              state-licensed 503A and 503B compounding pharmacies that meet strict quality standards.
-            </p>
-          </div>
+      {/* Rich state-specific content — only renders when richContent is available */}
+      {richContent && (
+        <section className="py-16 border-t border-navy-100/40">
+          <SectionShell>
+            <div className="grid gap-12 lg:grid-cols-3">
+              {/* Main content — 2/3 */}
+              <div className="lg:col-span-2">
+                <h2 className="text-2xl font-bold text-navy mb-6">
+                  GLP-1 Weight Loss in {richContent.name}
+                </h2>
+                <div className="space-y-4 text-sm leading-relaxed text-graphite-600">
+                  {richContent.localContext.split("\n\n").map((paragraph, i) => (
+                    <p key={i}>{paragraph}</p>
+                  ))}
+                </div>
 
-          {/* Internal links */}
-          <div className="mt-8 flex flex-wrap gap-3 text-xs">
-            <Link href="/eligibility" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
-              Check eligibility →
-            </Link>
-            <Link href="/how-it-works" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
-              How it works →
-            </Link>
-            <Link href="/blog/glp1-weight-loss-cost-without-insurance" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
-              GLP-1 cost guide →
-            </Link>
-            <Link href="/blog/compounded-glp1-safety-evidence" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
-              Compounded medication safety →
-            </Link>
-            <Link href="/compare" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
-              Compare programs →
-            </Link>
-          </div>
-        </SectionShell>
-      </section>
+                {/* Telehealth law box */}
+                <div className="mt-6 rounded-xl border border-teal/20 bg-teal-50/30 p-5">
+                  <h3 className="text-sm font-semibold text-navy mb-2">
+                    Telehealth prescribing in {richContent.name}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-graphite-600">
+                    {richContent.teleHealthLaw}
+                  </p>
+                </div>
+
+                {/* Insurance landscape box */}
+                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/30 p-5">
+                  <h3 className="text-sm font-semibold text-navy mb-2">
+                    Insurance coverage in {richContent.name}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-graphite-600">
+                    {richContent.insuranceLandscape}
+                  </p>
+                </div>
+
+                {/* Compliance disclaimer */}
+                <p className="mt-6 text-xs leading-relaxed text-graphite-400">
+                  {siteConfig.compliance.shortDisclaimer}
+                </p>
+              </div>
+
+              {/* Sidebar — 1/3 */}
+              <div className="space-y-4">
+                {/* Stats card */}
+                <div className="rounded-xl border bg-white p-5 shadow-premium">
+                  <h3 className="text-sm font-semibold text-navy mb-3">By the numbers</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-graphite-500">Population</span>
+                      <span className="font-medium text-navy">{richContent.population}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-graphite-500">Adult obesity rate</span>
+                      <span className="font-medium text-navy">{richContent.obesityRate}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-graphite-500">Adults with obesity</span>
+                      <span className="font-medium text-navy">{richContent.adultObesityCount}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Major cities */}
+                <div className="rounded-xl border bg-white p-5 shadow-premium">
+                  <h3 className="text-sm font-semibold text-navy mb-3">We serve patients in</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {richContent.majorCities.map((city) => (
+                      <Badge key={city} variant="secondary" className="text-xs">
+                        {city}
+                      </Badge>
+                    ))}
+                    <span className="text-xs text-graphite-400 self-center">and all {richContent.name} ZIP codes</span>
+                  </div>
+                </div>
+
+                {/* CTA card */}
+                <div className="rounded-xl bg-gradient-to-br from-teal to-atlantic p-5 text-white">
+                  <h3 className="text-sm font-semibold mb-1">
+                    Start your treatment in {richContent.name}
+                  </h3>
+                  <p className="text-xs text-white/80 mb-3">
+                    Complete a 2-minute assessment and see if you qualify.
+                  </p>
+                  <Link href="/qualify">
+                    <Button size="sm" className="w-full bg-white text-teal hover:bg-white/90">
+                      Check Eligibility
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </SectionShell>
+        </section>
+      )}
+
+      {/* Generic state-specific content for SEO (shown when no richContent) */}
+      {!richContent && (
+        <section className="py-16">
+          <SectionShell className="max-w-3xl">
+            <h2 className="text-2xl font-bold text-navy">
+              About GLP-1 weight loss treatment in {state.name}
+            </h2>
+            <div className="mt-6 space-y-4 text-sm leading-relaxed text-graphite-600">
+              <p>
+                {state.name} residents can now access GLP-1 weight management medication through
+                telehealth — without visiting a clinic, waiting for an appointment, or navigating
+                insurance pre-authorizations. Nature's Journey partners with licensed providers in {state.name} to
+                deliver comprehensive weight management care entirely online.
+              </p>
+              <p>
+                Our program includes a licensed provider evaluation, compounded GLP-1 medication
+                (semaglutide) if prescribed, free 2-day shipping anywhere in {state.name}, and ongoing
+                clinical support. Plans start at $279/month — up to 79% less than brand-name
+                GLP-1 medications like Ozempic ($935+/mo) or Wegovy ($1,349+/mo).
+              </p>
+              <p>
+                Telehealth weight management is regulated in {state.name}, and all Nature's Journey providers
+                are licensed and authorized to practice in the state. Medication is prepared by
+                state-licensed 503A and 503B compounding pharmacies that meet strict quality standards.
+              </p>
+            </div>
+
+            {/* Internal links */}
+            <div className="mt-8 flex flex-wrap gap-3 text-xs">
+              <Link href="/eligibility" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                Check eligibility →
+              </Link>
+              <Link href="/how-it-works" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                How it works →
+              </Link>
+              <Link href="/blog/glp1-weight-loss-cost-without-insurance" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                GLP-1 cost guide →
+              </Link>
+              <Link href="/blog/compounded-glp1-safety-evidence" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                Compounded medication safety →
+              </Link>
+              <Link href="/compare" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                Compare programs →
+              </Link>
+            </div>
+          </SectionShell>
+        </section>
+      )}
+
+      {/* Internal links — shown on rich content pages below the main section */}
+      {richContent && (
+        <section className="pb-4">
+          <SectionShell className="max-w-3xl">
+            <div className="flex flex-wrap gap-3 text-xs">
+              <Link href="/eligibility" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                Check eligibility →
+              </Link>
+              <Link href="/how-it-works" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                How it works →
+              </Link>
+              <Link href="/blog/glp1-weight-loss-cost-without-insurance" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                GLP-1 cost guide →
+              </Link>
+              <Link href="/blog/compounded-glp1-safety-evidence" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                Compounded medication safety →
+              </Link>
+              <Link href="/compare" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                Compare programs →
+              </Link>
+            </div>
+          </SectionShell>
+        </section>
+      )}
 
       {/* Nearby states */}
       <section className="bg-navy-50/20 py-12">

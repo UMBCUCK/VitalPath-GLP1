@@ -5,7 +5,7 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export async function generateImageMetadata({ params }: { params: { slug: string } }) {
-  return [{ id: "og", alt: "VitalPath Comparison", contentType: "image/png", size }];
+  return [{ id: "og", alt: "Nature's Journey Comparison", contentType: "image/png", size }];
 }
 
 export default async function OGImage({ params }: { params: { slug: string } }) {
@@ -82,7 +82,7 @@ export default async function OGImage({ params }: { params: { slug: string } }) 
             >
               VP
             </div>
-            <span style={{ fontSize: "20px", fontWeight: 700, color: "white" }}>VitalPath</span>
+            <span style={{ fontSize: "20px", fontWeight: 700, color: "white" }}>Nature's Journey</span>
           </div>
           <span style={{ fontSize: "14px", color: "#97A5B0" }}>Side-by-side comparison</span>
         </div>

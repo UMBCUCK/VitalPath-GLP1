@@ -138,7 +138,7 @@ function QualifyResultsContent() {
                 <p className="text-sm font-bold text-navy">~{Math.round(currentWeight * 0.15)} lbs</p>
               </div>
               <div className="rounded-lg bg-teal-50 border border-teal-100 p-2.5">
-                <p className="text-[10px] text-teal-600">GLP-1 + VitalPath</p>
+                <p className="text-[10px] text-teal-600">GLP-1 + Nature's Journey</p>
                 <p className="text-sm font-bold text-teal">~{totalLoss} lbs</p>
               </div>
             </div>

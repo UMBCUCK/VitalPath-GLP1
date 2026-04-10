@@ -131,6 +131,20 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Save medication preference (added via schema migration — graceful noop if column absent)
+    if (data.medicationInterest) {
+      try {
+        await db.$executeRawUnsafe(
+          `UPDATE "IntakeSubmission" SET "medicationInterest" = ?, "medicationInterestLabel" = ? WHERE id = ?`,
+          data.medicationInterest,
+          data.medicationInterestLabel ?? null,
+          intake.id
+        );
+      } catch {
+        // Column not yet created — run `npx prisma db push` to apply schema migration
+      }
+    }
+
     // ── Create versioned consent records ─────────────────────
     const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || null;
     const userAgent = req.headers.get("user-agent") || null;

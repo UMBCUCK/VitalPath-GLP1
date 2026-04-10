@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description:
     "Brand-name GLP-1 medications like Wegovy and Zepbound cost $1,000–$1,400/month. Compounded semaglutide and tirzepatide from licensed pharmacies cost $150–$450/month. Here's the honest breakdown.",
   openGraph: {
-    title: "GLP-1 Medication Cost in 2026: Brand vs Compounded | VitalPath",
+    title: "GLP-1 Medication Cost in 2026: Brand vs Compounded | Nature's Journey",
     description:
       "Complete breakdown of GLP-1 costs in 2026 — Wegovy, Zepbound, compounded options, insurance reality, and how to access affordable treatment through a licensed telehealth provider.",
   },
@@ -59,9 +59,9 @@ const brandCosts = [
 
 const compoundedCosts = [
   { tier: "Basic (semaglutide)", range: "$150–$250/mo", notes: "Titration dosing, no nutrition support" },
-  { tier: "VitalPath Essential", range: "$279/mo", notes: "Provider eval, medication if prescribed, care team messaging, monthly check-ins" },
-  { tier: "VitalPath Premium", range: "$379/mo", notes: "Everything in Essential + meal plans, recipes, coaching, progress tracking" },
-  { tier: "VitalPath Complete", range: "$599/mo", notes: "Everything in Premium + supplements, weekly coaching, lab coordination" },
+  { tier: "Nature's Journey Essential", range: "$279/mo", notes: "Provider eval, medication if prescribed, care team messaging, monthly check-ins" },
+  { tier: "Nature's Journey Premium", range: "$379/mo", notes: "Everything in Essential + meal plans, recipes, coaching, progress tracking" },
+  { tier: "Nature's Journey Complete", range: "$599/mo", notes: "Everything in Premium + supplements, weekly coaching, lab coordination" },
   { tier: "Compounded tirzepatide (range)", range: "$300–$500/mo", notes: "Higher cost than semaglutide due to compound complexity; still 50–70% below brand" },
 ];
 
@@ -76,7 +76,7 @@ const faqs = [
   },
   {
     q: "Is compounded semaglutide safe?",
-    a: "Compounded semaglutide produced by an FDA-registered 503B outsourcing facility meets the same manufacturing standards (sterility, potency, purity) as commercially produced drugs. The key distinction is the source. A legitimate 503B facility has federal oversight; a gray-market or unregulated source does not. VitalPath only works with licensed, inspected 503B pharmacies and provides certificates of analysis for every batch.",
+    a: "Compounded semaglutide produced by an FDA-registered 503B outsourcing facility meets the same manufacturing standards (sterility, potency, purity) as commercially produced drugs. The key distinction is the source. A legitimate 503B facility has federal oversight; a gray-market or unregulated source does not. Nature's Journey only works with licensed, inspected 503B pharmacies and provides certificates of analysis for every batch.",
   },
   {
     q: "What's the difference between 503A and 503B compounding pharmacies?",
@@ -88,7 +88,7 @@ const faqs = [
   },
   {
     q: "Are there any other costs beyond the medication?",
-    a: "At VitalPath, the monthly fee includes your provider evaluation, treatment plan, medication (if prescribed), shipping, and care team access — there are no hidden fees. Some programs charge separately for the provider visit ($150–$300) plus the medication cost. Always ask whether the quoted price is all-inclusive before starting.",
+    a: "At Nature's Journey, the monthly fee includes your provider evaluation, treatment plan, medication (if prescribed), shipping, and care team access — there are no hidden fees. Some programs charge separately for the provider visit ($150–$300) plus the medication cost. Always ask whether the quoted price is all-inclusive before starting.",
   },
 ];
 
@@ -141,7 +141,7 @@ export default function GLP1CostPage() {
             </div>
             <div>
               <div className="text-3xl font-bold text-teal">$279</div>
-              <div className="mt-1 text-sm text-white/70">VitalPath Essential/mo</div>
+              <div className="mt-1 text-sm text-white/70">Nature's Journey Essential/mo</div>
             </div>
           </div>
         </SectionShell>
@@ -294,7 +294,7 @@ export default function GLP1CostPage() {
         </SectionShell>
       </section>
 
-      {/* VitalPath pricing CTA */}
+      {/* Nature's Journey pricing CTA */}
       <section className="py-16">
         <SectionShell>
           <div className="mx-auto max-w-2xl rounded-3xl bg-gradient-to-br from-teal to-atlantic p-8 text-center text-white shadow-premium-lg sm:p-12">
@@ -303,7 +303,7 @@ export default function GLP1CostPage() {
               Everything included. No surprises.
             </h2>
             <p className="mt-4 text-base text-white/80">
-              VitalPath pricing covers your provider evaluation, treatment plan, medication (if prescribed), free 2-day shipping, and care team access. No separate visit fees. No pharmacy markups.
+              Nature's Journey pricing covers your provider evaluation, treatment plan, medication (if prescribed), free 2-day shipping, and care team access. No separate visit fees. No pharmacy markups.
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-3 text-sm">
               {[

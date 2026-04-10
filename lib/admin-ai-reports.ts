@@ -71,7 +71,7 @@ function buildPrompt(reportType: string, snapshot: Record<string, unknown>): str
     CUSTOM: `Provide a balanced analysis of all metrics, highlighting the most notable findings and areas needing immediate attention.`,
   };
 
-  return `You are an expert business analyst for VitalPath, a telehealth weight management platform. Analyze the following analytics data and generate a detailed report.
+  return `You are an expert business analyst for Nature's Journey, a telehealth weight management platform. Analyze the following analytics data and generate a detailed report.
 
 REPORT TYPE: ${reportType}
 FOCUS: ${typeInstructions[reportType] || typeInstructions.CUSTOM}

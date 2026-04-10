@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description:
     "Men store fat differently — especially visceral fat that surrounds organs and raises cardiovascular risk. GLP-1 medications are particularly effective at targeting visceral fat. Here's what the clinical data shows.",
   openGraph: {
-    title: "GLP-1 for Men: Visceral Fat, Testosterone & Metabolic Health | VitalPath",
+    title: "GLP-1 for Men: Visceral Fat, Testosterone & Metabolic Health | Nature's Journey",
     description:
       "Evidence-informed guide to GLP-1 weight loss for men. Covers visceral fat, testosterone, cardiovascular outcomes from the SELECT trial, muscle preservation, and what to realistically expect.",
   },
@@ -219,7 +219,7 @@ export default function MenPage() {
                 <Zap className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-navy">Preserving muscle while losing fat — the VitalPath approach</h3>
+                <h3 className="text-lg font-bold text-navy">Preserving muscle while losing fat — the Nature's Journey approach</h3>
                 <p className="mt-2 text-sm text-graphite-600 leading-relaxed">
                   Our treatment plans for men include specific protein targets (0.7–1g/lb body weight), guidance on resistance training timing relative to dose schedule, and monitoring for lean mass changes. You shouldn&apos;t have to choose between losing fat and keeping muscle — with the right support, you can accomplish both.
                 </p>
@@ -274,6 +274,34 @@ export default function MenPage() {
               <h3 className="font-bold text-navy text-sm">Board-certified physicians</h3>
               <p className="text-xs text-graphite-500">Every patient evaluated and monitored by licensed MDs</p>
             </div>
+          </div>
+        </SectionShell>
+      </section>
+
+      {/* Further reading */}
+      <section className="py-12 bg-cloud/40 border-y border-sage/20">
+        <SectionShell>
+          <h2 className="text-lg font-semibold text-navy mb-2">Further reading</h2>
+          <p className="text-sm text-graphite-500 mb-6">Articles on GLP-1 treatment, visceral fat, and cardiovascular health</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: "GLP-1 and Alcohol", href: "/blog/alcohol-and-glp1", tag: "Lifestyle" },
+              { label: "Exercise During GLP-1 Treatment", href: "/blog/exercise-during-treatment", tag: "Fitness" },
+              { label: "Protein Intake Guide", href: "/blog/protein-intake-guide", tag: "Nutrition" },
+              { label: "GLP-1 & Heart Health", href: "/heart-health", tag: "Cardiovascular" },
+            ].map((article) => (
+              <Link
+                key={article.href}
+                href={article.href}
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+              >
+                <div>
+                  <span className="text-xs font-medium text-teal">{article.tag}</span>
+                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-teal transition-colors leading-snug">{article.label}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+              </Link>
+            ))}
           </div>
         </SectionShell>
       </section>

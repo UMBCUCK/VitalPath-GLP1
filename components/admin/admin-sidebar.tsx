@@ -43,9 +43,27 @@ import {
   ShoppingBag,
   Target,
   Handshake,
+  BadgeDollarSign,
+  Scale,
+  MessageCircle,
+  Pill,
+  Globe,
+  Globe2,
+  Sparkles,
+  History,
+  Award,
+  Image,
+  Package,
+  MousePointerClick,
+  BookOpen,
+  PieChart,
+  Filter,
+  GitBranch,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LeafIcon } from "@/components/layout/brand-logo";
+import { siteConfig } from "@/lib/site";
 
 interface NavItem {
   label: string;
@@ -77,6 +95,9 @@ const navGroups: NavGroup[] = [
       { label: "Products & Pricing", href: "/admin/products", icon: CreditCard },
       { label: "Subscriptions", href: "/admin/subscriptions", icon: Wallet },
       { label: "Payments", href: "/admin/payments", icon: CreditCard },
+      { label: "Pricing", href: "/admin/pricing", icon: BadgeDollarSign },
+      { label: "Reconciliation", href: "/admin/reconciliation", icon: Scale },
+      { label: "Currency & Tax", href: "/admin/currency", icon: Globe2 },
     ],
   },
   {
@@ -86,12 +107,18 @@ const navGroups: NavGroup[] = [
       { label: "Telehealth", href: "/admin/telehealth", icon: HeartPulse },
       { label: "Providers", href: "/admin/providers", icon: Stethoscope },
       { label: "Segments", href: "/admin/segments", icon: UsersRound },
+      { label: "Communications", href: "/admin/communications", icon: MessageCircle },
+      { label: "Medication", href: "/admin/medication", icon: Pill },
+      { label: "Scorecards", href: "/admin/provider-scorecards", icon: Award },
+      { label: "Segments+", href: "/admin/advanced-segments", icon: Filter },
+      { label: "Playbooks", href: "/admin/playbooks", icon: BookOpen },
     ],
   },
   {
     title: "Growth",
     items: [
       { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+      { label: "Attribution", href: "/admin/attribution", icon: MousePointerClick },
       { label: "Conversion", href: "/admin/conversion", icon: Target },
       { label: "Campaigns", href: "/admin/campaigns", icon: Send },
       { label: "Referrals", href: "/admin/referrals", icon: Share2 },
@@ -101,6 +128,8 @@ const navGroups: NavGroup[] = [
       { label: "Coupons", href: "/admin/coupons", icon: Tag },
       { label: "Journey", href: "/admin/journey", icon: Route },
       { label: "Experiments", href: "/admin/experiments", icon: FlaskConical },
+      { label: "Geo Intel", href: "/admin/geographic", icon: Globe },
+      { label: "Content ROI", href: "/admin/revenue-attribution", icon: PieChart },
     ],
   },
   {
@@ -109,6 +138,8 @@ const navGroups: NavGroup[] = [
       { label: "Blog", href: "/admin/blog", icon: FileText },
       { label: "Recipes", href: "/admin/recipes", icon: ChefHat },
       { label: "Meal Plans", href: "/admin/meal-plans", icon: Calendar },
+      { label: "Intelligence", href: "/admin/content-intelligence", icon: Sparkles },
+      { label: "Marketing Assets", href: "/admin/marketing-assets", icon: Image },
     ],
   },
   {
@@ -118,7 +149,10 @@ const navGroups: NavGroup[] = [
       { label: "Compliance Log", href: "/admin/compliance", icon: ClipboardCheck },
       { label: "Scanner", href: "/admin/compliance/scanner", icon: ScanLine },
       { label: "States", href: "/admin/states", icon: MapPin },
+      { label: "Geographic Intel", href: "/admin/geographic", icon: Globe },
       { label: "Adverse Events", href: "/admin/adverse-events", icon: AlertTriangle },
+      { label: "Outcomes", href: "/admin/outcomes", icon: Award },
+      { label: "Score", href: "/admin/compliance-dashboard", icon: ShieldCheck },
     ],
   },
   {
@@ -131,6 +165,9 @@ const navGroups: NavGroup[] = [
       { label: "Reports", href: "/admin/reports", icon: FileBarChart },
       { label: "Admin Users", href: "/admin/users", icon: UserCog },
       { label: "Settings", href: "/admin/settings", icon: Settings },
+      { label: "Audit Trail", href: "/admin/audit-trail", icon: History },
+      { label: "Inventory", href: "/admin/inventory", icon: Package },
+      { label: "Health", href: "/admin/health", icon: HeartPulse },
     ],
   },
 ];
@@ -162,12 +199,10 @@ export function AdminSidebar({ collapsed = false }: { collapsed?: boolean }) {
     >
       {/* Logo */}
       <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-navy-100/40 px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy text-xs font-bold text-white">
-          VP
-        </div>
+        <LeafIcon className="h-8 w-8" />
         {!collapsed && (
           <div>
-            <p className="text-sm font-bold text-navy">VitalPath</p>
+            <p className="text-sm font-bold text-navy">{siteConfig.name}</p>
             <p className="text-[10px] text-graphite-400">Admin Panel</p>
           </div>
         )}

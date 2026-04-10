@@ -342,7 +342,7 @@ export function getMessageTemplates() {
     {
       id: "welcome",
       name: "Welcome",
-      body: "Welcome to VitalPath! We're excited to support your weight management journey. Your dedicated care team is here to help. If you have any questions about your treatment plan, medications, or anything else, don't hesitate to reach out.",
+      body: "Welcome to Nature's Journey! We're excited to support your weight management journey. Your dedicated care team is here to help. If you have any questions about your treatment plan, medications, or anything else, don't hesitate to reach out.",
     },
     {
       id: "follow-up",

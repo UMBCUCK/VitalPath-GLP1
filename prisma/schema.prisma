@@ -175,6 +175,10 @@ model IntakeSubmission {
   eligibilityResult       EligibilityResult?
   reviewedAt              DateTime?
 
+  // Medication preference (captured during intake flow)
+  medicationInterest      String?  // 'provider_recommendation' | medication slug
+  medicationInterestLabel String?  // human-readable display name, e.g. "Wegovy® Pen"
+
   // Assignment
   assignedToId String?  // admin user id
   assignedAt   DateTime?
@@ -187,6 +191,24 @@ model IntakeSubmission {
   @@index([status])
   @@index([state])
   @@index([assignedToId])
+}
+
+// ─── MEDICATION CATALOG ─────────────────────────────────────
+
+model MedicationCatalog {
+  id          String   @id @default(cuid())
+  name        String   // e.g. "Wegovy® Pen"
+  slug        String   @unique // e.g. "wegovy-pen"
+  description String?  // short description shown to patient
+  imageUrl    String?  // URL to medication image
+  type        String   @default("branded") // 'branded' | 'generic' | 'compounded'
+  form        String   @default("pen")     // 'pill' | 'pen' | 'injection'
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
 }
 
 enum IntakeStatus {
@@ -1525,6 +1547,27 @@ model ResellerProfile {
   conversionRate    Float?   // click-to-sale %
   lastSaleAt        DateTime?
 
+  // Multi-tier referral network (legally structured as referral bonuses)
+  referredByResellerId  String?   // the reseller who recruited this reseller (tier 1 upline)
+  networkDepth          Int       @default(0) // 0 = top-level, 1 = referred by tier 0, etc. Max 3.
+  referralCode          String?   @unique // unique code for this reseller to recruit sub-resellers
+  totalSubResellers     Int       @default(0)
+  totalNetworkRevenue   Int       @default(0) // cents - total revenue from entire downline
+  totalOverrideEarnings Int       @default(0) // cents - total override commissions earned
+
+  // Override commission rates (earned from sub-reseller sales)
+  tier1OverridePct      Float     @default(5.0)  // % of Tier 1 (direct recruit) sale commission
+  tier2OverridePct      Float     @default(3.0)  // % of Tier 2 sale commission
+  tier3OverridePct      Float     @default(1.5)  // % of Tier 3 sale commission
+
+  // Payout preferences
+  payoutMethod          String    @default("CREDIT") // CREDIT, BANK_ACH, CHECK
+  payoutBankName        String?
+  payoutAccountLast4    String?
+  payoutRoutingLast4    String?
+  taxIdProvided         Boolean   @default(false) // W-9 on file
+  taxId1099Eligible     Boolean   @default(false) // earnings >= $600/year threshold
+
   // Admin notes
   adminNotes        String?
 
@@ -1535,6 +1578,8 @@ model ResellerProfile {
 
   @@index([status])
   @@index([tier])
+  @@index([referredByResellerId])
+  @@index([referralCode])
 }
 
 model Commission {
@@ -1543,13 +1588,19 @@ model Commission {
   orderId         String?
   subscriptionId  String?
   customerId      String?  // the referred customer
-  type            String   // INITIAL_SALE, RECURRING, BONUS, ADJUSTMENT
+  type            String   // INITIAL_SALE, RECURRING, BONUS, ADJUSTMENT, OVERRIDE_TIER1, OVERRIDE_TIER2, OVERRIDE_TIER3
   amountCents     Int
   status          String   @default("PENDING") // PENDING, APPROVED, PAID, REJECTED, CLAWBACK
   paidAt          DateTime?
   periodStart     DateTime? // for recurring commissions
   periodEnd       DateTime?
   notes           String?
+
+  // Override tracking (for multi-tier referral bonuses)
+  sourceResellerId  String?  // the reseller whose sale generated this override
+  overrideTier      Int?     // 1, 2, or 3 — which tier of the network this came from
+  sourceCommissionId String? // the original commission this override was generated from
+
   createdAt       DateTime @default(now())
 
   reseller ResellerProfile @relation(fields: [resellerId], references: [id], onDelete: Cascade)
@@ -1558,6 +1609,31 @@ model Commission {
   @@index([customerId])
   @@index([status])
   @@index([type])
+  @@index([createdAt])
+  @@index([sourceResellerId])
+}
+
+// ─── RESELLER NETWORK TRACKING ──────────────────────────────
+// Legally structured as a Referral Bonus Program:
+// - Compensation is based ONLY on actual product/service sales to end consumers
+// - No compensation for recruiting resellers — override bonuses are tied to sales volume
+// - Maximum 3 tiers (direct, 2nd-level, 3rd-level) — compliant with FTC guidelines
+// - No inventory purchase requirements
+// - No minimum sales quotas to earn overrides
+// - Reseller Agreement required with full disclosure of compensation structure
+
+model ResellerNetworkEvent {
+  id              String   @id @default(cuid())
+  eventType       String   // RECRUIT, SALE, OVERRIDE_PAID, TIER_UPGRADE, DEACTIVATION
+  resellerId      String   // the reseller this event is about
+  relatedResellerId String? // for RECRUIT: who recruited them. For OVERRIDE: who generated the sale
+  tier            Int?     // network tier level
+  amountCents     Int?     // for financial events
+  metadata        Json?    // additional context
+  createdAt       DateTime @default(now())
+
+  @@index([resellerId])
+  @@index([eventType])
   @@index([createdAt])
 }
 
@@ -1703,4 +1779,282 @@ model ResellerSession {
 
   @@index([token])
   @@index([resellerId])
+}
+
+// ─── DASHBOARD WIDGET LAYOUTS ───────────────────────────────
+
+model WidgetLayout {
+  id        String   @id @default(cuid())
+  adminId   String   @unique
+  widgets   Json     // [{id, type, position: {x,y,w,h}, config}]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── RESELLER MARKETING ASSETS ──────────────────────────────
+
+model MarketingAsset {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // BANNER, EMAIL_TEMPLATE, SOCIAL_POST, LANDING_PAGE, DOCUMENT
+  fileUrl     String?
+  content     String?  // for text-based assets like email templates
+  thumbnail   String?
+  category    String?
+  isActive    Boolean  @default(true)
+  downloads   Int      @default(0)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([isActive])
+}
+
+// ─── INVENTORY & SUPPLY CHAIN ───────────────────────────────
+
+model InventoryRecord {
+  id              String   @id @default(cuid())
+  medicationName  String
+  pharmacyVendor  String
+  currentStock    Int      // units available
+  reorderThreshold Int     // reorder when stock falls below this
+  reorderQuantity Int      // how many to order
+  unitCostCents   Int?     // cost per unit
+  lastRestockedAt DateTime?
+  estimatedRunout DateTime? // predicted date stock runs out
+  status          String   @default("IN_STOCK") // IN_STOCK, LOW_STOCK, OUT_OF_STOCK, ON_ORDER
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+  @@index([medicationName])
+  @@index([pharmacyVendor])
+}
+
+// ─── OUTCOME REPORTS ────────────────────────────────────────
+
+model OutcomeReport {
+  id           String   @id @default(cuid())
+  title        String
+  reportType   String   // AGGREGATE, PROVIDER, MEDICATION, PLAN, PUBLISHABLE
+  periodStart  DateTime
+  periodEnd    DateTime
+  metrics      Json     // { avgWeightLoss, avgAdherence, retentionRate, satisfactionScore, etc }
+  breakdown    Json?    // per-plan or per-provider breakdown
+  isPublishable Boolean @default(false)
+  complianceApproved Boolean @default(false)
+  approvedBy   String?
+  generatedBy  String
+  createdAt    DateTime @default(now())
+
+  @@index([reportType])
+  @@index([createdAt])
+}
+
+// ─── CURRENCY & TAX CONFIG ──────────────────────────────────
+
+model CurrencyConfig {
+  id            String  @id @default(cuid())
+  currencyCode  String  @unique // USD, CAD, EUR, GBP
+  symbol        String  // $, C$, etc
+  exchangeRate  Float   @default(1.0) // relative to USD
+  isActive      Boolean @default(true)
+  updatedAt     DateTime @updatedAt
+}
+
+model TaxRule {
+  id          String  @id @default(cuid())
+  jurisdiction String // state code or country code
+  taxRate     Float   // e.g. 0.0825 for 8.25%
+  taxName     String  // "Sales Tax", "HST", "VAT"
+  appliesTo   String  @default("ALL") // ALL, MEMBERSHIP, ADDON, SUPPLEMENT
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([jurisdiction, appliesTo])
+  @@index([jurisdiction])
+  @@index([isActive])
+}
+
+// ─── MULTI-TOUCH ATTRIBUTION ────────────────────────────────
+
+model AttributionTouch {
+  id          String   @id @default(cuid())
+  leadId      String?
+  userId      String?
+  sessionId   String?
+  touchType   String   // FIRST_CLICK, LAST_CLICK, ASSIST
+  channel     String   // organic, paid, referral, email, social, direct
+  source      String?  // google, facebook, newsletter, partner_name
+  medium      String?  // cpc, email, referral
+  campaign    String?
+  content     String?  // ad variant, blog slug, email name
+  landingPage String?
+  convertedAt DateTime?
+  revenueCents Int?
+  createdAt   DateTime @default(now())
+
+  @@index([leadId])
+  @@index([userId])
+  @@index([channel])
+  @@index([source])
+  @@index([createdAt])
+}
+
+// ─── RETENTION PLAYBOOKS ────────────────────────────────────
+
+model RetentionPlaybook {
+  id          String   @id @default(cuid())
+  name        String
+  triggerType String   // ONBOARDING, INACTIVITY, CHURN_RISK, WIN_BACK, MILESTONE
+  triggerConfig Json   // { daysInactive, churnRiskThreshold, daysSinceCancel, milestoneType }
+  steps       Json     // [{ dayOffset, action, channel, templateKey, subject, body }]
+  isActive    Boolean  @default(true)
+  enrolledCount Int    @default(0)
+  completedCount Int   @default(0)
+  convertedCount Int   @default(0)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  enrollments PlaybookEnrollment[]
+
+  @@index([triggerType])
+  @@index([isActive])
+}
+
+model PlaybookEnrollment {
+  id          String    @id @default(cuid())
+  playbookId  String
+  userId      String
+  status      String    @default("ACTIVE") // ACTIVE, COMPLETED, CONVERTED, EXITED
+  currentStep Int       @default(0)
+  enrolledAt  DateTime  @default(now())
+  completedAt DateTime?
+  convertedAt DateTime?
+  exitedAt    DateTime?
+  exitReason  String?
+
+  playbook RetentionPlaybook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  @@unique([playbookId, userId])
+  @@index([playbookId])
+  @@index([userId])
+  @@index([status])
+}
+
+// ─── PROVIDER SCORECARDS ────────────────────────────────────
+
+model ProviderScorecard {
+  id                   String   @id @default(cuid())
+  providerId           String
+  periodStart          DateTime
+  periodEnd            DateTime
+  totalPatients        Int      @default(0)
+  consultationsCompleted Int    @default(0)
+  avgResponseTime      Float?   // hours
+  patientSatisfaction  Float?   // 0-5
+  avgWeightLoss        Float?   // lbs
+  adherenceRate        Float?   // 0-100%
+  prescriptionAccuracy Float?   // 0-100%
+  credentialScore      Float?   // 0-100% compliance
+  overallScore         Float?   // composite 0-100
+  createdAt            DateTime @default(now())
+
+  @@index([providerId])
+  @@index([periodStart])
+}
+
+// ─── ADVANCED SEGMENTS ──────────────────────────────────────
+
+model AdvancedSegment {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  rules       Json     // { operator: "AND"|"OR", conditions: [{field, op, value, group?}] }
+  memberCount Int      @default(0)
+  lastComputedAt DateTime?
+  isActive    Boolean  @default(true)
+  autoTrigger String?  // automation rule id to trigger when user enters segment
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+// ─── REVENUE ATTRIBUTION ────────────────────────────────────
+
+model RevenueAttribution {
+  id           String   @id @default(cuid())
+  orderId      String
+  userId       String
+  channel      String   // organic, paid, referral, email, social, direct
+  source       String?
+  campaign     String?
+  contentPiece String?  // blog slug, email name, ad variant
+  contentType  String?  // BLOG_POST, EMAIL, AD, REFERRAL
+  revenueCents Int
+  model        String   // FIRST_CLICK, LAST_CLICK, LINEAR
+  weight       Float    @default(1.0) // for linear attribution
+  createdAt    DateTime @default(now())
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([channel])
+  @@index([contentPiece])
+  @@index([model])
+}
+
+// ─── COMPLIANCE SCORES ──────────────────────────────────────
+
+model ComplianceScore {
+  id                   String   @id @default(cuid())
+  entityType           String   // OVERALL, CONTENT, CLAIMS, CONSENTS, CREDENTIALS
+  entityId             String?
+  score                Float    // 0-100
+  maxScore             Float    @default(100)
+  breakdown            Json?    // { contentScore, claimsScore, consentScore, credentialScore }
+  issues               Json?    // [{ type, description, severity }]
+  computedAt           DateTime @default(now())
+
+  @@index([entityType])
+  @@index([computedAt])
+}
+
+// ─── PLATFORM HEALTH MONITORING ─────────────────────────────
+
+model HealthCheck {
+  id           String   @id @default(cuid())
+  service      String   // API, DATABASE, STRIPE, OPENLOOP, PHARMACY, EMAIL
+  status       String   // HEALTHY, DEGRADED, DOWN
+  responseTime Int?     // ms
+  errorMessage String?
+  metadata     Json?
+  checkedAt    DateTime @default(now())
+
+  @@index([service])
+  @@index([status])
+  @@index([checkedAt])
+}
+
+model ErrorLog {
+  id         String   @id @default(cuid())
+  route      String   // API route path
+  method     String   // GET, POST, PUT, DELETE
+  statusCode Int
+  message    String
+  stack      String?
+  userId     String?
+  ipAddress  String?
+  userAgent  String?
+  duration   Int?     // ms
+  createdAt  DateTime @default(now())
+
+  @@index([route])
+  @@index([statusCode])
+  @@index([createdAt])
 }

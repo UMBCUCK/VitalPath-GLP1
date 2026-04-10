@@ -17,13 +17,13 @@ function baseTemplate(content: string) {
           <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #1F6F78, #163A63); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
             <span style="color: white; font-weight: 700; font-size: 12px;">VP</span>
           </div>
-          <span style="font-weight: 700; font-size: 18px; color: #0E223D;">VitalPath</span>
+          <span style="font-weight: 700; font-size: 18px; color: #0E223D;">Nature's Journey</span>
         </div>
       </div>
       ${content}
       <hr style="border: none; border-top: 1px solid #E8EDF4; margin: 32px 0;" />
       <p style="color: #97A5B0; font-size: 12px; text-align: center;">
-        VitalPath Health | Clinically informed weight management<br/>
+        Nature's Journey Health | Clinically informed weight management<br/>
         <a href="${APP_URL}/legal/privacy" style="color: #97A5B0;">Privacy Policy</a> &middot;
         <a href="${APP_URL}/dashboard/settings" style="color: #97A5B0;">Manage Preferences</a>
       </p>
@@ -41,7 +41,7 @@ function ctaButton(text: string, href: string) {
 
 export const welcomeSequence = {
   day0: (name: string) => ({
-    subject: "Welcome to VitalPath — here's what happens next",
+    subject: "Welcome to Nature's Journey — here's what happens next",
     html: baseTemplate(`
       <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">Welcome, ${name}!</h1>
       <p style="font-size: 16px; line-height: 1.6;">Thank you for starting your journey with us. Your intake is being reviewed by a licensed provider, and we'll be in touch within 24 hours with your next steps.</p>
@@ -58,7 +58,7 @@ export const welcomeSequence = {
   }),
 
   day3: (name: string) => ({
-    subject: "Getting the most from your VitalPath membership",
+    subject: "Getting the most from your Nature's Journey membership",
     html: baseTemplate(`
       <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">Hey ${name}, a few tips to get the most out of your plan</h1>
       <p style="font-size: 16px; line-height: 1.6;">Members who engage with tracking and nutrition tools in their first week report higher satisfaction and better outcomes. Here are three things to try today:</p>
@@ -72,10 +72,10 @@ export const welcomeSequence = {
   }),
 
   day7: (name: string) => ({
-    subject: "Your first week with VitalPath — how's it going?",
+    subject: "Your first week with Nature's Journey — how's it going?",
     html: baseTemplate(`
       <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">One week in, ${name}</h1>
-      <p style="font-size: 16px; line-height: 1.6;">You've been a VitalPath member for a week. Whether you've started treatment or are still in the evaluation process, we're here to support you.</p>
+      <p style="font-size: 16px; line-height: 1.6;">You've been a Nature's Journey member for a week. Whether you've started treatment or are still in the evaluation process, we're here to support you.</p>
       <p style="font-size: 16px; line-height: 1.6;">Remember: consistency matters more than perfection. Even small daily actions — logging your water intake, tracking protein, checking in — compound into real results over time.</p>
       <p style="font-size: 16px; line-height: 1.6;">If you have questions about your treatment plan, your care team is always available through secure messaging.</p>
       ${ctaButton("Message Your Care Team", `${APP_URL}/dashboard/messages`)}
@@ -89,7 +89,7 @@ export const quizAbandonment = (name?: string) => ({
   subject: "Still thinking about it? Your assessment is saved",
   html: baseTemplate(`
     <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">${name ? `Hi ${name}` : "Hi there"}, your assessment is waiting</h1>
-    <p style="font-size: 16px; line-height: 1.6;">You started a health assessment with VitalPath but didn't finish. No worries — your progress is saved, and you can pick up right where you left off.</p>
+    <p style="font-size: 16px; line-height: 1.6;">You started a health assessment with Nature's Journey but didn't finish. No worries — your progress is saved, and you can pick up right where you left off.</p>
     <p style="font-size: 16px; line-height: 1.6;">The assessment takes about 2 minutes and helps us understand what kind of support may be right for you. There's no commitment required.</p>
     ${ctaButton("Continue Your Assessment", `${APP_URL}/quiz`)}
     <p style="font-size: 14px; color: #677A8A;">Not ready? That's okay. You can also explore our free health calculators or read more about how our program works.</p>
@@ -103,17 +103,17 @@ export const checkoutAbandonment = {
     subject: "Your plan is ready — complete your membership",
     html: baseTemplate(`
       <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">${name ? `${name}, your` : "Your"} plan is waiting</h1>
-      <p style="font-size: 16px; line-height: 1.6;">You were in the middle of setting up your VitalPath membership. Your selected plan and preferences are saved.</p>
+      <p style="font-size: 16px; line-height: 1.6;">You were in the middle of setting up your Nature's Journey membership. Your selected plan and preferences are saved.</p>
       <p style="font-size: 16px; line-height: 1.6;">Complete your subscription now and your provider evaluation can begin today.</p>
       ${ctaButton("Complete Your Membership", `${APP_URL}/pricing`)}
     `),
   }),
 
   hour24: (name?: string) => ({
-    subject: "Questions about VitalPath? We're here to help",
+    subject: "Questions about Nature's Journey? We're here to help",
     html: baseTemplate(`
       <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">Have questions?</h1>
-      <p style="font-size: 16px; line-height: 1.6;">${name ? `Hi ${name}, we` : "We"} noticed you started but didn't complete your VitalPath membership. If you have questions about how our program works, pricing, or eligibility, we'd love to help.</p>
+      <p style="font-size: 16px; line-height: 1.6;">${name ? `Hi ${name}, we` : "We"} noticed you started but didn't complete your Nature's Journey membership. If you have questions about how our program works, pricing, or eligibility, we'd love to help.</p>
       <p style="font-size: 16px; line-height: 1.6;">Common questions members had before joining:</p>
       <ul style="font-size: 15px; line-height: 1.8; padding-left: 20px;">
         <li>What if I'm not eligible for medication?</li>
@@ -158,7 +158,7 @@ export const milestoneCongrats = (name: string, milestone: string) => ({
     <p style="font-size: 16px; line-height: 1.6; text-align: center;">${milestone}</p>
     <p style="font-size: 16px; line-height: 1.6; text-align: center;">Every milestone matters. This is real progress, built on your consistency and the structured support around you. Keep building momentum.</p>
     ${ctaButton("View Your Progress", `${APP_URL}/dashboard/progress`)}
-    <p style="font-size: 14px; color: #677A8A; text-align: center;">Know someone who could benefit from VitalPath? Share your referral link and earn credit toward your membership.</p>
+    <p style="font-size: 14px; color: #677A8A; text-align: center;">Know someone who could benefit from Nature's Journey? Share your referral link and earn credit toward your membership.</p>
   `),
 });
 

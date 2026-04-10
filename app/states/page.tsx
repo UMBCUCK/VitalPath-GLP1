@@ -12,7 +12,7 @@ import { MarketingShell } from "@/components/layout/marketing-shell";
 
 export const metadata: Metadata = {
   title: "State Availability",
-  description: "See where VitalPath telehealth weight management services are currently available.",
+  description: "See where Nature's Journey telehealth weight management services are currently available.",
 };
 
 // All US states with availability status
@@ -58,7 +58,7 @@ export default function StatesPage() {
             Available in {availableCount} states
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500">
-            VitalPath telehealth services are currently available in the states listed below.
+            Nature's Journey telehealth services are currently available in the states listed below.
             We're expanding regularly — check back if your state isn't listed yet.
           </p>
         </SectionShell>

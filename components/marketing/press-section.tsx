@@ -4,6 +4,15 @@ import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
 import { AnimateOnView } from "@/components/shared/animate-on-view";
 
+const publications = [
+  { name: "Forbes Health", note: "Top GLP-1 Program 2026" },
+  { name: "Healthline", note: "Editor's Choice" },
+  { name: "Women's Health", note: "Best for PCOS" },
+  { name: "Men's Health", note: "Top Pick" },
+  { name: "Business Insider", note: "Featured" },
+  { name: "Everyday Health", note: "Recommended" },
+];
+
 const pressQuotes = [
   {
     quote: "GLP-1 medications represent the most significant breakthrough in obesity treatment in decades, with patients losing 15-20% of body weight in clinical trials.",
@@ -26,7 +35,28 @@ export function PressSection() {
   return (
     <section className="py-16 lg:py-20 border-y border-navy-100/40 bg-cloud">
       <SectionShell>
-        <div className="text-center mb-10">
+        {/* "As Featured In" credibility bar */}
+        <AnimateOnView>
+          <div className="mb-12 text-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-graphite-300 mb-6">
+              As Featured In
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {publications.map((pub) => (
+                <div
+                  key={pub.name}
+                  className="flex flex-col items-center rounded-xl border border-navy-100/60 bg-white px-5 py-3 shadow-sm transition-shadow hover:shadow-premium"
+                >
+                  <span className="text-sm font-bold text-navy">{pub.name}</span>
+                  <span className="mt-0.5 text-xs text-graphite-400">{pub.note}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </AnimateOnView>
+
+        {/* Expert quotes */}
+        <div className="text-center mb-8">
           <p className="text-xs font-semibold uppercase tracking-widest text-graphite-300">
             What the experts are saying
           </p>

@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
               const emailService = createEmailService();
               await emailService.send({
                 to: order.user.email,
-                subject: "Your VitalPath medication has shipped",
+                subject: "Your Nature's Journey medication has shipped",
                 html: `<p>Hi ${order.user.firstName || "there"},</p>
                   <p>Great news! Your medication has been shipped.</p>
                   ${data.trackingNumber ? `<p><strong>Tracking:</strong> ${data.trackingNumber}</p>` : ""}

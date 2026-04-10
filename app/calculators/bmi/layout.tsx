@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description:
     "Free BMI calculator. Enter your height and weight to calculate your body mass index instantly. Understand BMI categories and what they mean for GLP-1 weight management eligibility.",
   openGraph: {
-    title: "BMI Calculator — Check Your Body Mass Index | VitalPath",
+    title: "BMI Calculator — Check Your Body Mass Index | Nature's Journey",
     description:
       "Calculate your BMI in seconds. Understand where you stand and whether you may qualify for provider-guided GLP-1 weight management.",
   },

@@ -13,7 +13,7 @@ import { MarketingShell } from "@/components/layout/marketing-shell";
 export const metadata: Metadata = {
   title: "Refer a Friend",
   description:
-    "Share VitalPath with friends and earn credit toward your membership. Our referral program rewards you for spreading the word.",
+    "Share Nature's Journey with friends and earn credit toward your membership. Our referral program rewards you for spreading the word.",
 };
 
 const tiers = [
@@ -25,7 +25,7 @@ const tiers = [
 
 const steps = [
   { title: "Share your link", description: "Get a unique referral link from your dashboard. Share it with friends, family, or on social media." },
-  { title: "They subscribe", description: "When someone uses your link to start a VitalPath membership, they get a welcome discount too." },
+  { title: "They subscribe", description: "When someone uses your link to start a Nature's Journey membership, they get a welcome discount too." },
   { title: "You earn credit", description: "Earn membership credit for every successful referral. Credits are applied to your next billing cycle." },
 ];
 
@@ -40,7 +40,7 @@ export default function ReferralsPage() {
             Referral Program
           </Badge>
           <h1 className="mx-auto max-w-3xl text-4xl font-bold tracking-tight text-navy sm:text-5xl">
-            Share VitalPath, earn credit
+            Share Nature's Journey, earn credit
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500">
             Know someone who could benefit from provider-guided weight management?

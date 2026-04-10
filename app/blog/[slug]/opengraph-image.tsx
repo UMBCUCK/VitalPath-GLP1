@@ -5,7 +5,7 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export async function generateImageMetadata({ params }: { params: { slug: string } }) {
-  return [{ id: "og", alt: `VitalPath Blog`, contentType: "image/png", size }];
+  return [{ id: "og", alt: `Nature's Journey Blog`, contentType: "image/png", size }];
 }
 
 export default async function OGImage({ params }: { params: { slug: string } }) {
@@ -14,7 +14,7 @@ export default async function OGImage({ params }: { params: { slug: string } }) 
     select: { title: true, category: true, author: true },
   });
 
-  const title = post?.title || "VitalPath Blog";
+  const title = post?.title || "Nature's Journey Blog";
   const category = post?.category || "Health";
 
   return new ImageResponse(
@@ -93,11 +93,11 @@ export default async function OGImage({ params }: { params: { slug: string } }) 
               VP
             </div>
             <span style={{ fontSize: "20px", fontWeight: 700, color: "white" }}>
-              VitalPath
+              Nature's Journey
             </span>
           </div>
           <span style={{ fontSize: "14px", color: "#677A8A" }}>
-            vitalpath.com/blog
+            naturesjourneyhealth.com/blog
           </span>
         </div>
       </div>

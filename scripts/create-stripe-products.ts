@@ -21,9 +21,9 @@ interface ProductDef {
 }
 
 const products: ProductDef[] = [
-  { slug: "essential", name: "VitalPath Essential", description: "Provider-guided treatment with medication, if prescribed.", monthlyPrice: 29700 },
-  { slug: "premium", name: "VitalPath Premium", description: "Treatment plus nutrition, tracking, and coaching.", monthlyPrice: 39700 },
-  { slug: "complete", name: "VitalPath Complete", description: "The full system: treatment, nutrition, supplements, coaching.", monthlyPrice: 52900 },
+  { slug: "essential", name: "Nature's Journey Essential", description: "Provider-guided treatment with medication, if prescribed.", monthlyPrice: 29700 },
+  { slug: "premium", name: "Nature's Journey Premium", description: "Treatment plus nutrition, tracking, and coaching.", monthlyPrice: 39700 },
+  { slug: "complete", name: "Nature's Journey Complete", description: "The full system: treatment, nutrition, supplements, coaching.", monthlyPrice: 52900 },
   { slug: "metabolic-support", name: "Metabolic Support Bundle", description: "Targeted nutritional support for metabolic wellness.", monthlyPrice: 3900 },
   { slug: "protein-hydration", name: "Protein & Hydration Bundle", description: "Premium protein and electrolyte support.", monthlyPrice: 3400 },
   { slug: "digestive-comfort", name: "Digestive Comfort Bundle", description: "Gentle digestive support for GLP-1 patients.", monthlyPrice: 2900 },

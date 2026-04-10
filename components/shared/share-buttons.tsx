@@ -14,7 +14,7 @@ export function ShareButtons({ title, slug }: ShareButtonsProps) {
 
   const url = typeof window !== "undefined"
     ? window.location.href
-    : `https://vitalpath.com/blog/${slug}`;
+    : `https://naturesjourneyhealth.com/blog/${slug}`;
 
   function copyLink() {
     navigator.clipboard.writeText(url);

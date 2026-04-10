@@ -21,6 +21,7 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
+import { MedicalConditionJsonLd, BreadcrumbJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
   description:
     "The SELECT trial showed semaglutide reduced heart attack, stroke, and cardiovascular death by 20% in people with obesity — the first weight management drug ever to demonstrate this. Here's what it means for you.",
   openGraph: {
-    title: "GLP-1 Medication and Heart Health | SELECT Trial Results Explained | VitalPath",
+    title: "GLP-1 Medication and Heart Health | SELECT Trial Results Explained | Nature's Journey",
     description:
       "The SELECT trial showed semaglutide reduced heart attack, stroke, and cardiovascular death by 20% in people with obesity — the first weight management drug ever to demonstrate this. Here's what it means for you.",
   },
@@ -84,7 +85,7 @@ const faqs = [
   },
   {
     q: "Does tirzepatide (Mounjaro/Zepbound) have similar cardiovascular data?",
-    a: "The SURPASS-CVOT trial (tirzepatide's cardiovascular outcomes trial) results were published in 2024 and showed a 15% reduction in MACE events, comparable to the SELECT results for semaglutide. Both drugs reduce cardiovascular risk, with tirzepatide showing potentially larger metabolic effects due to its dual GIP/GLP-1 mechanism. Your VitalPath provider can discuss which medication is appropriate for your clinical profile.",
+    a: "The SURPASS-CVOT trial (tirzepatide's cardiovascular outcomes trial) results were published in 2024 and showed a 15% reduction in MACE events, comparable to the SELECT results for semaglutide. Both drugs reduce cardiovascular risk, with tirzepatide showing potentially larger metabolic effects due to its dual GIP/GLP-1 mechanism. Your Nature's Journey provider can discuss which medication is appropriate for your clinical profile.",
   },
   {
     q: "Can GLP-1 medication replace my statin?",
@@ -92,7 +93,7 @@ const faqs = [
   },
   {
     q: "I have heart failure. Is GLP-1 safe for me?",
-    a: "It depends on the type. For heart failure with preserved ejection fraction (HFpEF), the STEP-HFpEF trial showed benefit — improved symptoms, reduced weight, better exercise capacity. For heart failure with reduced ejection fraction (HFrEF), the evidence is more mixed — earlier small studies with older GLP-1 agents showed neutral or negative signals in severe HFrEF, though newer agents appear safer. This is a clinical decision that requires your VitalPath provider to review your cardiology records and current medications. Heart failure history does not automatically exclude you, but requires careful evaluation.",
+    a: "It depends on the type. For heart failure with preserved ejection fraction (HFpEF), the STEP-HFpEF trial showed benefit — improved symptoms, reduced weight, better exercise capacity. For heart failure with reduced ejection fraction (HFrEF), the evidence is more mixed — earlier small studies with older GLP-1 agents showed neutral or negative signals in severe HFrEF, though newer agents appear safer. This is a clinical decision that requires your Nature's Journey provider to review your cardiology records and current medications. Heart failure history does not automatically exclude you, but requires careful evaluation.",
   },
   {
     q: "How long before I might see cardiovascular benefit?",
@@ -103,6 +104,19 @@ const faqs = [
 export default function HeartHealthPage() {
   return (
     <MarketingShell>
+      <MedicalConditionJsonLd
+        name="Cardiovascular Disease and Obesity"
+        description="Obesity-related cardiovascular disease including increased risk of heart attack, stroke, and heart failure driven by visceral adiposity and metabolic dysfunction."
+        url="/heart-health"
+        possibleTreatment="GLP-1 receptor agonist therapy with demonstrated 20% MACE reduction (SELECT trial)"
+      />
+      <FAQPageJsonLd faqs={faqs.map((f) => ({ question: f.q, answer: f.a }))} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "GLP-1 & Heart Health", href: "/heart-health" },
+        ]}
+      />
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">
@@ -332,7 +346,7 @@ export default function HeartHealthPage() {
                 <strong className="text-navy">If you have obesity without established CVD</strong>, the primary benefit is risk reduction: improving blood pressure, lipids, inflammation, and insulin sensitivity before cardiovascular disease develops. The data here comes from extrapolation of mechanism and intermediate endpoints rather than a completed outcomes trial in this specific group — but the biological rationale is sound.
               </p>
               <p>
-                VitalPath providers review your cardiovascular history as part of intake. If you have CVD in your history, this will be noted and factored into your clinical management plan.
+                Nature's Journey providers review your cardiovascular history as part of intake. If you have CVD in your history, this will be noted and factored into your clinical management plan.
               </p>
             </div>
           </div>
@@ -349,7 +363,7 @@ export default function HeartHealthPage() {
                 <h3 className="font-bold text-navy text-sm">If you have cardiovascular disease</h3>
                 <ul className="mt-2 space-y-1.5 text-xs text-graphite-600 leading-relaxed">
                   <li>• Do not stop any prescribed cardiovascular medications without discussing with your cardiologist. GLP-1 treatment is additive, not a replacement.</li>
-                  <li>• Share your complete medication list with your VitalPath provider — some interactions with antihypertensives and antidiabetics require monitoring.</li>
+                  <li>• Share your complete medication list with your Nature's Journey provider — some interactions with antihypertensives and antidiabetics require monitoring.</li>
                   <li>• If you have heart failure with reduced ejection fraction (HFrEF), your provider will need your cardiology records before approving GLP-1 treatment.</li>
                 </ul>
               </div>
@@ -396,6 +410,34 @@ export default function HeartHealthPage() {
               <h3 className="font-bold text-navy text-sm">Cardiovascular-aware protocols</h3>
               <p className="text-xs text-graphite-500">Providers review cardiac history as part of intake</p>
             </div>
+          </div>
+        </SectionShell>
+      </section>
+
+      {/* Further reading */}
+      <section className="py-12 bg-cloud/40 border-y border-sage/20">
+        <SectionShell>
+          <h2 className="text-lg font-semibold text-navy mb-2">Further reading</h2>
+          <p className="text-sm text-graphite-500 mb-6">Clinical evidence and practical guides for GLP-1 and cardiovascular health</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: "How GLP-1 Medications Work", href: "/blog/understanding-glp1", tag: "Science" },
+              { label: "Semaglutide Mechanism of Action", href: "/blog/semaglutide-mechanism-of-action-explained", tag: "Clinical" },
+              { label: "GLP-1 & Prediabetes", href: "/prediabetes", tag: "Metabolic Health" },
+              { label: "Semaglutide vs Tirzepatide (2026)", href: "/blog/tirzepatide-vs-semaglutide-2026", tag: "Comparison" },
+            ].map((article) => (
+              <Link
+                key={article.href}
+                href={article.href}
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+              >
+                <div>
+                  <span className="text-xs font-medium text-teal">{article.tag}</span>
+                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-teal transition-colors leading-snug">{article.label}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+              </Link>
+            ))}
           </div>
         </SectionShell>
       </section>

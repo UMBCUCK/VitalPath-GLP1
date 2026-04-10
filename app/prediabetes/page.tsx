@@ -22,6 +22,7 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
+import { MedicalConditionJsonLd, BreadcrumbJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
   description:
     "Prediabetes affects 88 million Americans, and 70-80% will develop type 2 diabetes without intervention. GLP-1 medications can reverse prediabetes — here's what the clinical evidence shows.",
   openGraph: {
-    title: "GLP-1 for Prediabetes | Can Semaglutide Reverse the Diagnosis? | VitalPath",
+    title: "GLP-1 for Prediabetes | Can Semaglutide Reverse the Diagnosis? | Nature's Journey",
     description:
       "Prediabetes affects 88 million Americans, and 70-80% will develop type 2 diabetes without intervention. GLP-1 medications can reverse prediabetes — here's what the clinical evidence shows.",
   },
@@ -99,11 +100,11 @@ const trialData = [
 const faqs = [
   {
     q: "Will GLP-1 work for prediabetes if I'm not obese?",
-    a: "The BMI eligibility threshold for GLP-1 medications is 27+ with a comorbidity like prediabetes. This means you do not need to meet traditional obesity criteria (BMI 30+) to qualify if you have prediabetes — a BMI of 27 or above is sufficient. For people below BMI 27 with prediabetes, GLP-1 medications are not currently FDA-approved, though some providers may consider off-label use. The DPP trial showed that lifestyle intervention is effective across all weight categories for prediabetes — your VitalPath provider can help you understand which approach is most appropriate for your specific situation.",
+    a: "The BMI eligibility threshold for GLP-1 medications is 27+ with a comorbidity like prediabetes. This means you do not need to meet traditional obesity criteria (BMI 30+) to qualify if you have prediabetes — a BMI of 27 or above is sufficient. For people below BMI 27 with prediabetes, GLP-1 medications are not currently FDA-approved, though some providers may consider off-label use. The DPP trial showed that lifestyle intervention is effective across all weight categories for prediabetes — your Nature's Journey provider can help you understand which approach is most appropriate for your specific situation.",
   },
   {
     q: "How often should I check my A1c while on GLP-1 treatment for prediabetes?",
-    a: "Standard practice is to check A1c every 3 months during the first year of treatment to assess response, then every 6 months once stable. Fasting glucose can be monitored more frequently at home with an inexpensive glucose meter. The goal is A1c below 5.7% (normoglycemia) or at minimum below 6.4% (remaining in prediabetes range vs converting to T2D). Your VitalPath provider will integrate A1c monitoring into your follow-up schedule.",
+    a: "Standard practice is to check A1c every 3 months during the first year of treatment to assess response, then every 6 months once stable. Fasting glucose can be monitored more frequently at home with an inexpensive glucose meter. The goal is A1c below 5.7% (normoglycemia) or at minimum below 6.4% (remaining in prediabetes range vs converting to T2D). Your Nature's Journey provider will integrate A1c monitoring into your follow-up schedule.",
   },
   {
     q: "Can I take GLP-1 with metformin? I was already prescribed it for prediabetes.",
@@ -122,6 +123,20 @@ const faqs = [
 export default function PrediabetesPage() {
   return (
     <MarketingShell>
+      <MedicalConditionJsonLd
+        name="Prediabetes"
+        alternateName="Impaired Glucose Tolerance"
+        description="A metabolic condition characterized by blood glucose levels higher than normal but below the threshold for type 2 diabetes (HbA1c 5.7-6.4%)."
+        url="/prediabetes"
+        possibleTreatment="GLP-1 receptor agonist therapy, lifestyle intervention"
+      />
+      <FAQPageJsonLd faqs={faqs.map((f) => ({ question: f.q, answer: f.a }))} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Prediabetes & GLP-1", href: "/prediabetes" },
+        ]}
+      />
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">
@@ -377,7 +392,7 @@ export default function PrediabetesPage() {
             </div>
 
             <div className="mt-8 space-y-3">
-              <h3 className="font-bold text-navy">What to tell your VitalPath provider</h3>
+              <h3 className="font-bold text-navy">What to tell your Nature's Journey provider</h3>
               {[
                 "Your most recent A1c and fasting glucose results (date and value)",
                 "How long you have had a prediabetes diagnosis",
@@ -454,6 +469,34 @@ export default function PrediabetesPage() {
               <h3 className="font-bold text-navy text-sm">Metabolic health expertise</h3>
               <p className="text-xs text-graphite-500">Providers experienced with glucose management and prediabetes</p>
             </div>
+          </div>
+        </SectionShell>
+      </section>
+
+      {/* Further reading */}
+      <section className="py-12 bg-cloud/40 border-y border-sage/20">
+        <SectionShell>
+          <h2 className="text-lg font-semibold text-navy mb-2">Further reading</h2>
+          <p className="text-sm text-graphite-500 mb-6">Clinical context and practical guides for GLP-1 and metabolic health</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: "How GLP-1 Medications Work", href: "/blog/understanding-glp1", tag: "Science" },
+              { label: "Semaglutide Mechanism of Action", href: "/blog/semaglutide-mechanism-of-action-explained", tag: "Clinical" },
+              { label: "Metformin + Semaglutide Together?", href: "/blog/metformin-and-semaglutide-can-you-take-together", tag: "Medication" },
+              { label: "GLP-1 Weight Loss Timeline", href: "/blog/semaglutide-timeline-first-3-months", tag: "Results" },
+            ].map((article) => (
+              <Link
+                key={article.href}
+                href={article.href}
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+              >
+                <div>
+                  <span className="text-xs font-medium text-teal">{article.tag}</span>
+                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-teal transition-colors leading-snug">{article.label}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+              </Link>
+            ))}
           </div>
         </SectionShell>
       </section>

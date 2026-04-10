@@ -19,9 +19,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!recipe) return { title: "Recipe Not Found" };
   return {
     title: `${recipe.title} — High-Protein Recipe`,
-    description: `${recipe.title}: ${recipe.calories} cal, ${recipe.proteinG}g protein. Ready in ${(recipe.prepMinutes || 0) + (recipe.cookMinutes || 0)} minutes. Free GLP-1-friendly recipe from VitalPath.`,
+    description: `${recipe.title}: ${recipe.calories} cal, ${recipe.proteinG}g protein. Ready in ${(recipe.prepMinutes || 0) + (recipe.cookMinutes || 0)} minutes. Free GLP-1-friendly recipe from Nature's Journey.`,
     openGraph: {
-      title: `${recipe.title} | VitalPath Recipes`,
+      title: `${recipe.title} | Nature's Journey Recipes`,
       description: `${recipe.calories} cal, ${recipe.proteinG}g protein. ${recipe.difficulty} difficulty. GLP-1-friendly recipe.`,
     },
   };
@@ -212,7 +212,7 @@ export default async function PublicRecipePage({ params }: PageProps) {
           <div className="mt-12 rounded-2xl bg-gradient-to-r from-teal-50 to-sage p-8 text-center">
             <h3 className="text-xl font-bold text-navy">Want weekly meal plans like this?</h3>
             <p className="mt-2 text-sm text-graphite-500">
-              VitalPath Premium includes personalized weekly meal plans, grocery lists, and 100+ GLP-1-friendly recipes.
+              Nature's Journey Premium includes personalized weekly meal plans, grocery lists, and 100+ GLP-1-friendly recipes.
             </p>
             <Link href="/qualify">
               <Button className="mt-4 gap-2">

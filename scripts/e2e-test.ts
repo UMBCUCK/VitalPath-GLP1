@@ -1,5 +1,5 @@
 /**
- * VitalPath E2E Test Suite
+ * Nature's Journey E2E Test Suite
  * Run against a running dev server: npx tsx scripts/e2e-test.ts
  * Requires: npm run dev running on port 3000
  */
@@ -36,7 +36,7 @@ async function api(path: string, opts: RequestInit = {}) {
 }
 
 async function run() {
-  console.log(`\nVitalPath E2E Test Suite`);
+  console.log(`\nNature's Journey E2E Test Suite`);
   console.log(`Server: ${BASE}\n`);
 
   // ─── AUTH ───────────────────────────────────────────────
@@ -71,7 +71,7 @@ async function run() {
   await test("Login as admin", async () => {
     const { data } = await api("/api/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email: "admin@vitalpath.com", password: "admin123" }),
+      body: JSON.stringify({ email: "admin@naturesjourneyhealth.com", password: "admin123" }),
     });
     assert(data.user?.role === "ADMIN", "Not ADMIN");
   });
@@ -79,7 +79,7 @@ async function run() {
   await test("Login as provider", async () => {
     const { data } = await api("/api/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email: "dr.chen@vitalpath.com", password: "provider1" }),
+      body: JSON.stringify({ email: "dr.chen@naturesjourneyhealth.com", password: "provider1" }),
     });
     assert(data.user?.role === "PROVIDER", "Not PROVIDER");
   });
@@ -227,7 +227,7 @@ async function run() {
 
   await api("/api/auth/login", {
     method: "POST",
-    body: JSON.stringify({ email: "admin@vitalpath.com", password: "admin123" }),
+    body: JSON.stringify({ email: "admin@naturesjourneyhealth.com", password: "admin123" }),
   });
 
   await test("Admin fetch products", async () => {

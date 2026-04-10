@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Scale, Flame, Target, Droplets, TrendingDown, ExternalLink } from "lucide-react";
@@ -49,6 +49,14 @@ interface Results {
 }
 
 export default function EmbedCalculatorPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-graphite-400">Loading calculator...</p></div>}>
+      <EmbedCalculatorInner />
+    </Suspense>
+  );
+}
+
+function EmbedCalculatorInner() {
   const searchParams = useSearchParams();
   const refCode = searchParams.get("ref") || "";
   const theme = searchParams.get("theme") || "light";
@@ -155,7 +163,7 @@ export default function EmbedCalculatorPage() {
         {/* Header */}
         <div className="text-center mb-6">
           {partnerName && (
-            <p className={`text-xs ${subtext} mb-1`}>Powered by VitalPath &middot; via {partnerName}</p>
+            <p className={`text-xs ${subtext} mb-1`}>Powered by Nature's Journey &middot; via {partnerName}</p>
           )}
           <h1 className={`text-2xl sm:text-3xl font-bold ${text}`}>
             {step === "input" ? "Health Profile Calculator" : "Your Health Numbers"}
@@ -356,7 +364,7 @@ export default function EmbedCalculatorPage() {
               {/* Powered by */}
               <div className="text-center pt-2">
                 <a href={APP_URL} target="_blank" rel="noopener noreferrer" className={`text-[10px] ${subtext} hover:text-teal transition-colors`}>
-                  Powered by VitalPath
+                  Powered by Nature's Journey
                 </a>
               </div>
             </motion.div>

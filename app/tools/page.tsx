@@ -12,9 +12,9 @@ import { WebPageJsonLd } from "@/components/seo/json-ld";
 export const metadata: Metadata = {
   title: "Free Health & Weight Loss Tools",
   description:
-    "Free weight loss tools: BMI calculator, TDEE calculator, protein calculator, hydration calculator, meal plans, GLP-1 guide, glossary, and more. Evidence-based resources from VitalPath.",
+    "Free weight loss tools: BMI calculator, TDEE calculator, protein calculator, hydration calculator, meal plans, GLP-1 guide, glossary, and more. Evidence-based resources from Nature's Journey.",
   openGraph: {
-    title: "Free Weight Loss Tools & Calculators | VitalPath",
+    title: "Free Weight Loss Tools & Calculators | Nature's Journey",
     description: "BMI, TDEE, protein, hydration calculators plus meal plans, guides, and glossary. All free.",
   },
 };

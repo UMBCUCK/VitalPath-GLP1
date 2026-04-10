@@ -171,7 +171,7 @@ export async function POST(req: NextRequest) {
             subject: `${name}, we'd love to have you back`,
             html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;">
               <h1 style="color:#0E223D;font-size:24px;">We miss you, ${name}</h1>
-              <p style="color:#2E3742;font-size:16px;line-height:1.6;">It's been a while since you've been active on VitalPath. We'd love to welcome you back with a special offer.</p>
+              <p style="color:#2E3742;font-size:16px;line-height:1.6;">It's been a while since you've been active on Nature's Journey. We'd love to welcome you back with a special offer.</p>
               <div style="background:#F7FAF8;border-radius:12px;padding:20px;margin:20px 0;text-align:center;">
                 <p style="font-size:24px;font-weight:700;color:#0E223D;">30% off your first month back</p>
                 <p style="color:#677A8A;font-size:14px;">Use code <strong>COMEBACK30</strong> at checkout</p>
@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
               <div style="text-align:center;margin:24px 0;">
                 <a href="${process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "development" ? "http://localhost:3000" : "")}/pricing" style="background-color:#1F6F78;color:white;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:600;">Reactivate Your Plan</a>
               </div>
-              <p style="color:#97A5B0;font-size:12px;">VitalPath Health</p>
+              <p style="color:#97A5B0;font-size:12px;">Nature's Journey Health</p>
             </div>`,
           };
 

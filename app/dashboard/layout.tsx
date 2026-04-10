@@ -6,6 +6,8 @@ import {
   LayoutDashboard, TrendingUp, Pill, Utensils, Share2, Settings,
   MessageCircle, Camera, ClipboardCheck, ShoppingBag,
 } from "lucide-react";
+import { LeafIcon } from "@/components/layout/brand-logo";
+import { siteConfig } from "@/lib/site";
 import { NotificationBell } from "@/app/dashboard/notification-bell";
 import { StreakBadges } from "@/components/dashboard/streak-badges";
 
@@ -67,9 +69,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <aside className="hidden w-64 shrink-0 border-r border-navy-100/40 bg-white lg:block">
         <div className="flex h-16 items-center gap-2.5 border-b border-navy-100/40 px-6">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal to-atlantic text-xs font-bold text-white">VP</div>
+            <LeafIcon className="h-8 w-8" />
             <div>
-              <p className="text-sm font-bold text-navy">VitalPath</p>
+              <p className="text-sm font-bold text-navy">{siteConfig.name}</p>
               <p className="text-[10px] text-graphite-400">Member Dashboard</p>
             </div>
           </Link>

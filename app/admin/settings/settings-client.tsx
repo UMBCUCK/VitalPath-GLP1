@@ -167,7 +167,7 @@ export function AdminSettingsClient({
             </div>
             <div>
               <label className="block text-xs font-semibold text-navy mb-1">From Email</label>
-              <Input defaultValue="care@vitalpath.com" />
+              <Input defaultValue="care@naturesjourneyhealth.com" />
             </div>
           </div>
         </CardContent>

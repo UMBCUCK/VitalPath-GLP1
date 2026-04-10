@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchDialog } from "@/components/layout/search-dialog";
+import { BrandLogo } from "@/components/layout/brand-logo";
 import { siteConfig } from "@/lib/site";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -17,10 +18,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-atlantic">
-            <span className="text-sm font-bold text-white">VP</span>
-          </div>
-          <span className="text-lg font-bold text-navy tracking-tight">{siteConfig.name}</span>
+          <BrandLogo />
         </Link>
 
         {/* Desktop nav */}

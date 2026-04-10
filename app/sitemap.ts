@@ -14,6 +14,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${baseUrl}/eligibility`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${baseUrl}/faq`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/faq/semaglutide`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${baseUrl}/faq/tirzepatide`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${baseUrl}/faq/cost`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${baseUrl}/faq/side-effects`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${baseUrl}/faq/getting-started`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${baseUrl}/results`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${baseUrl}/referrals`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${baseUrl}/states`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
@@ -53,6 +58,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/legal/hipaa`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${baseUrl}/legal/baa`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${baseUrl}/accessibility`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${baseUrl}/free-guide`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/press`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${baseUrl}/qualify`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
   ];
 
   // Dynamic pages from DB — wrapped in try/catch for build-time when DB isn't available

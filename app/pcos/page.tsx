@@ -22,6 +22,7 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
+import { MedicalConditionJsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
   description:
     "PCOS causes insulin resistance that makes conventional weight loss nearly impossible. GLP-1 medications target the metabolic root of PCOS directly — and clinical studies show improvements in weight, testosterone, and menstrual regularity.",
   openGraph: {
-    title: "GLP-1 for PCOS Weight Loss | Insulin Resistance & Hormonal Treatment | VitalPath",
+    title: "GLP-1 for PCOS Weight Loss | Insulin Resistance & Hormonal Treatment | Nature's Journey",
     description:
       "PCOS causes insulin resistance that makes conventional weight loss nearly impossible. GLP-1 medications target the metabolic root of PCOS directly — and clinical studies show improvements in weight, testosterone, and menstrual regularity.",
   },
@@ -39,7 +40,7 @@ const stats = [
   { stat: "1 in 10", label: "Women of reproductive age have PCOS" },
   { stat: "75%", label: "Of women with PCOS have insulin resistance" },
   { stat: "60–70%", label: "See menstrual improvement with GLP-1 therapy" },
-  { stat: "$0 extra", label: "PCOS-related care included in your VitalPath plan" },
+  { stat: "$0 extra", label: "PCOS-related care included in your Nature's Journey plan" },
 ];
 
 const mechanismPoints = [
@@ -94,7 +95,7 @@ const beyondWeightCards = [
 
 const checklist = [
   "A formal PCOS diagnosis from a gynecologist or endocrinologist is helpful context for your provider — but it is not required to start treatment. Metabolic eligibility is based on BMI and comorbidities.",
-  "Tell your VitalPath provider about any fertility plans. GLP-1 medications must be stopped at least 2 months before attempting conception. Your provider can help you plan the timing.",
+  "Tell your Nature's Journey provider about any fertility plans. GLP-1 medications must be stopped at least 2 months before attempting conception. Your provider can help you plan the timing.",
   "If you take oral contraceptives, take them 1 hour before or 4 hours after your semaglutide dose to avoid any absorption effects from slowed gastric emptying. IUDs, implants, and patches have no interaction.",
   "Monitoring during treatment: fasting glucose, insulin, testosterone, and LH/FSH ratios every 3–6 months while your provider adjusts your protocol.",
   "Weight loss of just 5–10% of body weight can produce disproportionate hormonal improvements in PCOS — this is not a condition where you need to reach a 'goal weight' before seeing benefits.",
@@ -107,7 +108,7 @@ const faqs = [
   },
   {
     q: "I want to get pregnant. Should I take GLP-1 medication first?",
-    a: "GLP-1 medications are contraindicated during pregnancy and should be stopped at least 2 months before attempting conception. However, using GLP-1 treatment to achieve metabolic improvements before stopping can actually improve fertility outcomes in PCOS. Women with PCOS who achieve weight loss of 5–10% show improved ovulation rates, better IVF response, and improved egg quality. Talk to your VitalPath provider and your OB-GYN or reproductive endocrinologist to coordinate timing.",
+    a: "GLP-1 medications are contraindicated during pregnancy and should be stopped at least 2 months before attempting conception. However, using GLP-1 treatment to achieve metabolic improvements before stopping can actually improve fertility outcomes in PCOS. Women with PCOS who achieve weight loss of 5–10% show improved ovulation rates, better IVF response, and improved egg quality. Talk to your Nature's Journey provider and your OB-GYN or reproductive endocrinologist to coordinate timing.",
   },
   {
     q: "Do I need to change my birth control while on GLP-1?",
@@ -126,6 +127,13 @@ const faqs = [
 export default function PcosPage() {
   return (
     <MarketingShell>
+      <MedicalConditionJsonLd
+        name="Polycystic Ovary Syndrome (PCOS)"
+        alternateName="PCOS"
+        description="A hormonal disorder characterized by insulin resistance, androgen excess, and irregular menstrual cycles, affecting approximately 1 in 10 women of reproductive age."
+        url="/pcos"
+        possibleTreatment="GLP-1 receptor agonist therapy (semaglutide, tirzepatide)"
+      />
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">

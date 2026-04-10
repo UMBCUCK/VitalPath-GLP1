@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description:
     "Everything you need to know about GLP-1 weight loss medication. How it works, cost, results timeline, side effects, diet tips, exercise, and choosing a provider. Free comprehensive guide.",
   openGraph: {
-    title: "The Complete Guide to GLP-1 Weight Loss | VitalPath",
+    title: "The Complete Guide to GLP-1 Weight Loss | Nature's Journey",
     description: "The most comprehensive GLP-1 weight loss guide online. Medication science, cost breakdown, meal plans, exercise tips, and provider selection — all in one place.",
   },
 };
@@ -29,8 +29,8 @@ const chapters = [
     description: "How GLP-1 receptor agonists work, the science behind appetite suppression, and why they're different from every diet you've tried.",
     links: [
       { label: "How GLP-1 Medications Work", href: "/blog/understanding-glp1" },
-      { label: "Semaglutide vs Tirzepatide", href: "/blog/semaglutide-vs-tirzepatide" },
-      { label: "Why Diets Fail (Biology)", href: "/blog/why-diets-fail-biology-weight-regain" },
+      { label: "Semaglutide vs Tirzepatide (2026)", href: "/blog/tirzepatide-vs-semaglutide-2026" },
+      { label: "GLP-1 vs Diet & Exercise Alone", href: "/blog/semaglutide-vs-diet-exercise-alone" },
     ],
   },
   {
@@ -39,10 +39,10 @@ const chapters = [
     title: "Cost & Accessibility",
     description: "What GLP-1 medications cost with and without insurance, how compounded alternatives work, and how to find affordable treatment.",
     links: [
-      { label: "GLP-1 Cost Without Insurance", href: "/blog/glp1-weight-loss-cost-without-insurance" },
-      { label: "Are Compounded Medications Safe?", href: "/blog/compounded-glp1-safety-evidence" },
+      { label: "How to Get GLP-1 Without Insurance", href: "/blog/how-to-get-glp1-without-insurance" },
+      { label: "Are Compounded Medications Safe?", href: "/blog/compounded-semaglutide-safety" },
       { label: "Compounded vs Brand-Name GLP-1", href: "/compare/compounded-vs-brand-glp1" },
-      { label: "VitalPath Plans & Pricing", href: "/pricing" },
+      { label: "Nature's Journey Plans & Pricing", href: "/pricing" },
     ],
   },
   {
@@ -51,9 +51,9 @@ const chapters = [
     title: "Results & Timeline",
     description: "What to realistically expect month by month, how much weight you can lose, and what affects your personal results.",
     links: [
-      { label: "Month-by-Month Weight Loss Timeline", href: "/blog/glp1-weight-loss-timeline-results" },
-      { label: "Your First Month on GLP-1", href: "/blog/what-to-expect-first-month-glp1" },
-      { label: "How to Lose 30 Pounds", href: "/blog/how-to-lose-30-pounds" },
+      { label: "Month-by-Month Weight Loss Timeline", href: "/blog/semaglutide-timeline-first-3-months" },
+      { label: "Your First Month on GLP-1", href: "/blog/first-month-on-semaglutide" },
+      { label: "How to Lose 50 Pounds with GLP-1", href: "/blog/semaglutide-for-50-pounds-overweight" },
       { label: "Member Results & Stories", href: "/results" },
     ],
   },
@@ -64,8 +64,8 @@ const chapters = [
     description: "Common side effects, how to manage them, what's normal vs concerning, and safety considerations for specific situations.",
     links: [
       { label: "Managing Common Side Effects", href: "/blog/managing-side-effects" },
-      { label: "GLP-1 and Alcohol", href: "/blog/glp1-alcohol-safety" },
-      { label: "Ozempic Face: Prevention Guide", href: "/blog/ozempic-face-prevention" },
+      { label: "GLP-1 and Alcohol", href: "/blog/alcohol-and-glp1" },
+      { label: "Ozempic Face: What It Is & Prevention", href: "/blog/ozempic-face-what-is-it" },
     ],
   },
   {
@@ -74,10 +74,10 @@ const chapters = [
     title: "Nutrition & Meal Planning",
     description: "What to eat during treatment, protein targets, meal plans, recipes, and strategies for when your appetite is reduced.",
     links: [
-      { label: "What to Eat Week 1", href: "/blog/what-to-eat-first-week-glp1" },
-      { label: "20 Best High-Protein Foods", href: "/blog/best-high-protein-foods-weight-loss" },
-      { label: "7-Day High-Protein Meal Plan", href: "/blog/7-day-high-protein-meal-plan-weight-loss" },
-      { label: "10 Easy Meal Prep Recipes", href: "/blog/glp1-meal-prep-easy-recipes" },
+      { label: "What to Eat Week 1", href: "/blog/what-to-eat-first-week-semaglutide" },
+      { label: "High-Protein Foods Guide", href: "/blog/protein-intake-guide" },
+      { label: "High-Protein Recipes for GLP-1", href: "/blog/high-protein-recipes-appetite-changes" },
+      { label: "What to Eat on Semaglutide", href: "/blog/what-to-eat-on-semaglutide" },
       { label: "Protein Calculator", href: "/calculators/protein" },
       { label: "All GLP-1 Recipes", href: "/meals" },
     ],
@@ -89,8 +89,8 @@ const chapters = [
     description: "The best exercises during treatment, how many steps you need, what to avoid early on, and how to preserve muscle.",
     links: [
       { label: "Exercise During GLP-1 Treatment", href: "/blog/exercise-during-treatment" },
-      { label: "Walking for Weight Loss", href: "/blog/walking-for-weight-loss-steps" },
-      { label: "Breaking Weight Loss Plateaus", href: "/blog/break-weight-loss-plateau" },
+      { label: "Exercise During GLP-1 Treatment", href: "/blog/exercise-during-treatment" },
+      { label: "Breaking Weight Loss Plateaus", href: "/blog/glp1-weight-loss-plateau" },
     ],
   },
   {
@@ -109,11 +109,11 @@ const chapters = [
     icon: Users,
     number: "08",
     title: "Choosing a Program",
-    description: "How to evaluate telehealth weight loss programs, what to look for in a provider, and how VitalPath compares.",
+    description: "How to evaluate telehealth weight loss programs, what to look for in a provider, and how Nature's Journey compares.",
     links: [
-      { label: "VitalPath vs Hims", href: "/compare/vitalpath-vs-hims" },
-      { label: "VitalPath vs WeightWatchers", href: "/compare/vitalpath-vs-weightwatchers" },
-      { label: "VitalPath vs Ro", href: "/compare/vitalpath-vs-ro" },
+      { label: "Nature's Journey vs Hims", href: "/compare/vitalpath-vs-hims" },
+      { label: "Nature's Journey vs WeightWatchers", href: "/compare/vitalpath-vs-weightwatchers" },
+      { label: "Nature's Journey vs Ro", href: "/compare/vitalpath-vs-ro" },
       { label: "GLP-1 vs Bariatric Surgery", href: "/compare/glp1-vs-bariatric-surgery" },
       { label: "Check Your Eligibility", href: "/eligibility" },
     ],
@@ -212,6 +212,43 @@ export default function GuidePage() {
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
+
+      {/* FAQ cross-links */}
+      <section className="py-12 bg-cloud/40 border-y border-sage/20">
+        <SectionShell>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-graphite-400">Have questions?</p>
+              <h2 className="text-lg font-bold text-navy mt-0.5">Browse the GLP-1 FAQ</h2>
+            </div>
+            <Link href="/faq" className="text-sm font-medium text-teal hover:underline shrink-0">
+              View all FAQs &rarr;
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { label: "Semaglutide FAQ", sub: "15 questions about dosing, timeline & what to expect", href: "/faq/semaglutide" },
+              { label: "Tirzepatide FAQ", sub: "How it compares to semaglutide and clinical data", href: "/faq/tirzepatide" },
+              { label: "Cost & Insurance FAQ", sub: "What GLP-1 medications cost without insurance", href: "/faq/cost" },
+              { label: "Side Effects FAQ", sub: "Common side effects and how to manage them", href: "/faq/side-effects" },
+              { label: "Getting Started FAQ", sub: "How to qualify, what to expect in week 1", href: "/faq/getting-started" },
+              { label: "GLP-1 Cost Guide", sub: "Full 2026 pricing breakdown for all medications", href: "/glp1-cost" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-navy group-hover:text-teal transition-colors">{item.label}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-graphite-500">{item.sub}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+              </Link>
             ))}
           </div>
         </SectionShell>

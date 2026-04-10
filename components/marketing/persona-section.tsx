@@ -53,7 +53,7 @@ export function PersonaSection() {
       <SectionShell>
         <SectionHeading
           eyebrow="Is This You?"
-          title="VitalPath was built for people who've tried everything"
+          title="Nature's Journey was built for people who've tried everything"
           description="If any of these sound familiar, you're exactly who this program is designed for."
         />
 

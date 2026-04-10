@@ -12,7 +12,7 @@ export const CONSENT_VERSIONS = {
   },
   HIPAA: {
     version: "2026-04-09-v1",
-    text: "I authorize VitalPath and its affiliated providers and pharmacies to use and disclose my protected health information (PHI) for treatment, payment, and healthcare operations as described in the HIPAA Notice of Privacy Practices. I understand I may revoke this authorization in writing at any time, except to the extent that action has already been taken in reliance on it.",
+    text: "I authorize Nature's Journey and its affiliated providers and pharmacies to use and disclose my protected health information (PHI) for treatment, payment, and healthcare operations as described in the HIPAA Notice of Privacy Practices. I understand I may revoke this authorization in writing at any time, except to the extent that action has already been taken in reliance on it.",
   },
   TELEHEALTH: {
     version: "2026-04-09-v1",

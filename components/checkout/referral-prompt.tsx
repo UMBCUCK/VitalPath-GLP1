@@ -21,8 +21,8 @@ export function ReferralPrompt() {
   function shareNative() {
     if (navigator.share) {
       navigator.share({
-        title: "VitalPath — GLP-1 Weight Loss",
-        text: "I just started VitalPath and you can save $50 on your first month with my referral link:",
+        title: "Nature's Journey — GLP-1 Weight Loss",
+        text: "I just started Nature's Journey and you can save $50 on your first month with my referral link:",
         url: referralUrl,
       });
     }
@@ -41,7 +41,7 @@ export function ReferralPrompt() {
       </div>
 
       <p className="text-sm text-graphite-600 mb-5">
-        Share your referral link with friends who could benefit from VitalPath.
+        Share your referral link with friends who could benefit from Nature's Journey.
         They get <span className="font-bold text-navy">$50 off</span> their first month,
         and you get <span className="font-bold text-teal">$50 credit</span> toward your next month.
       </p>
@@ -77,7 +77,7 @@ export function ReferralPrompt() {
           variant="outline"
           size="sm"
           onClick={() => {
-            const text = encodeURIComponent(`I just started VitalPath for GLP-1 weight loss. Get $50 off your first month: ${referralUrl}`);
+            const text = encodeURIComponent(`I just started Nature's Journey for GLP-1 weight loss. Get $50 off your first month: ${referralUrl}`);
             window.open(`sms:?body=${text}`, "_blank");
           }}
           className="flex-1 gap-1.5"

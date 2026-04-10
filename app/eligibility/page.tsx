@@ -14,8 +14,12 @@ import { MarketingShell } from "@/components/layout/marketing-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "Eligibility",
-  description: "Learn who qualifies for GLP-1 weight management treatment. Eligibility is determined by a licensed medical provider.",
+  title: "Do I Qualify for GLP-1 Weight Loss Medication? | Eligibility Criteria",
+  description: "See if you qualify for semaglutide or tirzepatide treatment. Most adults with a BMI of 27+ qualify. Eligibility is determined by a licensed medical provider — take our free 2-minute assessment.",
+  openGraph: {
+    title: "GLP-1 Eligibility Criteria | Who Qualifies for Semaglutide?",
+    description: "BMI 27+ with a weight-related condition, or BMI 30+ without — most adults qualify. Find out in 2 minutes.",
+  },
 };
 
 export default function EligibilityPage() {
@@ -152,7 +156,7 @@ export default function EligibilityPage() {
             <Link href="/calculators/bmi" className="rounded-lg border border-navy-100/40 bg-navy-50/20 px-3 py-2 text-navy hover:border-teal hover:text-teal transition-colors">
               BMI calculator →
             </Link>
-            <Link href="/blog/glp1-weight-loss-cost-without-insurance" className="rounded-lg border border-navy-100/40 bg-navy-50/20 px-3 py-2 text-navy hover:border-teal hover:text-teal transition-colors">
+            <Link href="/blog/how-to-get-glp1-without-insurance" className="rounded-lg border border-navy-100/40 bg-navy-50/20 px-3 py-2 text-navy hover:border-teal hover:text-teal transition-colors">
               Cost without insurance →
             </Link>
             <Link href="/guide" className="rounded-lg border border-navy-100/40 bg-navy-50/20 px-3 py-2 text-navy hover:border-teal hover:text-teal transition-colors">

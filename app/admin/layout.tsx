@@ -16,6 +16,10 @@ const KeyboardShortcutsModal = dynamic(() =>
   import("@/components/admin/keyboard-shortcuts-modal").then((m) => ({ default: m.KeyboardShortcutsModal })),
   { ssr: false }
 );
+const PushNotificationManager = dynamic(() =>
+  import("@/components/admin/push-notification-manager").then((m) => ({ default: m.PushNotificationManager })),
+  { ssr: false }
+);
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -114,6 +118,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Modals */}
       <CommandPalette open={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
       <KeyboardShortcutsModal open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
+
+      {/* Real-time push notifications */}
+      <PushNotificationManager />
     </div>
   );
 }

@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { SectionShell } from "@/components/shared/section-shell";
-import { plans, addOns } from "@/lib/pricing";
+import { plans as defaultPlans, addOns as defaultAddOns } from "@/lib/pricing";
+import type { PricingPlan, AddOn } from "@/lib/pricing";
 import { formatPrice, cn } from "@/lib/utils";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { BillingToggle, getIntervalPrice, type BillingInterval } from "@/components/marketing/billing-toggle";
@@ -22,8 +23,10 @@ export default function CheckoutPage() {
   const { state: funnelState } = useFunnelStore();
   const selectedPlanSlug = searchParams.get("plan") || funnelState.recommendedPlan || "premium";
 
-  const [selectedPlan, setSelectedPlan] = useState(
-    plans.find((p) => p.slug === selectedPlanSlug) || plans[1]
+  const [plans, setPlans] = useState<PricingPlan[]>(defaultPlans);
+  const [addOns, setAddOns] = useState<AddOn[]>(defaultAddOns);
+  const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(
+    defaultPlans.find((p) => p.slug === selectedPlanSlug) || defaultPlans[1]
   );
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [billingInterval, setBillingInterval] = useState<BillingInterval>("monthly");
@@ -32,6 +35,24 @@ export default function CheckoutPage() {
   const [email, setEmail] = useState(funnelState.email || "");
   const [loading, setLoading] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  // Fetch live plans + add-ons from DB on mount
+  useEffect(() => {
+    fetch("/api/products/plans")
+      .then((r) => r.json())
+      .then((data: { plans?: PricingPlan[]; addOns?: AddOn[] }) => {
+        if (data.plans?.length) {
+          setPlans(data.plans);
+          // Re-sync selectedPlan to the fetched version
+          const match = data.plans.find((p) => p.slug === selectedPlanSlug);
+          if (match) setSelectedPlan(match);
+        }
+        if (data.addOns?.length) setAddOns(data.addOns);
+      })
+      .catch(() => { /* silently keep defaults */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     track(ANALYTICS_EVENTS.CHECKOUT_START, { plan: selectedPlan.slug });
@@ -83,6 +104,7 @@ export default function CheckoutPage() {
 
   async function handleCheckout() {
     setLoading(true);
+    setCheckoutError(null);
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -99,9 +121,11 @@ export default function CheckoutPage() {
       if (data.url) {
         track(ANALYTICS_EVENTS.CHECKOUT_COMPLETE, { plan: selectedPlan.slug, total: total / 100 });
         window.location.href = data.url;
+      } else {
+        setCheckoutError(data.error || "Unable to start checkout. Please try again.");
       }
     } catch {
-      // handle error
+      setCheckoutError("Something went wrong. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -325,6 +349,11 @@ export default function CheckoutPage() {
                     {loading ? "Redirecting..." : "Continue to Payment"}
                     {!loading && <ArrowRight className="h-4 w-4" />}
                   </Button>
+                  {checkoutError && (
+                    <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 text-center">
+                      {checkoutError}
+                    </p>
+                  )}
                   <p className="text-center text-[10px] text-graphite-400">
                     Join 18,000+ members &middot; 4.9/5 average rating
                   </p>

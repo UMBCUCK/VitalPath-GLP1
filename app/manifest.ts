@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "VitalPath Health",
-    short_name: "VitalPath",
+    name: "Nature's Journey Health",
+    short_name: "Nature's Journey",
     description: "Clinically informed weight management, delivered to your door.",
     start_url: "/",
     display: "standalone",

@@ -62,8 +62,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updateData: Record<string, any> = {};
+    const updateData: Record<string, unknown> = {};
     let auditDetails: Record<string, unknown> = {};
 
     switch (action) {

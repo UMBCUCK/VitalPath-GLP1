@@ -7,6 +7,8 @@ import { ArrowRight, Eye, EyeOff, Shield, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SectionShell } from "@/components/shared/section-shell";
+import { LeafIcon } from "@/components/layout/brand-logo";
+import { siteConfig } from "@/lib/site";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -63,10 +65,8 @@ export default function RegisterPage() {
       <SectionShell className="max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5 mb-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-atlantic">
-              <span className="text-sm font-bold text-white">VP</span>
-            </div>
-            <span className="text-xl font-bold text-navy tracking-tight">VitalPath</span>
+            <LeafIcon className="h-10 w-10" />
+            <span className="text-xl font-bold text-navy tracking-tight">{siteConfig.name}</span>
           </Link>
           <h1 className="text-2xl font-bold text-navy">Create your account</h1>
           <p className="mt-2 text-sm text-graphite-400">

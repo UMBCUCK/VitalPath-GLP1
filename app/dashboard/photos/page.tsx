@@ -44,7 +44,7 @@ export default function PhotosPage() {
         </div>
         <div className="flex gap-2">
           <Button variant={compareMode ? "default" : "outline"} size="sm" onClick={() => setCompareMode(!compareMode)} className="gap-2">
-            <Image className="h-4 w-4" /> {compareMode ? "Exit Compare" : "Compare"}
+            <Image className="h-4 w-4" aria-hidden="true" /> {compareMode ? "Exit Compare" : "Compare"}
           </Button>
           <Button size="sm" className="gap-2">
             <Upload className="h-4 w-4" /> Upload Photo

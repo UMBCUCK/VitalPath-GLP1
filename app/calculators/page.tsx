@@ -83,7 +83,7 @@ const comingSoon = [
   {
     icon: Users,
     title: "Referral Earnings",
-    description: "Estimate how much you can earn by sharing VitalPath.",
+    description: "Estimate how much you can earn by sharing Nature's Journey.",
     color: "from-teal-50 to-blue-50",
     iconColor: "text-teal-600",
   },
@@ -183,7 +183,7 @@ export default function CalculatorsPage() {
       {/* Main calculators grid */}
       <section className="py-16">
         <SectionShell>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {calculators.map((calc) => (
               <Link
                 key={calc.title}

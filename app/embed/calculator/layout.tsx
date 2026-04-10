@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Health Calculator Widget | VitalPath",
+  title: "Health Calculator Widget | Nature's Journey",
   description: "Embeddable health calculator — BMI, calories, protein, hydration, and weight loss timeline.",
   robots: { index: false, follow: false },
 };

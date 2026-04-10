@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description:
     "Free hydration calculator. Calculate your optimal daily water intake based on body weight and activity level. Proper hydration is especially important during GLP-1 weight management treatment.",
   openGraph: {
-    title: "Hydration Calculator — How Much Water Should You Drink? | VitalPath",
+    title: "Hydration Calculator — How Much Water Should You Drink? | Nature's Journey",
     description:
       "Calculate your daily water goal in ounces, glasses, and liters. Get a time-of-day hydration schedule for optimal results.",
   },

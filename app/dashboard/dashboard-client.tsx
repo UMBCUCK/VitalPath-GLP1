@@ -237,7 +237,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-premium"><Gift className="h-6 w-6 text-teal" /></div>
             <div>
-              <p className="text-base font-bold text-navy">Share VitalPath, earn credit</p>
+              <p className="text-base font-bold text-navy">Share Nature's Journey, earn credit</p>
               <p className="text-sm text-graphite-500">
                 {referralCode ? `${referralCode.totalReferred} referrals · ${formatPrice(referralCode.totalEarned)} earned` : "Get $50 for every friend who subscribes"}
               </p>

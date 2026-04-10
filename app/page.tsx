@@ -5,16 +5,17 @@ import type { Metadata } from "next";
 import dynamic_import from "next/dynamic";
 import { HeroSection } from "@/components/marketing/hero-section";
 import { TrustBar } from "@/components/marketing/trust-bar";
+import { PressBar } from "@/components/marketing/press-bar";
 import { ProblemSection } from "@/components/marketing/problem-section";
 import { PersonaSection } from "@/components/marketing/persona-section";
 import { SolutionSection } from "@/components/marketing/solution-section";
 import { ProcessSection } from "@/components/marketing/process-section";
 import { Disclaimer } from "@/components/shared/disclaimer";
-import { OrganizationJsonLd, FAQPageJsonLd, HowToJsonLd, ProductJsonLd, MedicalWebPageJsonLd } from "@/components/seo/json-ld";
+import { OrganizationJsonLd, FAQPageJsonLd, HowToJsonLd, ProductJsonLd, MedicalWebPageJsonLd, SiteLinksSearchBoxJsonLd } from "@/components/seo/json-ld";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { siteConfig } from "@/lib/site";
 import { faqs } from "@/lib/content";
-import { plans } from "@/lib/pricing";
+import { fetchDbPlans } from "@/lib/pricing-server";
 
 // Lazy load below-fold sections to reduce initial JS bundle (~40% faster LCP)
 const MedicationShowcase = dynamic_import(() => import("@/components/marketing/medication-showcase").then(m => ({ default: m.MedicationShowcase })));
@@ -37,7 +38,7 @@ const CtaSection = dynamic_import(() => import("@/components/marketing/cta-secti
 
 // SEO metadata optimized for GLP-1 weight loss keywords
 export const metadata: Metadata = {
-  title: "GLP-1 Weight Loss Medication Online | From $279/mo | VitalPath",
+  title: "GLP-1 Weight Loss Medication Online | From $279/mo | Nature's Journey",
   description:
     "Get GLP-1 weight loss medication prescribed online by licensed providers. Same active ingredient as Ozempic & Wegovy — 79% less than retail. Free 2-day shipping. Cancel anytime.",
   keywords: [
@@ -53,7 +54,7 @@ export const metadata: Metadata = {
     "GLP-1 prescription online",
   ],
   openGraph: {
-    title: "GLP-1 Weight Loss Medication — 79% Less Than Retail | VitalPath",
+    title: "GLP-1 Weight Loss Medication — 79% Less Than Retail | Nature's Journey",
     description:
       "Prescribed online by licensed providers. From $279/mo with free shipping. Join 18,000+ members. See if you qualify in 2 minutes.",
     url: siteConfig.url,
@@ -72,13 +73,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const plans = await fetchDbPlans();
   return (
     <MarketingShell>
-      {/* Rich structured data for SEO — 6 schema types for maximum SERP features */}
+      {/* Rich structured data for SEO — 7 schema types for maximum SERP features */}
       <OrganizationJsonLd />
+      <SiteLinksSearchBoxJsonLd />
       <MedicalWebPageJsonLd
-        name="GLP-1 Weight Loss Medication Online — VitalPath"
+        name="GLP-1 Weight Loss Medication Online — Nature's Journey"
         description="Provider-guided GLP-1 weight management with personalized treatment plans, medication if prescribed, and ongoing support. From $279/mo."
         url="/"
         medicalAudience="Patient"
@@ -86,7 +89,7 @@ export default function HomePage() {
       <FAQPageJsonLd faqs={faqs} />
       <HowToJsonLd
         name="How to Get GLP-1 Weight Loss Medication Online"
-        description="Get prescribed GLP-1 medication through VitalPath's telehealth platform in 3 simple steps."
+        description="Get prescribed GLP-1 medication through Nature's Journey's telehealth platform in 3 simple steps."
         steps={[
           { title: "Complete online assessment", description: "Answer questions about your health goals and history. Takes about 2 minutes." },
           { title: "Get evaluated by a provider", description: "A board-certified provider reviews your health profile and determines eligibility." },
@@ -96,16 +99,17 @@ export default function HomePage() {
       {plans.map((plan) => (
         <ProductJsonLd
           key={plan.id}
-          name={`VitalPath ${plan.name} Plan`}
+          name={`Nature's Journey ${plan.name} Plan`}
           description={plan.description}
           price={plan.priceMonthly / 100}
-          url={`/quiz?plan=${plan.slug}`}
+          url={`/qualify?plan=${plan.slug}`}
         />
       ))}
 
       {/* ATTENTION: Hook them immediately (eagerly loaded — above the fold) */}
       <HeroSection />
       <TrustBar />
+      <PressBar />
 
       {/* PROBLEM: Make them feel understood */}
       <ProblemSection />
@@ -138,7 +142,7 @@ export default function HomePage() {
       <GuaranteeSection />
 
       {/* CONVERT: Close the deal */}
-      <PricingSection />
+      <PricingSection plans={plans} />
       <FaqSection limit={8} />
       <CtaSection />
 

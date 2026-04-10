@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description:
     "Compare GLP-1 weight loss medications: semaglutide (Ozempic, Wegovy) vs tirzepatide (Mounjaro, Zepbound). How they work, clinical results, cost comparison, side effects, and how to get prescribed online.",
   openGraph: {
-    title: "GLP-1 Weight Loss Medications Guide | VitalPath",
+    title: "GLP-1 Weight Loss Medications Guide | Nature's Journey",
     description: "Everything about semaglutide and tirzepatide for weight loss. Compare results, cost, side effects, and get prescribed online from $279/mo.",
   },
 };
@@ -91,7 +91,7 @@ export default function MedicationsPage() {
                   </div>
                   <div className="rounded-xl bg-navy-50/30 p-3">
                     <div className="flex items-center gap-1.5 text-xs text-graphite-400 mb-1">
-                      <DollarSign className="h-3 w-3" /> VitalPath Price
+                      <DollarSign className="h-3 w-3" /> Nature's Journey Price
                     </div>
                     <p className="text-sm font-bold text-teal">{med.vitalpathCost}</p>
                   </div>
@@ -137,7 +137,7 @@ export default function MedicationsPage() {
                   ["Avg weight loss", "15-16%", "20-22%"],
                   ["Dosing", "Weekly injection", "Weekly injection"],
                   ["Retail cost", "$935-$1,349+/mo", "$1,023-$1,200+/mo"],
-                  ["VitalPath cost", "From $279/mo", "From $279/mo"],
+                  ["Nature's Journey cost", "From $279/mo", "From $279/mo"],
                   ["Nausea rate", "44%", "31%"],
                   ["Clinical trials", "STEP (Novo Nordisk)", "SURMOUNT (Eli Lilly)"],
                 ].map(([factor, sem, tir]) => (
@@ -168,7 +168,7 @@ export default function MedicationsPage() {
             legal when prescribed by a licensed provider and prepared by a properly licensed pharmacy.
           </p>
           <p className="mt-4 text-sm leading-relaxed text-graphite-600">
-            VitalPath partners exclusively with state-licensed 503A and 503B compounding pharmacies
+            Nature's Journey partners exclusively with state-licensed 503A and 503B compounding pharmacies
             that meet strict quality standards including sterility testing, potency verification, and
             proper cold-chain shipping.
           </p>

@@ -17,7 +17,7 @@ import { processSteps } from "@/lib/content";
 export const metadata: Metadata = {
   title: "How It Works",
   description:
-    "Learn how VitalPath delivers provider-guided weight management with personalized treatment plans, medication if prescribed, and ongoing support.",
+    "Learn how Nature's Journey delivers provider-guided weight management with personalized treatment plans, medication if prescribed, and ongoing support.",
 };
 
 const details = [
@@ -57,7 +57,7 @@ export default function HowItWorksPage() {
   return (
     <MarketingShell>
       <HowToJsonLd
-        name="How to Start GLP-1 Weight Management with VitalPath"
+        name="How to Start GLP-1 Weight Management with Nature's Journey"
         description="A four-step process from initial assessment to ongoing provider-guided care with personalized treatment plans."
         steps={processSteps.map((s) => ({ title: s.title, description: s.description }))}
       />
@@ -72,7 +72,7 @@ export default function HowItWorksPage() {
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500">
             No hidden requirements, no confusing fine print. Here's exactly what happens when you
-            start with VitalPath.
+            start with Nature's Journey.
           </p>
         </SectionShell>
       </section>

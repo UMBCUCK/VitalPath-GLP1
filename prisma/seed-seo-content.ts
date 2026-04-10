@@ -47,7 +47,7 @@ async function main() {
 
 <h2>Cost Comparison</h2>
 <p>Brand-name versions of both medications can cost $1,000-$1,500+ per month without insurance. Compounded versions, prescribed by licensed providers and prepared by state-licensed pharmacies, offer a significantly more affordable option.</p>
-<p>At VitalPath, plans including compounded medication start at <strong>$279/month</strong> — up to 79% less than brand-name pricing.</p>
+<p>At Nature's Journey, plans including compounded medication start at <strong>$279/month</strong> — up to 79% less than brand-name pricing.</p>
 
 <h2>How Providers Choose Between Them</h2>
 <p>Your provider evaluates several factors when recommending a medication:</p>
@@ -94,8 +94,8 @@ async function main() {
 <p>Compounded medications are prepared by state-licensed 503A and 503B pharmacies using the same active ingredients. While not FDA-approved, they are legal, regulated, and prescribed by licensed medical providers after clinical evaluation.</p>
 <p><strong>Compounded semaglutide programs typically cost $200-$500/month</strong> — a fraction of brand-name pricing.</p>
 
-<h2>What's Included in VitalPath's $279/Month Plan?</h2>
-<p>Unlike standalone pharmacy pricing, VitalPath's Essential plan includes:</p>
+<h2>What's Included in Nature's Journey's $279/Month Plan?</h2>
+<p>Unlike standalone pharmacy pricing, Nature's Journey's Essential plan includes:</p>
 <ul>
 <li>Licensed provider evaluation and ongoing care</li>
 <li>Compounded medication, if prescribed</li>
@@ -117,7 +117,7 @@ async function main() {
 
 <h2>Is the Investment Worth It?</h2>
 <p>Consider the cost of <em>not</em> treating obesity. The CDC estimates that adults with obesity spend $1,861 more annually on medical costs than those at healthy weights. Over a lifetime, untreated obesity is associated with significantly higher rates of type 2 diabetes, heart disease, and joint problems.</p>
-<p>At $9.30/day, a VitalPath Essential plan costs less than most daily coffee habits.</p>`,
+<p>At $9.30/day, a Nature's Journey Essential plan costs less than most daily coffee habits.</p>`,
     },
 
     // HIGH PRIORITY — 8K searches/mo
@@ -323,8 +323,8 @@ async function main() {
 <h2>Important Disclaimer</h2>
 <p>Compounded medications are <strong>not FDA-approved</strong>. They have not undergone the same clinical trial process as brand-name medications. However, they are legal when prescribed by a licensed provider and prepared by a properly licensed pharmacy.</p>
 
-<h2>VitalPath's Approach</h2>
-<p>VitalPath partners exclusively with state-licensed 503A and 503B pharmacies that meet strict quality standards. Every patient receives a licensed provider evaluation before any medication is prescribed, and ongoing care team support is included in every plan.</p>`,
+<h2>Nature's Journey's Approach</h2>
+<p>Nature's Journey partners exclusively with state-licensed 503A and 503B pharmacies that meet strict quality standards. Every patient receives a licensed provider evaluation before any medication is prescribed, and ongoing care team support is included in every plan.</p>`,
     },
 
     // 5K searches/mo
@@ -381,7 +381,7 @@ async function main() {
 <p><strong>Produce:</strong> Mixed greens, avocados, berries, asparagus, bell peppers, spinach, sweet potatoes, lemons</p>
 <p><strong>Pantry:</strong> Olive oil, chia seeds, granola, bone broth, spices</p>
 
-<p><em>Want personalized meal plans that adapt to your progress? VitalPath Premium includes weekly customized meal plans tailored to GLP-1 patients. <a href="/qualify">Take the assessment</a> to get started.</em></p>`,
+<p><em>Want personalized meal plans that adapt to your progress? Nature's Journey Premium includes weekly customized meal plans tailored to GLP-1 patients. <a href="/qualify">Take the assessment</a> to get started.</em></p>`,
     },
 
     // 4K searches/mo
@@ -835,10 +835,10 @@ async function main() {
     },
     {
       slug: "vitalpath-vs-weightwatchers",
-      title: "VitalPath vs WeightWatchers",
-      seoTitle: "VitalPath vs WeightWatchers (WW): Medical Weight Loss vs Point System",
-      seoDescription: "Compare VitalPath's medical weight loss program vs WeightWatchers. GLP-1 medication + provider care vs points system + community. See which approach works better.",
-      heroHeadline: "How VitalPath compares to WeightWatchers",
+      title: "Nature's Journey vs WeightWatchers",
+      seoTitle: "Nature's Journey vs WeightWatchers (WW): Medical Weight Loss vs Point System",
+      seoDescription: "Compare Nature's Journey's medical weight loss program vs WeightWatchers. GLP-1 medication + provider care vs points system + community. See which approach works better.",
+      heroHeadline: "How Nature's Journey compares to WeightWatchers",
       heroDescription: "Medical weight management vs behavioral coaching — two very different approaches to the same goal.",
       features: JSON.stringify([
         { feature: "Medical provider evaluation", us: true, them: false },
@@ -852,10 +852,10 @@ async function main() {
         { feature: "Addresses hunger biology", us: true, them: false },
       ]),
       keyDifferences: JSON.stringify([
-        "VitalPath includes medical evaluation and prescription medication",
+        "Nature's Journey includes medical evaluation and prescription medication",
         "WeightWatchers focuses on behavioral change through a points system",
         "Clinical data shows GLP-1 programs produce 3-5x more weight loss than behavioral programs alone",
-        "VitalPath costs more but includes medical care and medication",
+        "Nature's Journey costs more but includes medical care and medication",
       ]),
       ctaHeadline: "Ready for a medical approach?",
       ctaDescription: "If you've tried behavioral programs and want more significant results, take our assessment.",
@@ -863,10 +863,10 @@ async function main() {
     },
     {
       slug: "vitalpath-vs-ro",
-      title: "VitalPath vs Ro",
-      seoTitle: "VitalPath vs Ro Body: Comparing GLP-1 Weight Loss Programs (2026)",
-      seoDescription: "Compare VitalPath vs Ro Body for GLP-1 weight loss. Side-by-side on pricing, medication, provider care, meal plans, coaching, and member support.",
-      heroHeadline: "How VitalPath compares to Ro Body",
+      title: "Nature's Journey vs Ro",
+      seoTitle: "Nature's Journey vs Ro Body: Comparing GLP-1 Weight Loss Programs (2026)",
+      seoDescription: "Compare Nature's Journey vs Ro Body for GLP-1 weight loss. Side-by-side on pricing, medication, provider care, meal plans, coaching, and member support.",
+      heroHeadline: "How Nature's Journey compares to Ro Body",
       heroDescription: "Both offer telehealth GLP-1 weight management — but the programs differ in what's included beyond the medication.",
       features: JSON.stringify([
         { feature: "Provider evaluation", us: true, them: true },
@@ -880,12 +880,12 @@ async function main() {
         { feature: "Starting price", us: "$279/mo", them: "$145/mo" },
       ]),
       keyDifferences: JSON.stringify([
-        "VitalPath includes comprehensive nutrition and lifestyle support",
+        "Nature's Journey includes comprehensive nutrition and lifestyle support",
         "Ro Body focuses primarily on medication access at a lower price point",
-        "VitalPath offers coaching, meal plans, and progress tools in all plans",
+        "Nature's Journey offers coaching, meal plans, and progress tools in all plans",
       ]),
       ctaHeadline: "Get medication plus real support",
-      ctaDescription: "VitalPath includes everything you need — not just the prescription.",
+      ctaDescription: "Nature's Journey includes everything you need — not just the prescription.",
       isPublished: true,
     },
   ];

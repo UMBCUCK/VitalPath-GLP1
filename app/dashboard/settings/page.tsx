@@ -190,7 +190,7 @@ export default function SettingsPage() {
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles className="h-4 w-4 text-gold-300" />
-                  <span className="text-xs font-bold text-white/60 uppercase tracking-wider">Make money with VitalPath</span>
+                  <span className="text-xs font-bold text-white/60 uppercase tracking-wider">Make money with Nature's Journey</span>
                 </div>
                 <p className="text-lg font-bold mb-1">Earn $150–$250 per referral</p>
                 <p className="text-sm text-white/70 mb-4 max-w-sm">

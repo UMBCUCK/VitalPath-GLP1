@@ -49,7 +49,7 @@ export default function AdminWidgetsPage() {
   frameborder="0"
   style="border: none; border-radius: 16px; overflow: hidden;"
   allow="clipboard-write"
-  title="VitalPath Health Calculator"
+  title="Nature's Journey Health Calculator"
 ></iframe>`;
 
   function handleCopy() {
@@ -63,7 +63,7 @@ export default function AdminWidgetsPage() {
       <div>
         <h1 className="text-2xl font-bold text-navy">Widget Manager</h1>
         <p className="mt-1 text-sm text-graphite-500">
-          Generate embeddable calculator widgets for partners. All leads funnel through VitalPath with referral attribution.
+          Generate embeddable calculator widgets for partners. All leads funnel through Nature's Journey with referral attribution.
         </p>
       </div>
 
@@ -87,7 +87,7 @@ export default function AdminWidgetsPage() {
                     onChange={(e) => { setSelectedRef(e.target.value); setCustomRef(""); }}
                     className="calculator-input text-sm py-2"
                   >
-                    <option value="">No referral (direct VitalPath)</option>
+                    <option value="">No referral (direct Nature's Journey)</option>
                     {referrals.map((r) => (
                       <option key={r.code} value={r.code}>
                         {r.code} &mdash; {r.userName} ({r.totalReferred} referrals)
@@ -118,7 +118,7 @@ export default function AdminWidgetsPage() {
                   className="calculator-input text-sm py-2"
                 />
                 <p className="text-[10px] text-graphite-400 mt-1">
-                  Shows &quot;Powered by VitalPath &middot; via [partner]&quot; in the widget.
+                  Shows &quot;Powered by Nature's Journey &middot; via [partner]&quot; in the widget.
                 </p>
               </div>
             </CardContent>
@@ -237,7 +237,7 @@ export default function AdminWidgetsPage() {
               </div>
               <div className="flex gap-3">
                 <Badge variant="default" className="shrink-0 h-6 w-6 rounded-full p-0 flex items-center justify-center text-[10px]">3</Badge>
-                <p>&quot;See If I Qualify&quot; opens VitalPath with the <code className="text-teal">?ref=CODE</code> parameter</p>
+                <p>&quot;See If I Qualify&quot; opens Nature's Journey with the <code className="text-teal">?ref=CODE</code> parameter</p>
               </div>
               <div className="flex gap-3">
                 <Badge variant="default" className="shrink-0 h-6 w-6 rounded-full p-0 flex items-center justify-center text-[10px]">4</Badge>

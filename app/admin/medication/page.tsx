@@ -6,17 +6,30 @@ import {
   getDosageAnalytics,
   getMedicationAdherenceCorrelation,
 } from "@/lib/admin-medication";
+import { db } from "@/lib/db";
 import { MedicationClient } from "./medication-client";
+
+async function getCatalog() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await (db as any).medicationCatalog.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    });
+  } catch {
+    return [];
+  }
+}
 
 export default async function MedicationPage() {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") redirect("/login");
 
-  const [overview, schedules, analytics, correlation] = await Promise.all([
+  const [overview, schedules, analytics, correlation, catalog] = await Promise.all([
     getDosageOverview(),
     getDosageSchedules(1, 25),
     getDosageAnalytics(),
     getMedicationAdherenceCorrelation(),
+    getCatalog(),
   ]);
 
   return (
@@ -26,6 +39,7 @@ export default async function MedicationPage() {
       initialTotal={schedules.total}
       analytics={analytics}
       correlation={correlation}
+      initialCatalog={JSON.parse(JSON.stringify(catalog))}
     />
   );
 }

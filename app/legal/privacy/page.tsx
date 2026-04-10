@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "VitalPath Privacy Policy describing how we collect, use, and protect your personal and health information.",
+  description: "Nature's Journey Privacy Policy describing how we collect, use, and protect your personal and health information.",
 };
 
 export default function PrivacyPage() {
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-bold text-navy">3. HIPAA Compliance</h2>
-            <p>VitalPath operates as a HIPAA-compliant platform. Protected Health Information (PHI) is handled in accordance with the Health Insurance Portability and Accountability Act. We maintain administrative, technical, and physical safeguards to protect your health information.</p>
+            <p>Nature's Journey operates as a HIPAA-compliant platform. Protected Health Information (PHI) is handled in accordance with the Health Insurance Portability and Accountability Act. We maintain administrative, technical, and physical safeguards to protect your health information.</p>
             <p className="mt-2">For detailed information about how we handle PHI, please see our HIPAA Notice of Privacy Practices.</p>
           </section>
 
@@ -66,16 +66,16 @@ export default function PrivacyPage() {
               <ul className="mt-2 space-y-2">
                 <li><strong>Right to Know:</strong> You have the right to request that we disclose the categories and specific pieces of personal information we have collected about you, the categories of sources from which it was collected, the business or commercial purpose for collecting it, and the categories of third parties with whom we share it.</li>
                 <li><strong>Right to Delete:</strong> You have the right to request the deletion of your personal information, subject to certain exceptions (such as legal retention requirements for health records).</li>
-                <li><strong>Right to Opt-Out of Sale:</strong> You have the right to opt out of the sale or sharing of your personal information. VitalPath does not sell personal information as defined under the CCPA/CPRA.</li>
+                <li><strong>Right to Opt-Out of Sale:</strong> You have the right to opt out of the sale or sharing of your personal information. Nature's Journey does not sell personal information as defined under the CCPA/CPRA.</li>
                 <li><strong>Right to Correct:</strong> You have the right to request correction of inaccurate personal information that we maintain about you.</li>
                 <li><strong>Right to Non-Discrimination:</strong> You have the right not to be discriminated against for exercising any of your CCPA/CPRA rights. We will not deny you services, charge different prices, or provide a different quality of service because you exercised your privacy rights.</li>
               </ul>
-              <p className="mt-2">To exercise any of these rights, contact us at privacy@vitalpath.com with the subject line &quot;California Privacy Rights Request.&quot; We will verify your identity before processing your request and respond within 45 days as required by law.</p>
+              <p className="mt-2">To exercise any of these rights, contact us at privacy@naturesjourneyhealth.com with the subject line &quot;California Privacy Rights Request.&quot; We will verify your identity before processing your request and respond within 45 days as required by law.</p>
             </div>
 
             <div className="mt-4">
               <h3 className="text-base font-bold text-navy">Virginia (VCDPA), Colorado (CPA), and Connecticut (CTDPA)</h3>
-              <p className="mt-1">If you are a resident of Virginia, Colorado, or Connecticut, you may have similar privacy rights under your state&apos;s respective privacy law, including the right to access, correct, and delete your personal data, as well as the right to opt out of targeted advertising and the sale of personal data. To exercise your rights under these state laws, please contact us at privacy@vitalpath.com.</p>
+              <p className="mt-1">If you are a resident of Virginia, Colorado, or Connecticut, you may have similar privacy rights under your state&apos;s respective privacy law, including the right to access, correct, and delete your personal data, as well as the right to opt out of targeted advertising and the sale of personal data. To exercise your rights under these state laws, please contact us at privacy@naturesjourneyhealth.com.</p>
             </div>
 
             <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
@@ -85,7 +85,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-bold text-navy">8. Contact Us</h2>
-            <p>For privacy-related questions or to exercise your rights, contact us at privacy@vitalpath.com or (888) 509-2745.</p>
+            <p>For privacy-related questions or to exercise your rights, contact us at privacy@naturesjourneyhealth.com or (888) 509-2745.</p>
           </section>
         </div>
       </SectionShell>

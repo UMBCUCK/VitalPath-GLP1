@@ -27,9 +27,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!med) return { title: "Medication Not Found" };
   return {
     title: `${med.genericName} (${med.brandName}) for Weight Loss — Cost, Results & How to Get It`,
-    description: `Everything about ${med.genericName} for weight loss: how it works, clinical results (${med.weightLoss.split('.')[0]}), cost (${med.retailCost} retail vs ${med.vitalpathCost} with VitalPath), side effects, and how to get prescribed online.`,
+    description: `Everything about ${med.genericName} for weight loss: how it works, clinical results (${med.weightLoss.split('.')[0]}), cost (${med.retailCost} retail vs ${med.vitalpathCost} with Nature's Journey), side effects, and how to get prescribed online.`,
     openGraph: {
-      title: `${med.genericName} Weight Loss: Cost, Results & Availability | VitalPath`,
+      title: `${med.genericName} Weight Loss: Cost, Results & Availability | Nature's Journey`,
       description: `Get ${med.genericName} (${med.brandName}) online from ${med.vitalpathCost}. ${med.savings} less than retail. Licensed providers, free shipping.`,
     },
   };
@@ -89,7 +89,7 @@ export default async function MedicationPage({ params }: PageProps) {
             {[
               { icon: TrendingDown, label: "Avg Weight Loss", value: med.weightLoss.split('.')[0], color: "text-teal" },
               { icon: DollarSign, label: "Retail Cost", value: med.retailCost, color: "text-graphite-400" },
-              { icon: DollarSign, label: "VitalPath Cost", value: med.vitalpathCost, color: "text-teal" },
+              { icon: DollarSign, label: "Nature's Journey Cost", value: med.vitalpathCost, color: "text-teal" },
               { icon: Clock, label: "Dosing", value: med.dosing.split('.')[0], color: "text-atlantic" },
             ].map((stat) => (
               <div key={stat.label} className="rounded-2xl border border-navy-100/60 bg-white p-5 shadow-premium">
@@ -155,7 +155,7 @@ export default async function MedicationPage({ params }: PageProps) {
               <p className="mt-1 text-xs text-graphite-400">Without insurance, no support included</p>
             </div>
             <div className="rounded-2xl border-2 border-teal bg-white p-6 shadow-glow">
-              <p className="text-xs font-semibold uppercase tracking-wider text-teal">VitalPath</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-teal">Nature's Journey</p>
               <p className="mt-2 text-3xl font-bold text-navy">{med.vitalpathCost}</p>
               <p className="mt-1 text-xs text-teal-600">Save {med.savings} — includes provider care, medication & support</p>
             </div>
@@ -190,7 +190,7 @@ export default async function MedicationPage({ params }: PageProps) {
             How to get {med.genericName} online
           </h2>
           <p className="mt-4 text-graphite-500">
-            VitalPath offers compounded {med.genericName.toLowerCase()} through a simple 3-step process.
+            Nature's Journey offers compounded {med.genericName.toLowerCase()} through a simple 3-step process.
             No clinic visits, no insurance hassles.
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-3 text-left">

@@ -42,6 +42,14 @@ const nextConfig: NextConfig = {
   async headers() {
     const isProd = process.env.NODE_ENV === "production";
     return [
+      // Allow embed pages to be iframed from any origin (overrides the DENY below)
+      {
+        source: "/embed/(.*)",
+        headers: [
+          { key: "X-Frame-Options", value: "ALLOWALL" },
+          { key: "Content-Security-Policy", value: "frame-ancestors *" },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [

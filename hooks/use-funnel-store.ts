@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-const STORAGE_KEY = "vitalpath-funnel";
+const STORAGE_KEY = "nj-funnel";
 
 export interface QualifyFlowState {
   currentStep?: number;

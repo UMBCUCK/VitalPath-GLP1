@@ -5,25 +5,25 @@ async function main() {
   // Add author to medication/education posts
   await db.blogPost.updateMany({
     where: { category: { in: ["medication", "education"] }, author: null },
-    data: { author: "Dr. Sarah Chen, MD — VitalPath Medical Director" },
+    data: { author: "Dr. Sarah Chen, MD — Nature's Journey Medical Director" },
   });
 
   // Add author to nutrition posts
   await db.blogPost.updateMany({
     where: { category: "nutrition", author: null },
-    data: { author: "VitalPath Nutrition Team" },
+    data: { author: "Nature's Journey Nutrition Team" },
   });
 
   // Add author to lifestyle posts
   await db.blogPost.updateMany({
     where: { category: "lifestyle", author: null },
-    data: { author: "VitalPath Clinical Team" },
+    data: { author: "Nature's Journey Clinical Team" },
   });
 
   // Catch any remaining
   await db.blogPost.updateMany({
     where: { author: null },
-    data: { author: "VitalPath Clinical Team" },
+    data: { author: "Nature's Journey Clinical Team" },
   });
 
   const total = await db.blogPost.count();

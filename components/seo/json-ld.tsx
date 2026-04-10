@@ -393,6 +393,106 @@ export function MedicalWebPageJsonLd({
   );
 }
 
+// Medical condition schema — improves E-E-A-T for condition-focused pages
+export function MedicalConditionJsonLd({
+  name,
+  alternateName,
+  description,
+  url,
+  possibleTreatment,
+}: {
+  name: string;
+  alternateName?: string;
+  description: string;
+  url: string;
+  possibleTreatment?: string;
+}) {
+  const data: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "MedicalCondition",
+    name,
+    description,
+    url: `${BASE_URL}${url}`,
+  };
+  if (alternateName) data.alternateName = alternateName;
+  if (possibleTreatment) {
+    data.possibleTreatment = {
+      "@type": "MedicalTherapy",
+      name: possibleTreatment,
+    };
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+// Drug schema — improves E-E-A-T for medication-focused pages
+export function DrugJsonLd({
+  name,
+  alternateName,
+  description,
+  url,
+  manufacturer,
+  administrationRoute,
+  pregnancyCategory,
+}: {
+  name: string;
+  alternateName?: string;
+  description: string;
+  url: string;
+  manufacturer?: string;
+  administrationRoute?: string;
+  pregnancyCategory?: string;
+}) {
+  const data: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Drug",
+    name,
+    description,
+    url: `${BASE_URL}${url}`,
+  };
+  if (alternateName) data.alternateName = alternateName;
+  if (manufacturer) data.manufacturer = { "@type": "Organization", name: manufacturer };
+  if (administrationRoute) data.administrationRoute = administrationRoute;
+  if (pregnancyCategory) data.pregnancyCategory = pregnancyCategory;
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
+// SiteLinksSearchBox schema — enables Google SERP search box
+export function SiteLinksSearchBoxJsonLd() {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.name,
+    url: BASE_URL,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${BASE_URL}/blog?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
 // Video testimonial schema for rich SERP snippets
 export function VideoObjectJsonLd({
   name,

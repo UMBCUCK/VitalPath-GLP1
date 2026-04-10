@@ -239,7 +239,7 @@ export const testimonials = [
     rating: 5,
     date: "February 2026",
     verified: true,
-    text: "I'm a truck driver so my schedule is insane and eating healthy on the road is basically impossible. I was 271 when I started and my doctor had been on me about my blood pressure for years. What sold me on VitalPath was that I didn't have to go to an office — everything was on my phone. The provider actually listened to my situation and worked with me on it. 5 months later I'm at 232 and my BP is normal for the first time since my 30s. My only complaint is I wish the app had a dark mode lol.",
+    text: "I'm a truck driver so my schedule is insane and eating healthy on the road is basically impossible. I was 271 when I started and my doctor had been on me about my blood pressure for years. What sold me on Nature's Journey was that I didn't have to go to an office — everything was on my phone. The provider actually listened to my situation and worked with me on it. 5 months later I'm at 232 and my BP is normal for the first time since my 30s. My only complaint is I wish the app had a dark mode lol.",
     highlight: "39 lbs lost, BP normalized",
     disclosureText:
       "Individual experience. Results vary and depend on many factors including adherence to treatment plans.",
@@ -255,7 +255,7 @@ export const testimonials = [
     rating: 5,
     date: "March 2026",
     verified: true,
-    text: "After my second baby I could NOT lose the weight no matter what I did. I was working out 4x a week, eating 1400 calories, and the scale would not move. My OB mentioned GLP-1 medications and I found VitalPath. The intake process was really thorough — they actually reviewed my full medical history and asked about breastfeeding and everything (I'd already weaned). I'm down 28 lbs in 4 months and I finally fit into my pre-pregnancy jeans. Crying actual tears in the Target dressing room, not even joking.",
+    text: "After my second baby I could NOT lose the weight no matter what I did. I was working out 4x a week, eating 1400 calories, and the scale would not move. My OB mentioned GLP-1 medications and I found Nature's Journey. The intake process was really thorough — they actually reviewed my full medical history and asked about breastfeeding and everything (I'd already weaned). I'm down 28 lbs in 4 months and I finally fit into my pre-pregnancy jeans. Crying actual tears in the Target dressing room, not even joking.",
     highlight: "28 lbs — fits pre-pregnancy clothes",
     disclosureText:
       "Individual experience. Results vary and depend on many factors including adherence to treatment plans.",
@@ -303,7 +303,7 @@ export const testimonials = [
     rating: 5,
     date: "March 2026",
     verified: true,
-    text: "My wife started VitalPath 2 months before me and when I saw her results I signed up the same day. I was paying $180/month for a gym I went to twice plus $200 on supplements that did nothing. This is less than that and actually works. Down 26 lbs in 3 months and I cancelled the gym and the supplement subscriptions. My knees don't hurt when I climb stairs anymore which honestly means more to me than the number on the scale.",
+    text: "My wife started Nature's Journey 2 months before me and when I saw her results I signed up the same day. I was paying $180/month for a gym I went to twice plus $200 on supplements that did nothing. This is less than that and actually works. Down 26 lbs in 3 months and I cancelled the gym and the supplement subscriptions. My knees don't hurt when I climb stairs anymore which honestly means more to me than the number on the scale.",
     highlight: "26 lbs, no more knee pain",
     disclosureText:
       "Individual experience. Results vary and depend on many factors including adherence to treatment plans.",
@@ -383,7 +383,7 @@ export const testimonials = [
     rating: 5,
     date: "January 2026",
     verified: true,
-    text: "Menopausal weight gain is real and it is BRUTAL. I gained 60 lbs between ages 48-51 and nothing I did made a dent. My HRT helped with symptoms but not the weight. Found VitalPath through a Facebook group and honestly thought it was too good to be true. 9 months later I've lost 67 lbs and I feel like I got my body back. The provider understood menopause-related weight gain specifically which made a huge difference in my treatment plan. Also the grocery list feature saves me so much time.",
+    text: "Menopausal weight gain is real and it is BRUTAL. I gained 60 lbs between ages 48-51 and nothing I did made a dent. My HRT helped with symptoms but not the weight. Found Nature's Journey through a Facebook group and honestly thought it was too good to be true. 9 months later I've lost 67 lbs and I feel like I got my body back. The provider understood menopause-related weight gain specifically which made a huge difference in my treatment plan. Also the grocery list feature saves me so much time.",
     highlight: "67 lbs lost — menopausal weight gone",
     disclosureText:
       "Individual experience. Results vary and depend on many factors including adherence to treatment plans.",
@@ -441,7 +441,7 @@ export const faqs = [
   {
     question: "How much does it cost compared to Ozempic or Wegovy?",
     answer:
-      "Brand-name GLP-1 medications like Ozempic and Wegovy can cost $1,000-$1,500+ per month without insurance. VitalPath plans start at $279/month and include not just the medication (if prescribed), but also provider consultations, progress tracking, meal plans, and ongoing support. That's up to 79% less than the retail price of branded medications alone.",
+      "Brand-name GLP-1 medications like Ozempic and Wegovy can cost $1,000-$1,500+ per month without insurance. Nature's Journey plans start at $279/month and include not just the medication (if prescribed), but also provider consultations, progress tracking, meal plans, and ongoing support. That's up to 79% less than the retail price of branded medications alone.",
   },
   {
     question: "How quickly will I see results?",
@@ -466,7 +466,7 @@ export const faqs = [
   {
     question: "How much weight can I expect to lose?",
     answer:
-      "Results vary by individual, but clinical trial data shows patients on GLP-1 medications lose an average of 15-20% of their body weight over 12 months. For a 200-pound person, that's 30-40 pounds. Members who combine medication with VitalPath's nutrition and tracking tools tend to see results at the higher end of this range. Your provider sets realistic goals based on your specific health profile.",
+      "Results vary by individual, but clinical trial data shows patients on GLP-1 medications lose an average of 15-20% of their body weight over 12 months. For a 200-pound person, that's 30-40 pounds. Members who combine medication with Nature's Journey's nutrition and tracking tools tend to see results at the higher end of this range. Your provider sets realistic goals based on your specific health profile.",
   },
   {
     question: "Can I cancel my subscription?",
@@ -474,7 +474,7 @@ export const faqs = [
       "Yes. You can cancel, pause, or adjust your plan at any time from your dashboard. There are no long-term contracts, no cancellation fees, and no hidden charges. If you're considering canceling, our team can help explore options like plan adjustments or pausing your subscription.",
   },
   {
-    question: "How is VitalPath different from other telehealth weight loss programs?",
+    question: "How is Nature's Journey different from other telehealth weight loss programs?",
     answer:
       "Most programs either just prescribe medication or just offer coaching — we combine both into a comprehensive system. You get licensed provider care, GLP-1 medication (if prescribed), structured meal plans, progress tracking, and ongoing coaching support all in one platform. Plus, our maintenance transition planning helps you sustain results long-term, not just while you're on medication.",
   },
@@ -496,7 +496,7 @@ export const faqs = [
   {
     question: "What should I eat while taking GLP-1 medication?",
     answer:
-      "Focus on high-protein foods first at every meal — aim for 0.7-1.0 grams per pound of body weight daily. This is critical for preserving muscle during weight loss. Good choices include lean meats, fish, Greek yogurt, eggs, and cottage cheese. Avoid greasy, fried foods that can worsen nausea. Stay well-hydrated with water and bone broth. VitalPath Premium includes weekly meal plans specifically designed for GLP-1 patients.",
+      "Focus on high-protein foods first at every meal — aim for 0.7-1.0 grams per pound of body weight daily. This is critical for preserving muscle during weight loss. Good choices include lean meats, fish, Greek yogurt, eggs, and cottage cheese. Avoid greasy, fried foods that can worsen nausea. Stay well-hydrated with water and bone broth. Nature's Journey Premium includes weekly meal plans specifically designed for GLP-1 patients.",
   },
   {
     question: "Can I drink alcohol while on GLP-1 medication?",
@@ -506,7 +506,7 @@ export const faqs = [
   {
     question: "What happens if I stop taking the medication?",
     answer:
-      "This is exactly why VitalPath includes maintenance transition planning — most programs don't. Research shows stopping GLP-1 medication abruptly can lead to weight regain. Our providers work with you to build sustainable habits throughout your program so that when it's time to taper, you're ready. Think of the medication as training wheels: the goal is to need them less over time, not forever.",
+      "This is exactly why Nature's Journey includes maintenance transition planning — most programs don't. Research shows stopping GLP-1 medication abruptly can lead to weight regain. Our providers work with you to build sustainable habits throughout your program so that when it's time to taper, you're ready. Think of the medication as training wheels: the goal is to need them less over time, not forever.",
   },
   {
     question: "I'm afraid of needles. Can I still do this?",
@@ -516,7 +516,7 @@ export const faqs = [
   {
     question: "Is it worth $279/month?",
     answer:
-      "Let's do the math. The average American spends $2,000+/year on diets, gym memberships, and supplements — with a 95% failure rate. Brand-name GLP-1 costs $1,349+/month. Weight loss surgery runs $20,000-$35,000. VitalPath includes the medication, provider care, meal plans, progress tracking, and coaching for $279/month. Most members say the real cost was the years they spent on programs that didn't address the root cause. And unlike diets, GLP-1 medication has a clinical success rate of 85%+.",
+      "Let's do the math. The average American spends $2,000+/year on diets, gym memberships, and supplements — with a 95% failure rate. Brand-name GLP-1 costs $1,349+/month. Weight loss surgery runs $20,000-$35,000. Nature's Journey includes the medication, provider care, meal plans, progress tracking, and coaching for $279/month. Most members say the real cost was the years they spent on programs that didn't address the root cause. And unlike diets, GLP-1 medication has a clinical success rate of 85%+.",
   },
 ] as const;
 

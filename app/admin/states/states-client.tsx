@@ -77,7 +77,7 @@ export function StatesClient({ states: initialStates }: { states: StateData[] })
       <div>
         <h2 className="text-2xl font-bold text-navy">State Availability</h2>
         <p className="text-sm text-graphite-400">
-          Toggle which states offer VitalPath telehealth services
+          Toggle which states offer Nature's Journey telehealth services
         </p>
       </div>
 

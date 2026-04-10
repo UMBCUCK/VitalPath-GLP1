@@ -111,7 +111,7 @@ export function ShopClient({ eligible, reason, products, activeProductSlugs, act
         <h1 className="text-2xl font-bold text-navy">Shop Unlocks After Approval</h1>
         <p className="mt-2 max-w-md text-sm text-graphite-500">
           {reason === "no_subscription"
-            ? "Subscribe to a VitalPath plan to access our curated product shop."
+            ? "Subscribe to a Nature's Journey plan to access our curated product shop."
             : "Your treatment plan needs to be approved by a provider before you can add products."}
         </p>
         <Link href={reason === "no_subscription" ? "/pricing" : "/dashboard/treatment"}>

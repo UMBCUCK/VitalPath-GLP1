@@ -22,7 +22,7 @@ export function MilestoneShare({ weightLost, daysOnProgram, streakDays }: Milest
   if (currentMilestone < 5) return null;
 
   const shareText = `I just reached a ${currentMilestone}-pound milestone on my health journey! ${daysOnProgram} days of consistency and structured support are paying off.`;
-  const shareUrl = process.env.NEXT_PUBLIC_APP_URL || "https://vitalpath.com";
+  const shareUrl = process.env.NEXT_PUBLIC_APP_URL || "https://naturesjourneyhealth.com";
 
   function copyLink() {
     navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}/referrals`);
@@ -60,7 +60,7 @@ export function MilestoneShare({ weightLost, daysOnProgram, streakDays }: Milest
             <span>·</span>
             <span>{streakDays}-day streak</span>
           </div>
-          <p className="mt-2 text-[10px] text-navy-500">VitalPath Health</p>
+          <p className="mt-2 text-[10px] text-navy-500">Nature's Journey Health</p>
         </div>
 
         <div className="flex items-center gap-2">

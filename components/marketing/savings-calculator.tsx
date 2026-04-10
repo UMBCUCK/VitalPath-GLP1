@@ -104,7 +104,7 @@ export function SavingsCalculator() {
               <div className="flex flex-col">
                 <h3 className="text-lg font-bold text-navy flex items-center gap-2">
                   <Calculator className="h-5 w-5 text-gold" />
-                  Your savings with VitalPath
+                  Your savings with Nature's Journey
                 </h3>
 
                 <div className="mt-4 space-y-3 flex-1">
@@ -121,11 +121,11 @@ export function SavingsCalculator() {
                     </div>
                   </div>
 
-                  {/* VitalPath cost */}
+                  {/* Nature's Journey cost */}
                   <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-semibold text-teal">VitalPath</p>
+                        <p className="text-sm font-semibold text-teal">Nature's Journey</p>
                         <p className="text-xs text-teal-600">{monthsToGoal} months &times; $279/mo</p>
                       </div>
                       <p className="text-xl font-bold text-teal">

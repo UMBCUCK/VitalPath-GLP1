@@ -14,7 +14,7 @@ import { formatPrice } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Annual Plans — Save 20%",
-  description: "Switch to annual billing and save 20% on your VitalPath membership. Same premium care, better value.",
+  description: "Switch to annual billing and save 20% on your Nature's Journey membership. Same premium care, better value.",
 };
 
 export default function AnnualPricingPage() {

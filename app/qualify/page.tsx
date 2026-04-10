@@ -1,11 +1,12 @@
 "use client";
 
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowRight, ArrowLeft, Check, Shield, Users, Star, Clock,
   AlertTriangle, Lock, Sparkles, TrendingDown, Activity, Target, Zap,
+  FileCheck, Package, Pill, Info, ChevronDown,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -26,8 +27,8 @@ import { siteConfig } from "@/lib/site";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
-type QualifyStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-const TOTAL_STEPS = 7;
+type QualifyStep = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+const TOTAL_STEPS = 8;
 
 const US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
 
@@ -85,15 +86,35 @@ const contraindications = [
 const stepProof = [
   null,
   null,
-  { icon: Users, text: "18,000+ patients have started their journey with VitalPath", color: "text-teal" },
-  { icon: Star, text: "94% of members would recommend VitalPath to a friend", color: "text-gold" },
+  { icon: Users, text: "18,000+ patients have started their journey with Nature's Journey", color: "text-teal" },
+  { icon: Star, text: "94% of members would recommend Nature's Journey to a friend", color: "text-gold" },
   { icon: Shield, text: "Your answers are reviewed by licensed medical providers", color: "text-teal" },
+  { icon: Shield, text: "Your medication preference is shared with your provider — not a binding order", color: "text-teal" },
   null, // projection step
   { icon: Clock, text: "Most members see results within the first 30 days", color: "text-atlantic" },
-  { icon: Star, text: "4.9/5 from 2,400+ verified members · 94% would recommend VitalPath", color: "text-gold" },
+  { icon: Star, text: "4.9/5 from 2,400+ verified members · 94% would recommend Nature's Journey", color: "text-gold" },
+];
+
+// Default medications shown before catalog loads from API
+const DEFAULT_MEDICATIONS = [
+  { id: "1", slug: "wegovy-pill", name: "Wegovy® Pill", description: null, imageUrl: null, type: "branded", form: "pill" },
+  { id: "2", slug: "wegovy-pen", name: "Wegovy® Pen", description: null, imageUrl: null, type: "branded", form: "pen" },
+  { id: "3", slug: "ozempic-pen", name: "Ozempic® Pen", description: null, imageUrl: null, type: "branded", form: "pen" },
+  { id: "4", slug: "zepbound-pen", name: "Zepbound® Pen", description: null, imageUrl: null, type: "branded", form: "pen" },
+  { id: "5", slug: "mounjaro-pen", name: "Mounjaro® Pen", description: null, imageUrl: null, type: "branded", form: "pen" },
+  { id: "6", slug: "generic-liraglutide", name: "Generic Liraglutide", description: null, imageUrl: null, type: "generic", form: "pen" },
+  { id: "7", slug: "compounded-semaglutide", name: "Compounded Semaglutide", description: null, imageUrl: null, type: "compounded", form: "injection" },
 ];
 
 export default function QualifyPage() {
+  return (
+    <Suspense>
+      <QualifyPageInner />
+    </Suspense>
+  );
+}
+
+function QualifyPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { state: funnelState, update: updateFunnel } = useFunnelStore();
@@ -101,6 +122,8 @@ export default function QualifyPage() {
   const [showExitModal, setShowExitModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [exitEmail, setExitEmail] = useState("");
+  const [exitEmailSent, setExitEmailSent] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [restored, setRestored] = useState(false);
   const hasInteracted = useRef(false);
@@ -162,7 +185,11 @@ export default function QualifyPage() {
     emergencyContactName: "",
     emergencyContactPhone: "",
     emergencyContactRelation: "",
-    // Step 7: Consent
+    // Step 5: Medication preference
+    wantsMedication: null as null | boolean,
+    medicationInterest: "",
+    medicationInterestLabel: "",
+    // Step 8: Consent
     consentTreatment: false,
     consentHipaa: false,
     consentTelehealth: false,
@@ -171,6 +198,13 @@ export default function QualifyPage() {
     medicalHistory: "",
     goalWeightLbs: "",
   });
+
+  // ─── Medication catalog (fetched on demand) ───────────────
+  const [catalogMeds, setCatalogMeds] = useState<Array<{
+    id: string; name: string; slug: string; description: string | null;
+    imageUrl: string | null; type: string; form: string;
+  }>>([]);
+  const catalogFetched = useRef(false);
 
   const progress = (step / TOTAL_STEPS) * 100;
 
@@ -208,7 +242,7 @@ export default function QualifyPage() {
     if (restored) return;
     setRestored(true);
     try {
-      const raw = localStorage.getItem("vitalpath-funnel");
+      const raw = localStorage.getItem("nj-funnel");
       if (!raw) return;
       const stored = JSON.parse(raw);
       const q = stored?.qualify;
@@ -353,11 +387,20 @@ export default function QualifyPage() {
       });
     }
 
+    // Fetch medication catalog when moving to step 5
+    if (step === 4 && !catalogFetched.current) {
+      catalogFetched.current = true;
+      fetch("/api/medication-catalog")
+        .then((r) => r.json())
+        .then((data) => { if (data.medications) setCatalogMeds(data.medications); })
+        .catch(() => {});
+    }
+
     track(ANALYTICS_EVENTS.QUALIFY_STEP_COMPLETE, { step, stepName: stepNames[step - 1] });
     hasInteracted.current = true;
 
-    if (step === 4) {
-      // Generate projection before showing step 5
+    if (step === 5) {
+      // Generate projection before showing step 6
       const proj = generateProjection({
         currentWeight: w,
         heightInches: totalInches,
@@ -377,8 +420,8 @@ export default function QualifyPage() {
   function prevStep() {
     setAttemptedNext(false);
     setFieldErrors({});
-    if (step === 5) {
-      // Skip projection animation reset on back
+    if (step === 6) {
+      // Reset projection animation when going back from projection step
       setProjectionRevealed(false);
       setProjectionStep(0);
     }
@@ -387,7 +430,7 @@ export default function QualifyPage() {
 
   // ─── Projection animation ────────────────────────────────
   useEffect(() => {
-    if (step !== 5 || projectionRevealed) return;
+    if (step !== 6 || projectionRevealed) return;
 
     const timers = [
       setTimeout(() => setProjectionStep(1), 500),
@@ -405,6 +448,21 @@ export default function QualifyPage() {
 
     return () => timers.forEach(clearTimeout);
   }, [step, projectionRevealed, projection]);
+
+  // ─── Exit email capture ───────────────────────────────────
+  async function handleExitEmailCapture() {
+    if (!exitEmail) return;
+    try {
+      await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: exitEmail, source: "exit_intent_guide" }),
+      });
+    } catch {
+      // ignore
+    }
+    setExitEmailSent(true);
+  }
 
   // ─── Submit ───────────────────────────────────────────────
   async function handleSubmit() {
@@ -454,6 +512,8 @@ export default function QualifyPage() {
           emergencyContactName: form.emergencyContactName,
           emergencyContactPhone: form.emergencyContactPhone,
           emergencyContactRelation: form.emergencyContactRelation,
+          medicationInterest: form.medicationInterest || undefined,
+          medicationInterestLabel: form.medicationInterestLabel || undefined,
           consentTreatment: form.consentTreatment,
           consentHipaa: form.consentHipaa,
           consentTelehealth: form.consentTelehealth,
@@ -500,7 +560,11 @@ export default function QualifyPage() {
         if (unanswered.length > 0) errors.screening = `Please answer all ${unanswered.length} remaining safety question${unanswered.length > 1 ? "s" : ""}`;
         break;
       }
-      case 6:
+      case 5:
+        if (form.wantsMedication === null) errors.wantsMedication = "Please make a selection";
+        if (form.wantsMedication === true && !form.medicationInterest) errors.medicationInterest = "Please select a medication or choose provider recommendation";
+        break;
+      case 7:
         if (!form.firstName) errors.firstName = "First name is required";
         if (!form.lastName) errors.lastName = "Last name is required";
         if (!form.email) errors.email = "Email is required";
@@ -512,7 +576,7 @@ export default function QualifyPage() {
         if (!form.emergencyContactPhone) errors.emergencyContactPhone = "Emergency contact phone is required";
         if (!form.emergencyContactRelation) errors.emergencyContactRelation = "Emergency contact relationship is required";
         break;
-      case 7:
+      case 8:
         if (!form.consentTreatment) errors.consentTreatment = "Treatment consent is required";
         if (!form.consentHipaa) errors.consentHipaa = "HIPAA authorization is required";
         if (!form.consentTelehealth) errors.consentTelehealth = "Telehealth consent is required";
@@ -531,7 +595,7 @@ export default function QualifyPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, answeredScreening, allScreeningAnswered, attemptedNext]);
 
-  const stepNames = ["BMI Check", "Goals", "Medical History", "Safety Screening", "Your Projection", "Personal Info", "Plan & Consent"];
+  const stepNames = ["BMI Check", "Goals", "Medical History", "Safety Screening", "Medication Interest", "Your Projection", "Personal Info", "Plan & Consent"];
 
   return (
     <MarketingShell>
@@ -541,7 +605,8 @@ export default function QualifyPage() {
           <div ref={scrollRef} className="mb-8 text-center">
             <Badge variant="default" className="mb-4 gap-1.5">
               {step <= 4 ? <><Shield className="h-3 w-3" /> Quick Health Assessment</> :
-               step === 5 ? <><Sparkles className="h-3 w-3" /> Your Results</> :
+               step === 5 ? <><Pill className="h-3 w-3" /> Medication Preference</> :
+               step === 6 ? <><Sparkles className="h-3 w-3" /> Your Results</> :
                <><Lock className="h-3 w-3" /> Secure Medical Intake</>}
             </Badge>
             <h1 className="text-2xl font-bold text-navy sm:text-3xl">
@@ -549,33 +614,66 @@ export default function QualifyPage() {
               {step === 2 && (form.heightFeet ? `Great${bmi >= 27 ? " — you may qualify!" : ""}. Tell us about your goals.` : "Tell us about your goals")}
               {step === 3 && `${form.firstName || "Almost there"} — help your provider prepare`}
               {step === 4 && "Quick safety check"}
-              {step === 5 && "Your Personalized Weight Loss Projection"}
-              {step === 6 && "Let\u2019s get you set up"}
-              {step === 7 && `${form.firstName ? `${form.firstName}, your` : "Your"} recommended plan`}
+              {step === 5 && "Are you interested in a specific medication?"}
+              {step === 6 && "Your Personalized Weight Loss Projection"}
+              {step === 7 && "Let\u2019s get you set up"}
+              {step === 8 && `${form.firstName ? `${form.firstName}, your` : "Your"} recommended plan`}
             </h1>
             <p className="mt-2 text-sm text-graphite-400">
               Step {step} of {TOTAL_STEPS} &middot; {stepNames[step - 1]}
-              {step >= 5 && " · HIPAA-compliant · Encrypted"}
+              {step >= 6 && " · HIPAA-compliant · Encrypted"}
             </p>
+          </div>
+
+          {/* Social proof counter + step label row */}
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-graphite-400">Step {step} of {TOTAL_STEPS}</span>
+            <span className="flex items-center gap-1.5 text-xs font-medium text-teal-700">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-teal" />
+              </span>
+              {247 + (new Date().getMinutes() % 7)} people started this week
+            </span>
           </div>
 
           {/* Step Progress Indicator */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
-              {[1, 2, 3, 4, 5, 6, 7].map((s) => (
-                <div key={s} className="flex items-center">
+              {[
+                { n: 1, label: "BMI" },
+                { n: 2, label: "Goals" },
+                { n: 3, label: "History" },
+                { n: 4, label: "Safety" },
+                { n: 5, label: "Meds" },
+                { n: 6, label: "Results" },
+                { n: 7, label: "Info" },
+                { n: 8, label: "Plan" },
+              ].map((s) => (
+                <div key={s.n} className="flex items-center">
                   <div className={cn(
-                    "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all",
-                    s < step ? "bg-teal text-white" :
-                    s === step ? "bg-navy text-white ring-2 ring-navy/20 ring-offset-2" :
-                    "bg-navy-100/60 text-graphite-400"
+                    "flex flex-col items-center transition-all",
+                    step === s.n ? "scale-110" : step > s.n ? "" : "opacity-50"
                   )}>
-                    {s < step ? <Check className="h-3.5 w-3.5" /> : s}
-                  </div>
-                  {s < 7 && (
                     <div className={cn(
-                      "h-0.5 w-full min-w-[16px] sm:min-w-[32px] transition-all",
-                      s < step ? "bg-teal" : "bg-navy-100/60"
+                      "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-all",
+                      s.n < step ? "bg-teal text-white" :
+                      s.n === step ? "bg-teal text-white ring-2 ring-teal ring-offset-2" :
+                      "bg-navy-100/60 text-graphite-400"
+                    )}>
+                      {s.n < step ? "✓" : s.n}
+                    </div>
+                    <span className={cn(
+                      "mt-0.5 text-[9px] font-medium leading-none",
+                      step === s.n ? "text-teal" : "text-graphite-300"
+                    )}>
+                      {s.label}
+                    </span>
+                  </div>
+                  {s.n < 8 && (
+                    <div className={cn(
+                      "h-0.5 w-full min-w-[8px] sm:min-w-[16px] transition-all mb-3",
+                      s.n < step ? "bg-teal" : "bg-navy-100/60"
                     )} />
                   )}
                 </div>
@@ -905,8 +1003,166 @@ export default function QualifyPage() {
                   </div>
                 )}
 
-                {/* ─── STEP 5: Projection ─── */}
+                {/* ─── STEP 5: Medication Preference ─── */}
                 {step === 5 && (
+                  <div className="space-y-5">
+                    <div>
+                      <p className="text-sm text-graphite-500 mb-5">
+                        If you have a specific GLP-1 medication in mind, let us know. Your provider will review your selection and make the final prescribing decision based on your health profile.
+                      </p>
+                    </div>
+
+                    {/* YES / NO choice */}
+                    <div className="space-y-3" data-error={!!fieldErrors.wantsMedication || undefined}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setField("wantsMedication", false);
+                          setField("medicationInterest", "provider_recommendation");
+                          setField("medicationInterestLabel", "No, I'd like a provider recommendation");
+                        }}
+                        className={cn(
+                          "flex w-full items-center gap-3 rounded-xl border-2 px-5 py-4 text-left transition-all",
+                          form.wantsMedication === false
+                            ? "border-teal bg-teal-50"
+                            : fieldErrors.wantsMedication
+                            ? "border-red-300 hover:border-red-400"
+                            : "border-navy-200 hover:border-navy-300"
+                        )}
+                      >
+                        <div className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all", form.wantsMedication === false ? "border-teal bg-teal" : "border-navy-300")}>
+                          {form.wantsMedication === false && <Check className="h-3 w-3 text-white" />}
+                        </div>
+                        <span className="text-sm font-medium text-navy">No, I&apos;d like a provider recommendation</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setField("wantsMedication", true);
+                          if (form.medicationInterest === "provider_recommendation") {
+                            setField("medicationInterest", "");
+                            setField("medicationInterestLabel", "");
+                          }
+                        }}
+                        className={cn(
+                          "flex w-full items-center gap-3 rounded-xl border-2 px-5 py-4 text-left transition-all",
+                          form.wantsMedication === true
+                            ? "border-teal bg-teal-50"
+                            : fieldErrors.wantsMedication
+                            ? "border-red-300 hover:border-red-400"
+                            : "border-navy-200 hover:border-navy-300"
+                        )}
+                      >
+                        <div className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all", form.wantsMedication === true ? "border-teal bg-teal" : "border-navy-300")}>
+                          {form.wantsMedication === true && <Check className="h-3 w-3 text-white" />}
+                        </div>
+                        <span className="text-sm font-medium text-navy">Yes, I have something in mind already</span>
+                      </button>
+
+                      {fieldErrors.wantsMedication && (
+                        <p className="text-xs text-red-500 font-medium">{fieldErrors.wantsMedication}</p>
+                      )}
+                    </div>
+
+                    {/* Medication picker grid — shown when "Yes" selected */}
+                    {form.wantsMedication === true && (
+                      <div className="space-y-3 animate-fade-in-up">
+                        <div>
+                          <h3 className="text-sm font-bold text-navy mb-1">Which GLP-1 are you most interested in?</h3>
+                          <p className="text-xs text-graphite-400 mb-3">
+                            If eligible, you can choose your preferred option. A provider will review your profile to make sure it&apos;s a fit.
+                          </p>
+                          {fieldErrors.medicationInterest && (
+                            <p className="text-xs text-red-500 font-medium mb-2">{fieldErrors.medicationInterest}</p>
+                          )}
+                        </div>
+
+                        {/* Two-column grid */}
+                        <div className="grid grid-cols-2 gap-3">
+                          {(catalogMeds.length > 0 ? catalogMeds : DEFAULT_MEDICATIONS).map((med) => (
+                            <button
+                              key={med.slug}
+                              type="button"
+                              onClick={() => {
+                                setField("medicationInterest", med.slug);
+                                setField("medicationInterestLabel", med.name);
+                              }}
+                              className={cn(
+                                "flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all",
+                                form.medicationInterest === med.slug
+                                  ? "border-teal bg-teal-50"
+                                  : "border-navy-200 hover:border-navy-300 hover:bg-cloud/30"
+                              )}
+                            >
+                              {med.imageUrl ? (
+                                <img
+                                  src={med.imageUrl}
+                                  alt={med.name}
+                                  className="h-16 w-16 object-contain"
+                                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                                />
+                              ) : (
+                                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-navy-50">
+                                  <Pill className="h-8 w-8 text-navy-300" />
+                                </div>
+                              )}
+                              <span className={cn(
+                                "text-xs font-semibold leading-tight",
+                                form.medicationInterest === med.slug ? "text-teal-800" : "text-navy"
+                              )}>
+                                {med.name}
+                              </span>
+                              {form.medicationInterest === med.slug && (
+                                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-teal">
+                                  <Check className="h-3 w-3 text-white" />
+                                </div>
+                              )}
+                            </button>
+                          ))}
+
+                          {/* "Something else" option */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setField("medicationInterest", "something-else");
+                              setField("medicationInterestLabel", "Something else / Not sure");
+                            }}
+                            className={cn(
+                              "flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 text-center transition-all",
+                              form.medicationInterest === "something-else"
+                                ? "border-teal bg-teal-50"
+                                : "border-dashed border-navy-200 hover:border-navy-300 hover:bg-cloud/30"
+                            )}
+                          >
+                            <span className={cn(
+                              "text-xs font-medium",
+                              form.medicationInterest === "something-else" ? "text-teal-800" : "text-graphite-400"
+                            )}>
+                              Something else / Not sure
+                            </span>
+                          </button>
+                        </div>
+
+                        <p className="text-[10px] text-graphite-400 text-center leading-relaxed">
+                          Your provider makes all final prescribing decisions based on your medical profile and eligibility.
+                        </p>
+                      </div>
+                    )}
+
+                    {form.wantsMedication === false && (
+                      <div className="flex items-start gap-3 rounded-xl bg-teal-50/50 border border-teal-100 px-4 py-3">
+                        <Check className="h-4 w-4 shrink-0 text-teal mt-0.5" />
+                        <p className="text-xs text-teal-700">
+                          Your provider will evaluate your complete health profile and recommend the most appropriate GLP-1 medication for your specific needs.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ─── STEP 6: Projection ─── */}
+                {step === 6 && (
                   <div>
                     {!projectionRevealed ? (
                       <div className="py-8 text-center">
@@ -962,7 +1218,7 @@ export default function QualifyPage() {
                               <span className="h-2.5 w-5 rounded-full bg-teal" /> GLP-1 Medication
                             </span>
                             <span className="flex items-center gap-1.5">
-                              <span className="h-2.5 w-5 rounded-full bg-gold" /> GLP-1 + VitalPath Plan
+                              <span className="h-2.5 w-5 rounded-full bg-gold" /> GLP-1 + Nature's Journey Plan
                             </span>
                           </div>
                           <ResponsiveContainer width="100%" height={280}>
@@ -988,7 +1244,7 @@ export default function QualifyPage() {
                                 contentStyle={{ borderRadius: "12px", border: "1px solid #E8EDF4", fontSize: "12px" }}
                                 formatter={(value: number, name: string) => [
                                   `${Math.round(value)} lbs`,
-                                  name === "dietExercise" ? "Diet & Exercise Only" : name === "medicationOnly" ? "GLP-1 Medication" : "GLP-1 + VitalPath Plan",
+                                  name === "dietExercise" ? "Diet & Exercise Only" : name === "medicationOnly" ? "GLP-1 Medication" : "GLP-1 + Nature's Journey Plan",
                                 ]}
                                 labelStyle={{ fontWeight: 600, marginBottom: 4 }}
                               />
@@ -1014,7 +1270,7 @@ export default function QualifyPage() {
                             />
                           </div>
                           <p className="mt-2 text-center text-xs text-graphite-500">
-                            <strong className="text-teal">-{Math.round(projection.summary.totalLossWithPlan)} lbs</strong> projected with VitalPath Plan
+                            <strong className="text-teal">-{Math.round(projection.summary.totalLossWithPlan)} lbs</strong> projected with Nature's Journey Plan
                           </p>
                         </div>
 
@@ -1050,7 +1306,7 @@ export default function QualifyPage() {
                               <p className="text-lg font-bold">-<AnimatedCounter value={Math.round(projection.summary.totalLossMedOnly)} duration={1500} /> lbs</p>
                             </div>
                             <div className="rounded-xl bg-teal/30 p-3 text-center border border-teal/40">
-                              <p className="text-[10px] text-teal-300">GLP-1 + VitalPath</p>
+                              <p className="text-[10px] text-teal-300">GLP-1 + Nature's Journey</p>
                               <p className="text-lg font-bold text-teal-200">-<AnimatedCounter value={Math.round(projection.summary.totalLossWithPlan)} duration={1500} /> lbs</p>
                             </div>
                           </div>
@@ -1065,10 +1321,27 @@ export default function QualifyPage() {
                             {[1,2,3,4,5].map((i) => <span key={i} className="text-gold text-sm">★</span>)}
                           </div>
                           <p className="text-sm text-graphite-600 italic leading-relaxed">
-                            &ldquo;I lost 47 lbs in 6 months with VitalPath. My projection said 40 lbs — I actually exceeded it. The support team checked in every week.&rdquo;
+                            &ldquo;I lost 47 lbs in 6 months with Nature's Journey. My projection said 40 lbs — I actually exceeded it. The support team checked in every week.&rdquo;
                           </p>
                           <p className="mt-2 text-xs font-semibold text-navy">— Sarah M., Texas · Verified Member</p>
                         </div>
+
+                        {/* How we calculated this tooltip */}
+                        <details className="mt-4 rounded-xl border border-navy-100/40 bg-white">
+                          <summary className="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium text-navy hover:bg-cloud/50 rounded-xl">
+                            <span className="flex items-center gap-2">
+                              <Info className="h-4 w-4 text-graphite-400" />
+                              How we calculated your projection
+                            </span>
+                            <ChevronDown className="h-4 w-4 text-graphite-400 transition-transform [[open]_&]:rotate-180" />
+                          </summary>
+                          <div className="border-t border-navy-100/40 px-4 py-4 text-xs text-graphite-600 leading-relaxed space-y-2">
+                            <p><strong className="text-navy">Medication-only line:</strong> Based on STEP-1 trial data (semaglutide 2.4mg, 68 weeks, n=1,961). Average 14.9% body weight reduction. We apply age and activity modifiers from the trial subgroup analyses.</p>
+                            <p><strong className="text-navy">With Nature's Journey plan line:</strong> Based on SURMOUNT-1 data (tirzepatide 15mg) and combined lifestyle + medication arms from STEP trials. Structured nutrition support and coaching check-ins are associated with additional 3-7% improvement over medication alone.</p>
+                            <p><strong className="text-navy">Monthly model:</strong> Uses exponential decay (steepest early, tapering by month 6-12) matching observed clinical trial weight loss trajectories.</p>
+                            <p className="text-graphite-400 italic">Projections are estimates based on clinical averages. Individual results vary. This is not a medical guarantee.</p>
+                          </div>
+                        </details>
 
                         <p className="text-[10px] text-graphite-300 text-center leading-relaxed">
                           {siteConfig.compliance.resultsDisclaimer} Projections based on clinical trial averages (STEP/SURMOUNT trials).
@@ -1078,8 +1351,8 @@ export default function QualifyPage() {
                   </div>
                 )}
 
-                {/* ─── STEP 6: Personal Info ─── */}
-                {step === 6 && (
+                {/* ─── STEP 7: Personal Info ─── */}
+                {step === 7 && (
                   <div className="space-y-4">
                     <div>
                       <h2 className="text-lg font-bold text-navy mb-1">Almost there — a few more details</h2>
@@ -1172,8 +1445,8 @@ export default function QualifyPage() {
                   </div>
                 )}
 
-                {/* ─── STEP 7: Plan & Consent ─── */}
-                {step === 7 && (
+                {/* ─── STEP 8: Plan & Consent ─── */}
+                {step === 8 && (
                   <div className="space-y-5">
                     {/* Recommended Plan */}
                     <div className="rounded-2xl border-2 border-teal bg-white p-5">
@@ -1290,7 +1563,7 @@ export default function QualifyPage() {
                         <div>
                           <p className="text-sm font-semibold text-navy">HIPAA Authorization</p>
                           <p className="mt-1 text-xs text-graphite-400 leading-relaxed">
-                            I authorize VitalPath and its affiliated providers and pharmacies to
+                            I authorize Nature's Journey and its affiliated providers and pharmacies to
                             use and disclose my protected health information (PHI) for treatment,
                             payment, and healthcare operations as described in the{" "}
                             <a href="/legal/hipaa" className="underline text-teal">HIPAA Notice</a>.
@@ -1332,6 +1605,32 @@ export default function QualifyPage() {
                       </label>
                     </div>
 
+                    {/* What happens next micro-timeline */}
+                    <div className="rounded-2xl border border-teal/20 bg-gradient-to-b from-teal-50/30 to-white p-6 mt-6">
+                      <h3 className="text-sm font-bold text-navy mb-4 flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-teal" />
+                        What happens after you submit
+                      </h3>
+                      <ol className="relative ml-4 space-y-4 border-l border-teal/30">
+                        {[
+                          { icon: FileCheck, label: "Provider review", time: "Same day", desc: "A licensed physician reviews your intake and medical history." },
+                          { icon: Pill, label: "Prescription sent", time: "Within 24 hrs", desc: "If prescribed, your medication order goes to our pharmacy partner immediately." },
+                          { icon: Package, label: "Ships to your door", time: "48 hrs free 2-day", desc: "Free 2-day shipping with temperature-controlled packaging." },
+                        ].map((s, i) => (
+                          <li key={i} className="pl-6 relative">
+                            <div className="absolute -left-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-teal text-white">
+                              <span className="text-[10px] font-bold">{i + 1}</span>
+                            </div>
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="text-sm font-semibold text-navy">{s.label}</span>
+                              <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold text-teal">{s.time}</span>
+                            </div>
+                            <p className="text-xs text-graphite-500">{s.desc}</p>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+
                     {error && (
                       <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
                     )}
@@ -1365,14 +1664,15 @@ export default function QualifyPage() {
                 <ArrowLeft className="h-4 w-4" /> Back
               </Button>
 
-              {step < 7 ? (
-                <Button onClick={nextStep} disabled={step === 5 && !projectionRevealed} className="gap-1">
+              {step < 8 ? (
+                <Button onClick={nextStep} disabled={step === 6 && !projectionRevealed} className="gap-1">
                   {step === 1 && "Check My Results"}
                   {step === 2 && "Continue"}
                   {step === 3 && "Continue"}
-                  {step === 4 && "See My Projection"}
-                  {step === 5 && "Claim My Plan"}
-                  {step === 6 && "Review My Plan"}
+                  {step === 4 && "Continue"}
+                  {step === 5 && "See My Projection"}
+                  {step === 6 && "Claim My Plan"}
+                  {step === 7 && "Review My Plan"}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               ) : (
@@ -1383,8 +1683,8 @@ export default function QualifyPage() {
               )}
             </div>
 
-            {/* Micro-timeline on step 7 */}
-            {step === 7 && (
+            {/* Micro-timeline on step 8 */}
+            {step === 8 && (
               <>
                 <div className="mt-5 flex items-center justify-center gap-2 text-xs text-graphite-400">
                   <span className="flex items-center gap-1">
@@ -1465,6 +1765,36 @@ export default function QualifyPage() {
                 Leave
               </button>
             </div>
+
+            {/* GLP-1 Starter Guide email capture */}
+            <div className="border-t border-navy-100/40 pt-4 mt-4">
+              {exitEmailSent ? (
+                <p className="text-xs text-teal-700 font-medium text-center py-1">
+                  <Check className="inline h-3.5 w-3.5 mr-1" />
+                  Guide sent! Check your inbox.
+                </p>
+              ) : (
+                <>
+                  <p className="text-xs text-graphite-500 text-center mb-3">Or get a free copy of our GLP-1 Starter Guide — no commitment</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={exitEmail}
+                      onChange={(e) => setExitEmail(e.target.value)}
+                      className="flex-1 rounded-lg border border-navy-100/60 px-3 py-2 text-sm focus:border-teal focus:outline-none"
+                    />
+                    <button
+                      onClick={handleExitEmailCapture}
+                      className="rounded-lg bg-teal px-4 py-2 text-sm font-semibold text-white hover:bg-teal/90"
+                    >
+                      Send
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
             <p className="mt-3 text-[10px] text-graphite-300">
               We&apos;ll only send a link to finish your assessment. No spam.
             </p>

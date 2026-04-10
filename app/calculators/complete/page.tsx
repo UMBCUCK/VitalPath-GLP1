@@ -194,7 +194,7 @@ export default function CompleteCalculatorPage() {
   function copyResults() {
     if (!results) return;
     const text = [
-      `My Health Profile (VitalPath)`,
+      `My Health Profile (Nature's Journey)`,
       `BMI: ${results.bmi} (${results.bmiCategory})`,
       `Daily Calories (TDEE): ${results.tdee}`,
       `Weight Loss Target: ${results.tdee - 500} cal/day`,
@@ -327,6 +327,25 @@ export default function CompleteCalculatorPage() {
                     <option value="moderate">Moderate</option>
                     <option value="active">Active</option>
                   </select>
+                </div>
+              </div>
+
+              {/* Goal */}
+              <div>
+                <label className="block text-xs font-semibold text-navy mb-1.5">Primary Goal</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { value: "lose" as const, label: "Lose Weight" },
+                    { value: "maintain" as const, label: "Maintain" },
+                    { value: "gain" as const, label: "Build Muscle" },
+                  ]).map((g) => (
+                    <button key={g.value} type="button" onClick={() => setGoal(g.value)}
+                      className={`rounded-xl border-2 py-2.5 text-xs font-medium transition-all ${
+                        goal === g.value ? "border-teal bg-teal-50 text-teal-800" : "border-navy-200 text-graphite-500"
+                      }`}>
+                      {g.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 

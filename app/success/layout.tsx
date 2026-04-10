@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Welcome to VitalPath",
+  title: "Welcome to Nature's Journey",
   description: "Your weight management journey starts now. Access your dashboard, complete your intake, and get started with your treatment plan.",
   robots: { index: false, follow: false },
 };

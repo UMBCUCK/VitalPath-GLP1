@@ -26,7 +26,7 @@ const benefits = [
   {
     icon: Globe,
     title: "Custom landing page",
-    desc: "Your own branded VitalPath page with your name, photo, and personalized message.",
+    desc: "Your own branded Nature's Journey page with your name, photo, and personalized message.",
     color: "text-teal",
     bg: "bg-teal-50",
   },
@@ -227,7 +227,7 @@ export function ResellerPromoModal({ open, onClose, onApplied }: ResellerPromoMo
 
                 <div>
                   <label className="block text-xs font-semibold text-navy mb-1.5">
-                    How will you promote VitalPath? <span className="text-red-400">*</span>
+                    How will you promote Nature's Journey? <span className="text-red-400">*</span>
                   </label>
                   <Input
                     value={form.platform}

@@ -49,7 +49,13 @@ export async function POST(req: NextRequest) {
         where: { slug: { in: addOnSlugs }, isAddon: true, isActive: true },
       });
       for (const addon of addOns) {
-        const addonPriceId = addon.stripePriceIdMonthly;
+        // Use the matching interval price ID so add-ons bill on the same cycle as the plan
+        const addonPriceId =
+          interval === "annual"
+            ? (addon.stripePriceIdAnnual ?? addon.stripePriceIdMonthly)
+            : interval === "quarterly"
+              ? (addon.stripePriceIdQuarterly ?? addon.stripePriceIdMonthly)
+              : addon.stripePriceIdMonthly;
         if (addonPriceId) {
           lineItems.push({ price: addonPriceId, quantity: 1 });
         }

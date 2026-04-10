@@ -6,7 +6,8 @@ import { Check, ArrowRight, Flame, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { plans } from "@/lib/pricing";
+import { plans as defaultPlans } from "@/lib/pricing";
+import type { PricingPlan } from "@/lib/pricing";
 import { formatPrice } from "@/lib/utils";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
@@ -22,7 +23,7 @@ function DailyCost({ cents }: { cents: number }) {
   );
 }
 
-export function PricingSection() {
+export function PricingSection({ plans = defaultPlans }: { plans?: PricingPlan[] }) {
   const [annual, setAnnual] = useState(false);
 
   return (
@@ -74,7 +75,7 @@ export function PricingSection() {
               Brand-name GLP-1 retail:{" "}
               <span className="font-bold text-graphite-400 line-through">$1,349+/mo</span>
               {" "}&rarr;{" "}
-              VitalPath from{" "}
+              Nature&apos;s Journey from{" "}
               <span className="font-bold text-teal">
                 {annual ? "$223/mo" : "$279/mo"}
               </span>
@@ -196,7 +197,7 @@ export function PricingSection() {
                 <p className="mt-1 text-xl font-bold text-graphite-600">$75/month</p>
               </div>
               <div className="rounded-xl bg-teal-50 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-teal">VitalPath Essential</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-teal">Nature&apos;s Journey Essential</p>
                 <p className="mt-1 text-xl font-bold text-teal">
                   {annual ? "$7.44/day" : "$9.30/day"}
                 </p>

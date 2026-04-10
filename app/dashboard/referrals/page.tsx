@@ -224,18 +224,18 @@ export default function ReferralDashboardPage() {
 
   // Embed codes
   const badgeEmbedCode = `<a href="${referralLink}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#0a2540;color:#fff;padding:10px 18px;border-radius:999px;font-family:sans-serif;font-size:14px;font-weight:600;text-decoration:none;">
-  💊 Try VitalPath — Get started with GLP-1 treatment
+  💊 Try Nature's Journey — Get started with GLP-1 treatment
 </a>`;
 
   const cardEmbedCode = `<div style="border:1px solid #e5e7eb;border-radius:16px;padding:24px;max-width:360px;font-family:sans-serif;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.08)">
-  <p style="font-size:18px;font-weight:700;color:#0a2540;margin:0 0 8px">VitalPath GLP-1 Program</p>
+  <p style="font-size:18px;font-weight:700;color:#0a2540;margin:0 0 8px">Nature's Journey GLP-1 Program</p>
   <p style="font-size:14px;color:#6b7280;margin:0 0 16px">Medical weight loss with semaglutide — supervised by licensed providers.</p>
   <a href="${referralLink}" target="_blank" rel="noopener" style="display:inline-block;background:#2ab5a5;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;">
     Start your free assessment →
   </a>
 </div>`;
 
-  const textLinkCode = `<a href="${referralLink}" target="_blank" rel="noopener">Start your VitalPath GLP-1 journey →</a>`;
+  const textLinkCode = `<a href="${referralLink}" target="_blank" rel="noopener">Start your Nature's Journey GLP-1 journey →</a>`;
 
   if (loading) {
     return (
@@ -258,7 +258,7 @@ export default function ReferralDashboardPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-navy">Referral Program</h2>
-            <p className="text-sm text-graphite-400">Share VitalPath and earn credit toward your membership</p>
+            <p className="text-sm text-graphite-400">Share Nature's Journey and earn credit toward your membership</p>
           </div>
           {!resellerApplied ? (
             <button
@@ -369,7 +369,7 @@ export default function ReferralDashboardPage() {
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a
-                    href={`https://twitter.com/intent/tweet?text=I%27ve%20been%20using%20VitalPath%20for%20GLP-1%20weight%20loss.%20Use%20my%20link%20to%20get%20started%3A%20${encodeURIComponent(referralLink)}`}
+                    href={`https://twitter.com/intent/tweet?text=I%27ve%20been%20using%20Nature's Journey%20for%20GLP-1%20weight%20loss.%20Use%20my%20link%20to%20get%20started%3A%20${encodeURIComponent(referralLink)}`}
                     target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1.5 rounded-lg bg-[#1da1f2]/10 px-3 py-1.5 text-xs font-semibold text-[#1da1f2] hover:bg-[#1da1f2]/20 transition-colors"
                   >
@@ -385,7 +385,7 @@ export default function ReferralDashboardPage() {
                     Share on Facebook
                   </a>
                   <a
-                    href={`mailto:?subject=Try%20VitalPath%20GLP-1&body=Hey%2C%20I%27ve%20been%20using%20VitalPath%20for%20medical%20weight%20loss%20and%20wanted%20to%20share%20it.%20Use%20my%20link%3A%20${encodeURIComponent(referralLink)}`}
+                    href={`mailto:?subject=Try%20Nature's Journey%20GLP-1&body=Hey%2C%20I%27ve%20been%20using%20Nature's Journey%20for%20medical%20weight%20loss%20and%20wanted%20to%20share%20it.%20Use%20my%20link%3A%20${encodeURIComponent(referralLink)}`}
                     className="flex items-center gap-1.5 rounded-lg bg-navy-50 px-3 py-1.5 text-xs font-semibold text-navy hover:bg-navy-100 transition-colors"
                   >
                     <Mail className="h-3 w-3" /> Share via Email
@@ -849,7 +849,7 @@ export default function ReferralDashboardPage() {
                     href={referralLink} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-full bg-navy px-5 py-2.5 text-sm font-semibold text-white shadow-md"
                   >
-                    💊 Try VitalPath — Get started with GLP-1 treatment
+                    💊 Try Nature's Journey — Get started with GLP-1 treatment
                   </a>
                 </div>
                 <div className="relative">
@@ -878,7 +878,7 @@ export default function ReferralDashboardPage() {
               <CardContent className="space-y-4">
                 <div className="rounded-xl bg-navy-50/30 p-5 flex items-center justify-center">
                   <div className="border border-gray-200 rounded-2xl p-6 max-w-[360px] w-full bg-white shadow-sm">
-                    <p className="text-lg font-bold text-navy mb-2">VitalPath GLP-1 Program</p>
+                    <p className="text-lg font-bold text-navy mb-2">Nature's Journey GLP-1 Program</p>
                     <p className="text-sm text-graphite-400 mb-4">Medical weight loss with semaglutide — supervised by licensed providers.</p>
                     <a href={referralLink} target="_blank" rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 rounded-xl bg-teal px-5 py-2.5 text-sm font-semibold text-white"
@@ -913,7 +913,7 @@ export default function ReferralDashboardPage() {
               <CardContent className="space-y-4">
                 <div className="rounded-xl bg-navy-50/30 p-5">
                   <a href={referralLink} target="_blank" rel="noopener noreferrer" className="text-sm text-teal underline font-medium">
-                    Start your VitalPath GLP-1 journey →
+                    Start your Nature's Journey GLP-1 journey →
                   </a>
                 </div>
                 <div className="relative">

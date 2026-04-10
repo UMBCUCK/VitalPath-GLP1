@@ -22,13 +22,14 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { siteConfig } from "@/lib/site";
+import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "GLP-1 Weight Loss After 50 | Menopause, Testosterone & Metabolic Changes",
   description:
     "Weight loss after 50 is harder — slower metabolism, hormonal changes, muscle loss, and years of diet failures. GLP-1 medications work differently from calorie restriction and are equally effective in older adults. Here's what to know.",
   openGraph: {
-    title: "GLP-1 Weight Loss After 50 | Menopause, Testosterone & Metabolic Changes | VitalPath",
+    title: "GLP-1 Weight Loss After 50 | Menopause, Testosterone & Metabolic Changes | Nature's Journey",
     description:
       "Weight loss after 50 is harder — slower metabolism, hormonal changes, muscle loss, and years of diet failures. GLP-1 medications work differently from calorie restriction and are equally effective in older adults. Here's what to know.",
   },
@@ -65,7 +66,7 @@ const musclePreservationSteps = [
   {
     title: "Track lean mass, not just total weight",
     description:
-      "Your VitalPath plan includes body composition guidance. The scale alone does not tell the full story — losing 20 lbs of fat while maintaining or gaining 2 lbs of muscle is an excellent outcome that a simple scale would report as losing only 18 lbs. Dual-energy X-ray absorptiometry (DEXA) scans or bioelectrical impedance scales with lean mass tracking are useful tools.",
+      "Your Nature's Journey plan includes body composition guidance. The scale alone does not tell the full story — losing 20 lbs of fat while maintaining or gaining 2 lbs of muscle is an excellent outcome that a simple scale would report as losing only 18 lbs. Dual-energy X-ray absorptiometry (DEXA) scans or bioelectrical impedance scales with lean mass tracking are useful tools.",
   },
 ];
 
@@ -95,7 +96,7 @@ const faqs = [
   },
   {
     q: "I'm worried about losing muscle — is that a real risk?",
-    a: "It is a real concern, not a reason to avoid treatment. Some lean mass loss occurs with any significant caloric deficit — this is unavoidable biology. In the STEP-1 trial, approximately 10% of total weight loss was lean mass (vs 38% in purely calorie-restricted populations), which is favorable but not zero. The combination of adequate protein (0.7–1g/lb/day), resistance training, and GLP-1 treatment produces significantly better lean mass preservation than calorie restriction alone. Your VitalPath plan includes protein targets and resistance training guidance specifically optimized for this.",
+    a: "It is a real concern, not a reason to avoid treatment. Some lean mass loss occurs with any significant caloric deficit — this is unavoidable biology. In the STEP-1 trial, approximately 10% of total weight loss was lean mass (vs 38% in purely calorie-restricted populations), which is favorable but not zero. The combination of adequate protein (0.7–1g/lb/day), resistance training, and GLP-1 treatment produces significantly better lean mass preservation than calorie restriction alone. Your Nature's Journey plan includes protein targets and resistance training guidance specifically optimized for this.",
   },
   {
     q: "I take statins and blood pressure medications. Any interactions?",
@@ -114,6 +115,14 @@ const faqs = [
 export default function Over50Page() {
   return (
     <MarketingShell>
+      <FAQPageJsonLd faqs={faqs.map((f) => ({ question: f.q, answer: f.a }))} />
+
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Weight Loss After 50", href: "/over-50" },
+        ]}
+      />
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">
@@ -431,6 +440,34 @@ export default function Over50Page() {
               <h3 className="font-bold text-navy text-sm">Age-appropriate protocols</h3>
               <p className="text-xs text-graphite-500">Care plans that account for muscle preservation and age-related factors</p>
             </div>
+          </div>
+        </SectionShell>
+      </section>
+
+      {/* Further reading */}
+      <section className="py-12 bg-cloud/40 border-y border-sage/20">
+        <SectionShell>
+          <h2 className="text-lg font-semibold text-navy mb-2">Further reading</h2>
+          <p className="text-sm text-graphite-500 mb-6">Articles relevant to GLP-1 treatment in older adults</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: "GLP-1 Medications for Adults Over 65", href: "/blog/glp1-medications-for-seniors-over-65", tag: "Age 50+" },
+              { label: "Exercise During GLP-1 Treatment", href: "/blog/exercise-during-treatment", tag: "Fitness" },
+              { label: "Protein Intake Guide", href: "/blog/protein-intake-guide", tag: "Nutrition" },
+              { label: "Long-Term Maintenance Program", href: "/maintenance", tag: "After Treatment" },
+            ].map((article) => (
+              <Link
+                key={article.href}
+                href={article.href}
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+              >
+                <div>
+                  <span className="text-xs font-medium text-teal">{article.tag}</span>
+                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-teal transition-colors leading-snug">{article.label}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+              </Link>
+            ))}
           </div>
         </SectionShell>
       </section>

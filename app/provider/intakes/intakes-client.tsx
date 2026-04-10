@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, X, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, X, AlertTriangle, ChevronDown, ChevronUp, FileText, Pill } from "lucide-react";
 
 interface Intake {
   id: string;
@@ -24,6 +25,8 @@ interface Intake {
   allergies: string | null;
   medicalHistory: string;
   conditions: unknown;
+  medicationInterest?: string | null;
+  medicationInterestLabel?: string | null;
   status: string;
   eligibilityResult: string | null;
   consentGiven: boolean;
@@ -90,16 +93,23 @@ export function IntakeReviewClient({ intakes, providerId }: { intakes: Intake[];
 
             return (
               <Card key={intake.id}>
-                <button onClick={() => setExpandedId(expanded ? null : intake.id)} className="flex w-full items-center justify-between p-5 text-left">
-                  <div>
+                <div className="flex w-full items-center justify-between p-5">
+                  <button onClick={() => setExpandedId(expanded ? null : intake.id)} className="flex-1 text-left">
                     <p className="text-base font-bold text-navy">{intake.firstName} {intake.lastName}</p>
-                    <p className="text-xs text-graphite-400">{intake.state} &middot; BMI {bmi(intake)} &middot; {intake.weightLbs} lbs &middot; Submitted {intake.createdAt.toLocaleDateString()}</p>
+                    <p className="text-xs text-graphite-400">{intake.state} &middot; BMI {bmi(intake)} &middot; {intake.weightLbs} lbs &middot; Submitted {(intake.createdAt as unknown as Date).toLocaleDateString()}</p>
+                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Link href={`/provider/intakes/${intake.id}`}>
+                      <Button variant="outline" size="sm" className="gap-1.5 text-xs h-8">
+                        <FileText className="h-3.5 w-3.5" /> Full Report
+                      </Button>
+                    </Link>
+                    <Badge variant="warning">Pending</Badge>
+                    <button onClick={() => setExpandedId(expanded ? null : intake.id)}>
+                      {expanded ? <ChevronUp className="h-4 w-4 text-graphite-400" /> : <ChevronDown className="h-4 w-4 text-graphite-400" />}
+                    </button>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="warning">Pending Review</Badge>
-                    {expanded ? <ChevronUp className="h-4 w-4 text-graphite-400" /> : <ChevronDown className="h-4 w-4 text-graphite-400" />}
-                  </div>
-                </button>
+                </div>
 
                 {expanded && (
                   <CardContent className="border-t border-navy-100/40 pt-4">
@@ -121,6 +131,26 @@ export function IntakeReviewClient({ intakes, providerId }: { intakes: Intake[];
                         </div>
                       </div>
                     </div>
+
+                    {/* Medication Preference highlight */}
+                    {intake.medicationInterest && (
+                      <div className="mt-4 flex items-start gap-3 rounded-xl bg-teal-50 border border-teal/30 px-4 py-3">
+                        <Pill className="h-4 w-4 text-teal mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-teal-800">Patient Medication Preference</p>
+                          <p className="text-sm text-teal-700 font-medium mt-0.5">
+                            {intake.medicationInterest === "provider_recommendation"
+                              ? "No preference — provider recommendation requested"
+                              : intake.medicationInterestLabel ?? intake.medicationInterest}
+                          </p>
+                        </div>
+                        <Link href={`/provider/intakes/${intake.id}`} className="ml-auto shrink-0">
+                          <Button variant="ghost" size="sm" className="text-xs h-7 gap-1">
+                            <FileText className="h-3 w-3" /> Full Report
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
 
                     {intake.eligibilityResult === "ALTERNATIVE_PATH" && (
                       <div className="mt-4 flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">

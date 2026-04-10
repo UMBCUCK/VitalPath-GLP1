@@ -13,14 +13,14 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { siteConfig } from "@/lib/site";
-import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { FAQPageJsonLd, BreadcrumbJsonLd, DrugJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "Semaglutide for Weight Loss | How It Works, Dosing, and Results",
   description:
-    "Semaglutide is the active ingredient in Wegovy and Ozempic. Learn how it works for weight loss, what clinical trials show, dosing schedules, side effects, and how to access it through VitalPath.",
+    "Semaglutide is the active ingredient in Wegovy and Ozempic. Learn how it works for weight loss, what clinical trials show, dosing schedules, side effects, and how to access it through Nature's Journey.",
   openGraph: {
-    title: "Semaglutide for Weight Loss | VitalPath",
+    title: "Semaglutide for Weight Loss | Nature's Journey",
     description:
       "A complete guide to semaglutide weight loss treatment — clinical data, dosing, side effects, and how to get started with a licensed provider.",
   },
@@ -73,6 +73,14 @@ export default function SemaglutidePage() {
 
   return (
     <MarketingShell>
+      <DrugJsonLd
+        name="Semaglutide"
+        alternateName="Wegovy, Ozempic"
+        description="A GLP-1 receptor agonist approved for chronic weight management (Wegovy) and type 2 diabetes (Ozempic), administered as a once-weekly subcutaneous injection."
+        url="/semaglutide"
+        administrationRoute="Subcutaneous injection"
+        pregnancyCategory="Contraindicated during pregnancy"
+      />
       <FAQPageJsonLd faqs={faqJsonLd} />
       <BreadcrumbJsonLd
         items={[

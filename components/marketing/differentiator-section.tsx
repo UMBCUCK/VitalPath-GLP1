@@ -36,7 +36,7 @@ export function DifferentiatorSection() {
     <section className="py-20 lg:py-28 bg-gradient-to-b from-linen/30 to-white">
       <SectionShell>
         <SectionHeading
-          eyebrow="Why VitalPath"
+          eyebrow="Why Nature's Journey"
           title="Not all GLP-1 programs are the same"
           description="Most telehealth weight loss programs just prescribe and disappear. We built something different."
         />
@@ -49,7 +49,7 @@ export function DifferentiatorSection() {
                 <p className="text-sm font-bold text-red-500">Other programs</p>
               </div>
               <div className="bg-teal-50/50 p-4 text-center">
-                <p className="text-sm font-bold text-teal">VitalPath</p>
+                <p className="text-sm font-bold text-teal">Nature's Journey</p>
               </div>
             </div>
 

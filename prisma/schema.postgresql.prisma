@@ -161,9 +161,15 @@ model IntakeSubmission {
   emergencyContactRelation String?
 
   // Telehealth
-  telehealthReferralId String?
-  providerAssignedId   String?
-  eligibilityResult    EligibilityResult?
+  telehealthReferralId     String?
+  telehealthConsultationId String?
+  providerAssignedId       String?
+  eligibilityResult        EligibilityResult?
+  reviewedAt               DateTime?
+
+  // Assignment
+  assignedToId String?
+  assignedAt   DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -172,6 +178,7 @@ model IntakeSubmission {
 
   @@index([status])
   @@index([state])
+  @@index([assignedToId])
 }
 
 enum IntakeStatus {

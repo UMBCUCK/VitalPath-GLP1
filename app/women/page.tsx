@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description:
     "GLP-1 medications like semaglutide and tirzepatide address the hormonal roots of weight gain in women — including insulin resistance, PCOS, and menopause-related metabolic changes. Learn what the research actually says.",
   openGraph: {
-    title: "GLP-1 for Women: PCOS, Menopause & Hormonal Weight Loss | VitalPath",
+    title: "GLP-1 for Women: PCOS, Menopause & Hormonal Weight Loss | Nature's Journey",
     description:
       "Evidence-informed guide to GLP-1 weight loss for women. Covers PCOS, perimenopause, insulin resistance, clinical trial data, and what to realistically expect.",
   },
@@ -68,7 +68,7 @@ const concerns = [
   },
   {
     q: "Will I lose muscle along with fat?",
-    a: "Some muscle loss occurs with any significant caloric deficit — this is not unique to GLP-1 medications. Adequate protein intake (0.7–1g per pound of body weight) and resistance training substantially reduce lean mass loss. Your VitalPath plan includes protein targets and exercise guidance specifically for this.",
+    a: "Some muscle loss occurs with any significant caloric deficit — this is not unique to GLP-1 medications. Adequate protein intake (0.7–1g per pound of body weight) and resistance training substantially reduce lean mass loss. Your Nature's Journey plan includes protein targets and exercise guidance specifically for this.",
   },
   {
     q: "I've heard GLP-1 causes hair loss — is that true for women?",
@@ -297,6 +297,34 @@ export default function WomenPage() {
               <h3 className="font-bold text-navy text-sm">Women-informed protocols</h3>
               <p className="text-xs text-graphite-500">Care plans account for hormonal health and cycle patterns</p>
             </div>
+          </div>
+        </SectionShell>
+      </section>
+
+      {/* Further reading */}
+      <section className="py-12 bg-cloud/40 border-y border-sage/20">
+        <SectionShell>
+          <h2 className="text-lg font-semibold text-navy mb-2">Further reading</h2>
+          <p className="text-sm text-graphite-500 mb-6">Articles on GLP-1, hormones, and women&apos;s weight loss</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: "Semaglutide Birth Control Interactions", href: "/blog/semaglutide-birth-control-interaction", tag: "Women's Health" },
+              { label: "Ozempic Face: What It Is & Prevention", href: "/blog/ozempic-face-what-is-it", tag: "Appearance" },
+              { label: "What to Eat on Semaglutide", href: "/blog/what-to-eat-on-semaglutide", tag: "Nutrition" },
+              { label: "GLP-1 & PCOS: How It Helps", href: "/pcos", tag: "PCOS" },
+            ].map((article) => (
+              <Link
+                key={article.href}
+                href={article.href}
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+              >
+                <div>
+                  <span className="text-xs font-medium text-teal">{article.tag}</span>
+                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-teal transition-colors leading-snug">{article.label}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+              </Link>
+            ))}
           </div>
         </SectionShell>
       </section>

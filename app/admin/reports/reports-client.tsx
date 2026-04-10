@@ -651,7 +651,7 @@ export function ReportsClient({ templates, schedules, total, page, limit }: Prop
                 <Input
                   value={schedRecipients}
                   onChange={(e) => setSchedRecipients(e.target.value)}
-                  placeholder="admin@vitalpath.com, cto@vitalpath.com"
+                  placeholder="admin@naturesjourneyhealth.com, cto@naturesjourneyhealth.com"
                   className="mt-1"
                 />
               </div>

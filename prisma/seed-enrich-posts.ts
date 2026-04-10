@@ -126,7 +126,7 @@ async function main() {
 <li><strong>Track your intake</strong> — what gets measured gets managed</li>
 </ul>
 
-<p><em>Want personalized meal plans that adapt weekly? <a href="/qualify">Take the assessment</a> to see if VitalPath Premium is right for you.</em></p>`,
+<p><em>Want personalized meal plans that adapt weekly? <a href="/qualify">Take the assessment</a> to see if Nature's Journey Premium is right for you.</em></p>`,
     },
     {
       slug: "understanding-compounded-medications",
@@ -156,7 +156,7 @@ async function main() {
 <ul>
 <li><strong>Brand-name Wegovy:</strong> $1,349+/month</li>
 <li><strong>Brand-name Ozempic:</strong> $935+/month</li>
-<li><strong>Compounded semaglutide (via VitalPath):</strong> Starting at $279/month (includes provider care, medication, and support)</li>
+<li><strong>Compounded semaglutide (via Nature's Journey):</strong> Starting at $279/month (includes provider care, medication, and support)</li>
 </ul>
 <p>That's up to <strong>78% less</strong> than brand-name retail pricing. <a href="/blog/glp1-weight-loss-cost-without-insurance">See our complete cost breakdown</a>.</p>
 
@@ -491,7 +491,7 @@ async function main() {
 <li><strong>Weekly weigh-ins:</strong> Catch small gains before they become big ones</li>
 <li><strong>Protein-first eating:</strong> This habit prevents muscle loss and keeps metabolism strong</li>
 <li><strong>Daily movement:</strong> Walking and resistance training maintain your results</li>
-<li><strong>Regular check-ins:</strong> VitalPath's maintenance program includes ongoing provider oversight</li>
+<li><strong>Regular check-ins:</strong> Nature's Journey's maintenance program includes ongoing provider oversight</li>
 </ul>
 
 <h2>What If Weight Starts Coming Back?</h2>
@@ -504,7 +504,7 @@ async function main() {
 </ol>
 <p>The key insight: <strong>medication can always be resumed.</strong> Maintenance is not all-or-nothing. Many patients cycle between active treatment and maintenance phases.</p>
 
-<h2>VitalPath's Maintenance Program</h2>
+<h2>Nature's Journey's Maintenance Program</h2>
 <p>Our Complete plan includes maintenance transition planning because we know this phase is critical. You'll get continued provider oversight, adapted meal plans, progress monitoring, and the option to resume treatment if needed. <a href="/pricing">See plan details</a>.</p>`,
     },
   ];

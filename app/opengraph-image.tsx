@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const size = { width: 1200, height: 630 };
-export const alt = "VitalPath — Clinically Informed Weight Management";
+export const alt = "Nature's Journey — Clinically Informed Weight Management";
 export const contentType = "image/png";
 
 export default async function OGImage() {
@@ -52,7 +52,7 @@ export default async function OGImage() {
               letterSpacing: "-1px",
             }}
           >
-            VitalPath
+            Nature's Journey
           </span>
         </div>
 

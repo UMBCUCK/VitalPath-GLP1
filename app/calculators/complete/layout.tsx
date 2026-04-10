@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description:
     "Enter your stats once and get your BMI, daily calories, protein target, hydration goal, and weight loss timeline — all personalized and saveable to your account.",
   openGraph: {
-    title: "Complete Health Profile Calculator | VitalPath",
+    title: "Complete Health Profile Calculator | Nature's Journey",
     description:
       "One calculator for all your health numbers. BMI, TDEE, protein, hydration, and projected timeline — personalized and saved to your account.",
   },

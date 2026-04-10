@@ -349,7 +349,7 @@ export function ApiKeysClient({ initialKeys }: Props) {
         <div>
           <h2 className="text-2xl font-bold text-navy">API Keys</h2>
           <p className="text-sm text-graphite-400">
-            Manage programmatic access to the VitalPath API
+            Manage programmatic access to the Nature's Journey API
           </p>
         </div>
         <Button

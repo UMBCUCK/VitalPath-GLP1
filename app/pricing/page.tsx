@@ -1,5 +1,3 @@
-export const dynamic = "force-static";
-
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PricingSection } from "@/components/marketing/pricing-section";
@@ -9,27 +7,27 @@ import { CtaSection } from "@/components/marketing/cta-section";
 import { SectionShell } from "@/components/shared/section-shell";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
-import { addOns } from "@/lib/pricing";
 import { formatPrice } from "@/lib/utils";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { ProductJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
-import { plans } from "@/lib/pricing";
+import { fetchDbPlans, fetchDbAddOns } from "@/lib/pricing-server";
 import { faqs } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Plans & Pricing",
   description:
-    "Explore VitalPath membership plans. Provider-guided treatment with medication if prescribed, plus nutrition, coaching, and tracking tools.",
+    "Explore Nature's Journey membership plans. Provider-guided treatment with medication if prescribed, plus nutrition, coaching, and tracking tools.",
 };
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const [plans, addOns] = await Promise.all([fetchDbPlans(), fetchDbAddOns()]);
   return (
     <MarketingShell>
       {plans.map((plan) => (
         <ProductJsonLd
           key={plan.id}
-          name={`VitalPath ${plan.name} Plan`}
+          name={`Nature's Journey ${plan.name} Plan`}
           description={plan.description}
           price={plan.priceMonthly / 100}
           url={`/quiz?plan=${plan.slug}`}
@@ -52,7 +50,7 @@ export default function PricingPage() {
         </SectionShell>
       </section>
 
-      <PricingSection />
+      <PricingSection plans={plans} />
 
       {/* Add-ons */}
       <section className="bg-premium-gradient py-20">

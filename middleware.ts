@@ -5,6 +5,8 @@ import { JWT_SECRET, COOKIE_NAME } from "@/lib/constants";
 const protectedRoutes = ["/dashboard"];
 const adminRoutes = ["/admin"];
 const providerRoutes = ["/provider"];
+const resellerRoutes = ["/reseller"];
+const resellerAuthRoutes = ["/reseller/login"];
 const authRoutes = ["/login", "/register"];
 
 export async function middleware(req: NextRequest) {
@@ -63,6 +65,16 @@ export async function middleware(req: NextRequest) {
     if (session.role !== "PROVIDER" && session.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
+  }
+
+  // Protect reseller routes (uses separate cookie: vp-reseller-session)
+  if (resellerRoutes.some((r) => pathname.startsWith(r)) && !resellerAuthRoutes.some((r) => pathname === r)) {
+    const resellerToken = req.cookies.get("vp-reseller-session")?.value;
+    if (!resellerToken) {
+      return NextResponse.redirect(new URL("/reseller/login", req.url));
+    }
+    // Token validation happens at page level via getResellerSession()
+    // Middleware just ensures the cookie exists
   }
 
   // Allow embed pages to be loaded in iframes from any origin

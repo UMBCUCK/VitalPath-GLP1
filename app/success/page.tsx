@@ -34,7 +34,7 @@ export default function SuccessPage() {
         </div>
 
         <h1 className="mt-8 text-3xl font-bold text-navy sm:text-4xl">
-          Welcome to VitalPath
+          Welcome to Nature's Journey
         </h1>
 
         <p className="mt-4 text-lg text-graphite-500">
