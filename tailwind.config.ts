@@ -179,6 +179,11 @@ const config: Config = {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        "shake": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "10%, 30%, 50%, 70%, 90%": { transform: "translateX(-4px)" },
+          "20%, 40%, 60%, 80%": { transform: "translateX(4px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -186,6 +191,7 @@ const config: Config = {
         "fade-in": "fade-in 0.5s ease-out",
         "slide-up": "slide-up 0.6s ease-out",
         "count-up": "count-up 0.3s ease-out",
+        "shake": "shake 0.5s ease-in-out",
       },
     },
   },

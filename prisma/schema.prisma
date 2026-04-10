@@ -169,9 +169,11 @@ model IntakeSubmission {
   emergencyContactRelation String?
 
   // Telehealth
-  telehealthReferralId String?
-  providerAssignedId   String?
-  eligibilityResult    EligibilityResult?
+  telehealthReferralId    String?
+  telehealthConsultationId String?
+  providerAssignedId      String?
+  eligibilityResult       EligibilityResult?
+  reviewedAt              DateTime?
 
   // Assignment
   assignedToId String?  // admin user id
@@ -1402,4 +1404,84 @@ model ApiKey {
 
   @@index([keyHash])
   @@index([isActive])
+}
+
+// ─── INSIGHTS & ANOMALY DETECTION ───────────────────────────
+
+model InsightRecord {
+  id          String   @id @default(cuid())
+  type        String   // ANOMALY, TREND, OPPORTUNITY, WARNING
+  metric      String   // mrr, churn_rate, signups, engagement, etc.
+  title       String
+  description String
+  severity    String   // LOW, MEDIUM, HIGH
+  currentValue Float
+  expectedValue Float
+  deviation   Float    // standard deviations from mean
+  isDismissed Boolean  @default(false)
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([type])
+  @@index([metric])
+  @@index([isDismissed])
+  @@index([createdAt])
+}
+
+// ─── NATURAL LANGUAGE QUERIES ───────────────────────────────
+
+model SavedQuery {
+  id        String   @id @default(cuid())
+  query     String   // natural language query text
+  parsedFilter Json  // the generated Prisma filter
+  resultCount Int?
+  adminId   String
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([createdAt])
+}
+
+// ─── COMPLIANCE SCAN RESULTS ────────────────────────────────
+
+model ComplianceScanResult {
+  id            String   @id @default(cuid())
+  entityType    String   // BLOG_POST, RECIPE, COMPARISON_PAGE
+  entityId      String
+  entityTitle   String
+  flaggedText   String   // the text that was flagged
+  claimId       String?  // matched unapproved claim if any
+  severity      String   // INFO, WARNING, VIOLATION
+  resolution    String?  // APPROVED, DISMISSED, FIXED
+  resolvedBy    String?
+  resolvedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([severity])
+  @@index([resolution])
+}
+
+// ─── OPENLOOP CONSULTATION TRACKING ─────────────────────────
+
+model ConsultationTracker {
+  id                String    @id @default(cuid())
+  userId            String
+  intakeId          String?
+  openloopPatientId String?
+  consultationId    String?   // OpenLoop consultation ID
+  status            String    @default("PENDING") // PENDING, SCHEDULED, IN_PROGRESS, COMPLETED, CANCELED
+  providerName      String?
+  scheduledAt       DateTime?
+  completedAt       DateTime?
+  eligibilityResult String?   // ELIGIBLE, NOT_ELIGIBLE, PENDING
+  prescriptionId    String?
+  notes             String?
+  lastSyncAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([consultationId])
 }

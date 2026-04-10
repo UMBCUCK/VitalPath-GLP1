@@ -198,12 +198,28 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      // Store OpenLoop patient ID for webhook matching
       await db.intakeSubmission.update({
         where: { id: intake.id },
-        data: { telehealthReferralId: patient.externalId },
+        data: {
+          telehealthReferralId: patient.externalId,
+          status: "UNDER_REVIEW",
+        },
       });
 
-      await telehealth.requestConsultation(patient.id, "GLP-1 weight management evaluation");
+      // Also store in patient profile for future lookups
+      await db.patientProfile.update({
+        where: { userId },
+        data: { telehealthPatientId: patient.externalId },
+      });
+
+      const consultation = await telehealth.requestConsultation(patient.id, "GLP-1 weight management evaluation");
+
+      // Store consultation ID for status polling
+      await db.intakeSubmission.update({
+        where: { id: intake.id },
+        data: { telehealthConsultationId: consultation.id },
+      });
     } catch (err) {
       safeError("[Intake] Telehealth service error", err);
     }

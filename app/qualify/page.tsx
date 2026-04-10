@@ -107,6 +107,8 @@ export default function QualifyPage() {
   const [answeredScreening, setAnsweredScreening] = useState<Record<string, boolean>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [attemptedNext, setAttemptedNext] = useState(false);
+  const [shakeKey, setShakeKey] = useState(0);
+  const formCardRef = useRef<HTMLDivElement>(null);
 
   // Capture referral code from URL (?ref=CODE) and persist in funnel
   useEffect(() => {
@@ -328,6 +330,12 @@ export default function QualifyPage() {
     if (Object.keys(errors).length > 0) {
       setAttemptedNext(true);
       setFieldErrors(errors);
+      setShakeKey((k) => k + 1);
+      // Scroll to the first error field
+      setTimeout(() => {
+        const firstError = formCardRef.current?.querySelector('[data-error="true"]');
+        firstError?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
       return;
     }
 
@@ -404,6 +412,11 @@ export default function QualifyPage() {
     if (Object.keys(errors).length > 0) {
       setAttemptedNext(true);
       setFieldErrors(errors);
+      setShakeKey((k) => k + 1);
+      setTimeout(() => {
+        const firstError = formCardRef.current?.querySelector('[data-error="true"]');
+        firstError?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
       return;
     }
     setError("");
@@ -571,7 +584,16 @@ export default function QualifyPage() {
           </div>
 
           {/* Step Content */}
-          <div className="rounded-2xl border border-navy-100/60 bg-white p-6 shadow-premium-md sm:p-8">
+          <div
+            key={shakeKey}
+            ref={formCardRef}
+            className={cn(
+              "rounded-2xl border bg-white p-6 shadow-premium-md sm:p-8 transition-colors",
+              attemptedNext && Object.keys(fieldErrors).length > 0
+                ? "border-red-200 animate-shake"
+                : "border-navy-100/60"
+            )}
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
@@ -588,11 +610,11 @@ export default function QualifyPage() {
                       <p className="text-sm text-graphite-400 mb-5">This helps us calculate your BMI and personalize your results.</p>
                     </div>
 
-                    <div>
-                      <label className={cn("block text-sm font-semibold mb-2", fieldErrors.heightFeet ? "text-red-500" : "text-navy")}>Height {fieldErrors.heightFeet && <span className="font-normal">— {fieldErrors.heightFeet}</span>}</label>
+                    <div data-error={!!fieldErrors.heightFeet || undefined}>
+                      <label className={cn("block text-sm font-semibold mb-2 transition-colors", fieldErrors.heightFeet ? "text-red-500" : "text-navy")}>Height {fieldErrors.heightFeet && <span className="font-normal">— {fieldErrors.heightFeet}</span>}</label>
                       <div className="flex gap-3">
                         <div className="flex-1 relative">
-                          <input type="number" placeholder="5" value={form.heightFeet} onChange={(e) => setField("heightFeet", e.target.value)} className={cn("calculator-input pr-10", fieldErrors.heightFeet && "!border-red-400 !ring-red-100")} min={3} max={8} />
+                          <input type="number" placeholder="5" value={form.heightFeet} onChange={(e) => setField("heightFeet", e.target.value)} className={cn("calculator-input pr-10", fieldErrors.heightFeet && "!border-red-400 ring-2 ring-red-100")} min={3} max={8} />
                           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-graphite-400">ft</span>
                         </div>
                         <div className="flex-1 relative">
@@ -602,24 +624,24 @@ export default function QualifyPage() {
                       </div>
                     </div>
 
-                    <div>
-                      <label className={cn("block text-sm font-semibold mb-2", fieldErrors.weightLbs ? "text-red-500" : "text-navy")}>Current Weight {fieldErrors.weightLbs && <span className="font-normal">— {fieldErrors.weightLbs}</span>}</label>
+                    <div data-error={!!fieldErrors.weightLbs || undefined}>
+                      <label className={cn("block text-sm font-semibold mb-2 transition-colors", fieldErrors.weightLbs ? "text-red-500" : "text-navy")}>Current Weight {fieldErrors.weightLbs && <span className="font-normal">— {fieldErrors.weightLbs}</span>}</label>
                       <div className="relative">
-                        <input type="number" placeholder="200" value={form.weightLbs} onChange={(e) => setField("weightLbs", e.target.value)} className={cn("calculator-input pr-12", fieldErrors.weightLbs && "!border-red-400 !ring-red-100")} min={80} max={700} />
+                        <input type="number" placeholder="200" value={form.weightLbs} onChange={(e) => setField("weightLbs", e.target.value)} className={cn("calculator-input pr-12", fieldErrors.weightLbs && "!border-red-400 ring-2 ring-red-100")} min={80} max={700} />
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-graphite-400">lbs</span>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className={cn("block text-sm font-semibold mb-2", fieldErrors.age ? "text-red-500" : "text-navy")}>Age {fieldErrors.age && <span className="font-normal">— {fieldErrors.age}</span>}</label>
-                        <input type="number" placeholder="35" value={form.age} onChange={(e) => setField("age", e.target.value)} className={cn("calculator-input", fieldErrors.age && "!border-red-400 !ring-red-100")} min={18} max={120} />
+                      <div data-error={!!fieldErrors.age || undefined}>
+                        <label className={cn("block text-sm font-semibold mb-2 transition-colors", fieldErrors.age ? "text-red-500" : "text-navy")}>Age {fieldErrors.age && <span className="font-normal">— {fieldErrors.age}</span>}</label>
+                        <input type="number" placeholder="35" value={form.age} onChange={(e) => setField("age", e.target.value)} className={cn("calculator-input", fieldErrors.age && "!border-red-400 ring-2 ring-red-100")} min={18} max={120} />
                       </div>
-                      <div>
-                        <label className={cn("block text-sm font-semibold mb-2", fieldErrors.sex ? "text-red-500" : "text-navy")}>Biological Sex {fieldErrors.sex && <span className="font-normal">— Required</span>}</label>
+                      <div data-error={!!fieldErrors.sex || undefined}>
+                        <label className={cn("block text-sm font-semibold mb-2 transition-colors", fieldErrors.sex ? "text-red-500" : "text-navy")}>Biological Sex {fieldErrors.sex && <span className="font-normal">— Required</span>}</label>
                         <div className="flex gap-2">
-                          <SelectButton selected={form.sex === "male"} onClick={() => setField("sex", "male")}>Male</SelectButton>
-                          <SelectButton selected={form.sex === "female"} onClick={() => setField("sex", "female")}>Female</SelectButton>
+                          <SelectButton selected={form.sex === "male"} onClick={() => setField("sex", "male")} error={!!fieldErrors.sex}>Male</SelectButton>
+                          <SelectButton selected={form.sex === "female"} onClick={() => setField("sex", "female")} error={!!fieldErrors.sex}>Female</SelectButton>
                         </div>
                       </div>
                     </div>
@@ -675,8 +697,8 @@ export default function QualifyPage() {
                 {/* ─── STEP 2: Goals & Lifestyle ─── */}
                 {step === 2 && (
                   <div className="space-y-6">
-                    <div>
-                      <label className={cn("block text-sm font-semibold mb-3", fieldErrors.primaryGoal ? "text-red-500" : "text-navy")}>What&apos;s your primary goal? {fieldErrors.primaryGoal && <span className="font-normal">— {fieldErrors.primaryGoal}</span>}</label>
+                    <div data-error={!!fieldErrors.primaryGoal || undefined}>
+                      <label className={cn("block text-sm font-semibold mb-3 transition-colors", fieldErrors.primaryGoal ? "text-red-500" : "text-navy")}>What&apos;s your primary goal? {fieldErrors.primaryGoal && <span className="font-normal">— {fieldErrors.primaryGoal}</span>}</label>
                       <div className="space-y-2">
                         {goals.map((g) => (
                           <button key={g.value} type="button" onClick={() => setField("primaryGoal", g.value)}
@@ -697,12 +719,12 @@ export default function QualifyPage() {
                       </div>
                     </div>
 
-                    <div>
-                      <label className={cn("block text-sm font-semibold mb-3", fieldErrors.activityLevel ? "text-red-500" : "text-navy")}>Current activity level {fieldErrors.activityLevel && <span className="font-normal">— {fieldErrors.activityLevel}</span>}</label>
+                    <div data-error={!!fieldErrors.activityLevel || undefined}>
+                      <label className={cn("block text-sm font-semibold mb-3 transition-colors", fieldErrors.activityLevel ? "text-red-500" : "text-navy")}>Current activity level {fieldErrors.activityLevel && <span className="font-normal">— {fieldErrors.activityLevel}</span>}</label>
                       <div className="grid grid-cols-2 gap-3">
                         {activityLevels.map((a) => (
                           <button key={a.value} type="button" onClick={() => setField("activityLevel", a.value)}
-                            className={cn("rounded-xl border-2 px-4 py-3 text-left transition-all", form.activityLevel === a.value ? "border-teal bg-teal-50" : "border-navy-200 hover:border-navy-300")}
+                            className={cn("rounded-xl border-2 px-4 py-3 text-left transition-all", form.activityLevel === a.value ? "border-teal bg-teal-50" : fieldErrors.activityLevel ? "border-red-300 hover:border-red-400" : "border-navy-200 hover:border-navy-300")}
                           >
                             <p className={cn("text-sm font-medium", form.activityLevel === a.value ? "text-teal-800" : "text-navy")}>{a.label}</p>
                             <p className="text-xs text-graphite-400">{a.desc}</p>
@@ -711,22 +733,22 @@ export default function QualifyPage() {
                       </div>
                     </div>
 
-                    <div>
-                      <label className={cn("block text-sm font-semibold mb-3", fieldErrors.eatingPattern ? "text-red-500" : "text-navy")}>How would you describe your eating habits? {fieldErrors.eatingPattern && <span className="font-normal">— {fieldErrors.eatingPattern}</span>}</label>
+                    <div data-error={!!fieldErrors.eatingPattern || undefined}>
+                      <label className={cn("block text-sm font-semibold mb-3 transition-colors", fieldErrors.eatingPattern ? "text-red-500" : "text-navy")}>How would you describe your eating habits? {fieldErrors.eatingPattern && <span className="font-normal">— {fieldErrors.eatingPattern}</span>}</label>
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                         {eatingPatterns.map((e) => (
-                          <SelectButton key={e.value} selected={form.eatingPattern === e.value} onClick={() => setField("eatingPattern", e.value)}>
+                          <SelectButton key={e.value} selected={form.eatingPattern === e.value} onClick={() => setField("eatingPattern", e.value)} error={!!fieldErrors.eatingPattern}>
                             {e.label}
                           </SelectButton>
                         ))}
                       </div>
                     </div>
 
-                    <div>
-                      <label className={cn("block text-sm font-semibold mb-3", fieldErrors.previousAttempts ? "text-red-500" : "text-navy")}>What have you tried before? {fieldErrors.previousAttempts && <span className="font-normal">— {fieldErrors.previousAttempts}</span>}</label>
+                    <div data-error={!!fieldErrors.previousAttempts || undefined}>
+                      <label className={cn("block text-sm font-semibold mb-3 transition-colors", fieldErrors.previousAttempts ? "text-red-500" : "text-navy")}>What have you tried before? {fieldErrors.previousAttempts && <span className="font-normal">— {fieldErrors.previousAttempts}</span>}</label>
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                         {previousAttempts.map((p) => (
-                          <SelectButton key={p.value} selected={form.previousAttempts === p.value} onClick={() => setField("previousAttempts", p.value)}>
+                          <SelectButton key={p.value} selected={form.previousAttempts === p.value} onClick={() => setField("previousAttempts", p.value)} error={!!fieldErrors.previousAttempts}>
                             {p.label}
                           </SelectButton>
                         ))}
@@ -1065,46 +1087,46 @@ export default function QualifyPage() {
                     </div>
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <div>
-                        <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.firstName ? "text-red-500" : "text-navy")}>First Name {fieldErrors.firstName && <span className="font-normal">*</span>}</label>
-                        <Input value={form.firstName} onChange={(e) => setField("firstName", e.target.value)} className={cn(fieldErrors.firstName && "!border-red-400")} required />
+                      <div data-error={!!fieldErrors.firstName || undefined}>
+                        <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.firstName ? "text-red-500" : "text-navy")}>First Name {fieldErrors.firstName && <span className="font-normal">*</span>}</label>
+                        <Input value={form.firstName} onChange={(e) => setField("firstName", e.target.value)} className={cn(fieldErrors.firstName && "!border-red-400 ring-2 ring-red-100")} required />
                       </div>
-                      <div>
-                        <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.lastName ? "text-red-500" : "text-navy")}>Last Name {fieldErrors.lastName && <span className="font-normal">*</span>}</label>
-                        <Input value={form.lastName} onChange={(e) => setField("lastName", e.target.value)} className={cn(fieldErrors.lastName && "!border-red-400")} required />
+                      <div data-error={!!fieldErrors.lastName || undefined}>
+                        <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.lastName ? "text-red-500" : "text-navy")}>Last Name {fieldErrors.lastName && <span className="font-normal">*</span>}</label>
+                        <Input value={form.lastName} onChange={(e) => setField("lastName", e.target.value)} className={cn(fieldErrors.lastName && "!border-red-400 ring-2 ring-red-100")} required />
                       </div>
                     </div>
 
-                    <div>
-                      <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.email ? "text-red-500" : "text-navy")}>Email {fieldErrors.email && <span className="font-normal">*</span>}</label>
-                      <Input type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} className={cn(fieldErrors.email && "!border-red-400")} required />
+                    <div data-error={!!fieldErrors.email || undefined}>
+                      <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.email ? "text-red-500" : "text-navy")}>Email {fieldErrors.email && <span className="font-normal">*</span>}</label>
+                      <Input type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} className={cn(fieldErrors.email && "!border-red-400 ring-2 ring-red-100")} required />
                     </div>
 
-                    <div>
-                      <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.phone ? "text-red-500" : "text-navy")}>Phone {fieldErrors.phone && <span className="font-normal">*</span>}</label>
-                      <Input type="tel" value={form.phone} onChange={(e) => setField("phone", e.target.value)} className={cn(fieldErrors.phone && "!border-red-400")} placeholder="(555) 123-4567" required />
+                    <div data-error={!!fieldErrors.phone || undefined}>
+                      <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.phone ? "text-red-500" : "text-navy")}>Phone {fieldErrors.phone && <span className="font-normal">*</span>}</label>
+                      <Input type="tel" value={form.phone} onChange={(e) => setField("phone", e.target.value)} className={cn(fieldErrors.phone && "!border-red-400 ring-2 ring-red-100")} placeholder="(555) 123-4567" required />
                     </div>
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <div>
-                        <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.dateOfBirth ? "text-red-500" : "text-navy")}>Date of Birth {fieldErrors.dateOfBirth && <span className="font-normal">*</span>}</label>
-                        <Input type="date" value={form.dateOfBirth} onChange={(e) => setField("dateOfBirth", e.target.value)} className={cn(fieldErrors.dateOfBirth && "!border-red-400")} required />
+                      <div data-error={!!fieldErrors.dateOfBirth || undefined}>
+                        <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.dateOfBirth ? "text-red-500" : "text-navy")}>Date of Birth {fieldErrors.dateOfBirth && <span className="font-normal">*</span>}</label>
+                        <Input type="date" value={form.dateOfBirth} onChange={(e) => setField("dateOfBirth", e.target.value)} className={cn(fieldErrors.dateOfBirth && "!border-red-400 ring-2 ring-red-100")} required />
                       </div>
-                      <div>
-                        <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.state ? "text-red-500" : "text-navy")}>State {fieldErrors.state && <span className="font-normal">*</span>}</label>
-                        <select value={form.state} onChange={(e) => setField("state", e.target.value)} className={cn("calculator-input", fieldErrors.state && "!border-red-400")} required>
+                      <div data-error={!!fieldErrors.state || undefined}>
+                        <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.state ? "text-red-500" : "text-navy")}>State {fieldErrors.state && <span className="font-normal">*</span>}</label>
+                        <select value={form.state} onChange={(e) => setField("state", e.target.value)} className={cn("calculator-input", fieldErrors.state && "!border-red-400 ring-2 ring-red-100")} required>
                           <option value="">Select your state</option>
                           {US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
                       </div>
                     </div>
 
-                    <div>
-                      <label className={cn("block text-sm font-semibold mb-1.5", fieldErrors.medicalHistory ? "text-red-500" : "text-navy")}>Medical History Summary {fieldErrors.medicalHistory && <span className="font-normal">— {fieldErrors.medicalHistory}</span>}</label>
+                    <div data-error={!!fieldErrors.medicalHistory || undefined}>
+                      <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.medicalHistory ? "text-red-500" : "text-navy")}>Medical History Summary {fieldErrors.medicalHistory && <span className="font-normal">— {fieldErrors.medicalHistory}</span>}</label>
                       <textarea
                         value={form.medicalHistory}
                         onChange={(e) => setField("medicalHistory", e.target.value)}
-                        className={cn("calculator-input min-h-[80px] resize-y", fieldErrors.medicalHistory && "!border-red-400")}
+                        className={cn("calculator-input min-h-[80px] resize-y", fieldErrors.medicalHistory && "!border-red-400 ring-2 ring-red-100")}
                         placeholder="Briefly describe your relevant medical history, previous weight management attempts, and anything else your provider should know."
                         required
                       />
@@ -1128,17 +1150,17 @@ export default function QualifyPage() {
                       <h3 className="text-sm font-bold text-navy mb-1">Emergency Contact</h3>
                       <p className="text-xs text-graphite-400 mb-4">Required for your safety during treatment.</p>
                       <div className="space-y-3">
-                        <div>
-                          <label className={cn("block text-xs font-semibold mb-1", fieldErrors.emergencyContactName ? "text-red-500" : "text-navy")}>Full Name {fieldErrors.emergencyContactName && <span className="font-normal">*</span>}</label>
-                          <Input value={form.emergencyContactName} onChange={(e) => setField("emergencyContactName", e.target.value)} className={cn(fieldErrors.emergencyContactName && "!border-red-400")} placeholder="Emergency contact name" required />
+                        <div data-error={!!fieldErrors.emergencyContactName || undefined}>
+                          <label className={cn("block text-xs font-semibold mb-1 transition-colors", fieldErrors.emergencyContactName ? "text-red-500" : "text-navy")}>Full Name {fieldErrors.emergencyContactName && <span className="font-normal">*</span>}</label>
+                          <Input value={form.emergencyContactName} onChange={(e) => setField("emergencyContactName", e.target.value)} className={cn(fieldErrors.emergencyContactName && "!border-red-400 ring-2 ring-red-100")} placeholder="Emergency contact name" required />
                         </div>
-                        <div>
-                          <label className={cn("block text-xs font-semibold mb-1", fieldErrors.emergencyContactPhone ? "text-red-500" : "text-navy")}>Phone Number {fieldErrors.emergencyContactPhone && <span className="font-normal">*</span>}</label>
-                          <Input type="tel" value={form.emergencyContactPhone} onChange={(e) => setField("emergencyContactPhone", e.target.value)} className={cn(fieldErrors.emergencyContactPhone && "!border-red-400")} placeholder="(555) 123-4567" required />
+                        <div data-error={!!fieldErrors.emergencyContactPhone || undefined}>
+                          <label className={cn("block text-xs font-semibold mb-1 transition-colors", fieldErrors.emergencyContactPhone ? "text-red-500" : "text-navy")}>Phone Number {fieldErrors.emergencyContactPhone && <span className="font-normal">*</span>}</label>
+                          <Input type="tel" value={form.emergencyContactPhone} onChange={(e) => setField("emergencyContactPhone", e.target.value)} className={cn(fieldErrors.emergencyContactPhone && "!border-red-400 ring-2 ring-red-100")} placeholder="(555) 123-4567" required />
                         </div>
-                        <div>
-                          <label className={cn("block text-xs font-semibold mb-1", fieldErrors.emergencyContactRelation ? "text-red-500" : "text-navy")}>Relationship {fieldErrors.emergencyContactRelation && <span className="font-normal">*</span>}</label>
-                          <Input value={form.emergencyContactRelation} onChange={(e) => setField("emergencyContactRelation", e.target.value)} className={cn(fieldErrors.emergencyContactRelation && "!border-red-400")} placeholder="e.g., Spouse, Parent, Sibling" required />
+                        <div data-error={!!fieldErrors.emergencyContactRelation || undefined}>
+                          <label className={cn("block text-xs font-semibold mb-1 transition-colors", fieldErrors.emergencyContactRelation ? "text-red-500" : "text-navy")}>Relationship {fieldErrors.emergencyContactRelation && <span className="font-normal">*</span>}</label>
+                          <Input value={form.emergencyContactRelation} onChange={(e) => setField("emergencyContactRelation", e.target.value)} className={cn(fieldErrors.emergencyContactRelation && "!border-red-400 ring-2 ring-red-100")} placeholder="e.g., Spouse, Parent, Sibling" required />
                         </div>
                       </div>
                     </div>
@@ -1328,9 +1350,14 @@ export default function QualifyPage() {
 
             {/* Navigation */}
             {attemptedNext && Object.keys(fieldErrors).length > 0 && (
-              <p className="mt-4 text-center text-xs text-red-500 font-medium">
-                Please fill in the highlighted fields above to continue
-              </p>
+              <div className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-red-50 border border-red-200 px-4 py-2.5">
+                <AlertTriangle className="h-4 w-4 text-red-500 shrink-0" />
+                <p className="text-xs text-red-600 font-medium">
+                  {Object.keys(fieldErrors).length === 1
+                    ? "1 field needs your attention above"
+                    : `${Object.keys(fieldErrors).length} fields need your attention above`}
+                </p>
+              </div>
             )}
 
             <div className="mt-4 flex items-center justify-between">
@@ -1450,14 +1477,18 @@ export default function QualifyPage() {
 
 // ─── Shared Components ─────────────────────────────────────
 
-function SelectButton({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
+function SelectButton({ selected, onClick, children, error }: { selected: boolean; onClick: () => void; children: React.ReactNode; error?: boolean }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
         "rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all flex-1",
-        selected ? "border-teal bg-teal-50 text-teal-800" : "border-navy-200 text-graphite-500 hover:border-navy-300"
+        selected
+          ? "border-teal bg-teal-50 text-teal-800"
+          : error
+            ? "border-red-300 text-graphite-500 hover:border-red-400"
+            : "border-navy-200 text-graphite-500 hover:border-navy-300"
       )}
     >
       {children}

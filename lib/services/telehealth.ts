@@ -3,6 +3,8 @@
  * Swap providers (OpenLoop, Wheel, custom) without touching business logic.
  */
 
+import { safeError, safeLog } from "@/lib/logger";
+
 export interface TelehealthPatient {
   id: string;
   externalId: string;
@@ -59,28 +61,74 @@ export interface TelehealthProvider {
   getPrescription(consultationId: string): Promise<TelehealthPrescription | null>;
 }
 
+// ─── Retry helper ──────────────────────────────────────────
+
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  retries = 2,
+  backoffMs = 1000
+): Promise<Response> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const response = await fetch(url, options);
+
+    // Don't retry client errors (4xx)
+    if (response.ok || (response.status >= 400 && response.status < 500)) {
+      return response;
+    }
+
+    // Retry on server errors (5xx) with exponential backoff
+    if (attempt < retries) {
+      safeLog("[Telehealth]", `Retry ${attempt + 1}/${retries} for ${url} (status ${response.status})`);
+      await new Promise((r) => setTimeout(r, backoffMs * Math.pow(2, attempt)));
+    } else {
+      return response;
+    }
+  }
+  throw new Error("Unreachable");
+}
+
 // ─── OpenLoop adapter ───────────────────────────────────────
 
 class OpenLoopAdapter implements TelehealthProvider {
   private apiKey: string;
   private baseUrl: string;
+  private headers: Record<string, string>;
 
   constructor() {
     this.apiKey = process.env.TELEHEALTH_API_KEY || "";
     this.baseUrl = process.env.TELEHEALTH_API_URL || "https://api.openloophealth.com/v1";
+    this.headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${this.apiKey}`,
+    };
   }
 
   async createPatient(data: Parameters<TelehealthProvider["createPatient"]>[0]): Promise<TelehealthPatient> {
-    const response = await fetch(`${this.baseUrl}/patients`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
+    const payload = {
+      first_name: data.firstName,
+      last_name: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      date_of_birth: data.dateOfBirth,
+      state: data.state,
+      medical_history: {
+        medications: data.medicalHistory.medications,
+        allergies: data.medicalHistory.allergies,
+        conditions: data.medicalHistory.conditions,
+        history: data.medicalHistory.history,
       },
-      body: JSON.stringify(data),
+    };
+
+    const response = await fetchWithRetry(`${this.baseUrl}/patients`, {
+      method: "POST",
+      headers: this.headers,
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
+      const errorBody = await response.text().catch(() => "");
+      safeError("[OpenLoop]", `createPatient failed: ${response.status} ${errorBody}`);
       throw new Error(`OpenLoop createPatient failed: ${response.status}`);
     }
 
@@ -98,16 +146,22 @@ class OpenLoopAdapter implements TelehealthProvider {
   }
 
   async requestConsultation(patientId: string, reason: string): Promise<TelehealthConsultation> {
-    const response = await fetch(`${this.baseUrl}/consultations`, {
+    const payload = {
+      patient_id: patientId,
+      reason,
+      type: "async", // Asynchronous review (no live video needed)
+      priority: "standard",
+    };
+
+    const response = await fetchWithRetry(`${this.baseUrl}/consultations`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify({ patient_id: patientId, reason }),
+      headers: this.headers,
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
+      const errorBody = await response.text().catch(() => "");
+      safeError("[OpenLoop]", `requestConsultation failed: ${response.status} ${errorBody}`);
       throw new Error(`OpenLoop requestConsultation failed: ${response.status}`);
     }
 
@@ -120,8 +174,8 @@ class OpenLoopAdapter implements TelehealthProvider {
   }
 
   async getConsultationStatus(consultationId: string): Promise<TelehealthConsultation> {
-    const response = await fetch(`${this.baseUrl}/consultations/${consultationId}`, {
-      headers: { Authorization: `Bearer ${this.apiKey}` },
+    const response = await fetchWithRetry(`${this.baseUrl}/consultations/${consultationId}`, {
+      headers: this.headers,
     });
 
     if (!response.ok) {
@@ -141,8 +195,8 @@ class OpenLoopAdapter implements TelehealthProvider {
   }
 
   async getEligibilityDecision(consultationId: string): Promise<EligibilityDecision> {
-    const response = await fetch(`${this.baseUrl}/consultations/${consultationId}/decision`, {
-      headers: { Authorization: `Bearer ${this.apiKey}` },
+    const response = await fetchWithRetry(`${this.baseUrl}/consultations/${consultationId}/decision`, {
+      headers: this.headers,
     });
 
     if (!response.ok) {
@@ -160,8 +214,8 @@ class OpenLoopAdapter implements TelehealthProvider {
   }
 
   async getPrescription(consultationId: string): Promise<TelehealthPrescription | null> {
-    const response = await fetch(`${this.baseUrl}/consultations/${consultationId}/prescription`, {
-      headers: { Authorization: `Bearer ${this.apiKey}` },
+    const response = await fetchWithRetry(`${this.baseUrl}/consultations/${consultationId}/prescription`, {
+      headers: this.headers,
     });
 
     if (!response.ok) return null;
@@ -185,6 +239,7 @@ class OpenLoopAdapter implements TelehealthProvider {
 
 class MockTelehealthAdapter implements TelehealthProvider {
   async createPatient(data: Parameters<TelehealthProvider["createPatient"]>[0]): Promise<TelehealthPatient> {
+    safeLog("[Telehealth Mock]", `createPatient: ${data.firstName} ${data.lastName}`);
     return {
       id: `mock_patient_${Date.now()}`,
       externalId: `mock_ext_${Date.now()}`,
@@ -198,6 +253,7 @@ class MockTelehealthAdapter implements TelehealthProvider {
   }
 
   async requestConsultation(patientId: string): Promise<TelehealthConsultation> {
+    safeLog("[Telehealth Mock]", `requestConsultation for patient ${patientId}`);
     return {
       id: `mock_consult_${Date.now()}`,
       patientId,

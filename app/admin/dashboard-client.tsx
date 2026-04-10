@@ -13,6 +13,8 @@ import {
   AlertTriangle,
   ArrowRight,
   AlertCircle,
+  Lightbulb,
+  Clock,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +22,19 @@ import { Button } from "@/components/ui/button";
 import { KPICard } from "@/components/admin/kpi-card";
 import { ActivityFeed, type ActivityItem } from "@/components/admin/activity-feed";
 import { formatPrice } from "@/lib/utils";
+
+interface InsightItem {
+  id: string;
+  type: string;
+  metric: string;
+  title: string;
+  description: string;
+  severity: string;
+  currentValue: number;
+  expectedValue: number;
+  deviation: number;
+  createdAt: Date | string;
+}
 
 interface DashboardData {
   kpis: {
@@ -45,7 +60,25 @@ interface DashboardData {
   }[];
 }
 
-export function DashboardClient({ data }: { data: DashboardData }) {
+const insightTypeConfig: Record<string, { icon: typeof AlertTriangle; color: string; bg: string }> = {
+  ANOMALY: { icon: AlertTriangle, color: "text-red-500", bg: "bg-red-50" },
+  TREND: { icon: TrendingUp, color: "text-blue-500", bg: "bg-blue-50" },
+  OPPORTUNITY: { icon: Lightbulb, color: "text-amber-500", bg: "bg-amber-50" },
+  WARNING: { icon: AlertCircle, color: "text-orange-500", bg: "bg-orange-50" },
+};
+
+function insightTimeAgo(dateStr: string | Date): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+export function DashboardClient({ data, recentInsights = [] }: { data: DashboardData; recentInsights?: InsightItem[] }) {
   // Fire-and-forget: evaluate smart alert rules on dashboard load
   useEffect(() => {
     fetch("/api/admin/alerts/evaluate", { method: "POST" }).catch(() => {
@@ -219,15 +252,68 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           </CardContent>
         </Card>
 
-        {/* Activity feed */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Live Activity</CardTitle>
-          </CardHeader>
-          <CardContent className="max-h-96 overflow-y-auto">
-            <ActivityFeed items={data.activityFeed} />
-          </CardContent>
-        </Card>
+        {/* Right column: Activity feed + Insights */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Live Activity</CardTitle>
+            </CardHeader>
+            <CardContent className="max-h-96 overflow-y-auto">
+              <ActivityFeed items={data.activityFeed} />
+            </CardContent>
+          </Card>
+
+          {/* Recent Insights */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-base">Insights</CardTitle>
+              <Link href="/admin/insights" className="flex items-center gap-1 text-xs font-medium text-teal hover:underline">
+                View all <ArrowRight className="h-3 w-3" />
+              </Link>
+            </CardHeader>
+            <CardContent>
+              {recentInsights.length === 0 ? (
+                <div className="py-6 text-center">
+                  <Lightbulb className="mx-auto h-5 w-5 text-graphite-300" />
+                  <p className="mt-2 text-xs text-graphite-300">No insights yet</p>
+                  <Link href="/admin/insights" className="mt-1 inline-block text-xs text-teal hover:underline">
+                    Run detection
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {recentInsights.map((insight) => {
+                    const tc = insightTypeConfig[insight.type] || insightTypeConfig.WARNING;
+                    const Icon = tc.icon;
+                    return (
+                      <div key={insight.id} className="flex items-start gap-2.5 rounded-xl px-2 py-2 transition-colors hover:bg-linen/30">
+                        <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${tc.bg}`}>
+                          <Icon className={`h-3.5 w-3.5 ${tc.color}`} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-navy truncate">{insight.title}</p>
+                          <p className="text-[10px] text-graphite-400 line-clamp-2">{insight.description}</p>
+                        </div>
+                        <div className="flex shrink-0 flex-col items-end gap-0.5">
+                          <Badge
+                            variant={insight.severity === "HIGH" ? "destructive" : insight.severity === "MEDIUM" ? "warning" : "secondary"}
+                            className="text-[9px] px-1.5 py-0"
+                          >
+                            {insight.severity}
+                          </Badge>
+                          <span className="flex items-center gap-0.5 text-[9px] text-graphite-300">
+                            <Clock className="h-2.5 w-2.5" />
+                            {insightTimeAgo(insight.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

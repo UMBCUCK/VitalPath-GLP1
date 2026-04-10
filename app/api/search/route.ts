@@ -59,13 +59,21 @@ export async function GET(req: NextRequest) {
     { title: "FAQ", href: "/faq", keywords: "questions answers faq help" },
   ].filter((p) => p.title.toLowerCase().includes(query) || p.keywords.includes(query)).slice(0, 5);
 
-  return NextResponse.json({
-    results: {
-      blogs: blogs.map((b) => ({ type: "blog" as const, title: b.title, href: `/blog/${b.slug}`, subtitle: b.excerpt || b.category })),
-      recipes: recipes.map((r) => ({ type: "recipe" as const, title: r.title, href: `/dashboard/meals`, subtitle: `${r.calories} cal · ${r.proteinG}g protein` })),
-      faqs: faqResults.map((f) => ({ type: "faq" as const, title: f.question, href: "/faq", subtitle: f.answer })),
-      pages: pages.map((p) => ({ type: "page" as const, title: p.title, href: p.href })),
+  return NextResponse.json(
+    {
+      results: {
+        blogs: blogs.map((b) => ({ type: "blog" as const, title: b.title, href: `/blog/${b.slug}`, subtitle: b.excerpt || b.category })),
+        recipes: recipes.map((r) => ({ type: "recipe" as const, title: r.title, href: `/dashboard/meals`, subtitle: `${r.calories} cal · ${r.proteinG}g protein` })),
+        faqs: faqResults.map((f) => ({ type: "faq" as const, title: f.question, href: "/faq", subtitle: f.answer })),
+        pages: pages.map((p) => ({ type: "page" as const, title: p.title, href: p.href })),
+      },
+      query,
     },
-    query,
-  });
+    {
+      headers: {
+        // Cache search results at CDN for 2 minutes — same query string = same results
+        "Cache-Control": "public, s-maxage=120, stale-while-revalidate=30",
+      },
+    }
+  );
 }
