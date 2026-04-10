@@ -95,6 +95,11 @@ model PatientProfile {
   notifyEmail        Boolean @default(true)
   notifySms          Boolean @default(false)
 
+  // Computed scores (cached)
+  healthScore    Int?
+  lifecycleStage String? // LEAD | QUIZ_COMPLETE | INTAKE_PENDING | ACTIVE_NEW | ACTIVE_ESTABLISHED | AT_RISK | CHURNED
+  lastScoredAt   DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -891,11 +896,16 @@ model Lead {
 // ─── WEBHOOK EVENTS (idempotency tracking) ─────────────────
 
 model WebhookEvent {
-  id          String   @id // Stripe event ID (evt_xxx)
-  type        String   // e.g. "checkout.session.completed"
-  processedAt DateTime @default(now())
+  id           String   @id // Stripe event ID (evt_xxx)
+  type         String   // e.g. "checkout.session.completed"
+  success      Boolean  @default(true)
+  errorMessage String?
+  payload      Json?
+  processedAt  DateTime @default(now())
 
   @@index([type])
+  @@index([success])
+  @@index([processedAt])
 }
 
 // ─── NOTIFICATIONS ──────────────────────────────────────────
@@ -1157,4 +1167,62 @@ model ComplianceAuditLog {
   @@index([patientId])
   @@index([action])
   @@index([createdAt])
+}
+
+// ─── ADMIN ALERTS ───────────────────────────────────────────
+
+model AdminAlert {
+  id          String   @id @default(cuid())
+  type        String   // PAYMENT_FAILED, CREDENTIAL_EXPIRING, HIGH_CHURN, ADVERSE_EVENT, WEBHOOK_FAILURE, SUBSCRIPTION_PAST_DUE, INTAKE_QUEUE_HIGH, SYSTEM
+  severity    String   // INFO, WARNING, CRITICAL
+  title       String
+  body        String?
+  link        String?
+  isRead      Boolean  @default(false)
+  isDismissed Boolean  @default(false)
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([isRead])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+// ─── CAMPAIGNS ──────────────────────────────────────────────
+
+model Campaign {
+  id               String    @id @default(cuid())
+  name             String
+  type             String    // REACTIVATION, RECOVERY, UPGRADE, RETENTION, ENGAGEMENT
+  status           String    @default("DRAFT") // DRAFT, ACTIVE, PAUSED, COMPLETED
+  trigger          String
+  offerText        String?
+  couponId         String?
+  emailSubject     String?
+  emailBody        String?
+  sentCount        Int       @default(0)
+  openedCount      Int       @default(0)
+  clickedCount     Int       @default(0)
+  convertedCount   Int       @default(0)
+  revenueGenerated Int       @default(0) // cents
+  startedAt        DateTime?
+  pausedAt         DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([status])
+  @@index([type])
+}
+
+// ─── ADMIN SAVED VIEWS ──────────────────────────────────────
+
+model AdminSavedView {
+  id        String   @id @default(cuid())
+  adminId   String
+  page      String   // e.g. "customers", "revenue"
+  name      String
+  filters   Json
+  createdAt DateTime @default(now())
+
+  @@index([adminId, page])
 }

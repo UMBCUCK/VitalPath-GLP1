@@ -125,6 +125,25 @@ function QualifyResultsContent() {
             </div>
           </div>
 
+          {/* Why medication matters */}
+          <div className="mt-5 rounded-xl bg-navy-50/50 p-4">
+            <p className="text-xs font-semibold text-navy mb-3">Why GLP-1 medication makes the difference</p>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="rounded-lg bg-white p-2.5">
+                <p className="text-[10px] text-graphite-400">Diet &amp; Exercise</p>
+                <p className="text-sm font-bold text-graphite-400">~{Math.round(currentWeight * 0.05)} lbs</p>
+              </div>
+              <div className="rounded-lg bg-white p-2.5">
+                <p className="text-[10px] text-graphite-500">GLP-1 Only</p>
+                <p className="text-sm font-bold text-navy">~{Math.round(currentWeight * 0.15)} lbs</p>
+              </div>
+              <div className="rounded-lg bg-teal-50 border border-teal-100 p-2.5">
+                <p className="text-[10px] text-teal-600">GLP-1 + VitalPath</p>
+                <p className="text-sm font-bold text-teal">~{totalLoss} lbs</p>
+              </div>
+            </div>
+          </div>
+
           {/* Features */}
           <div className="mt-6">
             <p className="text-sm font-semibold text-navy mb-3">What&apos;s included:</p>

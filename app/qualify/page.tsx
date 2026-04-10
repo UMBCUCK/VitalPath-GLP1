@@ -90,7 +90,7 @@ const stepProof = [
   { icon: Shield, text: "Your answers are reviewed by licensed medical providers", color: "text-teal" },
   null, // projection step
   { icon: Clock, text: "Most members see results within the first 30 days", color: "text-atlantic" },
-  { icon: Shield, text: "HIPAA-compliant · 256-bit encryption · Never sold", color: "text-teal" },
+  { icon: Star, text: "4.9/5 from 2,400+ verified members · 94% would recommend VitalPath", color: "text-gold" },
 ];
 
 export default function QualifyPage() {
@@ -910,7 +910,7 @@ export default function QualifyPage() {
                         </div>
 
                         {/* Milestones with animated counters */}
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-3 gap-2 sm:gap-3">
                           {projection.milestones.map((m, i) => (
                             <div key={m.month} className="rounded-xl border border-navy-100/60 bg-white p-3 text-center">
                               <p className="text-[10px] font-semibold uppercase tracking-wider text-graphite-400">Month {m.month}</p>
@@ -931,8 +931,8 @@ export default function QualifyPage() {
                             <Zap className="h-4 w-4 text-teal-300" />
                             <p className="text-xs font-semibold uppercase tracking-wider text-teal-300">Why medication matters</p>
                           </div>
-                          <div className="grid grid-cols-3 gap-3">
-                            <div className="rounded-xl bg-white/5 p-3 text-center">
+                          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                            <div className="rounded-xl bg-white/5 p-2 sm:p-3 text-center">
                               <p className="text-[10px] text-navy-300">Diet &amp; Exercise</p>
                               <p className="text-lg font-bold text-graphite-300">-<AnimatedCounter value={Math.round(projection.summary.totalLossDietExercise)} duration={1200} /> lbs</p>
                             </div>
@@ -1107,6 +1107,21 @@ export default function QualifyPage() {
                     </div>
 
                     {/* 4 Required Consents */}
+                    {!(form.consentTreatment && form.consentHipaa && form.consentTelehealth && form.consentMedicationRisks) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setField("consentTreatment", true);
+                          setField("consentHipaa", true);
+                          setField("consentTelehealth", true);
+                          setField("consentMedicationRisks", true);
+                        }}
+                        className="w-full rounded-xl border-2 border-teal bg-teal-50 px-4 py-3 text-sm font-medium text-teal-800 transition-all hover:bg-teal-100"
+                      >
+                        <Check className="mr-2 inline h-4 w-4" />
+                        I&apos;ve read and agree to all consents below
+                      </button>
+                    )}
                     <div className="space-y-3">
                       <label className={cn("flex items-start gap-3 cursor-pointer rounded-xl border-2 p-4 transition-all", form.consentTreatment ? "border-teal bg-teal-50/30" : "border-navy-200 hover:border-navy-300")}>
                         <input type="checkbox" checked={form.consentTreatment} onChange={(e) => setField("consentTreatment", e.target.checked)} className="mt-0.5 h-5 w-5 rounded border-navy-300 text-teal focus:ring-teal" />
@@ -1187,7 +1202,22 @@ export default function QualifyPage() {
             )}
 
             {/* Navigation */}
-            <div className="mt-6 flex items-center justify-between">
+            {/* Validation hint */}
+            {!canProceed() && step !== 5 && (
+              <p className="mt-4 text-center text-xs text-amber-600">
+                {step === 1 && "Please fill in your height, weight, age, and select your sex"}
+                {step === 2 && "Please select your goal, activity level, eating habits, and previous attempts"}
+                {step === 4 && "Please answer Yes or No for all safety questions (or use the shortcut above)"}
+                {step === 6 && (
+                  form.medicalHistory.length < 10
+                    ? "Please fill in all fields including a brief medical history (at least 10 characters)"
+                    : "Please fill in all required fields including emergency contact"
+                )}
+                {step === 7 && "Please review and check all four consent boxes to continue"}
+              </p>
+            )}
+
+            <div className="mt-4 flex items-center justify-between">
               <Button variant="ghost" onClick={prevStep} disabled={step === 1} className="gap-1">
                 <ArrowLeft className="h-4 w-4" /> Back
               </Button>
@@ -1253,7 +1283,13 @@ export default function QualifyPage() {
                 onChange={(e) => setField("email", e.target.value)}
                 className="flex-1 rounded-xl border border-navy-100 bg-white px-4 py-2.5 text-sm text-navy placeholder:text-graphite-300 focus:outline-none focus:ring-2 focus:ring-teal/30"
               />
-              <Button onClick={() => { track(ANALYTICS_EVENTS.QUALIFY_STEP_COMPLETE, { step: "exit_save", email: form.email }); setShowExitModal(false); }} size="sm">
+              <Button onClick={async () => {
+                if (form.email) {
+                  try { await fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: form.email, name: form.firstName || undefined, source: "qualify_exit_intent" }) }); } catch {}
+                }
+                track(ANALYTICS_EVENTS.QUALIFY_STEP_COMPLETE, { step: "exit_save", email: form.email });
+                setShowExitModal(false);
+              }} size="sm">
                 Save
               </Button>
             </div>
