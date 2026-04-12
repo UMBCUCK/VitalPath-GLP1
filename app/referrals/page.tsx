@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -9,6 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
+import { db } from "@/lib/db";
+import { formatPrice } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Refer a Friend",
@@ -29,7 +31,17 @@ const steps = [
   { title: "You earn credit", description: "Earn membership credit for every successful referral. Credits are applied to your next billing cycle." },
 ];
 
-export default function ReferralsPage() {
+export default async function ReferralsPage() {
+  const [activeReferrers, totalEarnedAgg, totalReferralsAgg] = await Promise.all([
+    db.referralCode.count({ where: { isActive: true, totalReferred: { gt: 0 } } }),
+    db.referralCode.aggregate({ _sum: { totalEarned: true } }),
+    db.referralCode.aggregate({ _sum: { totalReferred: true } }),
+  ]);
+
+  const totalEarned = totalEarnedAgg._sum.totalEarned || 0;
+  const totalReferred = totalReferralsAgg._sum.totalReferred || 0;
+  const avgReferrals = activeReferrers > 0 ? (totalReferred / activeReferrers).toFixed(1) : "0";
+
   return (
     <MarketingShell>
       {/* Hero */}
@@ -109,27 +121,40 @@ export default function ReferralsPage() {
       {/* Stats */}
       <section className="py-20">
         <SectionShell>
-          <div className="grid gap-8 sm:grid-cols-3 text-center">
+          <div className="grid gap-8 sm:grid-cols-4 text-center">
             <div>
               <div className="flex items-center justify-center gap-1.5">
                 <Users className="h-5 w-5 text-teal" />
-                <span className="text-3xl font-bold text-navy">3,200+</span>
+                <span className="text-3xl font-bold text-navy">
+                  {activeReferrers > 0 ? `${activeReferrers.toLocaleString()}+` : "Growing daily"}
+                </span>
               </div>
               <p className="mt-1 text-sm text-graphite-400">Active referrers</p>
             </div>
             <div>
               <div className="flex items-center justify-center gap-1.5">
                 <DollarSign className="h-5 w-5 text-gold-600" />
-                <span className="text-3xl font-bold text-navy">$247K+</span>
+                <span className="text-3xl font-bold text-navy">
+                  {totalEarned > 0 ? `${formatPrice(totalEarned)}+` : "$0"}
+                </span>
               </div>
               <p className="mt-1 text-sm text-graphite-400">Total credits earned</p>
             </div>
             <div>
               <div className="flex items-center justify-center gap-1.5">
                 <TrendingUp className="h-5 w-5 text-teal" />
-                <span className="text-3xl font-bold text-navy">4.2</span>
+                <span className="text-3xl font-bold text-navy">{avgReferrals}</span>
               </div>
               <p className="mt-1 text-sm text-graphite-400">Avg referrals per member</p>
+            </div>
+            <div>
+              <div className="flex items-center justify-center gap-1.5">
+                <Gift className="h-5 w-5 text-teal" />
+                <span className="text-3xl font-bold text-navy">
+                  {totalReferred > 0 ? `${totalReferred.toLocaleString()}+` : "0"}
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-graphite-400">Total members referred</p>
             </div>
           </div>
         </SectionShell>

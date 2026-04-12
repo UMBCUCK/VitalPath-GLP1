@@ -58,10 +58,10 @@ export default function EmbedCalculatorPage() {
 
 function EmbedCalculatorInner() {
   const searchParams = useSearchParams();
-  const refCode = searchParams.get("ref") || "";
-  const theme = searchParams.get("theme") || "light";
-  const hideTimeline = searchParams.get("hideTimeline") === "1";
-  const partnerName = searchParams.get("partner") || "";
+  const refCode = searchParams?.get("ref") || "";
+  const theme = searchParams?.get("theme") || "light";
+  const hideTimeline = searchParams?.get("hideTimeline") === "1";
+  const partnerName = searchParams?.get("partner") || "";
 
   const [step, setStep] = useState<"input" | "results">("input");
   const [currentWeight, setCurrentWeight] = useState("");

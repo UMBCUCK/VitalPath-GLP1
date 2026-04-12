@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { WebPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { WebPageJsonLd, BreadcrumbJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "The Complete Guide to GLP-1 Weight Loss (2026)",
@@ -146,6 +146,12 @@ export default function GuidePage() {
         description="Comprehensive guide covering everything about GLP-1 weight loss medication, nutrition, exercise, cost, and choosing the right program."
         path="/guide"
       />
+      <FAQPageJsonLd faqs={[
+        { question: "What are GLP-1 medications and how do they work for weight loss?", answer: "GLP-1 (glucagon-like peptide-1) receptor agonists mimic a natural gut hormone that regulates appetite and blood sugar. They slow gastric emptying, reduce hunger signals in the brain, and increase feelings of fullness. This combination leads to significant calorie reduction without willpower — resulting in 15-22% total body weight loss in clinical trials." },
+        { question: "How much weight can you lose with semaglutide or tirzepatide?", answer: "Clinical trials show semaglutide produces ~15-17% total body weight loss over 68 weeks (STEP trials). Tirzepatide produces ~20-22% total body weight loss over 72 weeks (SURMOUNT trials). Combined with a structured program including nutrition and behavior support, results are often higher." },
+        { question: "Is a GLP-1 program safe for long-term use?", answer: "GLP-1 medications have been studied for over a decade in diabetes management and more recently for obesity. Long-term data shows sustained safety and efficacy, with cardiovascular benefits observed in SELECT trial data. Your provider will monitor your health regularly during treatment." },
+        { question: "What should I eat while on semaglutide or tirzepatide?", answer: "High-protein, nutrient-dense foods help preserve muscle while losing fat. Focus on lean proteins (chicken, fish, Greek yogurt), vegetables, and complex carbohydrates. Avoid high-fat, high-sugar processed foods which can worsen nausea. Meal timing and hydration are also important during dose escalation." },
+      ]} />
 
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
@@ -170,6 +176,42 @@ export default function GuidePage() {
             <span>40+ resources</span>
             <span>&middot;</span>
             <span>Free to read</span>
+          </div>
+        </SectionShell>
+      </section>
+
+      {/* Condition specialty links */}
+      <section className="py-12 border-b border-sage/20 bg-cloud/30">
+        <SectionShell>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-graphite-400">Condition-specific programs</p>
+              <h2 className="text-lg font-bold text-navy mt-0.5">GLP-1 treatment for your situation</h2>
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { href: "/obesity", label: "Obesity", sub: "FDA-approved GLP-1 for BMI 30+" },
+              { href: "/type-2-diabetes", label: "Type 2 Diabetes", sub: "Dual blood sugar + weight benefit" },
+              { href: "/sleep-apnea", label: "Sleep Apnea", sub: "2024 FDA indication — tirzepatide" },
+              { href: "/pcos", label: "PCOS", sub: "Hormonal weight management" },
+              { href: "/prediabetes", label: "Prediabetes", sub: "Prevent progression with GLP-1" },
+              { href: "/heart-health", label: "Heart Health", sub: "SELECT trial cardiovascular data" },
+              { href: "/women", label: "Women's Health", sub: "Perimenopause, hormones & weight" },
+              { href: "/semaglutide", label: "Semaglutide", sub: "Ozempic & Wegovy active ingredient" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-navy group-hover:text-teal transition-colors">{item.label}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-graphite-500">{item.sub}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+              </Link>
+            ))}
           </div>
         </SectionShell>
       </section>
@@ -236,6 +278,8 @@ export default function GuidePage() {
               { label: "Cost & Insurance FAQ", sub: "What GLP-1 medications cost without insurance", href: "/faq/cost" },
               { label: "Side Effects FAQ", sub: "Common side effects and how to manage them", href: "/faq/side-effects" },
               { label: "Getting Started FAQ", sub: "How to qualify, what to expect in week 1", href: "/faq/getting-started" },
+              { label: "Nutrition FAQ", sub: "What to eat, protein targets, and managing nausea", href: "/faq/nutrition" },
+              { label: "Exercise FAQ", sub: "Best workouts, muscle preservation & plateaus", href: "/faq/exercise" },
               { label: "GLP-1 Cost Guide", sub: "Full 2026 pricing breakdown for all medications", href: "/glp1-cost" },
             ].map((item) => (
               <Link

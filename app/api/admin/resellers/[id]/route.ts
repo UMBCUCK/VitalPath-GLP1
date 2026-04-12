@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { getReseller, updateReseller } from "@/lib/admin-resellers";
-import { safeError } from "@/lib/logger";
+import { safeError, safeLog } from "@/lib/logger";
 
 // ── GET: Single reseller detail ─────────────────────────────────
 
@@ -36,10 +37,39 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin();
+    const session = await requireAdmin();
 
     const { id } = await params;
     const body = await req.json();
+
+    // Handle re-certification request
+    if (body.recertification === true) {
+      await db.resellerProfile.update({
+        where: { id },
+        data: {
+          onboardingStep: 0,
+          onboardingCompletedAt: null,
+          complianceTrainingCompletedAt: null,
+          agreementSignedAt: null,
+          agreementVersion: null,
+          agreementIpAddress: null,
+          // W-9 and attestation preserved — they need to re-sign agreement & re-train
+        },
+      });
+
+      await db.adminAuditLog.create({
+        data: {
+          userId: session.userId,
+          action: "reseller.recertification_triggered",
+          entity: "ResellerProfile",
+          entityId: id,
+          details: { triggeredBy: session.userId },
+        },
+      });
+
+      safeLog("[Reseller]", `Re-certification triggered for reseller ${id}`);
+      return NextResponse.json({ success: true, recertification: true });
+    }
 
     const reseller = await updateReseller(id, body);
     return NextResponse.json({ reseller });

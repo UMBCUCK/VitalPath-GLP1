@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export function ReferralPrompt() {
   const [copied, setCopied] = useState(false);
   const referralCode = "VITALFRIEND";
-  const referralUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/quiz?ref=${referralCode}`;
+  const referralUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/qualify?ref=${referralCode}`;
 
   function copyLink() {
     navigator.clipboard.writeText(referralUrl).then(() => {

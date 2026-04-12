@@ -52,9 +52,7 @@ interface DashboardData {
 
 interface CustomerRow {
   id: string;
-  firstName: string | null;
-  lastName: string | null;
-  email: string;
+  displayLabel: string;
   plan: string;
   status: string;
   signupDate: string;
@@ -133,6 +131,7 @@ interface Props {
   tierProgress?: TierProgressData | null;
   payoutSummary?: PayoutSummaryData | null;
   networkOverview?: NetworkOverviewData | null;
+  reattestationRequired?: boolean;
 }
 
 const assetTypeIcons: Record<string, typeof Image> = {
@@ -163,10 +162,28 @@ export function ResellerDashboardClient({
   tierProgress,
   payoutSummary,
   networkOverview,
+  reattestationRequired = false,
 }: Props) {
   const [copied, setCopied] = useState(false);
   const [custPage, setCustPage] = useState(customers.page);
   const [commPage, setCommPage] = useState(commissions.page);
+  const [reattestLoading, setReattestLoading] = useState(false);
+  const [reattestDone, setReattestDone] = useState(false);
+
+  async function handleReattestation() {
+    setReattestLoading(true);
+    try {
+      const res = await fetch("/api/reseller/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ step: "attestation", data: { fullLegalName: displayName } }),
+      });
+      if (res.ok) {
+        setReattestDone(true);
+      }
+    } catch { /* silent */ }
+    finally { setReattestLoading(false); }
+  }
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(referralLink);
@@ -222,10 +239,7 @@ export function ResellerDashboardClient({
       header: "Customer",
       render: (row) => (
         <div>
-          <p className="font-medium text-navy">
-            {row.firstName || ""} {row.lastName || ""}
-          </p>
-          <p className="text-xs text-graphite-400">{row.email}</p>
+          <p className="font-medium text-navy">{row.displayLabel}</p>
         </div>
       ),
     },
@@ -316,6 +330,38 @@ export function ResellerDashboardClient({
 
   return (
     <div className="space-y-6">
+      {/* Re-attestation Banner */}
+      {reattestationRequired && !reattestDone && (
+        <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4 flex items-start gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-200 shrink-0">
+            <span className="text-xl">⚠️</span>
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-amber-800">Quarterly Re-attestation Required</p>
+            <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+              Your healthcare provider attestation was signed more than 90 days ago.
+              Federal compliance requires periodic re-attestation that you are not a
+              licensed healthcare provider referring patients to VitalPath. Please
+              confirm your attestation to continue receiving commission payouts.
+            </p>
+            <div className="mt-3">
+              <button
+                onClick={handleReattestation}
+                disabled={reattestLoading}
+                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors disabled:opacity-50"
+              >
+                {reattestLoading ? "Confirming..." : "Confirm Re-attestation"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {reattestDone && (
+        <div className="rounded-xl border border-teal/30 bg-teal-50 p-3 flex items-center gap-2 text-sm text-teal-700">
+          <span>✅</span> Re-attestation confirmed. Thank you for maintaining compliance.
+        </div>
+      )}
+
       {/* Welcome Header */}
       <div className="flex items-center justify-between">
         <div>

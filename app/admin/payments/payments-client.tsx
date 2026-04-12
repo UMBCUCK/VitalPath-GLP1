@@ -1,12 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { DataTable, type ColumnDef, exportToCSV } from "@/components/admin/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RotateCcw, RefreshCw, CreditCard } from "lucide-react";
+import { RotateCcw, RefreshCw, DollarSign, TrendingDown, Clock, XCircle, TrendingUp } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { formatPrice } from "@/lib/utils";
 
 interface OrderRow {
@@ -166,10 +167,26 @@ interface Props {
   limit: number;
   currentStatus: string;
   currentSearch: string;
+  totalRevenue: number;
+  totalRefunded: number;
+  pendingCount: number;
+  processingCount: number;
+  recentOrders: Array<{ createdAt: Date; totalCents: number }>;
 }
 
-export function PaymentsClient({ orders, total, page, limit, currentStatus, currentSearch }: Props) {
+export function PaymentsClient({ orders, total, page, limit, currentStatus, currentSearch, totalRevenue, totalRefunded, pendingCount, processingCount, recentOrders }: Props) {
   const router = useRouter();
+
+  const monthlyData = useMemo(() => {
+    const map: Record<string, number> = {};
+    recentOrders.forEach((o) => {
+      const key = new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+      map[key] = (map[key] || 0) + o.totalCents;
+    });
+    const parseDate = (s: string) => new Date(s + " 1");
+    const sorted = Object.entries(map).sort(([a], [b]) => parseDate(a).getTime() - parseDate(b).getTime());
+    return sorted.map(([label, value]) => ({ label, value }));
+  }, [recentOrders]);
 
   const updateParams = (updates: Record<string, string | number | null>) => {
     const params = new URLSearchParams(window.location.search);
@@ -196,6 +213,86 @@ export function PaymentsClient({ orders, total, page, limit, currentStatus, curr
       <div>
         <h2 className="text-2xl font-bold text-navy">Payments</h2>
         <p className="text-sm text-graphite-400">Order history, refunds, and payment management</p>
+      </div>
+
+      {/* Revenue Trend */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <TrendingUp className="h-4 w-4 text-teal" />
+            Revenue (Last 6 Months)
+          </CardTitle>
+          <p className="text-xs text-graphite-400">
+            Total:{" "}
+            <span className="font-semibold text-navy">
+              {formatPrice(recentOrders.reduce((s, o) => s + o.totalCents, 0))}
+            </span>
+          </p>
+        </CardHeader>
+        <CardContent>
+          {monthlyData.length === 0 ? (
+            <div className="flex h-[180px] items-center justify-center text-sm text-graphite-400">
+              No revenue data yet
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={monthlyData} margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `$${(v / 100).toFixed(0)}`} />
+                <Tooltip formatter={(v: number) => [formatPrice(v), "Revenue"]} />
+                <Bar dataKey="value" fill="#2ab5a5" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Summary stats */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardContent className="flex items-center gap-4 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50">
+              <DollarSign className="h-5 w-5 text-teal" />
+            </div>
+            <div>
+              <p className="text-xs text-graphite-400">Total Revenue</p>
+              <p className="text-xl font-bold text-navy">{formatPrice(totalRevenue)}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-4 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50">
+              <TrendingDown className="h-5 w-5 text-red-500" />
+            </div>
+            <div>
+              <p className="text-xs text-graphite-400">Total Refunded</p>
+              <p className="text-xl font-bold text-navy">{formatPrice(totalRefunded)}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-4 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50">
+              <Clock className="h-5 w-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-xs text-graphite-400">Processing</p>
+              <p className="text-xl font-bold text-navy">{processingCount}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-4 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-navy-50">
+              <XCircle className="h-5 w-5 text-graphite-400" />
+            </div>
+            <div>
+              <p className="text-xs text-graphite-400">Pending</p>
+              <p className="text-xl font-bold text-navy">{pendingCount}</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>

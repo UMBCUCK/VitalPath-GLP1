@@ -29,7 +29,7 @@ const guarantees = [
     icon: Clock,
     title: "Fast Start Guarantee",
     description:
-      "Get evaluated within 24 hours of completing your intake. If prescribed, medication ships the same day with free 2-day delivery.",
+      "Get evaluated within 24 hours of completing your intake on business days. If prescribed, medication ships the same business day with free 2-day delivery.",
   },
 ];
 

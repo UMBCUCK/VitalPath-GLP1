@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -9,10 +9,11 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { cn } from "@/lib/utils";
 import { MarketingShell } from "@/components/layout/marketing-shell";
+import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "State Availability",
-  description: "See where Nature's Journey telehealth weight management services are currently available.",
+  title: "GLP-1 Telehealth Availability by State | VitalPath",
+  description: "See which states VitalPath GLP-1 weight loss telehealth is available in. Get semaglutide or tirzepatide prescribed online by a licensed provider in your state.",
 };
 
 // All US states with availability status
@@ -49,6 +50,13 @@ const availableCount = allStates.filter((s) => s.available).length;
 export default function StatesPage() {
   return (
     <MarketingShell>
+      <FAQPageJsonLd faqs={[
+        { question: "Which states is GLP-1 telehealth available in?", answer: "VitalPath currently serves patients in over 35 states across the US. Each state requires a licensed medical provider to practice telehealth within that state. Check the map above for current availability in your state." },
+        { question: "Can I get semaglutide or tirzepatide prescribed online in my state?", answer: "In states where VitalPath operates, you can complete your intake assessment online and receive a GLP-1 prescription from a licensed provider — no in-person appointment required. Medication ships from a licensed pharmacy directly to your door." },
+        { question: "What if my state is not currently available?", answer: "We are actively expanding to new states. If your state isn't available yet, you can join the waitlist and we'll notify you as soon as we launch in your area." },
+        { question: "Do I need to live in a specific city or area within my state?", answer: "No. VitalPath's telehealth model serves patients anywhere within a covered state, regardless of whether you're in a major city or a rural area. Medication is shipped directly to your address." },
+      ]} />
+      <BreadcrumbJsonLd items={[{ name: "Home", href: "/" }, { name: "State Availability", href: "/states" }]} />
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">
           <Badge variant="default" className="mb-6 gap-1.5">

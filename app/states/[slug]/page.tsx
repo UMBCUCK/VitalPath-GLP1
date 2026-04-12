@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { FaqSection } from "@/components/marketing/faq-section";
-import { BreadcrumbJsonLd, WebPageJsonLd } from "@/components/seo/json-ld";
+import { BreadcrumbJsonLd, WebPageJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 import { allStates } from "@/lib/states";
 import { stateContent } from "@/lib/state-content";
 import { siteConfig } from "@/lib/site";
@@ -55,8 +55,28 @@ export default async function StatePage({ params }: PageProps) {
     .filter((s) => s.available && s.slug !== slug)
     .slice(0, 6);
 
+  const stateFaqs = [
+    {
+      question: `Is GLP-1 weight loss medication available in ${state.name}?`,
+      answer: `Yes — Nature's Journey provides GLP-1 weight management programs to ${state.name} residents through telehealth. You can complete your evaluation online, get prescribed by a licensed ${state.name} provider, and receive medication shipped directly to your home with free 2-day delivery.`,
+    },
+    {
+      question: `Do I need to visit a clinic to get GLP-1 medication in ${state.name}?`,
+      answer: `No. The entire process is done online — assessment, provider evaluation, prescription, and ongoing care. There are no in-person clinic visits required. Your medication ships from a licensed pharmacy to your ${state.name} address.`,
+    },
+    {
+      question: `How much does GLP-1 treatment cost in ${state.name}?`,
+      answer: `Nature's Journey plans in ${state.name} start at $279/month — including provider evaluation, medication, and support. Brand-name alternatives (Wegovy, Zepbound) cost $1,000–$1,349/month without insurance. Compounded GLP-1 through telehealth programs typically saves 70–80% compared to retail.`,
+    },
+    {
+      question: `What GLP-1 medications are available in ${state.name}?`,
+      answer: `Nature's Journey prescribes compounded semaglutide (the active ingredient in Ozempic/Wegovy) and tirzepatide (the active ingredient in Mounjaro/Zepbound) to eligible ${state.name} patients. Eligibility is determined by a licensed provider after reviewing your health history.`,
+    },
+  ];
+
   return (
     <MarketingShell>
+      <FAQPageJsonLd faqs={stateFaqs} />
       <BreadcrumbJsonLd
         items={[
           { name: "Home", href: "/" },
@@ -192,7 +212,7 @@ export default async function StatePage({ params }: PageProps) {
                     </li>
                   ))}
                 </ul>
-                <Link href={`/quiz?state=${state.code}`} className="mt-4 block">
+                <Link href={`/qualify?state=${state.code}`} className="mt-4 block">
                   <Button variant={plan.highlight ? "default" : "outline"} size="sm" className="w-full">
                     Get Started
                   </Button>
@@ -334,14 +354,23 @@ export default async function StatePage({ params }: PageProps) {
               <Link href="/how-it-works" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
                 How it works →
               </Link>
-              <Link href="/blog/glp1-weight-loss-cost-without-insurance" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+              <Link href="/glp1-cost" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
                 GLP-1 cost guide →
               </Link>
-              <Link href="/blog/compounded-glp1-safety-evidence" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+              <Link href="/blog/compounded-semaglutide-safety" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
                 Compounded medication safety →
               </Link>
               <Link href="/compare" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
                 Compare programs →
+              </Link>
+              <Link href="/obesity" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                GLP-1 for obesity →
+              </Link>
+              <Link href="/type-2-diabetes" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                GLP-1 for diabetes →
+              </Link>
+              <Link href="/guide" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                Complete GLP-1 guide →
               </Link>
             </div>
           </SectionShell>
@@ -359,14 +388,23 @@ export default async function StatePage({ params }: PageProps) {
               <Link href="/how-it-works" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
                 How it works →
               </Link>
-              <Link href="/blog/glp1-weight-loss-cost-without-insurance" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+              <Link href="/glp1-cost" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
                 GLP-1 cost guide →
               </Link>
-              <Link href="/blog/compounded-glp1-safety-evidence" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+              <Link href="/blog/compounded-semaglutide-safety" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
                 Compounded medication safety →
               </Link>
               <Link href="/compare" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
                 Compare programs →
+              </Link>
+              <Link href="/obesity" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                GLP-1 for obesity →
+              </Link>
+              <Link href="/type-2-diabetes" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                GLP-1 for diabetes →
+              </Link>
+              <Link href="/guide" className="rounded-lg bg-navy-50/30 px-3 py-2 text-graphite-500 hover:text-teal transition-colors">
+                Complete GLP-1 guide →
               </Link>
             </div>
           </SectionShell>

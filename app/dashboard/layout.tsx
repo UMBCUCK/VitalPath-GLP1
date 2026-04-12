@@ -1,15 +1,17 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import {
   LayoutDashboard, TrendingUp, Pill, Utensils, Share2, Settings,
-  MessageCircle, Camera, ClipboardCheck, ShoppingBag,
+  MessageCircle, Camera, ClipboardCheck, ShoppingBag, Users,
 } from "lucide-react";
 import { LeafIcon } from "@/components/layout/brand-logo";
 import { siteConfig } from "@/lib/site";
 import { NotificationBell } from "@/app/dashboard/notification-bell";
 import { StreakBadges } from "@/components/dashboard/streak-badges";
+import { UserAvatarDropdown } from "@/components/shared/user-avatar-dropdown";
 
 const dashboardNav = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
@@ -19,6 +21,7 @@ const dashboardNav = [
   { label: "Meals & Recipes", href: "/dashboard/meals", icon: Utensils },
   { label: "Shop", href: "/dashboard/shop", icon: ShoppingBag },
   { label: "Photos", href: "/dashboard/photos", icon: Camera },
+  { label: "Community", href: "/dashboard/community", icon: Users },
   { label: "Messages", href: "/dashboard/messages", icon: MessageCircle },
   { label: "Referrals", href: "/dashboard/referrals", icon: Share2 },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
@@ -64,15 +67,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const displayName = user?.firstName || user?.email?.split("@")[0] || "Member";
 
   return (
-    <div className="flex min-h-screen bg-linen/30">
+    <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-navy-100/40 bg-white lg:block">
-        <div className="flex h-16 items-center gap-2.5 border-b border-navy-100/40 px-6">
+      <aside className="hidden w-64 shrink-0 border-r border-border bg-card lg:block">
+        <div className="flex h-16 items-center gap-2.5 border-b border-border px-6">
           <Link href="/" className="flex items-center gap-2.5">
             <LeafIcon className="h-8 w-8" />
             <div>
-              <p className="text-sm font-bold text-navy">{siteConfig.name}</p>
-              <p className="text-[10px] text-graphite-400">Member Dashboard</p>
+              <p className="text-sm font-bold text-card-foreground">{siteConfig.name}</p>
+              <p className="text-[10px] text-muted-foreground">Member Dashboard</p>
             </div>
           </Link>
         </div>
@@ -82,12 +85,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-graphite-500 transition-colors hover:bg-teal-50 hover:text-teal-800"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
             >
               <item.icon className="h-4 w-4" aria-hidden="true" />
               {item.label}
               {item.label === "Messages" && unreadMessages > 0 && (
-                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-teal text-[10px] font-bold text-white">{unreadMessages}</span>
+                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{unreadMessages}</span>
               )}
             </Link>
           ))}
@@ -96,27 +99,30 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
       {/* Main content */}
       <div className="flex-1 overflow-auto">
-        <header className="flex h-16 items-center justify-between border-b border-navy-100/40 bg-white px-6">
+        <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
           <div>
             <div className="flex items-center gap-3">
               <div>
-                <p className="text-sm text-graphite-400">Welcome back</p>
-                <p className="text-base font-bold text-navy">{displayName}</p>
+                <p className="text-sm text-muted-foreground">Welcome back</p>
+                <p className="text-base font-bold text-card-foreground">{displayName}</p>
               </div>
               <StreakBadges trackingStreak={trackingStreak} checkInStreak={Math.min(checkInStreak, 10)} />
             </div>
           </div>
           <div className="flex items-center gap-3">
             <NotificationBell initialCount={unreadNotifications} />
-            <Link href="/dashboard/messages" className="relative rounded-lg p-2 text-graphite-400 hover:bg-navy-50 transition-colors" aria-label={`Messages${unreadMessages > 0 ? `, ${unreadMessages} unread` : ""}`}>
+            <Link href="/dashboard/messages" className="relative rounded-lg p-2 text-muted-foreground hover:bg-muted transition-colors" aria-label={`Messages${unreadMessages > 0 ? `, ${unreadMessages} unread` : ""}`}>
               <MessageCircle className="h-5 w-5" />
               {unreadMessages > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-teal text-[10px] font-bold text-white">{unreadMessages}</span>
+                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{unreadMessages}</span>
               )}
             </Link>
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-teal to-atlantic flex items-center justify-center text-xs font-bold text-white" aria-label="Account">
-              {initials}
-            </div>
+            <UserAvatarDropdown
+              initials={initials}
+              displayName={displayName}
+              email={user?.email}
+              settingsHref="/dashboard/settings"
+            />
           </div>
         </header>
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { safeError } from "@/lib/logger";
+import { createEmailService } from "@/lib/services/email";
 
 function generateCode(length: number = 8): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -106,6 +107,31 @@ export async function POST(req: NextRequest) {
         status: "PENDING",
       },
     });
+
+    // Send invite email to referred person
+    try {
+      const referrer = await db.user.findUnique({
+        where: { id: session.userId },
+        select: { firstName: true, lastName: true, email: true },
+      });
+      const referrerName = [referrer?.firstName, referrer?.lastName].filter(Boolean).join(" ") || referrer?.email || "A friend";
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://vitalpath.com";
+      const inviteUrl = `${appUrl}/checkout?ref=${referralCode.code}`;
+
+      const emailService = createEmailService();
+      await emailService.send({
+        to: email,
+        subject: `${referrerName} invited you to VitalPath`,
+        html: `<p>Hi there,</p>
+<p>${referrerName} thought you'd benefit from VitalPath — a telehealth program that's helped thousands of people lose weight with GLP-1 medications.</p>
+<p>As their referral, you'll get a head start on your health journey.</p>
+<p><a href="${inviteUrl}" style="background:#0d9488;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Start Your Free Evaluation →</a></p>
+<p style="color:#999;font-size:12px;margin-top:24px;">You received this email because ${referrerName} wanted to share VitalPath with you. If you'd prefer not to receive these, just ignore this email.</p>`,
+      });
+    } catch (emailErr) {
+      safeError("[Referrals API] Invite email failed", emailErr);
+      // Non-fatal
+    }
 
     return NextResponse.json({ ok: true, referralId: referral.id });
   } catch (error) {

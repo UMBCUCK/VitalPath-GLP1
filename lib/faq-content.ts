@@ -405,7 +405,121 @@ export const faqTopics: FAQTopic[] = [
       { label: "Check Your Eligibility", href: "/eligibility" },
       { label: "Semaglutide FAQ", href: "/faq/semaglutide" },
       { label: "Side Effects FAQ", href: "/faq/side-effects" },
-      { label: "Take the Quiz", href: "/quiz" },
+      { label: "Take the Quiz", href: "/qualify" },
+    ],
+  },
+  {
+    slug: "nutrition",
+    title: "GLP-1 Nutrition FAQ: What to Eat on Semaglutide & Tirzepatide (2026)",
+    description:
+      "What to eat on semaglutide or tirzepatide, how much protein you need, foods to avoid, meal timing strategies, and managing nausea through diet. Evidence-based answers for GLP-1 patients.",
+    eyebrow: "Nutrition",
+    faqs: [
+      {
+        question: "What should I eat on semaglutide or tirzepatide?",
+        answer:
+          "Focus on high-protein, nutrient-dense whole foods. Lean proteins (chicken, fish, Greek yogurt, eggs, legumes), non-starchy vegetables, and complex carbohydrates are the foundation. GLP-1 medications significantly reduce appetite, which makes it easy to under-eat — especially protein. Protein supports muscle preservation during weight loss, which matters for long-term metabolic health and keeping weight off. Avoid high-fat, greasy foods and heavily processed foods during the early weeks — they tend to worsen nausea and gastrointestinal side effects. Small, frequent meals often work better than three large ones during the titration phase.",
+      },
+      {
+        question: "How much protein do I need on GLP-1 medication?",
+        answer:
+          "Clinical guidelines recommend 1.2–1.6g of protein per kilogram of body weight during active weight loss on GLP-1 medication — roughly 0.55–0.73g per pound. For a 200-pound person, that's 110–146g of protein daily. Because GLP-1 suppresses appetite significantly, many patients naturally eat less — making it easy to fall short of protein targets without realizing it. Tracking protein intake for at least the first few weeks helps establish baseline habits. High-protein foods include Greek yogurt (15–20g/serving), eggs (6g each), chicken breast (30g per 4oz), and cottage cheese (25g per cup).",
+      },
+      {
+        question: "What foods should I avoid on semaglutide?",
+        answer:
+          "High-fat, greasy foods are the main trigger for worsening nausea on GLP-1 medication — fried foods, fast food, full-fat dairy, and heavily marbled meats. Carbonated beverages can cause bloating and discomfort as gastric emptying slows. High-sugar processed foods (candy, pastries, sugary drinks) are absorbed quickly and can cause blood sugar spikes despite the medication's stabilizing effects. Alcohol tolerance often changes on GLP-1 — many patients become more sensitive with lower tolerance, and alcohol adds empty calories that compete with protein targets. Beyond these, most foods are fine in appropriate portions.",
+      },
+      {
+        question: "How do I manage nausea through diet on GLP-1 medication?",
+        answer:
+          "Eat small, frequent meals rather than large ones — a full stomach is the primary trigger for GLP-1-related nausea. Cold or room-temperature foods are often better tolerated than hot foods, which have stronger smells. Bland foods (rice, plain chicken, toast, bananas) are easier to digest during peak nausea periods. Ginger tea or ginger chews have clinical evidence for reducing nausea. Avoid lying down for 30–60 minutes after eating. Stay well hydrated — dehydration worsens nausea. Most patients find nausea significantly improves or resolves within 4–8 weeks as the body adjusts to the medication.",
+      },
+      {
+        question: "Does meal timing matter on GLP-1 medication?",
+        answer:
+          "Meal timing matters less than on some other diets, but a few principles help. Eating your largest protein serving earlier in the day tends to be easier, as appetite tends to be lowest in the evening on GLP-1 medication. Eating 2–3 hours before injecting can reduce the chance of nausea coinciding with peak medication concentration. Consistent meal timing (eating at roughly the same times each day) supports stable blood sugar and prevents the kind of extreme hunger that can lead to poor food choices. There is no strong evidence for intermittent fasting specifically on GLP-1 — adequate protein intake matters more than fasting windows.",
+      },
+      {
+        question: "Can I drink alcohol on semaglutide or tirzepatide?",
+        answer:
+          "Alcohol is not contraindicated with GLP-1 medications, but most patients find their tolerance changes significantly — often becoming much more sensitive, getting intoxicated faster, and experiencing stronger hangovers. GLP-1's effect on gastric emptying may change alcohol absorption patterns. Additionally, alcohol provides empty calories that compete with protein targets and can worsen nausea. Moderate consumption (1 drink for women, 2 for men per medical guidelines) is generally acceptable, but many patients naturally reduce alcohol intake on GLP-1 — a benefit many find unexpected.",
+      },
+      {
+        question: "How do I get enough calories if I'm never hungry?",
+        answer:
+          "This is one of the most common challenges on GLP-1 medication. The goal isn't to restrict calories as aggressively as your reduced appetite might push you toward. Eating too little (below ~1,200 calories for women, ~1,500 for men) can lead to muscle loss, nutrient deficiencies, and metabolic slowdown. Focus on calorie-dense protein sources: nuts, nut butters, Greek yogurt, cottage cheese, protein shakes, and eggs. A protein shake (25–30g protein, 200–300 calories) can help hit targets when appetite is very low. Use the TDEE calculator to find your target calorie range and treat it as a floor, not just a ceiling.",
+      },
+      {
+        question: "Are there any vitamins or supplements I should take?",
+        answer:
+          "No supplements are universally required, but several are worth considering. Vitamin D deficiency is common in people with obesity (fat-soluble vitamins are sequestered in fat tissue), and correction is associated with better metabolic outcomes. Magnesium supports blood sugar regulation and is often low in people eating Western diets. If your appetite is very suppressed and diet quality suffers, a multivitamin provides a nutritional safety net. Collagen peptides have limited evidence for joint and skin health during rapid weight loss. Creatine monohydrate has good evidence for preserving muscle during caloric restriction and is safe for most healthy adults. Always discuss supplements with your provider.",
+      },
+    ],
+    relatedLinks: [
+      { label: "Protein Calculator", href: "/calculators/protein" },
+      { label: "TDEE Calculator", href: "/calculators/tdee" },
+      { label: "GLP-1 Meal Plans", href: "/meals" },
+      { label: "Side Effects FAQ", href: "/faq/side-effects" },
+      { label: "Getting Started FAQ", href: "/faq/getting-started" },
+      { label: "Complete Guide", href: "/guide" },
+    ],
+  },
+  {
+    slug: "exercise",
+    title: "GLP-1 Exercise FAQ: Working Out on Semaglutide & Tirzepatide",
+    description:
+      "How to exercise on GLP-1 medication, what types of workouts are best, how to preserve muscle while losing fat, step count goals, and managing energy levels during treatment.",
+    eyebrow: "Exercise",
+    faqs: [
+      {
+        question: "Should I exercise on semaglutide or tirzepatide?",
+        answer:
+          "Yes — exercise is an important complement to GLP-1 medication, particularly for muscle preservation. GLP-1 medications cause weight loss that includes both fat and lean muscle mass. Exercise — especially resistance training — strongly reduces the proportion of weight lost from muscle vs fat. Clinical data shows that GLP-1 patients who exercise regularly maintain significantly better body composition than those who rely on medication alone. Energy levels may be lower during the first 4–8 weeks of titration, so starting with moderate activity and building up is a sensible approach.",
+      },
+      {
+        question: "What type of exercise is best on GLP-1 medication?",
+        answer:
+          "Resistance training (weight lifting, bodyweight exercises, resistance bands) is the highest-priority form of exercise during GLP-1 treatment because it specifically preserves lean muscle mass during caloric restriction. Aim for at least 2–3 sessions per week targeting major muscle groups. Cardio (walking, cycling, swimming) adds cardiovascular benefit and increases overall caloric expenditure — but it does not preserve muscle as effectively as resistance work. The ideal combination is 2–3 strength sessions plus 150+ minutes of moderate cardio per week, consistent with general physical activity guidelines.",
+      },
+      {
+        question: "How many steps per day should I aim for?",
+        answer:
+          "10,000 steps per day is a widely cited target, but the clinical evidence suggests meaningful benefit begins at 7,000–8,000 steps for adults. More relevant than a specific number is the trend — going from sedentary (2,000–3,000 steps/day) to moderately active (6,000–8,000 steps/day) produces significant cardiovascular and metabolic improvements. Step counting works well as a habit-building metric because it's easy to track and doesn't require a gym. Combining daily walking (steps) with 2–3 strength sessions per week covers both the cardiovascular and muscle-preservation dimensions of fitness during GLP-1 treatment.",
+      },
+      {
+        question: "Will exercise make side effects worse on GLP-1?",
+        answer:
+          "Intense exercise on a nearly empty stomach can worsen nausea — particularly in the first 4–8 weeks. Timing workouts 2–3 hours after eating, rather than immediately after or on an empty stomach, helps. High-intensity exercise can also temporarily increase nausea in some patients. Starting with moderate-intensity activity and monitoring your response is sensible. Most patients find that by weeks 8–12, as the body adapts to the medication and nausea diminishes, exercise tolerance normalizes or improves. If nausea during exercise is persistent, discuss dose timing with your provider.",
+      },
+      {
+        question: "How do I maintain muscle mass while losing fat on GLP-1?",
+        answer:
+          "Three evidence-based strategies work together: (1) Adequate protein intake — 1.2–1.6g per kg of body weight daily provides the substrate for muscle protein synthesis. (2) Resistance training — 2–3 sessions per week with progressive overload (gradually increasing weight or reps) signals the body to preserve muscle tissue even during a caloric deficit. (3) Avoid extreme caloric restriction — eating below 1,200–1,500 calories consistently increases muscle loss disproportionately. GLP-1 medication makes it easy to under-eat; tracking protein and total calories for the first several weeks helps establish habits that protect lean mass.",
+      },
+      {
+        question: "I'm exhausted in the first few weeks — is that normal?",
+        answer:
+          "Yes, fatigue in the first 4–8 weeks is common for two reasons. First, caloric intake drops significantly as appetite is suppressed, reducing overall energy availability. Second, the body is adjusting to changed hormonal signaling. Both improve as the body adapts. During this phase, lower-intensity exercise (walking, gentle yoga, bodyweight movements) is appropriate. Prioritize adequate sleep and protein intake, as both support energy. Most patients report energy levels normalizing or even improving beyond baseline by months 2–3, particularly as excess weight starts to reduce the physical burden of everyday activity.",
+      },
+      {
+        question: "Can I do high-intensity training (HIIT, CrossFit) on GLP-1?",
+        answer:
+          "Yes, once past the early titration phase. High-intensity training requires adequate fuel — meaning adequate caloric and carbohydrate intake on training days. Many GLP-1 patients naturally eat very low carbohydrate due to appetite suppression, which can impair high-intensity performance. Consuming a moderate carbohydrate source (fruit, oats, rice) 1–2 hours before intense sessions helps sustain performance. Protein recovery after sessions is also important. During weeks 1–8, it's sensible to reduce intensity and volume until the body adapts, then return to previous training levels as tolerated.",
+      },
+      {
+        question: "Does exercise help break a weight loss plateau on GLP-1?",
+        answer:
+          "Plateaus on GLP-1 medication typically reflect the body reaching a new metabolic set point rather than a failure of the medication. Increasing exercise intensity or volume — particularly resistance training — can help shift the plateau by increasing metabolic rate and improving insulin sensitivity. However, the most evidence-supported approach to plateaus is reviewing dietary protein and calorie intake, confirming adherence to the dosing schedule, and discussing with your provider whether dose adjustment is appropriate. Exercise is a useful complement to these strategies rather than a standalone fix.",
+      },
+    ],
+    relatedLinks: [
+      { label: "Protein Calculator", href: "/calculators/protein" },
+      { label: "TDEE Calculator", href: "/calculators/tdee" },
+      { label: "Nutrition FAQ", href: "/faq/nutrition" },
+      { label: "Getting Started FAQ", href: "/faq/getting-started" },
+      { label: "GLP-1 Complete Guide", href: "/guide" },
+      { label: "See If I Qualify", href: "/qualify" },
     ],
   },
 ];

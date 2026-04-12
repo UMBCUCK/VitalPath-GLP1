@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getWidgetLayout, WIDGET_TYPES } from "@/lib/admin-widgets";

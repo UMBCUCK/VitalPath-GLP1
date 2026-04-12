@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import {
   Settings, DollarSign, Shield, Stethoscope, Pill, Mail,
-  ToggleLeft, ToggleRight, Save, Check,
+  ToggleLeft, ToggleRight, Save, Check, Palette, Sun, Moon, Droplets, Settings2, ArrowRight,
 } from "lucide-react";
+import { useAdminTheme, type AdminTheme, applyAdminTheme } from "@/components/admin/dark-mode-toggle";
 import { formatPrice } from "@/lib/utils";
 
 interface ReferralSettings {
@@ -26,6 +28,7 @@ export function AdminSettingsClient({
   referralSettings: ReferralSettings | null;
 }) {
   const [saved, setSaved] = useState(false);
+  const { theme: activeTheme, setTheme } = useAdminTheme();
 
   // Referral config
   const [refPayout, setRefPayout] = useState(String((referralSettings?.defaultPayoutCents || 5000) / 100));
@@ -77,6 +80,141 @@ export function AdminSettingsClient({
           {saved ? "Saved!" : "Save Changes"}
         </Button>
       </div>
+
+      {/* Navigation settings link */}
+      <Link href="/admin/settings/navigation">
+        <Card className="border border-navy-100/60 hover:border-teal hover:shadow-md transition-all cursor-pointer group">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 group-hover:bg-teal transition-colors">
+              <Settings2 className="h-5 w-5 text-teal group-hover:text-white transition-colors" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-navy">Customize Sidebar Navigation</p>
+              <p className="text-xs text-graphite-400">Reorder, rename, toggle visibility, or move pages between groups</p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-graphite-300 group-hover:text-teal transition-colors" />
+          </CardContent>
+        </Card>
+      </Link>
+
+      {/* Appearance */}
+      <Card className="border-2 border-primary/20">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Palette className="h-4 w-4 text-primary" /> Appearance — Admin Theme
+          </CardTitle>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Choose the color scheme for the admin panel. Changes apply instantly and persist across sessions.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {/* Default Theme */}
+            <button
+              onClick={() => setTheme("default")}
+              className={`group relative flex flex-col gap-3 rounded-2xl border-2 p-4 text-left transition-all duration-200 hover:shadow-md ${
+                activeTheme === "default"
+                  ? "border-primary shadow-md"
+                  : "border-navy-100/40 hover:border-navy-200"
+              }`}
+            >
+              {activeTheme === "default" && (
+                <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary">
+                  <Check className="h-3 w-3 text-white" />
+                </span>
+              )}
+              {/* Preview swatch */}
+              <div className="flex h-16 w-full overflow-hidden rounded-xl border border-navy-100/30">
+                <div className="w-1/3 bg-white border-r border-navy-100/30" />
+                <div className="flex-1 bg-[#F5EFE7]/50 flex flex-col gap-1 p-1.5">
+                  <div className="h-2 w-3/4 rounded bg-[#0E223D]/20" />
+                  <div className="h-2 w-1/2 rounded bg-[#1F6F78]/40" />
+                  <div className="mt-auto h-3 w-2/3 rounded bg-[#1F6F78]" />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Sun className="h-4 w-4 text-gold-600" />
+                <div>
+                  <p className="text-sm font-semibold text-navy">Default (Warm)</p>
+                  <p className="text-[10px] text-graphite-400">Linen · Navy · Teal</p>
+                </div>
+              </div>
+            </button>
+
+            {/* Cerulean Theme */}
+            <button
+              onClick={() => setTheme("cerulean")}
+              className={`group relative flex flex-col gap-3 rounded-2xl border-2 p-4 text-left transition-all duration-200 hover:shadow-md ${
+                activeTheme === "cerulean"
+                  ? "border-[#00baee] shadow-md shadow-sky-100"
+                  : "border-navy-100/40 hover:border-sky-300"
+              }`}
+            >
+              {activeTheme === "cerulean" && (
+                <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-[#00baee]">
+                  <Check className="h-3 w-3 text-white" />
+                </span>
+              )}
+              {/* Preview swatch */}
+              <div className="flex h-16 w-full overflow-hidden rounded-xl border border-sky-200">
+                <div className="w-1/3 bg-white border-r border-sky-200" />
+                <div className="flex-1 bg-[#f0f9ff] flex flex-col gap-1 p-1.5">
+                  <div className="h-2 w-3/4 rounded bg-[#0b2a33]/20" />
+                  <div className="h-2 w-1/2 rounded bg-[#00baee]/40" />
+                  <div className="mt-auto h-3 w-2/3 rounded bg-[#00baee]" />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Droplets className="h-4 w-4 text-sky-500" />
+                <div>
+                  <p className="text-sm font-semibold text-navy">Cerulean (Light)</p>
+                  <p className="text-[10px] text-graphite-400">White · Cerulean Blue · Black</p>
+                </div>
+              </div>
+            </button>
+
+            {/* Dark Theme */}
+            <button
+              onClick={() => setTheme("dark")}
+              className={`group relative flex flex-col gap-3 rounded-2xl border-2 p-4 text-left transition-all duration-200 hover:shadow-md ${
+                activeTheme === "dark"
+                  ? "border-indigo-400 shadow-md shadow-indigo-100"
+                  : "border-navy-100/40 hover:border-indigo-300"
+              }`}
+            >
+              {activeTheme === "dark" && (
+                <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500">
+                  <Check className="h-3 w-3 text-white" />
+                </span>
+              )}
+              {/* Preview swatch */}
+              <div className="flex h-16 w-full overflow-hidden rounded-xl border border-navy-800/30">
+                <div className="w-1/3 bg-[#0d1b2e] border-r border-white/10" />
+                <div className="flex-1 bg-[#0a1525] flex flex-col gap-1 p-1.5">
+                  <div className="h-2 w-3/4 rounded bg-white/20" />
+                  <div className="h-2 w-1/2 rounded bg-teal/40" />
+                  <div className="mt-auto h-3 w-2/3 rounded bg-teal-500/80" />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Moon className="h-4 w-4 text-indigo-400" />
+                <div>
+                  <p className="text-sm font-semibold text-navy">Dark</p>
+                  <p className="text-[10px] text-graphite-400">Deep Navy · Teal accents</p>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            The theme toggle in the header (
+            <Droplets className="inline h-3 w-3 mx-0.5" />
+            <Sun className="inline h-3 w-3 mx-0.5" />
+            <Moon className="inline h-3 w-3 mx-0.5" />
+            ) cycles through all three themes. Your preference is saved per-browser.
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Referral Configuration */}
       <Card>

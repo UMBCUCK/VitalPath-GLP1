@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Users, Clock, CheckCircle, AlertTriangle, Eye } from "lucide-react";
+import { Search, Users, Clock, CheckCircle, AlertTriangle, Eye, ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
 
 type TabType = "all" | "intake_review" | "active" | "past_due";
+type SortKey = "name" | "state" | "plan" | "status" | "joined" | "progress";
+type SortDir = "asc" | "desc";
 
 interface Customer {
   id: string;
@@ -15,21 +18,52 @@ interface Customer {
   plan: string;
   subscriptionStatus: string;
   intakeStatus: string;
-  joinDate: Date;
+  joinDate: Date | string;
   weightLost: number;
+}
+
+function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; sortDir: SortDir }) {
+  if (col !== sortKey) return <ChevronsUpDown className="ml-1 inline h-3 w-3 text-graphite-300" />;
+  return sortDir === "asc"
+    ? <ChevronUp className="ml-1 inline h-3 w-3 text-navy" />
+    : <ChevronDown className="ml-1 inline h-3 w-3 text-navy" />;
 }
 
 export function AdminCustomersClient({ customers, total }: { customers: Customer[]; total?: number }) {
   const [tab, setTab] = useState<TabType>("all");
   const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("joined");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
-  const filtered = customers.filter((c) => {
-    if (search && !c.name.toLowerCase().includes(search.toLowerCase()) && !c.email.toLowerCase().includes(search.toLowerCase())) return false;
-    if (tab === "intake_review") return c.intakeStatus === "SUBMITTED" || c.intakeStatus === "NEEDS_INFO";
-    if (tab === "active") return c.subscriptionStatus === "ACTIVE";
-    if (tab === "past_due") return c.subscriptionStatus === "PAST_DUE";
-    return true;
-  });
+  function handleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  }
+
+  const filtered = customers
+    .filter((c) => {
+      if (search && !c.name.toLowerCase().includes(search.toLowerCase()) && !c.email.toLowerCase().includes(search.toLowerCase())) return false;
+      if (tab === "intake_review") return c.intakeStatus === "SUBMITTED" || c.intakeStatus === "NEEDS_INFO";
+      if (tab === "active") return c.subscriptionStatus === "ACTIVE";
+      if (tab === "past_due") return c.subscriptionStatus === "PAST_DUE";
+      return true;
+    })
+    .sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey) {
+        case "name": cmp = a.name.localeCompare(b.name); break;
+        case "state": cmp = a.state.localeCompare(b.state); break;
+        case "plan": cmp = a.plan.localeCompare(b.plan); break;
+        case "status": cmp = a.subscriptionStatus.localeCompare(b.subscriptionStatus); break;
+        case "joined": cmp = new Date(a.joinDate).getTime() - new Date(b.joinDate).getTime(); break;
+        case "progress": cmp = a.weightLost - b.weightLost; break;
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
 
   const pendingIntakes = customers.filter((c) => c.intakeStatus === "SUBMITTED" || c.intakeStatus === "NEEDS_INFO").length;
   const activeCount = customers.filter((c) => c.subscriptionStatus === "ACTIVE").length;
@@ -69,13 +103,24 @@ export function AdminCustomersClient({ customers, total }: { customers: Customer
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-navy-100/40 bg-navy-50/30">
-                  <th className="px-6 py-3 text-left font-medium text-graphite-400">Customer</th>
-                  <th className="px-4 py-3 text-left font-medium text-graphite-400">State</th>
-                  <th className="px-4 py-3 text-left font-medium text-graphite-400">Plan</th>
-                  <th className="px-4 py-3 text-left font-medium text-graphite-400">Intake</th>
-                  <th className="px-4 py-3 text-left font-medium text-graphite-400">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-graphite-400">Joined</th>
-                  <th className="px-4 py-3 text-left font-medium text-graphite-400">Progress</th>
+                  {([
+                    { key: "name" as SortKey, label: "Customer", cls: "px-6 py-3 text-left" },
+                    { key: "state" as SortKey, label: "State", cls: "px-4 py-3 text-left" },
+                    { key: "plan" as SortKey, label: "Plan", cls: "px-4 py-3 text-left" },
+                    { key: null, label: "Intake", cls: "px-4 py-3 text-left" },
+                    { key: "status" as SortKey, label: "Status", cls: "px-4 py-3 text-left" },
+                    { key: "joined" as SortKey, label: "Joined", cls: "px-4 py-3 text-left" },
+                    { key: "progress" as SortKey, label: "Progress (lbs)", cls: "px-4 py-3 text-left" },
+                  ]).map(({ key, label, cls }) => (
+                    <th
+                      key={label}
+                      className={`${cls} font-medium text-graphite-400 ${key ? "cursor-pointer select-none hover:text-navy" : ""}`}
+                      onClick={key ? () => handleSort(key) : undefined}
+                    >
+                      {label}
+                      {key && <SortIcon col={key} sortKey={sortKey} sortDir={sortDir} />}
+                    </th>
+                  ))}
                   <th className="px-4 py-3 text-right font-medium text-graphite-400">View</th>
                 </tr>
               </thead>
@@ -83,7 +128,11 @@ export function AdminCustomersClient({ customers, total }: { customers: Customer
                 {filtered.length === 0 ? (
                   <tr><td colSpan={8} className="py-8 text-center text-sm text-graphite-300">No customers match your filters</td></tr>
                 ) : filtered.map((c) => (
-                  <tr key={c.id} className="hover:bg-navy-50/20 transition-colors">
+                  <tr
+                    key={c.id}
+                    className="hover:bg-navy-50/20 transition-colors cursor-pointer"
+                    onClick={() => window.location.href = `/admin/customers/${c.id}`}
+                  >
                     <td className="px-6 py-3"><p className="font-medium text-navy">{c.name}</p><p className="text-xs text-graphite-400">{c.email}</p></td>
                     <td className="px-4 py-3 text-graphite-500">{c.state}</td>
                     <td className="px-4 py-3"><Badge variant="secondary">{c.plan}</Badge></td>
@@ -99,7 +148,16 @@ export function AdminCustomersClient({ customers, total }: { customers: Customer
                     </td>
                     <td className="px-4 py-3 text-xs text-graphite-400">{new Date(c.joinDate).toLocaleDateString()}</td>
                     <td className="px-4 py-3">{c.weightLost > 0 ? <span className="text-sm font-semibold text-teal">-{c.weightLost} lbs</span> : <span className="text-xs text-graphite-300">—</span>}</td>
-                    <td className="px-4 py-3 text-right"><button className="rounded-lg p-1.5 text-graphite-400 hover:bg-navy-50 hover:text-navy"><Eye className="h-4 w-4" /></button></td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        href={`/admin/customers/${c.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex rounded-lg p-1.5 text-graphite-400 hover:bg-teal-50 hover:text-teal transition-colors"
+                        title="View customer profile"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>

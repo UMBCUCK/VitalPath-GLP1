@@ -37,6 +37,42 @@ export const EXPERIMENTS: Record<string, Experiment> = {
     defaultVariant: "visible",
     description: "Test trust badge visibility on checkout",
   },
+  exit_intent_offer: {
+    key: "exit_intent_offer",
+    variants: ["guide_only", "guide_plus_discount", "discount_only"],
+    defaultVariant: "guide_plus_discount",
+    description: "Exit intent modal offer type",
+  },
+  urgency_banner: {
+    key: "urgency_banner",
+    variants: ["show", "hide"],
+    defaultVariant: "show",
+    description: "Show/hide urgency countdown banner",
+  },
+  social_proof_style: {
+    key: "social_proof_style",
+    variants: ["toasts", "counter", "both"],
+    defaultVariant: "both",
+    description: "Social proof display type on marketing pages",
+  },
+  checkout_progress: {
+    key: "checkout_progress",
+    variants: ["show", "hide"],
+    defaultVariant: "show",
+    description: "Show/hide checkout progress bar",
+  },
+  money_back_position: {
+    key: "money_back_position",
+    variants: ["above_cta", "below_cta", "both"],
+    defaultVariant: "above_cta",
+    description: "Money-back guarantee badge placement in checkout",
+  },
+  persona_card: {
+    key: "persona_card",
+    variants: ["show", "hide"],
+    defaultVariant: "show",
+    description: "Show/hide persona result card in qualify flow",
+  },
 };
 
 // ─── Hero headline variants ─────────────────────────────────

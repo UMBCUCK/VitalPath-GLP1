@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -45,7 +45,11 @@ export function StickyDesktopCta() {
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 text-xs text-graphite-500">
+            <Users className="h-3.5 w-3.5 text-teal" />
+            <span><span className="font-semibold text-navy">142</span> started this week</span>
+          </div>
           <span className="text-xs font-semibold text-teal">Save 79%</span>
           <Link href="/qualify" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { location: "sticky_desktop", target: "/qualify" })}>
             <Button size="sm" className="gap-1.5 shadow-glow">

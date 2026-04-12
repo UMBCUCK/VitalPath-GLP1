@@ -268,6 +268,10 @@ export async function getResellerPerformance(resellerId: string) {
 }
 
 // ── Calculate commission for an order ─────────────────────────
+// COMPLIANCE NOTE: This function only calculates DIRECT SALE commissions.
+// Override/tier commissions (OVERRIDE_TIER1, OVERRIDE_TIER2, OVERRIDE_TIER3)
+// are DISABLED for AKS/FTC healthcare compliance. The override fields on
+// ResellerProfile remain at 0.0 and must never be used for payment calculation.
 
 export function calculateCommission(
   reseller: {
@@ -281,8 +285,21 @@ export function calculateCommission(
     totalSales: number;
   },
   orderAmountCents: number,
-  isRecurring = false
+  isRecurring = false,
+  commissionType?: string
 ): number {
+  // ─── COMPLIANCE BLOCK: Override commissions permanently disabled ───
+  // Override commissions create a multi-tier payment structure that
+  // violates the Anti-Kickback Statute (42 U.S.C. § 1320a-7b) and
+  // FTC Business Opportunity Rule (16 C.F.R. Part 437) in healthcare.
+  if (
+    commissionType === "OVERRIDE_TIER1" ||
+    commissionType === "OVERRIDE_TIER2" ||
+    commissionType === "OVERRIDE_TIER3"
+  ) {
+    return 0; // BLOCKED — returns $0 for all override commission types
+  }
+
   // For recurring commissions
   if (isRecurring) {
     if (!reseller.subscriptionCommissionEnabled) return 0;

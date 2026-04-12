@@ -59,6 +59,11 @@ import {
   PieChart,
   Filter,
   GitBranch,
+  Watch,
+  ShieldAlert,
+  Building2,
+  RefreshCw,
+  FileHeart,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -97,7 +102,9 @@ const navGroups: NavGroup[] = [
       { label: "Payments", href: "/admin/payments", icon: CreditCard },
       { label: "Pricing", href: "/admin/pricing", icon: BadgeDollarSign },
       { label: "Reconciliation", href: "/admin/reconciliation", icon: Scale },
+      { label: "Payment Plans", href: "/admin/payment-plans", icon: Calendar },
       { label: "Currency & Tax", href: "/admin/currency", icon: Globe2 },
+      { label: "Organizations", href: "/admin/organizations", icon: Building2 },
     ],
   },
   {
@@ -112,6 +119,11 @@ const navGroups: NavGroup[] = [
       { label: "Scorecards", href: "/admin/provider-scorecards", icon: Award },
       { label: "Segments+", href: "/admin/advanced-segments", icon: Filter },
       { label: "Playbooks", href: "/admin/playbooks", icon: BookOpen },
+      { label: "Dose Intelligence", href: "/admin/dose-intelligence", icon: Brain },
+      { label: "Wearables", href: "/admin/wearables", icon: Watch },
+      { label: "Triage", href: "/admin/triage", icon: ShieldAlert },
+      { label: "Behavioral Health", href: "/admin/behavioral-health", icon: FileHeart },
+      { label: "Retention Engine", href: "/admin/retention-engine", icon: RefreshCw },
     ],
   },
   {
@@ -138,6 +150,7 @@ const navGroups: NavGroup[] = [
       { label: "Blog", href: "/admin/blog", icon: FileText },
       { label: "Recipes", href: "/admin/recipes", icon: ChefHat },
       { label: "Meal Plans", href: "/admin/meal-plans", icon: Calendar },
+      { label: "Media Library", href: "/admin/media", icon: Image },
       { label: "Intelligence", href: "/admin/content-intelligence", icon: Sparkles },
       { label: "Marketing Assets", href: "/admin/marketing-assets", icon: Image },
     ],
@@ -149,10 +162,11 @@ const navGroups: NavGroup[] = [
       { label: "Compliance Log", href: "/admin/compliance", icon: ClipboardCheck },
       { label: "Scanner", href: "/admin/compliance/scanner", icon: ScanLine },
       { label: "States", href: "/admin/states", icon: MapPin },
-      { label: "Geographic Intel", href: "/admin/geographic", icon: Globe },
       { label: "Adverse Events", href: "/admin/adverse-events", icon: AlertTriangle },
       { label: "Outcomes", href: "/admin/outcomes", icon: Award },
       { label: "Score", href: "/admin/compliance-dashboard", icon: ShieldCheck },
+      { label: "HIPAA Center", href: "/admin/hipaa", icon: ShieldCheck },
+      { label: "Reseller Compliance", href: "/admin/reseller-compliance", icon: ShieldAlert },
     ],
   },
   {
@@ -172,9 +186,37 @@ const navGroups: NavGroup[] = [
   },
 ];
 
+// Build icon lookup from default navGroups so customized config can resolve icons by href
+const iconMap = new Map<string, LucideIcon>();
+navGroups.forEach((g) => g.items.forEach((i) => iconMap.set(i.href, i.icon)));
+
+function getIcon(href: string): LucideIcon {
+  return iconMap.get(href) || LayoutDashboard;
+}
+
 export function AdminSidebar({ collapsed = false }: { collapsed?: boolean }) {
   const pathname = usePathname();
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+
+  // Load nav config from localStorage (customized order/visibility/names)
+  const [navConfig, setNavConfig] = useState<null | {
+    groups: Array<{
+      id: string; title: string; visible: boolean; order: number;
+      items: Array<{ id: string; label: string; visible: boolean; order: number }>;
+    }>;
+  }>(null);
+
+  // Load on mount
+  useState(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const stored = localStorage.getItem("vp-admin-nav-config");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.version === 1) setNavConfig(parsed);
+      }
+    } catch { /* use defaults */ }
+  });
 
   const toggleGroup = (title: string) => {
     setCollapsedGroups((prev) => {
@@ -186,38 +228,58 @@ export function AdminSidebar({ collapsed = false }: { collapsed?: boolean }) {
   };
 
   const isActive = (href: string) => {
+    if (!pathname) return false;
     if (href === "/admin") return pathname === "/admin";
     return pathname.startsWith(href);
   };
 
+  // Resolve which groups/items to render
+  const displayGroups = navConfig
+    ? navConfig.groups
+        .filter((g) => g.visible)
+        .sort((a, b) => a.order - b.order)
+        .map((g) => ({
+          title: g.title,
+          id: g.id,
+          items: g.items
+            .filter((i) => i.visible)
+            .sort((a, b) => a.order - b.order)
+            .map((i) => ({
+              label: i.label,
+              href: i.id,
+              icon: getIcon(i.id),
+            })),
+        }))
+    : navGroups.map((g) => ({ title: g.title, id: g.title.toLowerCase(), items: g.items }));
+
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-navy-100/40 bg-white transition-all duration-200",
+        "flex h-full flex-col border-r border-border bg-card transition-all duration-200",
         collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-navy-100/40 px-4">
+      <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-border px-4">
         <LeafIcon className="h-8 w-8" />
         {!collapsed && (
           <div>
-            <p className="text-sm font-bold text-navy">{siteConfig.name}</p>
-            <p className="text-[10px] text-graphite-400">Admin Panel</p>
+            <p className="text-sm font-bold text-card-foreground">{siteConfig.name}</p>
+            <p className="text-[10px] text-muted-foreground">Admin Panel</p>
           </div>
         )}
       </div>
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-        {navGroups.map((group) => {
+        {displayGroups.map((group) => {
           const isGroupCollapsed = collapsedGroups.has(group.title);
           return (
-            <div key={group.title}>
+            <div key={group.id}>
               {!collapsed && (
                 <button
                   onClick={() => toggleGroup(group.title)}
-                  className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-graphite-300 hover:text-graphite-500 transition-colors"
+                  className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 hover:text-muted-foreground transition-colors"
                 >
                   {group.title}
                   <ChevronDown
@@ -239,15 +301,15 @@ export function AdminSidebar({ collapsed = false }: { collapsed?: boolean }) {
                         className={cn(
                           "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-150",
                           active
-                            ? "bg-teal-50 text-teal-800 shadow-sm"
-                            : "text-graphite-500 hover:bg-navy-50/70 hover:text-navy"
+                            ? "bg-primary/10 text-primary shadow-sm"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
                         )}
                         title={collapsed ? item.label : undefined}
                       >
                         <item.icon
                           className={cn(
                             "h-4 w-4 shrink-0",
-                            active ? "text-teal" : "text-graphite-400"
+                            active ? "text-primary" : "text-muted-foreground"
                           )}
                         />
                         {!collapsed && item.label}

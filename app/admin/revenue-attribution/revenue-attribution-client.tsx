@@ -109,7 +109,7 @@ export function RevenueAttributionClient({
   const [activeModel, setActiveModel] = useState(initialModel);
 
   const handleDateChange = (from: string, to: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     params.set("from", from);
     params.set("to", to);
     router.push(`/admin/revenue-attribution?${params.toString()}`);
@@ -117,7 +117,7 @@ export function RevenueAttributionClient({
 
   const handleModelChange = (model: string) => {
     setActiveModel(model);
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     if (model === "all") params.delete("model");
     else params.set("model", model);
     router.push(`/admin/revenue-attribution?${params.toString()}`);

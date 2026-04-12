@@ -16,6 +16,7 @@ import {
   Lightbulb,
   Clock,
   Settings2,
+  Gift,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -70,6 +71,13 @@ const insightTypeConfig: Record<string, { icon: typeof AlertTriangle; color: str
   WARNING: { icon: AlertCircle, color: "text-orange-500", bg: "bg-orange-50" },
 };
 
+interface ReferralStats {
+  totalReferred: number;
+  totalEarned: number;
+  pendingPayout: number;
+  activeReferrers: number;
+}
+
 function insightTimeAgo(dateStr: string | Date): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
@@ -81,7 +89,7 @@ function insightTimeAgo(dateStr: string | Date): string {
   return `${days}d ago`;
 }
 
-export function DashboardClient({ data, recentInsights = [], widgetLayout }: { data: DashboardData; recentInsights?: InsightItem[]; widgetLayout?: WidgetConfig[] }) {
+export function DashboardClient({ data, recentInsights = [], widgetLayout, referralStats }: { data: DashboardData; recentInsights?: InsightItem[]; widgetLayout?: WidgetConfig[]; referralStats?: ReferralStats }) {
   const defaultLayout = getDefaultLayout();
   const isCustomLayout =
     widgetLayout &&
@@ -112,8 +120,8 @@ export function DashboardClient({ data, recentInsights = [], widgetLayout }: { d
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-navy">Command Center</h2>
-          <p className="text-sm text-graphite-400">Real-time platform overview</p>
+          <h2 className="text-2xl font-bold text-foreground">Command Center</h2>
+          <p className="text-sm text-muted-foreground">Real-time platform overview</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
@@ -230,6 +238,42 @@ export function DashboardClient({ data, recentInsights = [], widgetLayout }: { d
             />
           </div>
 
+          {/* Referral Program Health */}
+          {referralStats && (
+            <Card className="border-teal/20 bg-gradient-to-r from-teal-50/30 to-sage/20">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal/10">
+                      <Gift className="h-5 w-5 text-teal" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-navy">Referral Program</p>
+                      <p className="text-xs text-graphite-400">{referralStats.activeReferrers} active referrers</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6 flex-wrap">
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-navy">{referralStats.totalReferred}</p>
+                      <p className="text-[10px] text-graphite-400 uppercase tracking-wide">Total Referred</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-navy">{formatPrice(referralStats.totalEarned)}</p>
+                      <p className="text-[10px] text-graphite-400 uppercase tracking-wide">Total Earned</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-amber-600">{formatPrice(referralStats.pendingPayout)}</p>
+                      <p className="text-[10px] text-graphite-400 uppercase tracking-wide">Pending Payout</p>
+                    </div>
+                  </div>
+                  <Link href="/admin/referrals" className="text-xs font-medium text-teal hover:underline flex items-center gap-1">
+                    Manage <ArrowRight className="h-3 w-3" />
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Main content: Subscriptions + Activity Feed */}
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Recent subscriptions */}
@@ -248,21 +292,21 @@ export function DashboardClient({ data, recentInsights = [], widgetLayout }: { d
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-navy-100/40 text-left">
-                          <th className="pb-3 font-medium text-graphite-400">Customer</th>
-                          <th className="pb-3 font-medium text-graphite-400">Plan</th>
-                          <th className="pb-3 font-medium text-graphite-400">Amount</th>
-                          <th className="pb-3 font-medium text-graphite-400">Status</th>
+                          <th className="pb-3 font-medium text-muted-foreground">Customer</th>
+                          <th className="pb-3 font-medium text-muted-foreground">Plan</th>
+                          <th className="pb-3 font-medium text-muted-foreground">Amount</th>
+                          <th className="pb-3 font-medium text-muted-foreground">Status</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-navy-100/30">
                         {data.recentSubscriptions.map((sub) => (
                           <tr key={sub.id} className="hover:bg-linen/20 transition-colors">
                             <td className="py-3">
-                              <p className="font-medium text-navy">{sub.customerName}</p>
-                              <p className="text-xs text-graphite-400">{sub.email}</p>
+                              <p className="font-medium text-foreground">{sub.customerName}</p>
+                              <p className="text-xs text-muted-foreground">{sub.email}</p>
                             </td>
-                            <td className="py-3 text-graphite-500">{sub.planName}</td>
-                            <td className="py-3 font-medium text-navy">{formatPrice(sub.amount)}/mo</td>
+                            <td className="py-3 text-muted-foreground">{sub.planName}</td>
+                            <td className="py-3 font-medium text-foreground">{formatPrice(sub.amount)}/mo</td>
                             <td className="py-3">
                               <Badge
                                 variant={

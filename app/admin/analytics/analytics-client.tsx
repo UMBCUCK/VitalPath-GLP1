@@ -56,8 +56,8 @@ export function AnalyticsClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const currentFrom = searchParams.get("from") || initialFrom;
-  const currentTo = searchParams.get("to") || initialTo;
+  const currentFrom = searchParams?.get("from") || initialFrom;
+  const currentTo = searchParams?.get("to") || initialTo;
 
   function handleDateChange(from: string, to: string) {
     const params = new URLSearchParams();

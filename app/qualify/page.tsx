@@ -19,7 +19,8 @@ import { Progress } from "@/components/ui/progress";
 import { SectionShell } from "@/components/shared/section-shell";
 import { AnimatedCounter } from "@/components/calculators/animated-counter";
 import { useFunnelStore } from "@/hooks/use-funnel-store";
-import { recommendPlanFromQualify } from "@/lib/funnel";
+import { recommendPlanFromQualify, assignPersona } from "@/lib/funnel";
+import { PersonaResultCard } from "@/components/marketing/persona-result-card";
 import { generateProjection, type ProjectionResult } from "@/lib/weight-projection";
 import { calculateBMI, bmiCategory, formatPrice } from "@/lib/utils";
 import { plans } from "@/lib/pricing";
@@ -104,7 +105,79 @@ const DEFAULT_MEDICATIONS = [
   { id: "5", slug: "mounjaro-pen", name: "Mounjaro® Pen", description: null, imageUrl: null, type: "branded", form: "pen" },
   { id: "6", slug: "generic-liraglutide", name: "Generic Liraglutide", description: null, imageUrl: null, type: "generic", form: "pen" },
   { id: "7", slug: "compounded-semaglutide", name: "Compounded Semaglutide", description: null, imageUrl: null, type: "compounded", form: "injection" },
+  { id: "8", slug: "compounded-tirzepatide", name: "Compounded Tirzepatide", description: null, imageUrl: null, type: "compounded", form: "injection" },
 ];
+
+// Rich conversion-optimized metadata for each medication
+const MED_METADATA: Record<string, {
+  badge?: string;
+  badgeStyle?: string;
+  tagline: string;
+  pros: string[];
+  cons: string[];
+  delivery: string;
+}> = {
+  "wegovy-pill": {
+    badge: "No Needle",
+    badgeStyle: "bg-purple-100 text-purple-700 border-purple-200",
+    tagline: "Oral semaglutide · Weekly pill",
+    pros: ["Zero injections ever", "Discreet & travel-friendly"],
+    cons: ["Slower results than pen form", "Must take on empty stomach"],
+    delivery: "Oral pill",
+  },
+  "wegovy-pen": {
+    badge: "Most Prescribed",
+    badgeStyle: "bg-blue-100 text-blue-700 border-blue-200",
+    tagline: "Injectable semaglutide · FDA-approved",
+    pros: ["~15% avg weight loss in trials", "Many insurance plans cover it"],
+    cons: ["Weekly self-injection required", "High cost without insurance"],
+    delivery: "Weekly injection",
+  },
+  "ozempic-pen": {
+    tagline: "Semaglutide · Originally for diabetes",
+    pros: ["Decades of safety data", "Widely available"],
+    cons: ["Not FDA-approved for weight loss", "Harder to get covered for obesity"],
+    delivery: "Weekly injection",
+  },
+  "zepbound-pen": {
+    badge: "Best Results",
+    badgeStyle: "bg-teal-100 text-teal-700 border-teal-200",
+    tagline: "Dual-action tirzepatide · FDA-approved",
+    pros: ["Up to 22% weight loss in trials", "Targets 2 hunger pathways"],
+    cons: ["Newer drug, less long-term data", "Higher cost than semaglutide"],
+    delivery: "Weekly injection",
+  },
+  "mounjaro-pen": {
+    badge: "Dual-Action",
+    badgeStyle: "bg-indigo-100 text-indigo-700 border-indigo-200",
+    tagline: "Tirzepatide · Same as Zepbound®",
+    pros: ["Up to 22% weight loss in trials", "GIP + GLP-1 dual mechanism"],
+    cons: ["Not FDA-approved for weight loss", "Tougher insurance approval"],
+    delivery: "Weekly injection",
+  },
+  "generic-liraglutide": {
+    tagline: "Daily liraglutide · Budget option",
+    pros: ["10+ year safety record", "Lower upfront cost"],
+    cons: ["Daily injection (not weekly)", "Less weight loss than newer GLP-1s"],
+    delivery: "Daily injection",
+  },
+  "compounded-semaglutide": {
+    badge: "Best Value",
+    badgeStyle: "bg-green-100 text-green-700 border-green-200",
+    tagline: "Compounded · Same drug as Wegovy®",
+    pros: ["Up to 85% cheaper than brand-name", "Customizable dose titration"],
+    cons: ["Not FDA-approved product", "Quality depends on pharmacy"],
+    delivery: "Weekly injection",
+  },
+  "compounded-tirzepatide": {
+    badge: "Most Popular",
+    badgeStyle: "bg-amber-100 text-amber-700 border-amber-200",
+    tagline: "Compounded · Same drug as Zepbound®",
+    pros: ["Dual-action at a fraction of cost", "Customizable dosing schedule"],
+    cons: ["Not FDA-approved product", "Less long-term data than branded"],
+    delivery: "Weekly injection",
+  },
+};
 
 export default function QualifyPage() {
   return (
@@ -135,7 +208,7 @@ function QualifyPageInner() {
 
   // Capture referral code from URL (?ref=CODE) and persist in funnel
   useEffect(() => {
-    const ref = searchParams.get("ref");
+    const ref = searchParams?.get("ref");
     if (ref && !funnelState.referralCode) {
       updateFunnel({ referralCode: ref });
     }
@@ -216,10 +289,16 @@ function QualifyPageInner() {
   const bmi = ft >= 3 && w >= 80 ? calculateBMI(w, totalInches) : 0;
   const bmiCat = bmi > 0 ? bmiCategory(bmi) : "";
 
-  const hasContraindication =
-    form.hasThyroidCancer || form.hasMEN2 || form.isPregnant || form.hasPancreatitis ||
+  // Hard disqualifiers — GLP-1 prescribing is medically contraindicated; cannot proceed
+  const hasHardContraindication =
+    form.hasThyroidCancer || form.hasMEN2 || form.isPregnant || form.hasPancreatitis;
+
+  // Soft flags — provider reviews and makes final call; patient can still proceed
+  const hasSoftContraindication =
     form.hasGastroparesis || form.hasDiabeticRetinopathy || form.hasGallbladderDisease ||
     form.hasKidneyDisease || form.hasEatingDisorder || form.hasSuicidalIdeation;
+
+  const hasContraindication = hasHardContraindication || hasSoftContraindication;
 
   // ─── Plan recommendation ──────────────────────────────────
   const recommended = recommendPlanFromQualify({
@@ -558,6 +637,7 @@ function QualifyPageInner() {
       case 4: {
         const unanswered = contraindications.filter(c => !answeredScreening[c.key] && !allScreeningAnswered);
         if (unanswered.length > 0) errors.screening = `Please answer all ${unanswered.length} remaining safety question${unanswered.length > 1 ? "s" : ""}`;
+        if (hasHardContraindication) errors.screening = "HARD_BLOCK";
         break;
       }
       case 5:
@@ -991,12 +1071,35 @@ function QualifyPageInner() {
                         </div>
                       )}
 
-                      {hasContraindication && !form.hasSuicidalIdeation && (
-                        <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-3">
-                          <p className="text-xs font-semibold text-red-700">
-                            Based on your responses, GLP-1 medication may not be appropriate for you.
-                            Your provider will review this during your evaluation and discuss alternative options.
+                      {/* Hard stop — cannot proceed */}
+                      {hasHardContraindication && (
+                        <div className="mt-4 rounded-xl bg-red-50 border-2 border-red-300 p-4 space-y-3">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-sm font-bold text-red-700">You are not eligible for GLP-1 treatment</p>
+                              <p className="text-xs text-red-600 mt-1">
+                                Based on your responses, GLP-1 medications are medically contraindicated for your situation.
+                                We&apos;re unable to process an application at this time.
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-xs text-red-500 font-medium">
+                            Please speak with your primary care provider about weight management options that are safe for your specific health history.
                           </p>
+                        </div>
+                      )}
+
+                      {/* Soft flag — can proceed, provider reviews */}
+                      {!hasHardContraindication && hasSoftContraindication && !form.hasSuicidalIdeation && (
+                        <div className="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-3">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                            <p className="text-xs font-semibold text-amber-700">
+                              Your provider will carefully review your health history before making any prescribing decision.
+                              You may still proceed — eligibility is determined by your provider.
+                            </p>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1078,48 +1181,103 @@ function QualifyPageInner() {
                           )}
                         </div>
 
-                        {/* Two-column grid */}
+                        {/* Two-column medication cards with pros & cons */}
                         <div className="grid grid-cols-2 gap-3">
-                          {(catalogMeds.length > 0 ? catalogMeds : DEFAULT_MEDICATIONS).map((med) => (
-                            <button
-                              key={med.slug}
-                              type="button"
-                              onClick={() => {
-                                setField("medicationInterest", med.slug);
-                                setField("medicationInterestLabel", med.name);
-                              }}
-                              className={cn(
-                                "flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all",
-                                form.medicationInterest === med.slug
-                                  ? "border-teal bg-teal-50"
-                                  : "border-navy-200 hover:border-navy-300 hover:bg-cloud/30"
-                              )}
-                            >
-                              {med.imageUrl ? (
-                                <img
-                                  src={med.imageUrl}
-                                  alt={med.name}
-                                  className="h-16 w-16 object-contain"
-                                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                                />
-                              ) : (
-                                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-navy-50">
-                                  <Pill className="h-8 w-8 text-navy-300" />
+                          {(catalogMeds.length > 0 ? catalogMeds : DEFAULT_MEDICATIONS).map((med) => {
+                            const meta = MED_METADATA[med.slug];
+                            const isSelected = form.medicationInterest === med.slug;
+                            return (
+                              <button
+                                key={med.slug}
+                                type="button"
+                                onClick={() => {
+                                  setField("medicationInterest", med.slug);
+                                  setField("medicationInterestLabel", med.name);
+                                }}
+                                className={cn(
+                                  "flex flex-col gap-2 rounded-xl border-2 p-3 text-left transition-all w-full",
+                                  isSelected
+                                    ? "border-teal bg-teal-50 shadow-sm"
+                                    : "border-navy-200 hover:border-navy-300 hover:bg-cloud/30"
+                                )}
+                              >
+                                {/* Icon + selection indicator row */}
+                                <div className="flex items-start justify-between">
+                                  <div className={cn(
+                                    "flex h-14 w-14 items-center justify-center rounded-xl overflow-hidden",
+                                    isSelected ? "bg-teal/10 ring-2 ring-teal/30" : "bg-navy-50"
+                                  )}>
+                                    {med.imageUrl ? (
+                                      <img
+                                        src={med.imageUrl}
+                                        alt={med.name}
+                                        className="h-12 w-12 object-contain"
+                                        onError={(e) => {
+                                          const el = e.target as HTMLImageElement;
+                                          el.style.display = "none";
+                                          (el.nextElementSibling as HTMLElement | null)?.style.setProperty("display", "flex");
+                                        }}
+                                      />
+                                    ) : null}
+                                    <Pill className={cn(
+                                      "h-6 w-6",
+                                      isSelected ? "text-teal" : "text-navy-300",
+                                      med.imageUrl ? "hidden" : "flex"
+                                    )} />
+                                  </div>
+                                  <div className={cn(
+                                    "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-all",
+                                    isSelected ? "border-teal bg-teal" : "border-navy-300"
+                                  )}>
+                                    {isSelected && <Check className="h-2.5 w-2.5 text-white" />}
+                                  </div>
                                 </div>
-                              )}
-                              <span className={cn(
-                                "text-xs font-semibold leading-tight",
-                                form.medicationInterest === med.slug ? "text-teal-800" : "text-navy"
-                              )}>
-                                {med.name}
-                              </span>
-                              {form.medicationInterest === med.slug && (
-                                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-teal">
-                                  <Check className="h-3 w-3 text-white" />
+
+                                {/* Name + badge */}
+                                <div>
+                                  <p className={cn("text-xs font-bold leading-tight mb-1", isSelected ? "text-teal-800" : "text-navy")}>
+                                    {med.name}
+                                  </p>
+                                  {meta?.badge && (
+                                    <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[9px] font-semibold", meta.badgeStyle)}>
+                                      {meta.badge}
+                                    </span>
+                                  )}
                                 </div>
-                              )}
-                            </button>
-                          ))}
+
+                                {/* Tagline */}
+                                {meta && (
+                                  <p className={cn("text-[10px] leading-tight", isSelected ? "text-teal-700" : "text-graphite-400")}>
+                                    {meta.tagline}
+                                  </p>
+                                )}
+
+                                {/* Pros */}
+                                {meta && (
+                                  <ul className="space-y-0.5">
+                                    {meta.pros.map((p) => (
+                                      <li key={p} className="flex items-start gap-1">
+                                        <Check className={cn("h-2.5 w-2.5 shrink-0 mt-0.5", isSelected ? "text-teal" : "text-green-500")} />
+                                        <span className={cn("text-[10px] leading-tight", isSelected ? "text-teal-800" : "text-graphite-600")}>{p}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+
+                                {/* Cons */}
+                                {meta && (
+                                  <ul className="space-y-0.5 pt-0.5 border-t border-dashed border-navy-100">
+                                    {meta.cons.map((c) => (
+                                      <li key={c} className="flex items-start gap-1">
+                                        <span className="text-[9px] shrink-0 mt-0.5 text-graphite-400">–</span>
+                                        <span className="text-[10px] leading-tight text-graphite-400">{c}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </button>
+                            );
+                          })}
 
                           {/* "Something else" option */}
                           <button
@@ -1129,7 +1287,7 @@ function QualifyPageInner() {
                               setField("medicationInterestLabel", "Something else / Not sure");
                             }}
                             className={cn(
-                              "flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 text-center transition-all",
+                              "flex flex-col items-center justify-center gap-1 rounded-xl border-2 p-3 text-center transition-all",
                               form.medicationInterest === "something-else"
                                 ? "border-teal bg-teal-50"
                                 : "border-dashed border-navy-200 hover:border-navy-300 hover:bg-cloud/30"
@@ -1314,6 +1472,26 @@ function QualifyPageInner() {
                             <span className="text-teal-300">{Math.round(projection.summary.totalLossWithPlan / Math.max(1, projection.summary.totalLossDietExercise))}x more</span> weight loss than diet &amp; exercise alone
                           </p>
                         </div>
+
+                        {/* Persona Result */}
+                        <PersonaResultCard
+                          persona={assignPersona({
+                            bmi: calculateBMI(w, Number(form.heightFeet) * 12 + Number(form.heightInches)),
+                            activityLevel: form.activityLevel,
+                            eatingPattern: form.eatingPattern,
+                            primaryGoal: form.primaryGoal,
+                            conditionsCount: form.conditions?.length || 0,
+                            previousAttempts: (form as Record<string, unknown>).previousAttempts as string | undefined,
+                          })}
+                          projectedLoss={Math.round(projection.summary.totalLossWithPlan)}
+                          recommendedPlan={recommendPlanFromQualify({
+                            bmi: calculateBMI(w, Number(form.heightFeet) * 12 + Number(form.heightInches)),
+                            activityLevel: form.activityLevel,
+                            eatingPattern: form.eatingPattern,
+                            primaryGoal: form.primaryGoal,
+                            conditionsCount: form.conditions?.length || 0,
+                          })}
+                        />
 
                         {/* Testimonial */}
                         <div className="rounded-xl border border-navy-100/60 bg-navy-50/30 p-4">
@@ -1665,11 +1843,11 @@ function QualifyPageInner() {
               </Button>
 
               {step < 8 ? (
-                <Button onClick={nextStep} disabled={step === 6 && !projectionRevealed} className="gap-1">
+                <Button onClick={nextStep} disabled={(step === 6 && !projectionRevealed) || (step === 4 && hasHardContraindication)} className="gap-1">
                   {step === 1 && "Check My Results"}
                   {step === 2 && "Continue"}
                   {step === 3 && "Continue"}
-                  {step === 4 && "Continue"}
+                  {step === 4 && (hasHardContraindication ? "Not Eligible to Continue" : "Continue")}
                   {step === 5 && "See My Projection"}
                   {step === 6 && "Claim My Plan"}
                   {step === 7 && "Review My Plan"}

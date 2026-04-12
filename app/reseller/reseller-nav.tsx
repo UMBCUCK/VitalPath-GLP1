@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, Settings, FileCheck } from "lucide-react";
 
 const navItems = [
   { href: "/reseller", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/reseller/network", label: "My Network", icon: Users, exact: false },
+  { href: "/reseller/marketing", label: "Marketing", icon: FileCheck, exact: false },
   { href: "/reseller/analytics", label: "Analytics", icon: BarChart3, exact: false },
   { href: "/reseller/settings", label: "Settings", icon: Settings, exact: false },
 ];
@@ -16,6 +17,7 @@ export function ResellerNav() {
   const pathname = usePathname();
 
   const isActive = (href: string, exact: boolean) => {
+    if (!pathname) return false;
     if (exact) return pathname === href;
     return pathname.startsWith(href);
   };

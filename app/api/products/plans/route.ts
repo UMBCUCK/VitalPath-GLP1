@@ -25,6 +25,7 @@ export async function GET() {
         description: p.description ?? "",
         features: normalizeFeatures(p.features),
         highlighted: p.isFeatured,
+        imageUrl: p.imageUrl ?? undefined,
       }));
 
     const addOns: AddOn[] = products

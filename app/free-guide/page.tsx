@@ -1,7 +1,8 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import { MarketingShell } from "@/components/layout/marketing-shell";
+import { BreadcrumbJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Disclaimer } from "@/components/shared/disclaimer";
@@ -73,9 +74,18 @@ const guideContents = [
   },
 ];
 
+const guidePageFaqs = [
+  { question: "What is in the free GLP-1 Starter Guide?", answer: "The guide covers: how semaglutide and tirzepatide work in plain English, a week-by-week timeline for months 1-6, side effect management strategies, protein intake and meal planning basics, questions to ask your provider at your first visit, and a cost comparison between brand-name and compounded GLP-1 medications." },
+  { question: "Is the GLP-1 Starter Guide really free?", answer: "Yes — the guide is completely free. No credit card required. You'll receive it instantly after submitting your email address." },
+  { question: "Who is the guide designed for?", answer: "The guide is designed for adults considering GLP-1 weight management treatment for the first time. It's written in plain language — not clinical jargon — and focuses on practical, actionable information for the first 90 days of treatment." },
+  { question: "What are GLP-1 medications?", answer: "GLP-1 (glucagon-like peptide-1) receptor agonists are a class of injectable medications that mimic a natural gut hormone to suppress appetite and reduce food cravings. They include semaglutide (Ozempic, Wegovy) and tirzepatide (Mounjaro, Zepbound). Clinical trials show average weight loss of 15-21% of body weight over 68-72 weeks." },
+];
+
 export default function FreeGuidePage() {
   return (
     <MarketingShell>
+      <BreadcrumbJsonLd items={[{ name: "Home", href: "/" }, { name: "Free GLP-1 Starter Guide", href: "/free-guide" }]} />
+      <FAQPageJsonLd faqs={guidePageFaqs} />
       {/* Hero + Form */}
       <section className="relative overflow-hidden bg-gradient-to-b from-cloud via-sage/20 to-white py-16 lg:py-24">
         <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-teal/5 blur-3xl" />

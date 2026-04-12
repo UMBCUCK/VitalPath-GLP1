@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ImageUploader } from "@/components/ui/image-uploader";
 import {
   ArrowLeft, Save, Eye, ToggleLeft, ToggleRight, Check, AlertCircle,
 } from "lucide-react";
@@ -342,11 +343,12 @@ export function BlogEditClient({ post: initial }: Props) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-navy mb-1">Image URL</label>
-                <Input
-                  value={form.imageUrl}
-                  onChange={(e) => updateField("imageUrl", e.target.value)}
-                  placeholder="https://..."
+                <ImageUploader
+                  label="Cover Image"
+                  value={form.imageUrl || null}
+                  onChange={(url) => updateField("imageUrl", url ?? "")}
+                  hint="Shown as the blog post header and in social previews."
+                  defaultAspect={16 / 9}
                 />
               </div>
               <div>

@@ -3,11 +3,13 @@
 import { useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { DataTable, ColumnDef, exportToCSV } from "@/components/admin/data-table";
+import { ImageUploader } from "@/components/ui/image-uploader";
 import { cn } from "@/lib/utils";
 import {
   ChefHat, Flame, Target, Clock, Check, Minus,
-  ToggleLeft, ToggleRight,
+  ToggleLeft, ToggleRight, ImageIcon, X,
 } from "lucide-react";
 
 interface Recipe {
@@ -15,6 +17,7 @@ interface Recipe {
   title: string;
   slug: string;
   description: string | null;
+  imageUrl: string | null;
   category: string;
   calories: number | null;
   proteinG: number | null;
@@ -29,6 +32,73 @@ interface Recipe {
   isPublished: boolean;
   isGlp1Friendly: boolean;
   createdAt: string;
+}
+
+// ── Inline image editor per recipe ───────────────────────────────────────────
+function RecipeImageCell({ recipe, onUpdate }: { recipe: Recipe; onUpdate: (id: string, url: string | null) => void }) {
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [pendingUrl, setPendingUrl] = useState<string | null>(recipe.imageUrl);
+
+  async function save(url: string | null) {
+    setSaving(true);
+    try {
+      await fetch("/api/admin/recipes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: recipe.id, imageUrl: url }),
+      });
+      onUpdate(recipe.id, url);
+      setOpen(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          "flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-[10px] font-medium transition-all",
+          recipe.imageUrl
+            ? "border-teal/30 bg-teal-50 text-teal-700 hover:border-teal"
+            : "border-navy-100 text-graphite-400 hover:border-navy-300 hover:text-navy hover:bg-navy-50"
+        )}
+        title={recipe.imageUrl ? "Change image" : "Add image"}
+      >
+        {recipe.imageUrl
+          ? <img src={recipe.imageUrl} alt="" className="h-5 w-5 rounded object-cover" />
+          : <ImageIcon className="h-3.5 w-3.5" />}
+        {recipe.imageUrl ? "Image ✓" : "Add image"}
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 w-72 rounded-xl border border-navy-100 bg-white shadow-xl p-3 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-navy">Recipe Image</span>
+            <button onClick={() => setOpen(false)} className="text-graphite-300 hover:text-navy">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <ImageUploader
+            value={pendingUrl}
+            onChange={(url) => setPendingUrl(url)}
+            hint="Square or 4:3 works best for recipe cards."
+            defaultAspect={4 / 3}
+          />
+          <div className="flex gap-2 pt-1">
+            <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button size="sm" className="flex-1 h-8 text-xs" disabled={saving} onClick={() => save(pendingUrl)}>
+              {saving ? "Saving…" : "Save"}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 interface Props {
@@ -67,6 +137,10 @@ export function RecipesClient({ initialRecipes, total, page, limit, search, cate
     window.location.search = sp.toString();
   }, []);
 
+  function updateImage(id: string, url: string | null) {
+    setRecipes((prev) => prev.map((r) => r.id === id ? { ...r, imageUrl: url } : r));
+  }
+
   async function togglePublished(id: string) {
     const recipe = recipes.find((r) => r.id === id);
     if (!recipe || toggling) return;
@@ -101,6 +175,11 @@ export function RecipesClient({ initialRecipes, total, page, limit, search, cate
           </div>
         </div>
       ),
+    },
+    {
+      key: "imageUrl",
+      header: "Image",
+      render: (row) => <RecipeImageCell recipe={row} onUpdate={updateImage} />,
     },
     {
       key: "category",

@@ -6,14 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Copy, Check, Gift, DollarSign, Users, TrendingUp, Send, Share2,
+  Copy, Check, Gift, DollarSign, TrendingUp, Send, Share2,
   BarChart2, Code2, Sparkles, Mail, ChevronRight, ArrowUpRight, Zap,
-  Search, SlidersHorizontal, ArrowUpDown, Link2, RefreshCw,
+  Search, SlidersHorizontal, ArrowUpDown, Link2, RefreshCw, Trophy, Medal, Star,
+  Wallet, Clock, QrCode, Lock, MessageSquare, Info,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { ResellerPromoModal } from "@/components/dashboard/reseller-promo-modal";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 interface ReferralData {
   code: string;
@@ -29,6 +30,21 @@ interface ReferralData {
   }>;
   payoutPerReferral: number;
   payoutType: string;
+}
+
+interface LeaderboardEntry {
+  rank: number;
+  name: string;
+  isMe: boolean;
+  totalReferred: number;
+  totalEarned: number;
+  tier: string;
+}
+
+interface LeaderboardData {
+  leaderboard: LeaderboardEntry[];
+  myRank: number | null;
+  myEntry: LeaderboardEntry | null;
 }
 
 const tierThresholds = [
@@ -104,6 +120,58 @@ function statusBreakdown(referrals: ReferralData["referrals"]) {
     .sort((a, b) => b.count - a.count);
 }
 
+function LeaderboardRow({ entry }: { entry: LeaderboardEntry }) {
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-3 rounded-xl px-4 py-3 transition-all",
+        entry.isMe
+          ? "bg-teal-50 border-2 border-teal/30 shadow-sm"
+          : "bg-navy-50/30 border border-transparent hover:border-navy-100/40"
+      )}
+    >
+      {/* Rank badge */}
+      <span className={cn(
+        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+        entry.rank === 1 ? "bg-gold-100 text-gold-700" :
+        entry.rank === 2 ? "bg-slate-200 text-slate-600" :
+        entry.rank === 3 ? "bg-amber-100 text-amber-700" :
+        "bg-navy-100 text-graphite-500"
+      )}>
+        {entry.rank === 1 ? "🥇" : entry.rank === 2 ? "🥈" : entry.rank === 3 ? "🥉" : entry.rank}
+      </span>
+
+      {/* Name + tier */}
+      <div className="flex-1 min-w-0">
+        <p className={cn(
+          "text-sm font-semibold truncate",
+          entry.isMe ? "text-teal" : "text-navy"
+        )}>
+          {entry.name}
+          {entry.isMe && <span className="ml-1.5 text-[10px] font-normal text-teal/70">(you)</span>}
+        </p>
+        <div className="flex items-center gap-1.5 mt-0.5">
+          <span className={cn(
+            "rounded px-1.5 py-0.5 text-[10px] font-semibold",
+            entry.tier === "AMBASSADOR" ? "bg-gold-100 text-gold-700" :
+            entry.tier === "GOLD" ? "bg-amber-100 text-amber-700" :
+            entry.tier === "SILVER" ? "bg-slate-100 text-slate-600" :
+            "bg-teal-50 text-teal"
+          )}>
+            {entry.tier.charAt(0) + entry.tier.slice(1).toLowerCase()}
+          </span>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="text-right shrink-0">
+        <p className="text-sm font-bold text-navy">{entry.totalReferred} referral{entry.totalReferred !== 1 ? "s" : ""}</p>
+        <p className="text-[10px] text-graphite-400">{formatPrice(entry.totalEarned)} earned</p>
+      </div>
+    </div>
+  );
+}
+
 const DATE_RANGE_OPTIONS: { label: string; value: DateRange }[] = [
   { label: "Last 7 days", value: "7d" },
   { label: "Last 30 days", value: "30d" },
@@ -115,13 +183,18 @@ const UTM_SOURCES = ["instagram", "facebook", "twitter", "youtube", "tiktok", "e
 
 export default function ReferralDashboardPage() {
   const [data, setData] = useState<ReferralData | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [myRank, setMyRank] = useState<number | null>(null);
+  const [myEntry, setMyEntry] = useState<LeaderboardEntry | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteStatus, setInviteStatus] = useState<"idle" | "sent" | "duplicate" | "error">("idle");
+  const [inviteStatus, setInviteStatus] = useState<"idle" | "sending" | "sent" | "partial" | "duplicate" | "error">("idle");
+  const [inviteSentCount, setInviteSentCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("overview");
   const [showReseller, setShowReseller] = useState(false);
   const [resellerApplied, setResellerApplied] = useState(false);
+  const [newConversion, setNewConversion] = useState<{ email: string; payout: number } | null>(null);
 
   // Overview filters
   const [historySearch, setHistorySearch] = useState("");
@@ -137,19 +210,43 @@ export default function ReferralDashboardPage() {
   const [utmMedium, setUtmMedium] = useState("social");
 
   const loadData = useCallback(async () => {
-    const [refData, resellerData] = await Promise.all([
+    const [refData, resellerData, lbData] = await Promise.all([
       fetch("/api/referrals").then((r) => r.json()),
       fetch("/api/reseller/apply").then((r) => r.json()).catch(() => ({ applied: false })),
+      fetch("/api/referrals/leaderboard").then((r) => r.json()).catch(() => ({ leaderboard: [], myRank: null, myEntry: null })) as Promise<LeaderboardData>,
     ]);
     setData(refData);
     setResellerApplied(resellerData.applied || false);
+    setLeaderboard(lbData.leaderboard || []);
+    setMyRank(lbData.myRank ?? null);
+    setMyEntry(lbData.myEntry ?? null);
     setLoading(false);
+
+    const recentConversion = (refData.referrals as Array<{ id: string; status: string; createdAt: string; payoutCents: number | null; referredEmail: string | null }>)?.find(
+      (r) =>
+        r.status === "CONVERTED" &&
+        Date.now() - new Date(r.createdAt).getTime() < 24 * 60 * 60 * 1000
+    );
+    if (recentConversion) {
+      const seenKey = `seen_${recentConversion.referredEmail}_${recentConversion.createdAt}`;
+      if (!sessionStorage.getItem(seenKey)) {
+        setNewConversion({ email: recentConversion.referredEmail || "Someone", payout: recentConversion.payoutCents || 5000 });
+        sessionStorage.setItem(seenKey, "1");
+      }
+    }
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  useEffect(() => {
+    if (newConversion) {
+      const t = setTimeout(() => setNewConversion(null), 8000);
+      return () => clearTimeout(t);
+    }
+  }, [newConversion]);
+
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const referralLink = data ? `${origin}/quiz?ref=${data.code}` : "";
+  const referralLink = data ? `${origin}/qualify?ref=${data.code}` : "";
 
   // UTM-tagged link
   const utmLink = useMemo(() => {
@@ -169,22 +266,68 @@ export default function ReferralDashboardPage() {
   }
 
   async function sendInvite() {
-    if (!inviteEmail) return;
-    const res = await fetch("/api/referrals", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: inviteEmail }),
-    });
-    if (res.ok) {
-      setInviteStatus("sent");
-      setInviteEmail("");
-      setTimeout(() => setInviteStatus("idle"), 4000);
-      const updated = await fetch("/api/referrals").then((r) => r.json());
-      setData(updated);
+    if (!inviteEmail.trim()) return;
+    // Support comma-separated multi-invite
+    const emails = inviteEmail
+      .split(/[,\s]+/)
+      .map((e) => e.trim())
+      .filter((e) => e.includes("@"));
+    if (emails.length === 0) return;
+    setInviteStatus("sending");
+
+    if (emails.length === 1) {
+      const res = await fetch("/api/referrals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emails[0] }),
+      });
+      if (res.ok) {
+        setInviteStatus("sent");
+        setInviteSentCount(1);
+        setInviteEmail("");
+        setTimeout(() => setInviteStatus("idle"), 5000);
+        const updated = await fetch("/api/referrals").then((r) => r.json());
+        setData(updated);
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setInviteStatus(body.error === "Already invited" ? "duplicate" : "error");
+        setTimeout(() => setInviteStatus("idle"), 4000);
+      }
     } else {
-      const body = await res.json().catch(() => ({}));
-      setInviteStatus(body.error === "Already invited" ? "duplicate" : "error");
-      setTimeout(() => setInviteStatus("idle"), 4000);
+      // Batch: fire all, collect results
+      const results = await Promise.allSettled(
+        emails.map((e) =>
+          fetch("/api/referrals", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: e }),
+          }).then((r) => ({ ok: r.ok, email: e }))
+        )
+      );
+      const sent = results.filter((r) => r.status === "fulfilled" && r.value.ok).length;
+      setInviteSentCount(sent);
+      setInviteEmail("");
+      setInviteStatus(sent === emails.length ? "sent" : sent > 0 ? "partial" : "error");
+      setTimeout(() => setInviteStatus("idle"), 6000);
+      if (sent > 0) {
+        const updated = await fetch("/api/referrals").then((r) => r.json());
+        setData(updated);
+      }
+    }
+  }
+
+  const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
+
+  async function nativeShare() {
+    if (!canShare || !referralLink) return;
+    try {
+      await navigator.share({
+        title: "Join me on Nature's Journey",
+        text: "I've been using Nature's Journey for GLP-1 medical weight loss — supervised by a real provider. Use my link to get started:",
+        url: referralLink,
+      });
+    } catch {
+      // User cancelled or unsupported — silent
     }
   }
 
@@ -194,6 +337,39 @@ export default function ReferralDashboardPage() {
     tierThresholds[0]
   );
   const nextTier = tierThresholds.find((t) => t.min > (data?.totalReferred || 0));
+
+  // Earnings breakdown
+  const pendingEarnings = useMemo(
+    () => (data?.referrals || []).filter((r) => r.status === "CONVERTED").reduce((s, r) => s + (r.payoutCents || 0), 0),
+    [data]
+  );
+  const paidEarnings = useMemo(
+    () => (data?.referrals || []).filter((r) => r.status === "PAID").reduce((s, r) => s + (r.payoutCents || 0), 0),
+    [data]
+  );
+
+  // Milestones
+  const milestones = useMemo(() => {
+    const referred = data?.totalReferred || 0;
+    const earned = data?.totalEarned || 0;
+    return [
+      { id: "first", emoji: "🌱", label: "First Referral", desc: "Refer your first member", unlocked: referred >= 1 },
+      { id: "silver", emoji: "⭐", label: "Silver Status", desc: "5 referrals to unlock Silver", unlocked: referred >= 5 },
+      { id: "gold", emoji: "🏆", label: "Gold Status", desc: "10 referrals to unlock Gold", unlocked: referred >= 10 },
+      { id: "earn100", emoji: "💵", label: "$100 Earned", desc: "Earn your first $100 in credit", unlocked: earned >= 10000 },
+      { id: "ambassador", emoji: "👑", label: "Ambassador", desc: "25 referrals to reach Ambassador", unlocked: referred >= 25 },
+      { id: "earn500", emoji: "💰", label: "$500 Earned", desc: "Earn $500 in referral credit", unlocked: earned >= 50000 },
+    ];
+  }, [data]);
+
+  // QR code visibility toggle
+  const [showQr, setShowQr] = useState(false);
+
+  // Share kit state
+  const [shareChannel, setShareChannel] = useState<"text" | "instagram" | "email" | "facebook" | "linkedin">("text");
+
+  // Earnings calculator
+  const [calcReferrals, setCalcReferrals] = useState(10);
 
   // Filtered history
   const filteredHistory = useMemo(() => {
@@ -222,6 +398,20 @@ export default function ReferralDashboardPage() {
     ? Math.round((rangedConverted / rangedReferrals.length) * 100)
     : 0;
 
+  // Share kit messages
+  const shareMessages: Record<string, string> = {
+    text: `Hey! I've been using VitalPath for GLP-1 medical weight loss and it's been amazing — down real weight with a licensed provider guiding me. Check it out here: ${referralLink}`,
+    instagram: `✨ Real weight loss, real results. I've been on VitalPath's GLP-1 program and the support has been incredible. Link in bio or visit: ${referralLink} #GLP1 #WeightLoss #VitalPath`,
+    email: `Subject: Something that's actually working for weight loss\n\nHey,\n\nI've been quietly trying something for the past few months and wanted to share it with you. VitalPath is a telehealth program that prescribed me GLP-1 medication (semaglutide) — supervised by a real licensed provider.\n\nI'm actually seeing results. The process was easy, shipping was fast, and the team checks in regularly.\n\nIf you've been curious about GLP-1 medications, this is the easiest way to get started safely:\n${referralLink}\n\nLet me know if you have questions — happy to share more!`,
+    facebook: `I don't usually post about health stuff, but I've had too many people ask me what I'm doing differently lately. I started VitalPath's GLP-1 program and it's been a game changer — real medication, real provider, real results. If you're curious: ${referralLink}`,
+    linkedin: `Over the past few months I've been quietly experimenting with something that's had a real impact on my energy and focus — VitalPath's medically supervised GLP-1 program. Sharing for anyone who might find it useful: ${referralLink}`,
+  };
+
+  // Calculator tier for a given referral count
+  const calcTier = (n: number) => tierThresholds.reduce((acc, t) => (n >= t.min ? t : acc), tierThresholds[0]);
+  const calcEarnings = calcReferrals * calcTier(calcReferrals).payout;
+  const calcNextTier = tierThresholds.find((t) => t.min > calcReferrals);
+
   // Embed codes
   const badgeEmbedCode = `<a href="${referralLink}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#0a2540;color:#fff;padding:10px 18px;border-radius:999px;font-family:sans-serif;font-size:14px;font-weight:600;text-decoration:none;">
   💊 Try Nature's Journey — Get started with GLP-1 treatment
@@ -247,6 +437,18 @@ export default function ReferralDashboardPage() {
 
   return (
     <>
+      {newConversion && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-start gap-3 rounded-2xl bg-navy text-white px-5 py-4 shadow-2xl max-w-sm animate-in slide-in-from-bottom-4 duration-500">
+          <span className="text-2xl shrink-0">🎉</span>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-sm">New referral converted!</p>
+            <p className="text-xs text-white/60 mt-0.5 truncate">{newConversion.email} just signed up</p>
+            <p className="text-xs text-teal mt-1 font-semibold">You earned {formatPrice(newConversion.payout)}</p>
+          </div>
+          <button onClick={() => setNewConversion(null)} className="shrink-0 text-white/50 hover:text-white ml-1 text-lg leading-none">×</button>
+        </div>
+      )}
+
       <ResellerPromoModal
         open={showReseller}
         onClose={() => setShowReseller(false)}
@@ -291,8 +493,8 @@ export default function ReferralDashboardPage() {
           </button>
         )}
 
-        {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-4">
+        {/* Stats row */}
+        <div className="grid gap-4 sm:grid-cols-3">
           <Card>
             <CardContent className="flex items-center gap-3 p-4">
               <Gift className="h-5 w-5 text-teal" />
@@ -315,21 +517,137 @@ export default function ReferralDashboardPage() {
             <CardContent className="flex items-center gap-3 p-4">
               <TrendingUp className="h-5 w-5 text-teal" />
               <div>
-                <p className="text-xs text-graphite-400">Per Referral</p>
+                <p className="text-xs text-graphite-400">Earn Per Referral</p>
                 <p className="text-xl font-bold text-navy">{formatPrice(currentTier.payout)}</p>
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="flex items-center gap-3 p-4">
-              <Users className="h-5 w-5 text-atlantic" />
-              <div>
-                <p className="text-xs text-graphite-400">Current Tier</p>
-                <p className="text-xl font-bold text-navy">{currentTier.name}</p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
+
+        {/* Tier progress card */}
+        <Card className="overflow-hidden">
+          <CardContent className="p-0">
+            {/* Tier header gradient */}
+            <div className={cn(
+              "px-6 py-4",
+              currentTier.name === "Ambassador" ? "bg-gradient-to-r from-gold-600 to-gold-400" :
+              currentTier.name === "Gold" ? "bg-gradient-to-r from-amber-500 to-yellow-400" :
+              currentTier.name === "Silver" ? "bg-gradient-to-r from-graphite-400 to-slate-300" :
+              "bg-gradient-to-r from-teal to-atlantic"
+            )}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                    {currentTier.name === "Ambassador" ? <Trophy className="h-5 w-5 text-white" /> :
+                     currentTier.name === "Gold" ? <Medal className="h-5 w-5 text-white" /> :
+                     currentTier.name === "Silver" ? <Star className="h-5 w-5 text-white" /> :
+                     <Gift className="h-5 w-5 text-white" />}
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-white/70">Your Tier</p>
+                    <p className="text-xl font-bold text-white">{currentTier.name}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-white/70">Earning</p>
+                  <p className="text-lg font-bold text-white">{formatPrice(currentTier.payout)}<span className="text-sm font-normal">/referral</span></p>
+                </div>
+              </div>
+            </div>
+
+            {/* Tier ladder */}
+            <div className="px-6 py-4 space-y-3">
+              {nextTier && (
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-xs font-semibold text-graphite-500">
+                      Progress to <span className="text-navy">{nextTier.name}</span>
+                    </p>
+                    <p className="text-xs text-graphite-400">
+                      {data?.totalReferred || 0} / {nextTier.min} referrals
+                    </p>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-navy-100/40">
+                    <div
+                      className="h-2 rounded-full bg-gradient-to-r from-teal to-atlantic transition-all duration-500"
+                      style={{ width: `${Math.min(100, ((data?.totalReferred || 0) / nextTier.min) * 100)}%` }}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-xs text-graphite-400">
+                    {nextTier.min - (data?.totalReferred || 0)} more referral{nextTier.min - (data?.totalReferred || 0) !== 1 ? "s" : ""} to unlock{" "}
+                    <span className="font-semibold text-navy">{formatPrice(nextTier.payout)}/referral</span>
+                  </p>
+                </div>
+              )}
+
+              {/* All tier levels */}
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {tierThresholds.map((tier) => {
+                  const unlocked = (data?.totalReferred || 0) >= tier.min;
+                  const active = tier.name === currentTier.name;
+                  return (
+                    <div
+                      key={tier.name}
+                      className={cn(
+                        "rounded-xl border-2 p-3 transition-all",
+                        active ? "border-teal bg-teal-50/50 shadow-sm" :
+                        unlocked ? "border-emerald-200 bg-emerald-50/30" :
+                        "border-navy-100/40 bg-navy-50/20 opacity-60"
+                      )}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <p className={cn("text-xs font-bold", active ? "text-teal" : unlocked ? "text-emerald-700" : "text-graphite-400")}>
+                          {tier.name}
+                        </p>
+                        {active && <Check className="h-3 w-3 text-teal" />}
+                        {!active && unlocked && <Check className="h-3 w-3 text-emerald-500" />}
+                      </div>
+                      <p className="text-sm font-bold text-navy">{formatPrice(tier.payout)}</p>
+                      <p className="text-[10px] text-graphite-400">{tier.min === 0 ? "Starting tier" : `${tier.min}+ referrals`}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Near-tier urgency nudge */}
+        {nextTier && (data?.totalReferred || 0) >= nextTier.min - 2 && (data?.totalReferred || 0) < nextTier.min && (
+          <div className="flex items-center gap-3 rounded-2xl border-2 border-gold-300 bg-gradient-to-r from-gold-50 to-linen px-5 py-4 shadow-sm">
+            <span className="text-2xl shrink-0">🔥</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-navy">
+                {nextTier.min - (data?.totalReferred || 0) === 1
+                  ? `One more referral unlocks ${nextTier.name}!`
+                  : `${nextTier.min - (data?.totalReferred || 0)} referrals away from ${nextTier.name} tier`}
+              </p>
+              <p className="text-xs text-graphite-500 mt-0.5">
+                Hit {nextTier.name} to earn <span className="font-semibold text-navy">{formatPrice(nextTier.payout)}</span> per referral — that's <span className="font-semibold text-navy">{formatPrice(nextTier.payout - (currentTier?.payout || 0))} more</span> per signup.
+              </p>
+            </div>
+            <Badge variant="gold" className="shrink-0">{nextTier.name}</Badge>
+          </div>
+        )}
+
+        {/* How it works — collapsible */}
+        {(data?.totalReferred || 0) < 3 && (
+          <div className="rounded-2xl border border-navy-100/40 bg-navy-50/20 overflow-hidden">
+            <div className="grid grid-cols-3 divide-x divide-navy-100/40">
+              {[
+                { step: "1", icon: "🔗", title: "Share your link", desc: "Send your unique referral link to friends, family, or followers" },
+                { step: "2", icon: "✅", title: "They sign up", desc: "When they complete checkout, your referral is instantly tracked" },
+                { step: "3", icon: "💵", title: "You get paid", desc: `Earn ${formatPrice(currentTier.payout)} in credit toward your membership` },
+              ].map((s) => (
+                <div key={s.step} className="flex flex-col items-center gap-2 px-4 py-5 text-center">
+                  <span className="text-2xl">{s.icon}</span>
+                  <p className="text-xs font-bold text-navy">{s.title}</p>
+                  <p className="text-[11px] text-graphite-400 leading-snug">{s.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-1 rounded-xl border border-navy-100/40 bg-navy-50/20 p-1">
@@ -358,14 +676,20 @@ export default function ReferralDashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-3">
-                  <div className="flex-1 rounded-xl border border-navy-200 bg-navy-50/30 px-4 py-3 overflow-hidden">
+                <div className="flex gap-2">
+                  <div className="flex-1 rounded-xl border border-navy-200 bg-navy-50/30 px-4 py-3 overflow-hidden min-w-0">
                     <p className="text-sm font-mono text-navy truncate">{referralLink || "Loading..."}</p>
                   </div>
                   <Button onClick={() => copyText(referralLink, "link")} className="gap-2 shrink-0">
                     {copied === "link" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     {copied === "link" ? "Copied!" : "Copy"}
                   </Button>
+                  {canShare && (
+                    <Button variant="outline" onClick={nativeShare} className="gap-2 shrink-0" title="Share via device">
+                      <Share2 className="h-4 w-4" />
+                      <span className="hidden sm:inline">Share</span>
+                    </Button>
+                  )}
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a
@@ -391,8 +715,177 @@ export default function ReferralDashboardPage() {
                     <Mail className="h-3 w-3" /> Share via Email
                   </a>
                 </div>
-                <p className="mt-3 text-xs text-graphite-400">
-                  Your code: <span className="font-mono font-bold text-navy">{data?.code || "..."}</span>
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="text-xs text-graphite-400">
+                    Your code: <span className="font-mono font-bold text-navy">{data?.code || "..."}</span>
+                  </p>
+                  <button
+                    onClick={() => setShowQr((v) => !v)}
+                    className="flex items-center gap-1.5 rounded-lg border border-navy-200 px-2.5 py-1 text-xs font-medium text-graphite-500 hover:border-navy hover:text-navy transition-colors"
+                  >
+                    <QrCode className="h-3.5 w-3.5" />
+                    {showQr ? "Hide QR" : "Show QR"}
+                  </button>
+                </div>
+
+                {/* QR Code */}
+                {showQr && referralLink && (
+                  <div className="mt-4 flex flex-col items-center gap-3 rounded-xl border border-navy-100/40 bg-navy-50/20 p-5">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=8&color=0a2540&data=${encodeURIComponent(referralLink)}`}
+                      alt="QR code for referral link"
+                      className="h-[180px] w-[180px] rounded-lg"
+                    />
+                    <div className="text-center">
+                      <p className="text-xs font-semibold text-navy">Scan to visit your referral page</p>
+                      <p className="text-[10px] text-graphite-400 mt-0.5">Share in person, in print, or in a presentation</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
+                      onClick={() => {
+                        const a = document.createElement("a");
+                        a.href = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=16&color=0a2540&data=${encodeURIComponent(referralLink)}`;
+                        a.download = `referral-qr-${data?.code}.png`;
+                        a.click();
+                      }}
+                    >
+                      Download QR PNG
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Share Kit */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-teal" /> Share Kit
+                  <Badge variant="secondary" className="text-[10px] ml-1">Ready-to-send copy</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-xs text-graphite-400">Pick a channel and copy the pre-written message — just paste and send.</p>
+                {/* Channel tabs */}
+                <div className="flex flex-wrap gap-2">
+                  {(["text","instagram","email","facebook","linkedin"] as const).map((ch) => {
+                    const labels: Record<string, string> = { text: "💬 Text/DM", instagram: "📸 Instagram", email: "📧 Email", facebook: "👥 Facebook", linkedin: "💼 LinkedIn" };
+                    return (
+                      <button
+                        key={ch}
+                        onClick={() => setShareChannel(ch)}
+                        className={cn(
+                          "rounded-lg px-3 py-1.5 text-xs font-medium transition-all border",
+                          shareChannel === ch
+                            ? "bg-navy text-white border-navy shadow-sm"
+                            : "border-navy-200 text-graphite-500 hover:border-navy hover:text-navy bg-white"
+                        )}
+                      >
+                        {labels[ch]}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* Message preview */}
+                <div className="relative rounded-xl bg-navy-50/40 border border-navy-100/60 p-4">
+                  <p className="text-sm text-navy whitespace-pre-wrap leading-relaxed pr-10">
+                    {shareMessages[shareChannel]}
+                  </p>
+                  <button
+                    onClick={() => copyText(shareMessages[shareChannel], `share-${shareChannel}`)}
+                    className="absolute top-3 right-3 flex items-center gap-1 rounded-lg border border-navy-200 bg-white px-2 py-1 text-[10px] font-semibold text-navy hover:bg-navy-50 transition-colors shadow-sm"
+                  >
+                    {copied === `share-${shareChannel}` ? <><Check className="h-3 w-3 text-teal" /> Copied!</> : <><Copy className="h-3 w-3" /> Copy</>}
+                  </button>
+                </div>
+                {shareChannel === "instagram" && (
+                  <p className="text-[11px] text-graphite-400 flex items-center gap-1">
+                    <Info className="h-3 w-3 shrink-0" /> Update your bio link to your referral URL, then post this caption.
+                  </p>
+                )}
+                {shareChannel === "email" && (
+                  <p className="text-[11px] text-graphite-400 flex items-center gap-1">
+                    <Info className="h-3 w-3 shrink-0" /> Subject line is included — paste the full message into your email client.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Earnings wallet */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Wallet className="h-4 w-4 text-teal" /> Your Earnings
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="rounded-xl bg-teal-50/60 border border-teal/20 p-4 text-center">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-teal mb-1">Total</p>
+                    <p className="text-xl font-bold text-navy">{formatPrice(data?.totalEarned || 0)}</p>
+                    <p className="text-[10px] text-graphite-400 mt-0.5">lifetime</p>
+                  </div>
+                  <div className="rounded-xl bg-amber-50/60 border border-amber-200/50 p-4 text-center">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-600 mb-1">Pending</p>
+                    <p className="text-xl font-bold text-navy">{formatPrice(pendingEarnings)}</p>
+                    <p className="text-[10px] text-graphite-400 mt-0.5">awaiting payout</p>
+                  </div>
+                  <div className="rounded-xl bg-emerald-50/60 border border-emerald-200/50 p-4 text-center">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-600 mb-1">Paid</p>
+                    <p className="text-xl font-bold text-navy">{formatPrice(paidEarnings)}</p>
+                    <p className="text-[10px] text-graphite-400 mt-0.5">credited</p>
+                  </div>
+                </div>
+                {pendingEarnings > 0 && (
+                  <div className="flex items-center gap-2.5 rounded-xl bg-amber-50 border border-amber-200/60 px-4 py-3">
+                    <Clock className="h-4 w-4 text-amber-500 shrink-0" />
+                    <p className="text-xs text-amber-800">
+                      <span className="font-semibold">{formatPrice(pendingEarnings)}</span> in earnings pending payout — typically processed within 7 business days of your referral&apos;s first payment.
+                    </p>
+                  </div>
+                )}
+                {pendingEarnings === 0 && paidEarnings === 0 && (data?.totalReferred || 0) === 0 && (
+                  <p className="text-center text-xs text-graphite-400">Earnings appear here once your referrals sign up.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Milestones */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Trophy className="h-4 w-4 text-gold-600" /> Milestones
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {milestones.map((m) => (
+                    <div
+                      key={m.id}
+                      className={cn(
+                        "relative flex flex-col items-center rounded-xl border-2 p-4 text-center transition-all",
+                        m.unlocked
+                          ? "border-teal/30 bg-teal-50/40 shadow-sm"
+                          : "border-navy-100/40 bg-navy-50/20 opacity-60"
+                      )}
+                    >
+                      {!m.unlocked && (
+                        <Lock className="absolute top-2 right-2 h-3 w-3 text-graphite-300" />
+                      )}
+                      {m.unlocked && (
+                        <Check className="absolute top-2 right-2 h-3 w-3 text-teal" />
+                      )}
+                      <span className="text-2xl mb-2">{m.emoji}</span>
+                      <p className={cn("text-xs font-bold", m.unlocked ? "text-navy" : "text-graphite-400")}>{m.label}</p>
+                      <p className="text-[10px] text-graphite-400 mt-0.5 leading-tight">{m.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-3 text-center text-[11px] text-graphite-300">
+                  {milestones.filter((m) => m.unlocked).length} of {milestones.length} milestones unlocked
                 </p>
               </CardContent>
             </Card>
@@ -400,13 +893,35 @@ export default function ReferralDashboardPage() {
             {/* Invite by email */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Invite by Email</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Invite by Email</CardTitle>
+                  <Badge variant="secondary" className="text-[10px]">Supports multiple</Badge>
+                </div>
               </CardHeader>
               <CardContent>
                 {inviteStatus === "sent" ? (
-                  <div className="flex items-center gap-3 rounded-xl bg-teal-50 border border-teal/20 p-3">
-                    <Check className="h-5 w-5 text-teal shrink-0" />
-                    <p className="text-sm font-medium text-navy">Invite recorded! We&apos;ll track the conversion.</p>
+                  <div className="flex items-center gap-3 rounded-xl bg-teal-50 border border-teal/20 p-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal/10">
+                      <Check className="h-4 w-4 text-teal" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-navy">
+                        {inviteSentCount === 1 ? "Invite sent!" : `${inviteSentCount} invites sent!`}
+                      </p>
+                      <p className="text-xs text-graphite-400">We&apos;ll track each conversion automatically.</p>
+                    </div>
+                    <Button variant="ghost" size="sm" className="ml-auto shrink-0 text-xs" onClick={() => setInviteStatus("idle")}>Invite more</Button>
+                  </div>
+                ) : inviteStatus === "partial" ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 p-4">
+                      <Zap className="h-5 w-5 text-amber-500 shrink-0" />
+                      <div>
+                        <p className="text-sm font-semibold text-navy">{inviteSentCount} invite{inviteSentCount !== 1 ? "s" : ""} sent</p>
+                        <p className="text-xs text-graphite-400">Some addresses may already be invited or invalid.</p>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setInviteStatus("idle")}>Try again</Button>
                   </div>
                 ) : inviteStatus === "duplicate" ? (
                   <div className="space-y-3">
@@ -420,17 +935,25 @@ export default function ReferralDashboardPage() {
                   <div className="space-y-3">
                     <div className="flex gap-3">
                       <Input
-                        type="email"
+                        type="text"
                         value={inviteEmail}
                         onChange={(e) => setInviteEmail(e.target.value)}
-                        placeholder="friend@email.com"
+                        placeholder="friend@email.com, another@email.com"
                         className="flex-1"
                         onKeyDown={(e) => e.key === "Enter" && sendInvite()}
+                        disabled={inviteStatus === "sending"}
                       />
-                      <Button onClick={sendInvite} disabled={!inviteEmail} className="gap-2 shrink-0">
-                        <Send className="h-4 w-4" /> Send Invite
+                      <Button onClick={sendInvite} disabled={!inviteEmail.trim() || inviteStatus === "sending"} className="gap-2 shrink-0">
+                        {inviteStatus === "sending" ? (
+                          <><div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> Sending...</>
+                        ) : (
+                          <><Send className="h-4 w-4" /> Send</>
+                        )}
                       </Button>
                     </div>
+                    <p className="text-[11px] text-graphite-400">
+                      Separate multiple addresses with commas. Each person gets a unique tracked invite.
+                    </p>
                     {inviteStatus === "error" && (
                       <p className="text-xs text-red-500">Something went wrong. Please try again.</p>
                     )}
@@ -438,39 +961,6 @@ export default function ReferralDashboardPage() {
                 )}
               </CardContent>
             </Card>
-
-            {/* Tier progress */}
-            {nextTier && (
-              <Card className="bg-gradient-to-r from-gold-50 to-linen border-gold-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-bold text-navy">
-                        {nextTier.min - (data?.totalReferred || 0)} more referrals to reach {nextTier.name}
-                      </p>
-                      <p className="text-xs text-graphite-400">
-                        Earn {formatPrice(nextTier.payout)} per referral at {nextTier.name} tier
-                      </p>
-                    </div>
-                    <Badge variant="gold">{currentTier.name} → {nextTier.name}</Badge>
-                  </div>
-                  <div className="mt-3 h-2 rounded-full bg-white/60">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-gold to-gold-400 transition-all"
-                      style={{ width: `${Math.min(100, ((data?.totalReferred || 0) / nextTier.min) * 100)}%` }}
-                    />
-                  </div>
-                  <div className="mt-3 flex justify-between text-xs text-graphite-400">
-                    <span>0</span>
-                    {tierThresholds.slice(1).map((t) => (
-                      <span key={t.name} className={cn((data?.totalReferred || 0) >= t.min ? "font-semibold text-navy" : "")}>
-                        {t.min} — {t.name}
-                      </span>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {/* History with filters */}
             <Card>
@@ -583,6 +1073,53 @@ export default function ReferralDashboardPage() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Community Leaderboard */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Trophy className="h-4 w-4 text-gold-600" /> Top Referrers
+                  </CardTitle>
+                  {myRank && (
+                    <div className="flex items-center gap-2 rounded-xl bg-teal-50 border border-teal/20 px-3 py-1.5">
+                      <span className="text-xs font-semibold text-teal">Your Rank</span>
+                      <span className="text-sm font-bold text-navy">#{myRank}</span>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {leaderboard.length === 0 ? (
+                  <div className="py-8 text-center">
+                    <Trophy className="mx-auto h-10 w-10 text-graphite-200" />
+                    <p className="mt-3 text-sm text-graphite-400">No referrers on the board yet — be the first!</p>
+                    <p className="mt-1 text-xs text-graphite-300">Share your link to claim the #1 spot!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {leaderboard.map((entry) => (
+                      <LeaderboardRow key={entry.rank} entry={entry} />
+                    ))}
+
+                    {/* Show user's position if outside top 10 */}
+                    {myEntry && (
+                      <>
+                        <div className="flex items-center gap-2 py-1">
+                          <div className="flex-1 border-t border-dashed border-navy-100/50" />
+                          <span className="text-[10px] text-graphite-300 shrink-0">your position</span>
+                          <div className="flex-1 border-t border-dashed border-navy-100/50" />
+                        </div>
+                        <LeaderboardRow entry={myEntry} />
+                      </>
+                    )}
+                  </div>
+                )}
+                <p className="mt-4 text-center text-[11px] text-graphite-300">
+                  Rankings update in real time &middot; Names shown as initials for privacy
+                </p>
+              </CardContent>
+            </Card>
           </div>
         )}
 
@@ -687,70 +1224,146 @@ export default function ReferralDashboardPage() {
                 {statusData.length === 0 ? (
                   <p className="py-6 text-center text-sm text-graphite-400">No referrals in this period</p>
                 ) : (
-                  <div className="space-y-3">
-                    {statusData.map(({ status, count }) => (
-                      <div key={status} className="flex items-center gap-3">
-                        <div className="w-28 shrink-0">
-                          <Badge
-                            variant={
-                              status === "CONVERTED" || status === "PAID" ? "success"
-                              : status === "PENDING" ? "warning"
-                              : "secondary"
-                            }
+                  <div className="flex flex-col sm:flex-row gap-6 items-center">
+                    {/* Donut */}
+                    <div className="shrink-0">
+                      <ResponsiveContainer width={180} height={180}>
+                        <PieChart>
+                          <Pie
+                            data={statusData.map(d => ({ name: d.status, value: d.count }))}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={52}
+                            outerRadius={80}
+                            paddingAngle={3}
+                            dataKey="value"
                           >
-                            {status}
-                          </Badge>
-                        </div>
-                        <div className="flex-1 h-3 rounded-full bg-navy-50/50 overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-500"
-                            style={{
-                              width: `${Math.round((count / Math.max(1, rangedReferrals.length)) * 100)}%`,
-                              background: STATUS_COLORS[status] || "#9ca3af",
-                            }}
+                            {statusData.map(({ status }) => (
+                              <Cell key={status} fill={STATUS_COLORS[status] || "#9ca3af"} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            contentStyle={{ borderRadius: 10, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,.1)", fontSize: 12 }}
+                            formatter={(v: number, name: string) => [`${v} (${Math.round((v / rangedReferrals.length) * 100)}%)`, name]}
                           />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    {/* Bars */}
+                    <div className="flex-1 space-y-3 w-full">
+                      {statusData.map(({ status, count }) => (
+                        <div key={status} className="flex items-center gap-3">
+                          <div className="flex items-center gap-1.5 w-28 shrink-0">
+                            <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: STATUS_COLORS[status] || "#9ca3af" }} />
+                            <Badge
+                              variant={status === "CONVERTED" || status === "PAID" ? "success" : status === "PENDING" ? "warning" : "secondary"}
+                              className="text-[10px]"
+                            >
+                              {status}
+                            </Badge>
+                          </div>
+                          <div className="flex-1 h-2.5 rounded-full bg-navy-50/50 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{ width: `${Math.round((count / Math.max(1, rangedReferrals.length)) * 100)}%`, background: STATUS_COLORS[status] || "#9ca3af" }}
+                            />
+                          </div>
+                          <span className="w-7 text-right text-sm font-bold text-navy">{count}</span>
+                          <span className="w-9 text-right text-xs text-graphite-400">{Math.round((count / Math.max(1, rangedReferrals.length)) * 100)}%</span>
                         </div>
-                        <span className="w-8 text-right text-sm font-semibold text-navy">{count}</span>
-                        <span className="w-9 text-right text-xs text-graphite-400">
-                          {Math.round((count / Math.max(1, rangedReferrals.length)) * 100)}%
-                        </span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            {/* Earnings projection */}
-            <Card className="bg-gradient-to-br from-navy-50/30 to-teal-50/20 border-teal/20">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-semibold text-graphite-400 uppercase tracking-wide mb-1">Annual Projection</p>
-                    <p className="text-sm text-graphite-500">
-                      At your pace, you could earn{" "}
-                      <span className="font-bold text-navy">
-                        {formatPrice(
-                          Math.round(
-                            (rangedReferrals.length / Math.max(1, dateRange === "7d" ? 1/4 : dateRange === "30d" ? 1 : dateRange === "90d" ? 3 : 12))
-                            * 12 * currentTier.payout
-                          )
-                        )}
-                      </span>{" "}
-                      this year at {currentTier.name} tier.
-                    </p>
-                    <p className="text-xs text-graphite-400 mt-1">Extrapolated from your {DATE_RANGE_OPTIONS.find(o => o.value === dateRange)?.label.toLowerCase()} activity.</p>
+            {/* Interactive Earnings Calculator */}
+            <Card className="overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-teal" /> Earnings Calculator
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-semibold text-graphite-500">How many referrals are you aiming for?</label>
+                    <span className="text-sm font-bold text-navy">{calcReferrals} referrals</span>
                   </div>
-                  {!resellerApplied && (
-                    <button
-                      onClick={() => setShowReseller(true)}
-                      className="shrink-0 flex items-center gap-1.5 rounded-lg bg-navy text-white px-3 py-2 text-xs font-semibold hover:bg-atlantic transition-colors"
+                  <input
+                    type="range"
+                    min={1}
+                    max={50}
+                    value={calcReferrals}
+                    onChange={(e) => setCalcReferrals(Number(e.target.value))}
+                    className="w-full accent-teal h-2 cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-graphite-400 mt-1">
+                    <span>1</span><span>10</span><span>25</span><span>50</span>
+                  </div>
+                </div>
+
+                {/* Result */}
+                <div className="rounded-2xl bg-gradient-to-br from-teal-50/60 to-navy-50/40 border border-teal/20 p-5">
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-teal mb-0.5">You would earn</p>
+                      <p className="text-4xl font-bold text-navy">{formatPrice(calcEarnings)}</p>
+                      <p className="text-xs text-graphite-400 mt-1">
+                        {calcReferrals} × {formatPrice(calcTier(calcReferrals).payout)} at <span className="font-semibold text-navy">{calcTier(calcReferrals).name}</span> tier
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      {calcNextTier && (
+                        <div className="rounded-xl border border-gold-200 bg-gold-50/60 px-4 py-3">
+                          <p className="text-[10px] font-semibold text-gold-700 mb-0.5">Tip: refer {calcNextTier.min} to unlock {calcNextTier.name}</p>
+                          <p className="text-sm font-bold text-navy">
+                            +{formatPrice((calcNextTier.payout - calcTier(calcReferrals).payout) * calcNextTier.min)} more
+                          </p>
+                          <p className="text-[10px] text-graphite-400">vs staying at {calcTier(calcReferrals).name}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tier breakdown */}
+                <div className="grid grid-cols-4 gap-2">
+                  {tierThresholds.map((t) => (
+                    <div
+                      key={t.name}
+                      className={cn(
+                        "rounded-xl border p-3 text-center transition-all",
+                        calcTier(calcReferrals).name === t.name
+                          ? "border-teal bg-teal-50/50 shadow-sm"
+                          : "border-navy-100/40 opacity-50"
+                      )}
                     >
-                      <ArrowUpRight className="h-3.5 w-3.5" />
-                      Boost earnings
+                      <p className="text-[10px] font-bold text-graphite-500">{t.name}</p>
+                      <p className="text-sm font-bold text-navy mt-0.5">{formatPrice(t.payout)}</p>
+                      <p className="text-[9px] text-graphite-400">{t.min === 0 ? "0+" : `${t.min}+`} refs</p>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="text-center text-[11px] text-graphite-400">
+                  At your pace ({rangedReferrals.length > 0 ? `${rangedReferrals.length} in selected period` : "0 so far"}), you&apos;re on track for{" "}
+                  <span className="font-semibold text-navy">
+                    {formatPrice(
+                      Math.round(
+                        (rangedReferrals.length / Math.max(1, dateRange === "7d" ? 0.25 : dateRange === "30d" ? 1 : dateRange === "90d" ? 3 : 12))
+                        * 12 * currentTier.payout
+                      )
+                    )}/yr
+                  </span>{" "}
+                  annualised.
+                  {!resellerApplied && (
+                    <button onClick={() => setShowReseller(true)} className="ml-1 text-teal underline">
+                      Want to earn more?
                     </button>
                   )}
-                </div>
+                </p>
               </CardContent>
             </Card>
           </div>

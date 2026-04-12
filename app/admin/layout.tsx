@@ -89,7 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [router]);
 
   return (
-    <div className="flex h-screen bg-linen/30 dark:bg-navy-900">
+    <div className="flex h-screen bg-background">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <AdminSidebar collapsed={sidebarCollapsed} />

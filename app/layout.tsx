@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
@@ -49,8 +50,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
+        {/* Anti-FOUC: apply saved admin theme before React hydrates */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('vp-admin-theme')||'';var d=localStorage.getItem('vp-admin-dark');if(t==='dark'||d==='true'){document.documentElement.classList.add('dark')}else if(t==='cerulean'){document.documentElement.classList.add('theme-cerulean')}}catch(e){}})()` }} />
+        {/* PWA manifest + meta */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="VitalPath" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         {/* Preconnect = full handshake for domains we fetch from immediately */}
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://images.unsplash.com" />
@@ -64,6 +74,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastProvider>
           {children}
         </ToastProvider>
+
+        {/* Service Worker registration for PWA */}
+        <Script id="sw-register" strategy="lazyOnload">
+          {`if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(e){console.log('SW registration failed:',e)})}`}
+        </Script>
 
         {/* Analytics — loaded after page is interactive */}
         {process.env.NEXT_PUBLIC_POSTHOG_KEY && (

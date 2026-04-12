@@ -1555,10 +1555,39 @@ model ResellerProfile {
   totalNetworkRevenue   Int       @default(0) // cents - total revenue from entire downline
   totalOverrideEarnings Int       @default(0) // cents - total override commissions earned
 
-  // Override commission rates (earned from sub-reseller sales)
-  tier1OverridePct      Float     @default(5.0)  // % of Tier 1 (direct recruit) sale commission
-  tier2OverridePct      Float     @default(3.0)  // % of Tier 2 sale commission
-  tier3OverridePct      Float     @default(1.5)  // % of Tier 3 sale commission
+  // Override commission rates — DISABLED for healthcare compliance (AKS/FTC)
+  // Retained for analytics only; all values must remain 0.0 in production
+  tier1OverridePct      Float     @default(0.0)  // DISABLED — was % of Tier 1 override
+  tier2OverridePct      Float     @default(0.0)  // DISABLED — was % of Tier 2 override
+  tier3OverridePct      Float     @default(0.0)  // DISABLED — was % of Tier 3 override
+
+  // ─── Compliance & Onboarding ────────────────────────────────
+  onboardingStep                Int       @default(0) // 0-7 tracks progress through required onboarding
+  onboardingCompletedAt         DateTime?             // null = not yet completed
+  complianceTrainingCompletedAt DateTime?             // when they finished the compliance training module
+  agreementSignedAt             DateTime?             // when they signed the reseller agreement
+  agreementVersion              String?               // e.g. "2026-04-01-v1" — tracks which version they signed
+  agreementIpAddress            String?               // IP address when agreement was signed
+  w9SubmittedAt                 DateTime?             // when W-9 was submitted (required before payout)
+  w9LegalName                   String?               // legal name on W-9
+  w9BusinessName                String?               // business name (if different)
+  w9TaxClassification           String?               // INDIVIDUAL, C_CORP, S_CORP, PARTNERSHIP, LLC, OTHER
+  w9AddressLine1                String?
+  w9City                        String?
+  w9State                       String?
+  w9Zip                         String?
+  w9TinType                     String?               // SSN or EIN
+  w9TinLast4                    String?               // last 4 digits only (never store full TIN)
+  w9CertificationSignedAt       DateTime?             // electronic signature timestamp
+  oigCheckPassedAt              DateTime?             // OIG exclusion database check
+  oigCheckResult                String?               // CLEAR or FLAGGED
+  samCheckPassedAt              DateTime?             // SAM.gov check
+  samCheckResult                String?               // CLEAR or FLAGGED
+  healthcareProviderAttestation Boolean   @default(false) // attests they are NOT a licensed provider
+  attestationSignedAt           DateTime?
+  marketingApprovalRequired     Boolean   @default(true) // must use pre-approved materials only
+  lastComplianceAuditAt         DateTime?             // last time admin reviewed their marketing
+  complianceViolationCount      Int       @default(0) // tracked for auto-suspension
 
   // Payout preferences
   payoutMethod          String    @default("CREDIT") // CREDIT, BANK_ACH, CHECK
@@ -2057,4 +2086,421 @@ model ErrorLog {
   @@index([route])
   @@index([statusCode])
   @@index([createdAt])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BILLION-DOLLAR SYSTEM MODELS
+// ═══════════════════════════════════════════════════════════════
+
+// ─── PUSH NOTIFICATIONS (PWA) ───────────────────────────────
+
+model PushSubscription {
+  id           String   @id @default(cuid())
+  userId       String
+  endpoint     String   @unique
+  p256dh       String   // public key
+  auth         String   // auth secret
+  isActive     Boolean  @default(true)
+  deviceInfo   String?  // browser/OS
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([isActive])
+}
+
+// ─── COMMUNITY ──────────────────────────────────────────────
+
+model CommunityPost {
+  id          String   @id @default(cuid())
+  authorId    String
+  category    String   // JOURNEY, NUTRITION, EXERCISE, WINS, QUESTIONS, TIPS
+  title       String
+  body        String
+  isAnonymous Boolean  @default(false)
+  isPinned    Boolean  @default(false)
+  isFlagged   Boolean  @default(false)
+  likeCount   Int      @default(0)
+  commentCount Int     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  comments CommunityComment[]
+
+  @@index([category])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+model CommunityComment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  body      String
+  isAnonymous Boolean @default(false)
+  isFlagged Boolean  @default(false)
+  likeCount Int      @default(0)
+  createdAt DateTime @default(now())
+
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([authorId])
+}
+
+model AccountabilityGroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  maxMembers  Int      @default(6)
+  goalType    String   // WEIGHT_LOSS, MEDICATION_ADHERENCE, NUTRITION, GENERAL
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  members GroupMembership[]
+
+  @@index([goalType])
+  @@index([isActive])
+}
+
+model GroupMembership {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  role      String   @default("MEMBER") // MEMBER, LEADER
+  joinedAt  DateTime @default(now())
+
+  group AccountabilityGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+}
+
+model Challenge {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  type        String    // HYDRATION, STEPS, PROTEIN, WEIGHT_LOG, CUSTOM
+  target      Float     // e.g., 100 oz water, 10000 steps
+  unit        String    // oz, steps, g, entries
+  startsAt    DateTime
+  endsAt      DateTime
+  isActive    Boolean   @default(true)
+  participantCount Int  @default(0)
+  createdAt   DateTime  @default(now())
+
+  participants ChallengeParticipation[]
+
+  @@index([isActive])
+  @@index([startsAt])
+}
+
+model ChallengeParticipation {
+  id          String    @id @default(cuid())
+  challengeId String
+  userId      String
+  progress    Float     @default(0)
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  joinedAt    DateTime  @default(now())
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, userId])
+  @@index([userId])
+}
+
+// ─── PAYMENT PLANS (BNPL) ───────────────────────────────────
+
+model PaymentPlan {
+  id              String   @id @default(cuid())
+  userId          String
+  subscriptionId  String?
+  totalCents      Int      // total plan amount
+  installments    Int      // number of payments (3, 4, 6, 12)
+  installmentCents Int     // amount per installment
+  paidCount       Int      @default(0)
+  remainingCents  Int
+  status          String   @default("ACTIVE") // ACTIVE, COMPLETED, DEFAULTED, CANCELED
+  nextPaymentDate DateTime?
+  stripeSetupIntent String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  payments Installment[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([nextPaymentDate])
+}
+
+model Installment {
+  id            String    @id @default(cuid())
+  planId        String
+  sequenceNum   Int       // 1, 2, 3, etc.
+  amountCents   Int
+  status        String    @default("PENDING") // PENDING, PAID, FAILED, RETRYING
+  dueDate       DateTime
+  paidAt        DateTime?
+  stripePaymentId String?
+  retryCount    Int       @default(0)
+  createdAt     DateTime  @default(now())
+
+  plan PaymentPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([planId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+// ─── AI DOSE OPTIMIZATION ───────────────────────────────────
+
+model DoseRecommendation {
+  id              String   @id @default(cuid())
+  userId          String
+  scheduleId      String?  // DosageSchedule id
+  currentDose     String
+  recommendedDose String
+  confidence      Float    // 0-100
+  reasoning       String   // explanation of recommendation
+  factors         Json     // { weightLossVelocity, sideEffectSeverity, adherenceRate, cohortComparison }
+  status          String   @default("PENDING") // PENDING, ACCEPTED, REJECTED, EXPIRED
+  reviewedBy      String?  // provider who reviewed
+  reviewedAt      DateTime?
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ─── WEARABLE INTEGRATION ───────────────────────────────────
+
+model DeviceConnection {
+  id           String    @id @default(cuid())
+  userId       String
+  platform     String    // APPLE_HEALTH, GOOGLE_FIT, FITBIT, WHOOP, OURA
+  accessToken  String?
+  refreshToken String?
+  expiresAt    DateTime?
+  isActive     Boolean   @default(true)
+  lastSyncAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([userId, platform])
+  @@index([userId])
+}
+
+model DeviceDataPoint {
+  id        String   @id @default(cuid())
+  userId    String
+  source    String   // platform name
+  metric    String   // STEPS, WEIGHT, HEART_RATE, SLEEP_HOURS, BLOOD_GLUCOSE, ACTIVE_CALORIES
+  value     Float
+  unit      String   // steps, lbs, bpm, hours, mg/dL, kcal
+  recordedAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId, metric])
+  @@index([recordedAt])
+}
+
+// ─── PROVIDER TRIAGE & ESCALATION ───────────────────────────
+
+model TriageAlert {
+  id           String    @id @default(cuid())
+  patientId    String
+  providerId   String?
+  severity     String    // ROUTINE, URGENT, CRITICAL, EMERGENCY
+  triggerType  String    // SEVERE_SIDE_EFFECT, MISSED_DOSES, RAPID_WEIGHT_LOSS, PSYCHIATRIC, PATIENT_REQUEST
+  title        String
+  description  String
+  status       String    @default("OPEN") // OPEN, ACKNOWLEDGED, IN_PROGRESS, RESOLVED, ESCALATED
+  acknowledgedAt DateTime?
+  resolvedAt   DateTime?
+  escalatedAt  DateTime?
+  escalatedTo  String?   // medical director id
+  resolution   String?
+  createdAt    DateTime  @default(now())
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([severity])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model EscalationRecord {
+  id            String   @id @default(cuid())
+  triageAlertId String
+  fromProvider  String?
+  toProvider    String
+  reason        String
+  autoEscalated Boolean  @default(false) // true if triggered by timeout
+  createdAt     DateTime @default(now())
+
+  @@index([triageAlertId])
+}
+
+// ─── B2B / ORGANIZATIONS ────────────────────────────────────
+
+model Organization {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  type            String   @default("EMPLOYER") // EMPLOYER, PHARMACY_CHAIN, HEALTH_SYSTEM, PARTNER
+  contactName     String?
+  contactEmail    String?
+  contactPhone    String?
+  logoUrl         String?
+  brandColor      String?  // hex color
+  customDomain    String?
+  maxMembers      Int?
+  isActive        Boolean  @default(true)
+
+  // Billing
+  billingType     String   @default("PER_MEMBER") // PER_MEMBER, FLAT_RATE, SUBSIDIZED
+  billingRateCents Int?
+  subsidyPct      Float?   // employer subsidizes X% of member cost
+
+  // Performance
+  totalMembers    Int      @default(0)
+  totalRevenue    Int      @default(0) // cents
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members OrganizationMember[]
+
+  @@index([slug])
+  @@index([isActive])
+}
+
+model OrganizationMember {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  role           String   @default("MEMBER") // MEMBER, ADMIN, BILLING
+  enrolledAt     DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+// ─── RETENTION ENGINE ───────────────────────────────────────
+
+model RetentionIntervention {
+  id             String    @id @default(cuid())
+  userId         String
+  subscriptionId String?
+  type           String    // SAVE_OFFER, WIN_BACK, PAUSE_OFFER, DOWNGRADE_OFFER, DISCOUNT, FREE_MONTH
+  offerDetails   Json      // { discountPct, pauseDays, newPlan, freeMonths }
+  status         String    @default("OFFERED") // OFFERED, ACCEPTED, DECLINED, EXPIRED
+  triggeredBy    String    // SYSTEM, ADMIN, CANCELLATION_FLOW
+  offeredAt      DateTime  @default(now())
+  respondedAt    DateTime?
+  expiresAt      DateTime?
+  revenueSaved   Int?      // cents of revenue retained
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+}
+
+// ─── HIPAA COMPLIANCE ───────────────────────────────────────
+
+model HipaaAuditEntry {
+  id          String   @id @default(cuid())
+  actorId     String   // user or system
+  actorType   String   // PATIENT, PROVIDER, ADMIN, SYSTEM
+  action      String   // ACCESS, CREATE, UPDATE, DELETE, EXPORT, SHARE
+  resourceType String  // PHI, MEDICAL_RECORD, PRESCRIPTION, LAB_RESULT
+  resourceId  String?
+  patientId   String?
+  ipAddress   String?
+  userAgent   String?
+  details     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([actorId])
+  @@index([patientId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
+}
+
+model DataRequest {
+  id          String    @id @default(cuid())
+  userId      String
+  type        String    // ACCESS, DELETION, EXPORT, AMENDMENT
+  status      String    @default("PENDING") // PENDING, PROCESSING, COMPLETED, DENIED
+  requestedAt DateTime  @default(now())
+  completedAt DateTime?
+  completedBy String?
+  notes       String?
+  exportUrl   String?   // for ACCESS/EXPORT requests
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+}
+
+// ─── BEHAVIORAL HEALTH ──────────────────────────────────────
+
+model BehavioralScreening {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // PHQ9, GAD7, AUDIT_C, CAGE
+  score       Int
+  severity    String   // NONE, MILD, MODERATE, MODERATELY_SEVERE, SEVERE
+  responses   Json     // individual question responses
+  flagged     Boolean  @default(false) // true if above clinical threshold
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([flagged])
+  @@index([createdAt])
+}
+
+model BehavioralReferral {
+  id          String    @id @default(cuid())
+  userId      String
+  screeningId String?
+  referralType String   // THERAPY, PSYCHIATRY, CRISIS, SUPPORT_GROUP
+  status      String    @default("PENDING") // PENDING, SCHEDULED, COMPLETED, DECLINED
+  providerName String?
+  notes       String?
+  scheduledAt DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ─── RESELLER MARKETING CONTENT REVIEW ──────────────────────
+
+model MarketingContentSubmission {
+  id              String   @id @default(cuid())
+  resellerId      String
+  contentType     String   // SOCIAL_POST, EMAIL, BLOG, VIDEO_SCRIPT, LANDING_PAGE, OTHER
+  title           String
+  content         String   // the actual marketing copy submitted
+  platform        String?  // where they intend to use it (Instagram, TikTok, Email, etc.)
+  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED, REVISION_REQUESTED
+  reviewedBy      String?  // admin userId who reviewed
+  reviewedAt      DateTime?
+  reviewNotes     String?  // admin feedback
+  rejectionReason String?
+  submittedAt     DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([resellerId])
+  @@index([status])
+  @@index([submittedAt])
 }

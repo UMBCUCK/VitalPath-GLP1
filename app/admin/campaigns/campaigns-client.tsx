@@ -188,7 +188,7 @@ export function CampaignsClient({
   const searchParams = useSearchParams();
 
   function navigate(overrides: Record<string, string>) {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     for (const [k, v] of Object.entries(overrides)) {
       if (v === "all" || !v) params.delete(k);
       else params.set(k, v);

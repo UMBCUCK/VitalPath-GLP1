@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { WebPageJsonLd } from "@/components/seo/json-ld";
+import { WebPageJsonLd, BreadcrumbJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "Free Health & Weight Loss Tools",
@@ -45,6 +45,24 @@ const tools = [
       { icon: Target, title: "Top 20 Protein Foods", description: "The best high-protein foods ranked by protein per calorie.", href: "/blog/best-high-protein-foods-weight-loss" },
     ],
   },
+  {
+    category: "Condition Guides",
+    items: [
+      { icon: BookOpen, title: "GLP-1 for Obesity", description: "FDA-approved treatment for adults with BMI 30+ — clinical data and what to expect.", href: "/obesity" },
+      { icon: BookOpen, title: "GLP-1 for Type 2 Diabetes", description: "How GLP-1 medications improve blood sugar and produce weight loss simultaneously.", href: "/type-2-diabetes" },
+      { icon: BookOpen, title: "GLP-1 for Sleep Apnea", description: "2024 FDA approval — tirzepatide reduces AHI events by 63% in clinical trials.", href: "/sleep-apnea" },
+      { icon: BookOpen, title: "GLP-1 for PCOS", description: "How GLP-1 medications address insulin resistance and hormonal weight gain.", href: "/pcos" },
+      { icon: BookOpen, title: "GLP-1 for Prediabetes", description: "Reverse prediabetes and prevent type 2 diabetes progression with GLP-1 therapy.", href: "/prediabetes" },
+      { icon: BookOpen, title: "GLP-1 & Heart Health", description: "SELECT trial: 20% reduction in major cardiovascular events on semaglutide.", href: "/heart-health" },
+    ],
+  },
+];
+
+const toolsFaqs = [
+  { question: "Are these health calculators free?", answer: "Yes — all calculators and tools on this page are completely free. No account required." },
+  { question: "How accurate is the BMI calculator?", answer: "BMI is calculated using the standard formula: weight (lbs) ÷ height (in)² × 703. It is a screening tool, not a diagnostic measure. Two people with the same BMI can have very different body compositions." },
+  { question: "How is TDEE calculated?", answer: "TDEE (Total Daily Energy Expenditure) is calculated using the Mifflin-St Jeor equation for resting metabolic rate, then multiplied by an activity factor. It estimates your total daily calorie burn based on age, sex, height, weight, and activity level." },
+  { question: "How much protein do I need on GLP-1 medication?", answer: "Clinical guidelines recommend 1.2–1.6g of protein per kilogram of body weight (about 0.55–0.73g per pound) during active weight loss on GLP-1 medication. Use the protein calculator above for your personalized target." },
 ];
 
 export default function ToolsPage() {
@@ -55,6 +73,8 @@ export default function ToolsPage() {
         description="Free calculators, guides, and nutrition resources for weight management."
         path="/tools"
       />
+      <BreadcrumbJsonLd items={[{ name: "Home", href: "/" }, { name: "Free Tools", href: "/tools" }]} />
+      <FAQPageJsonLd faqs={toolsFaqs} />
 
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">
@@ -95,6 +115,24 @@ export default function ToolsPage() {
           </SectionShell>
         </section>
       ))}
+
+      {/* FAQ */}
+      <section className="py-12 border-t border-navy-100/40 bg-cloud/30">
+        <SectionShell className="max-w-3xl">
+          <h2 className="text-xl font-bold text-navy mb-6">Frequently asked questions</h2>
+          <div className="divide-y divide-navy-100/40">
+            {toolsFaqs.map((faq) => (
+              <details key={faq.question} className="group py-5">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 font-semibold text-navy text-sm list-none">
+                  {faq.question}
+                  <span className="shrink-0 text-graphite-300 group-open:rotate-180 transition-transform">▾</span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-graphite-500">{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
 
       <CtaSection />
     </MarketingShell>

@@ -1,18 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { KPICard } from "@/components/admin/kpi-card";
 import { formatPriceDecimal } from "@/lib/utils";
 import {
@@ -23,9 +15,13 @@ import {
   Copy,
   Check,
   Mail,
-  Link2,
+  Loader2,
   ArrowRight,
+  Shield,
+  AlertTriangle,
 } from "lucide-react";
+
+// ─── Types ─────────────────────────────────────────────────
 
 interface SubResellerRow {
   id: string;
@@ -35,7 +31,6 @@ interface SubResellerRow {
   status: string;
   totalSales: number;
   totalRevenue: number;
-  overrideEarned: number;
   joinedAt: string;
 }
 
@@ -75,21 +70,17 @@ interface Props {
   signupLink: string | null;
 }
 
+// ─── Component ─────────────────────────────────────────────
+
 export function NetworkClient({
   network,
-  overrideEarnings,
   tierProgress,
   signupLink,
 }: Props) {
-  const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
-
-  const handleCopyLink = async () => {
-    if (!signupLink) return;
-    await navigator.clipboard.writeText(signupLink);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-  };
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteResult, setInviteResult] = useState<"sent" | "error" | null>(null);
 
   const handleCopyCode = async () => {
     if (!network.referralCode) return;
@@ -98,12 +89,28 @@ export function NetworkClient({
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const handleEmailInvite = () => {
-    const subject = encodeURIComponent("Join Nature's Journey Partner Program");
-    const body = encodeURIComponent(
-      `Hi,\n\nI'd like to invite you to join the Nature's Journey reseller partner program. As a partner, you'll earn commissions on every sale you generate.\n\nSign up using my referral link:\n${signupLink}\n\nOr use my referral code: ${network.referralCode}\n\nLooking forward to working together!`
-    );
-    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+  const handleEmailInvite = async () => {
+    if (!inviteEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteEmail.trim())) return;
+    setInviteLoading(true);
+    setInviteResult(null);
+    try {
+      const res = await fetch("/api/reseller/network", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: inviteEmail.trim() }),
+      });
+      if (res.ok) {
+        setInviteResult("sent");
+        setInviteEmail("");
+        setTimeout(() => setInviteResult(null), 5000);
+      } else {
+        setInviteResult("error");
+      }
+    } catch {
+      setInviteResult("error");
+    } finally {
+      setInviteLoading(false);
+    }
   };
 
   const tierColor = (t: string) => {
@@ -138,31 +145,24 @@ export function NetworkClient({
         <div>
           <h2 className="text-2xl font-bold text-navy">My Network</h2>
           <p className="text-sm text-graphite-400">
-            Manage your partner network and track override earnings
+            Introduce partners to VitalPath and track your introductions
           </p>
         </div>
         {network.referralCode && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-graphite-400">Referral Code:</span>
-            <button
-              onClick={handleCopyCode}
-              className="flex items-center gap-1.5 rounded-lg border border-navy-100 bg-white px-3 py-1.5 text-sm font-mono font-semibold text-navy hover:bg-linen/30 transition-colors"
-            >
-              {network.referralCode}
-              {copiedCode ? (
-                <Check className="h-3.5 w-3.5 text-emerald-500" />
-              ) : (
-                <Copy className="h-3.5 w-3.5 text-graphite-400" />
-              )}
-            </button>
-          </div>
+          <button
+            onClick={handleCopyCode}
+            className="flex items-center gap-1.5 rounded-lg border border-navy-100 bg-white px-3 py-1.5 text-sm font-mono font-semibold text-navy hover:bg-linen/30 transition-colors"
+          >
+            {network.referralCode}
+            {copiedCode ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5 text-graphite-400" />}
+          </button>
         )}
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* KPIs — no override earnings displayed */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <KPICard
-          title="Direct Recruits"
+          title="Partners Introduced"
           value={String(network.totalDirectRecruits)}
           icon={Users}
           iconColor="text-blue-600"
@@ -176,14 +176,7 @@ export function NetworkClient({
           iconBg="bg-emerald-50"
         />
         <KPICard
-          title="Override Earnings"
-          value={formatPriceDecimal(network.totalOverrideEarnings)}
-          icon={TrendingUp}
-          iconColor="text-teal"
-          iconBg="bg-teal-50"
-        />
-        <KPICard
-          title="Network Tier"
+          title="Current Tier"
           value={tierProgress.currentTier}
           icon={Crown}
           iconColor="text-amber-600"
@@ -191,78 +184,70 @@ export function NetworkClient({
         />
       </div>
 
-      {/* Invite Section */}
-      <Card className="border-teal/20 bg-gradient-to-br from-teal-50/30 to-white">
-        <CardContent className="p-6">
-          <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-teal/10">
-              <Users className="h-6 w-6 text-teal" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-navy">
-                Invite a Partner
-              </h3>
-              <p className="mt-1 text-sm text-graphite-500 leading-relaxed">
-                Earn override bonuses when your recruited partners make sales.
-                You earn{" "}
-                <span className="font-semibold text-teal">
-                  {network.tier1OverridePct}%
-                </span>{" "}
-                on direct recruit sales,{" "}
-                <span className="font-semibold text-blue-600">
-                  {network.tier2OverridePct}%
-                </span>{" "}
-                on their recruits' sales, and{" "}
-                <span className="font-semibold text-purple-600">
-                  {network.tier3OverridePct}%
-                </span>{" "}
-                on 3rd-level sales. Bonuses are paid from company funds and do
-                not reduce your recruits' commissions.
-              </p>
+      {/* Compliance notice */}
+      <div className="rounded-xl border border-teal/20 bg-teal-50/20 p-4 flex items-start gap-3">
+        <Shield className="h-5 w-5 text-teal shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm font-semibold text-navy">How Partner Introductions Work</p>
+          <p className="text-xs text-graphite-500 mt-1 leading-relaxed">
+            You can introduce potential resellers to VitalPath. If they complete onboarding and become
+            an active reseller, you may receive a <strong>one-time flat introduction bonus</strong> (subject to
+            admin approval). You do <strong>not</strong> earn ongoing commissions from their sales — all
+            commissions are based on your own direct subscription sales only. This structure ensures
+            compliance with federal healthcare regulations.
+          </p>
+        </div>
+      </div>
 
-              {signupLink && (
-                <div className="mt-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 rounded-lg border border-navy-100 bg-white px-4 py-2.5">
-                      <code className="text-sm text-navy break-all">
-                        {signupLink}
-                      </code>
-                    </div>
-                    <button
-                      onClick={handleCopyLink}
-                      className="flex items-center gap-1.5 rounded-lg bg-navy px-4 py-2.5 text-sm font-medium text-white hover:bg-navy/90 transition-colors"
-                    >
-                      {copiedLink ? (
-                        <>
-                          <Check className="h-4 w-4" /> Copied
-                        </>
-                      ) : (
-                        <>
-                          <Link2 className="h-4 w-4" /> Copy Link
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={handleEmailInvite}
-                      className="flex items-center gap-1.5 rounded-lg border border-navy-100 bg-white px-4 py-2 text-sm font-medium text-navy hover:bg-linen/30 transition-colors"
-                    >
-                      <Mail className="h-4 w-4" /> Send Email Invite
-                    </button>
-                  </div>
-                </div>
+      {/* Introduce a Partner */}
+      <Card className="border-teal/20">
+        <CardHeader>
+          <CardTitle className="text-base">Introduce a Partner</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xs text-graphite-400 mb-3">
+            Enter their email address to send an introduction email. They will go through
+            the full compliance onboarding process.
+          </p>
+          <div className="flex gap-2">
+            <Input
+              type="email"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              placeholder="partner@example.com"
+              disabled={inviteLoading}
+              className="flex-1"
+            />
+            <Button
+              onClick={handleEmailInvite}
+              disabled={inviteLoading || !inviteEmail.trim()}
+            >
+              {inviteLoading ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Mail className="mr-1 h-4 w-4" />
               )}
-            </div>
+              Send Invite
+            </Button>
           </div>
+          {inviteResult === "sent" && (
+            <p className="mt-2 text-xs text-teal flex items-center gap-1">
+              <Check className="h-3.5 w-3.5" /> Invitation sent successfully!
+            </p>
+          )}
+          {inviteResult === "error" && (
+            <p className="mt-2 text-xs text-red-500 flex items-center gap-1">
+              <AlertTriangle className="h-3.5 w-3.5" /> Failed to send. They may already be a reseller.
+            </p>
+          )}
         </CardContent>
       </Card>
 
-      {/* My Recruits Table */}
+      {/* Introduced Partners Table */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base font-semibold text-navy">
-            My Recruits
+            Partners You Introduced ({network.totalDirectRecruits})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -270,73 +255,40 @@ export function NetworkClient({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-navy-100/40 bg-linen/30">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">
-                    Partner
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">
-                    Tier
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">
-                    Sales
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">
-                    Revenue
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">
-                    Your Override
-                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">Partner</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">Tier</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">Sales</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-graphite-400 uppercase tracking-wider">Joined</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-navy-100/30">
                 {network.directRecruits.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="py-12 text-center text-graphite-300"
-                    >
-                      No recruits yet. Share your referral link to grow your
-                      network.
+                    <td colSpan={5} className="py-12 text-center text-graphite-300">
+                      You haven&apos;t introduced any partners yet. Use the form above to get started.
                     </td>
                   </tr>
                 ) : (
                   network.directRecruits.map((recruit) => (
-                    <tr
-                      key={recruit.id}
-                      className="hover:bg-linen/20 transition-colors"
-                    >
+                    <tr key={recruit.id} className="hover:bg-linen/20 transition-colors">
                       <td className="px-4 py-3">
                         <div>
-                          <p className="font-medium text-navy">
-                            {recruit.displayName}
-                          </p>
+                          <p className="font-medium text-navy">{recruit.displayName}</p>
                           {recruit.companyName && (
-                            <p className="text-xs text-graphite-400">
-                              {recruit.companyName}
-                            </p>
+                            <p className="text-xs text-graphite-400">{recruit.companyName}</p>
                           )}
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge className={statusColor(recruit.status)}>
-                          {recruit.status}
-                        </Badge>
+                        <Badge className={statusColor(recruit.status)}>{recruit.status}</Badge>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge className={tierColor(recruit.tier)}>
-                          {recruit.tier}
-                        </Badge>
+                        <Badge className={tierColor(recruit.tier)}>{recruit.tier}</Badge>
                       </td>
-                      <td className="px-4 py-3 font-medium">
-                        {recruit.totalSales}
-                      </td>
-                      <td className="px-4 py-3 font-medium">
-                        {formatPriceDecimal(recruit.totalRevenue)}
-                      </td>
-                      <td className="px-4 py-3 font-semibold text-teal">
-                        {formatPriceDecimal(recruit.overrideEarned)}
+                      <td className="px-4 py-3 font-medium">{recruit.totalSales}</td>
+                      <td className="px-4 py-3 text-graphite-400 text-xs">
+                        {new Date(recruit.joinedAt).toLocaleDateString()}
                       </td>
                     </tr>
                   ))
@@ -347,98 +299,24 @@ export function NetworkClient({
         </CardContent>
       </Card>
 
-      {/* Override Earnings Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-navy">
-            Override Earnings by Tier
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={overrideEarnings}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis
-                dataKey="month"
-                tick={{ fontSize: 11 }}
-                stroke="#9ca3af"
-              />
-              <YAxis
-                tick={{ fontSize: 12 }}
-                stroke="#9ca3af"
-                tickFormatter={(v: number) => `$${(v / 100).toFixed(0)}`}
-              />
-              <Tooltip
-                formatter={(value: number, name: string) => [
-                  formatPriceDecimal(value),
-                  name === "tier1"
-                    ? "Tier 1 (Direct)"
-                    : name === "tier2"
-                      ? "Tier 2"
-                      : "Tier 3",
-                ]}
-              />
-              <Legend
-                formatter={(value: string) =>
-                  value === "tier1"
-                    ? "Tier 1 (Direct)"
-                    : value === "tier2"
-                      ? "Tier 2"
-                      : "Tier 3"
-                }
-              />
-              <Bar
-                dataKey="tier1"
-                stackId="overrides"
-                fill="#0d9488"
-                radius={[0, 0, 0, 0]}
-              />
-              <Bar
-                dataKey="tier2"
-                stackId="overrides"
-                fill="#3b82f6"
-                radius={[0, 0, 0, 0]}
-              />
-              <Bar
-                dataKey="tier3"
-                stackId="overrides"
-                fill="#8b5cf6"
-                radius={[6, 6, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Tier Progression */}
+      {/* Tier Progression — removed "recruits" from requirements display */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-semibold text-navy">
-              Tier Progression
-            </CardTitle>
-            <Badge className={tierColor(tierProgress.currentTier)}>
-              {tierProgress.currentTier}
-            </Badge>
+            <CardTitle className="text-base font-semibold text-navy">Tier Progression</CardTitle>
+            <Badge className={tierColor(tierProgress.currentTier)}>{tierProgress.currentTier}</Badge>
           </div>
         </CardHeader>
         <CardContent>
           {tierProgress.nextTier ? (
             <div className="space-y-5">
               <div className="flex items-center gap-3 text-sm">
-                <Badge className={tierColor(tierProgress.currentTier)}>
-                  {tierProgress.currentTier}
-                </Badge>
+                <Badge className={tierColor(tierProgress.currentTier)}>{tierProgress.currentTier}</Badge>
                 <ArrowRight className="h-4 w-4 text-graphite-300" />
-                <Badge className={tierColor(tierProgress.nextTier)}>
-                  {tierProgress.nextTier}
-                </Badge>
-                <span className="ml-auto text-graphite-400">
-                  {tierProgress.progressPct}% complete
-                </span>
+                <Badge className={tierColor(tierProgress.nextTier)}>{tierProgress.nextTier}</Badge>
+                <span className="ml-auto text-graphite-400">{tierProgress.progressPct}% complete</span>
               </div>
 
-              {/* Overall progress */}
               <div className="h-2 w-full rounded-full bg-navy-50">
                 <div
                   className="h-2 rounded-full bg-gradient-to-r from-teal to-atlantic transition-all duration-500"
@@ -446,90 +324,47 @@ export function NetworkClient({
                 />
               </div>
 
-              {/* Individual requirements */}
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-graphite-500">Sales</span>
+                    <span className="font-medium text-graphite-500">Direct Sales</span>
                     <span className="text-graphite-400">
-                      {tierProgress.requirements.sales.current} /{" "}
-                      {tierProgress.requirements.sales.needed}
+                      {tierProgress.requirements.sales.current} / {tierProgress.requirements.sales.needed}
                     </span>
                   </div>
                   <div className="h-1.5 w-full rounded-full bg-navy-50">
                     <div
                       className="h-1.5 rounded-full bg-teal transition-all duration-500"
-                      style={{
-                        width: `${progressBarWidth(
-                          tierProgress.requirements.sales.current,
-                          tierProgress.requirements.sales.needed
-                        )}%`,
-                      }}
+                      style={{ width: `${progressBarWidth(tierProgress.requirements.sales.current, tierProgress.requirements.sales.needed)}%` }}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-graphite-500">
-                      Recruits
-                    </span>
+                    <span className="font-medium text-graphite-500">Revenue Generated</span>
                     <span className="text-graphite-400">
-                      {tierProgress.requirements.recruits.current} /{" "}
-                      {tierProgress.requirements.recruits.needed}
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full rounded-full bg-navy-50">
-                    <div
-                      className="h-1.5 rounded-full bg-blue-500 transition-all duration-500"
-                      style={{
-                        width: `${progressBarWidth(
-                          tierProgress.requirements.recruits.current,
-                          tierProgress.requirements.recruits.needed
-                        )}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-graphite-500">
-                      Revenue
-                    </span>
-                    <span className="text-graphite-400">
-                      {formatPriceDecimal(
-                        tierProgress.requirements.revenue.current
-                      )}{" "}
-                      /{" "}
-                      {formatPriceDecimal(
-                        tierProgress.requirements.revenue.needed
-                      )}
+                      {formatPriceDecimal(tierProgress.requirements.revenue.current)} / {formatPriceDecimal(tierProgress.requirements.revenue.needed)}
                     </span>
                   </div>
                   <div className="h-1.5 w-full rounded-full bg-navy-50">
                     <div
                       className="h-1.5 rounded-full bg-purple-500 transition-all duration-500"
-                      style={{
-                        width: `${progressBarWidth(
-                          tierProgress.requirements.revenue.current,
-                          tierProgress.requirements.revenue.needed
-                        )}%`,
-                      }}
+                      style={{ width: `${progressBarWidth(tierProgress.requirements.revenue.current, tierProgress.requirements.revenue.needed)}%` }}
                     />
                   </div>
                 </div>
               </div>
+
+              <p className="text-[10px] text-graphite-400 italic">
+                Tier advancement is based on your own direct sales and revenue only. Partner introductions do not count toward tier requirements.
+              </p>
             </div>
           ) : (
             <div className="py-4 text-center">
               <Crown className="mx-auto h-8 w-8 text-amber-500 mb-2" />
-              <p className="text-sm font-medium text-navy">
-                You have reached the highest tier
-              </p>
-              <p className="text-xs text-graphite-400 mt-1">
-                Congratulations on achieving Ambassador status
-              </p>
+              <p className="text-sm font-medium text-navy">You have reached the highest tier</p>
+              <p className="text-xs text-graphite-400 mt-1">Congratulations on achieving Ambassador status</p>
             </div>
           )}
         </CardContent>

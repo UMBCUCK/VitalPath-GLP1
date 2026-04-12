@@ -155,6 +155,126 @@ export function recommendPlanFromQualify(input: QualifyRecommendInput): "essenti
   return "essential";
 }
 
+// ─── Persona Engine ────────────────────────────────────────
+
+export interface PersonaResult {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  color: string;
+  icon: string;
+  tips: string[];
+}
+
+const personas: Record<string, PersonaResult> = {
+  "metabolism-resetter": {
+    id: "metabolism-resetter",
+    name: "The Metabolism Resetter",
+    tagline: "Your body needs a biological reset",
+    description: "You've tried diet and exercise but your metabolism has been working against you. GLP-1 medication can help reset your body's weight set point, making sustainable loss finally achievable.",
+    color: "teal",
+    icon: "RefreshCw",
+    tips: [
+      "GLP-1 works with your biology, not against it",
+      "Focus on protein — aim for 100g+ daily",
+      "Walking 30 min/day amplifies medication results",
+      "Expect appetite changes in week 1-2",
+    ],
+  },
+  "appetite-controller": {
+    id: "appetite-controller",
+    name: "The Appetite Controller",
+    tagline: "Take back control from cravings",
+    description: "Emotional eating and cravings have been your biggest obstacle. GLP-1 medication targets the brain's appetite center, dramatically reducing food noise and giving you back control.",
+    color: "purple",
+    icon: "Brain",
+    tips: [
+      "Food noise reduction is often the first benefit you'll notice",
+      "Keep a hunger journal — notice when real hunger vs. cravings hit",
+      "Meal planning eliminates decision fatigue",
+      "The urge to snack often drops within 2 weeks",
+    ],
+  },
+  "plateau-breaker": {
+    id: "plateau-breaker",
+    name: "The Plateau Breaker",
+    tagline: "Break through what's been holding you back",
+    description: "You've lost weight before but always hit a wall. GLP-1 medication helps you push past plateaus by addressing the hormonal adaptations that cause weight regain.",
+    color: "orange",
+    icon: "TrendingUp",
+    tips: [
+      "Dose titration is key — your provider adjusts as you progress",
+      "Strength training preserves muscle during rapid loss",
+      "Track weekly, not daily — weight fluctuates",
+      "Members who log consistently break plateaus 40% faster",
+    ],
+  },
+  "fresh-starter": {
+    id: "fresh-starter",
+    name: "The Fresh Starter",
+    tagline: "Your journey begins with the right foundation",
+    description: "You're ready to take the first step with medical support. Starting with GLP-1 medication gives you a strong foundation while building the habits that sustain long-term results.",
+    color: "emerald",
+    icon: "Sparkles",
+    tips: [
+      "Start with small, sustainable habit changes",
+      "Your provider creates a plan specific to your body",
+      "Use the dashboard to track even small wins",
+      "Most members see noticeable results by month 2",
+    ],
+  },
+  "comprehensive-optimizer": {
+    id: "comprehensive-optimizer",
+    name: "The Comprehensive Optimizer",
+    tagline: "Maximum support for maximum results",
+    description: "Your health profile suggests you'll benefit most from the full toolkit — medication plus nutrition, coaching, and lab work. This comprehensive approach produces the strongest outcomes.",
+    color: "navy",
+    icon: "Target",
+    tips: [
+      "Lab work helps your provider fine-tune your plan",
+      "Coaching check-ins keep accountability high",
+      "Meal plans designed for GLP-1 optimize nutrition",
+      "This comprehensive approach averages 20%+ body weight loss",
+    ],
+  },
+};
+
+export function assignPersona(input: QualifyRecommendInput & { eatingPattern?: string; previousAttempts?: string }): PersonaResult {
+  // Emotional eater / snacker → Appetite Controller
+  if (input.eatingPattern === "emotional-eating" || input.eatingPattern === "snack-heavy") {
+    return personas["appetite-controller"];
+  }
+
+  // Has tried rx/surgery before → Plateau Breaker
+  if (input.previousAttempts === "rx-medication" || input.previousAttempts === "surgery") {
+    return personas["plateau-breaker"];
+  }
+
+  // High BMI + multiple conditions → Comprehensive Optimizer
+  if (input.bmi && input.bmi >= 40 && input.conditionsCount && input.conditionsCount >= 2) {
+    return personas["comprehensive-optimizer"];
+  }
+
+  // Sedentary + has tried diet → Metabolism Resetter
+  if (input.activityLevel === "sedentary" && input.previousAttempts === "diet-only") {
+    return personas["metabolism-resetter"];
+  }
+
+  // BMI 30-40, moderate activity → Metabolism Resetter
+  if (input.bmi && input.bmi >= 30 && input.bmi < 40) {
+    return personas["metabolism-resetter"];
+  }
+
+  // First time / no previous attempts → Fresh Starter
+  if (!input.previousAttempts || input.previousAttempts === "none") {
+    return personas["fresh-starter"];
+  }
+
+  // Default
+  return personas["metabolism-resetter"];
+}
+
 // ─── Qualify Schema ─────────────────────────────────────────
 
 export const qualifySchema = z.object({

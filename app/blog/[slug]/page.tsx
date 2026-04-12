@@ -24,7 +24,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: post.seoTitle || post.title,
     description: post.seoDescription || post.excerpt || undefined,
-    openGraph: { title: post.title, description: post.excerpt || undefined },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt || undefined,
+      ...(post.imageUrl ? { images: [{ url: post.imageUrl, width: 1200, height: 630, alt: post.title }] } : {}),
+    },
     other: {
       'article:published_time': post.publishedAt?.toISOString() ?? '',
       'article:modified_time': post.updatedAt.toISOString(),
@@ -163,30 +167,79 @@ function getRelatedResources(category: string | null): ResourceLink[] {
         { href: "/semaglutide", title: "Semaglutide Guide", description: "How it works, dosing schedule, and what to expect.", Icon: Pill },
         { href: "/tirzepatide", title: "Tirzepatide Guide", description: "Dual GIP/GLP-1 agonist with superior clinical results.", Icon: Pill },
         { href: "/glp1-cost", title: "GLP-1 Cost Guide", description: "Compare costs with and without insurance.", Icon: BookOpen },
+        { href: "/obesity", title: "GLP-1 for Obesity", description: "FDA-approved treatment for BMI 30+ adults.", Icon: BookOpen },
+        { href: "/maintenance", title: "Maintenance Program", description: "Keep the weight off after reaching your goal weight.", Icon: Dumbbell },
         qualifyCard,
       ];
     case "education":
       return [
         { href: "/qualify", title: "Check Eligibility", description: "See if you meet clinical criteria for GLP-1 treatment.", Icon: Shield },
         { href: "/how-it-works", title: "How It Works", description: "From assessment to prescription — your full journey.", Icon: BookOpen },
-        { href: "/eligibility", title: "Eligibility Guide", description: "BMI requirements, conditions, and contraindications.", Icon: BookOpen },
+        { href: "/glp1-cost", title: "GLP-1 Cost Guide", description: "Brand vs compounded pricing, insurance, and savings options.", Icon: BookOpen },
+        { href: "/prediabetes", title: "GLP-1 for Prediabetes", description: "How GLP-1 reverses insulin resistance and prediabetes.", Icon: BookOpen },
         qualifyCard,
       ];
     case "nutrition":
       return [
         { href: "/meals", title: "GLP-1 Recipe Hub", description: "High-protein, GLP-1-friendly recipes and meal plans.", Icon: Salad },
+        { href: "/calculators/protein", title: "Protein Calculator", description: "Find your daily protein target to preserve muscle.", Icon: BookOpen },
         { href: "/qualify", title: "Start Treatment", description: "Get your personalized nutrition plan with treatment.", Icon: Shield },
         qualifyCard,
       ];
     case "lifestyle":
       return [
+        { href: "/faq/exercise", title: "Exercise FAQ", description: "Best workouts, muscle preservation, and energy on GLP-1.", Icon: BookOpen },
         { href: "/qualify", title: "Get Started", description: "Start your program with full lifestyle support.", Icon: Shield },
-        { href: "/results", title: "Real Results", description: "See weight loss outcomes from real Nature's Journey patients.", Icon: Dumbbell },
+        { href: "/results", title: "Real Results", description: "See weight loss outcomes from real members.", Icon: Dumbbell },
         { href: "/maintenance", title: "Maintenance Plan", description: "Keep the weight off after reaching your goal.", Icon: Dumbbell },
+        { href: "/heart-health", title: "GLP-1 & Heart Health", description: "Cardiovascular benefits of GLP-1 weight loss treatment.", Icon: BookOpen },
+        qualifyCard,
+      ];
+    case "pcos":
+      return [
+        { href: "/pcos", title: "GLP-1 for PCOS", description: "How GLP-1 medication addresses PCOS-related weight gain.", Icon: BookOpen },
+        { href: "/women", title: "Women's Weight Loss", description: "How GLP-1 treatment is tailored for women.", Icon: BookOpen },
+        qualifyCard,
+      ];
+    case "medication-comparison":
+      return [
+        { href: "/compare", title: "Program Comparisons", description: "Side-by-side comparisons of GLP-1 telehealth programs.", Icon: BookOpen },
+        { href: "/semaglutide", title: "Semaglutide Guide", description: "Complete guide to semaglutide dosing and outcomes.", Icon: Pill },
+        { href: "/tirzepatide", title: "Tirzepatide Guide", description: "Dual GIP/GLP-1 agonist clinical data and results.", Icon: Pill },
+        { href: "/glp1-cost", title: "GLP-1 Cost Guide", description: "Full 2026 pricing breakdown for all medications.", Icon: BookOpen },
+        qualifyCard,
+      ];
+    case "clinical-research":
+      return [
+        { href: "/guide", title: "Complete GLP-1 Guide", description: "9-chapter guide covering all aspects of GLP-1 treatment.", Icon: BookOpen },
+        { href: "/semaglutide", title: "Semaglutide", description: "Clinical data and treatment guide for semaglutide.", Icon: Pill },
+        { href: "/tirzepatide", title: "Tirzepatide", description: "SURMOUNT trial data and tirzepatide treatment overview.", Icon: Pill },
+        qualifyCard,
+      ];
+    case "weight-maintenance":
+      return [
+        { href: "/maintenance", title: "Maintenance Program", description: "Structured program to maintain weight after GLP-1.", Icon: Dumbbell },
+        { href: "/faq/getting-started", title: "Getting Started FAQ", description: "Everything you need to know before starting treatment.", Icon: BookOpen },
+        qualifyCard,
+      ];
+    case "mental-health":
+      return [
+        { href: "/guide", title: "Complete GLP-1 Guide", description: "Comprehensive guide to GLP-1 weight loss treatment.", Icon: BookOpen },
+        { href: "/results", title: "Real Results", description: "Member outcomes and stories from GLP-1 treatment.", Icon: Dumbbell },
+        qualifyCard,
+      ];
+    case "success-strategies":
+      return [
+        { href: "/faq/nutrition", title: "Nutrition FAQ", description: "What to eat, protein targets, and managing nausea on GLP-1.", Icon: BookOpen },
+        { href: "/faq/exercise", title: "Exercise FAQ", description: "Best workouts and muscle preservation on GLP-1.", Icon: BookOpen },
+        { href: "/calculators/protein", title: "Protein Calculator", description: "Find your daily protein target.", Icon: BookOpen },
         qualifyCard,
       ];
     default:
-      return [qualifyCard];
+      return [
+        { href: "/guide", title: "GLP-1 Weight Loss Guide", description: "9-chapter guide covering all aspects of treatment.", Icon: BookOpen },
+        qualifyCard,
+      ];
   }
 }
 
@@ -313,6 +366,17 @@ export default async function BlogPostPage({ params }: PageProps) {
                 <p className="mt-6 text-lg leading-relaxed text-graphite-500 border-l-4 border-teal/30 pl-4">
                   {post.excerpt}
                 </p>
+              )}
+
+              {/* Cover image */}
+              {post.imageUrl && (
+                <div className="mt-6 overflow-hidden rounded-2xl aspect-video bg-graphite-50">
+                  <img
+                    src={post.imageUrl}
+                    alt={post.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
               )}
 
               {/* Medically Reviewed banner */}

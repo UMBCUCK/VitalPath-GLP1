@@ -7,12 +7,13 @@ import { safeError } from "@/lib/logger";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { planSlug, addOnSlugs = [], email, interval = "monthly", couponCode } = body as {
+    const { planSlug, addOnSlugs = [], email, interval = "monthly", couponCode, referralCode } = body as {
       planSlug: string;
       addOnSlugs?: string[];
       email?: string;
       interval?: "monthly" | "quarterly" | "annual";
       couponCode?: string;
+      referralCode?: string;
     };
 
     // Fetch plan from database
@@ -77,6 +78,7 @@ export async function POST(req: NextRequest) {
         planName: plan.name,
         interval,
         addOns: addOnSlugs.join(","),
+        ...(referralCode ? { referralCode } : {}),
       },
       subscription_data: {
         metadata: {

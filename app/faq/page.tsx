@@ -1,8 +1,8 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Pill, DollarSign, AlertCircle, Zap } from "lucide-react";
+import { ArrowRight, BookOpen, Pill, DollarSign, AlertCircle, Zap, Utensils, Activity } from "lucide-react";
 import { FaqSection } from "@/components/marketing/faq-section";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { SectionShell } from "@/components/shared/section-shell";
@@ -58,6 +58,20 @@ const faqTopics = [
     description: "How to qualify, what to expect in the first weeks, and how to prepare.",
     href: "/faq/getting-started",
     count: 10,
+  },
+  {
+    icon: Utensils,
+    title: "Nutrition FAQ",
+    description: "What to eat, how much protein, foods to avoid, and managing nausea through diet.",
+    href: "/faq/nutrition",
+    count: 8,
+  },
+  {
+    icon: Activity,
+    title: "Exercise FAQ",
+    description: "Best workouts, muscle preservation, energy levels, and breaking plateaus.",
+    href: "/faq/exercise",
+    count: 8,
   },
 ];
 
@@ -127,6 +141,36 @@ export default function FaqPage() {
         </SectionShell>
       </section>
       <FaqSection showHeading={false} />
+
+      <section className="py-14 bg-navy-50/40 border-t border-navy-100/40">
+        <SectionShell>
+          <div className="flex items-center gap-2 mb-6">
+            <BookOpen className="h-4 w-4 text-teal" />
+            <h2 className="text-lg font-semibold text-navy">Dive deeper in the blog</h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { href: "/blog/semaglutide-timeline-first-3-months", tag: "Timeline", title: "Semaglutide Weight Loss Timeline: First 3 Months" },
+              { href: "/blog/tirzepatide-vs-semaglutide-2026", tag: "Comparison", title: "Tirzepatide vs. Semaglutide: Which Wins in 2026?" },
+              { href: "/blog/managing-side-effects", tag: "Side Effects", title: "Managing GLP-1 Side Effects: Complete Guide" },
+              { href: "/blog/does-insurance-cover-wegovy-ozempic-2026", tag: "Insurance", title: "Does Insurance Cover GLP-1 in 2026?" },
+              { href: "/blog/what-to-eat-on-semaglutide", tag: "Nutrition", title: "What to Eat on GLP-1 for Best Results" },
+              { href: "/blog/is-semaglutide-safe-long-term", tag: "Safety", title: "Is Semaglutide Safe for Long-Term Use?" },
+            ].map(({ href, tag, title }) => (
+              <Link key={href} href={href} className="group flex flex-col gap-2 rounded-xl border border-navy-100/60 bg-white p-4 shadow-sm hover:shadow-md hover:border-teal/40 transition-all">
+                <span className="text-xs font-semibold uppercase tracking-wide text-teal">{tag}</span>
+                <span className="text-sm font-medium text-navy leading-snug group-hover:text-teal transition-colors">{title}</span>
+                <ArrowRight className="h-3.5 w-3.5 text-graphite-300 group-hover:text-teal mt-auto transition-colors" />
+              </Link>
+            ))}
+          </div>
+          <div className="mt-6 text-center">
+            <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm font-medium text-teal hover:underline">
+              Browse all articles <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </SectionShell>
+      </section>
 
       <CtaSection />
     </MarketingShell>

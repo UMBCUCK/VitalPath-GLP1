@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -10,7 +10,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { FaqSection } from "@/components/marketing/faq-section";
-import { WebPageJsonLd, MedicalWebPageJsonLd } from "@/components/seo/json-ld";
+import { WebPageJsonLd, MedicalWebPageJsonLd, FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { medications } from "@/lib/medications";
 import { siteConfig } from "@/lib/site";
 
@@ -38,6 +38,13 @@ export default function MedicationsPage() {
         url="/medications"
         medicalAudience="Patient"
       />
+      <FAQPageJsonLd faqs={[
+        { question: "What GLP-1 medications are available for weight loss?", answer: "The two primary GLP-1 medications used for weight loss are semaglutide (brand names Ozempic, Wegovy) and tirzepatide (brand names Mounjaro, Zepbound). Compounded versions of both are also available through licensed pharmacies at lower cost." },
+        { question: "What is the difference between semaglutide and tirzepatide?", answer: "Semaglutide is a GLP-1 receptor agonist that reduces appetite. Tirzepatide is a dual GIP/GLP-1 receptor agonist, targeting two pathways simultaneously. Clinical trials show tirzepatide produces slightly greater average weight loss (20-22% vs 15-17%)." },
+        { question: "Do I need a prescription for GLP-1 weight loss medication?", answer: "Yes, GLP-1 medications require a prescription from a licensed medical provider. Our telehealth platform connects you with a provider who can evaluate your eligibility, prescribe if appropriate, and oversee your treatment plan." },
+        { question: "What are the most common side effects of GLP-1 medications?", answer: "The most common side effects are nausea, vomiting, diarrhea, and constipation — particularly in the first few weeks as your dose increases. Most patients experience reduced side effects as their body adjusts to the medication." },
+      ]} />
+      <BreadcrumbJsonLd items={[{ name: "Home", href: "/" }, { name: "GLP-1 Medications", href: "/medications" }]} />
 
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
@@ -191,6 +198,31 @@ export default function MedicationsPage() {
       </section>
 
       <FaqSection limit={6} />
+
+      <section className="py-12 border-t border-navy-100/40 bg-navy-50/30">
+        <SectionShell>
+          <p className="text-xs font-semibold uppercase tracking-wider text-graphite-400 mb-4">Further reading</p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { href: "/semaglutide", tag: "Guide", title: "Semaglutide: Full Treatment Guide" },
+              { href: "/tirzepatide", tag: "Guide", title: "Tirzepatide: Full Treatment Guide" },
+              { href: "/blog/tirzepatide-vs-semaglutide-2026", tag: "Comparison", title: "Tirzepatide vs. Semaglutide in 2026" },
+              { href: "/blog/managing-side-effects", tag: "Side Effects", title: "Managing GLP-1 Side Effects" },
+              { href: "/blog/compounded-semaglutide-safety", tag: "Safety", title: "Is Compounded GLP-1 Safe?" },
+              { href: "/blog/semaglutide-dosing-schedule-guide", tag: "Dosing", title: "GLP-1 Dosing Schedule Guide" },
+              { href: "/glp1-cost", tag: "Cost", title: "GLP-1 Cost Without Insurance" },
+              { href: "/eligibility", tag: "Eligibility", title: "Check Your Eligibility" },
+            ].map(({ href, tag, title }) => (
+              <Link key={href} href={href} className="group flex flex-col gap-2 rounded-xl border border-navy-100/60 bg-white p-4 shadow-sm hover:shadow-md hover:border-teal/40 transition-all">
+                <span className="text-xs font-semibold uppercase tracking-wide text-teal">{tag}</span>
+                <span className="text-sm font-medium text-navy leading-snug group-hover:text-teal transition-colors">{title}</span>
+                <ArrowRight className="h-3.5 w-3.5 text-graphite-300 group-hover:text-teal mt-auto transition-colors" />
+              </Link>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
+
       <CtaSection />
     </MarketingShell>
   );

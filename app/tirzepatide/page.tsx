@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -320,7 +320,7 @@ export default function TirzepatidePage() {
           <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-graphite-400">
             <span className="flex items-center gap-2"><Shield className="h-4 w-4 text-teal" /> HIPAA Compliant</span>
             <span className="flex items-center gap-2"><Award className="h-4 w-4 text-teal" /> Licensed Medical Providers</span>
-            <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-teal" /> 24-Hour Provider Review</span>
+            <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-teal" /> Fast Provider Review</span>
             <span className="flex items-center gap-2"><Users className="h-4 w-4 text-teal" /> 18,000+ Patients</span>
             <span className="flex items-center gap-2">
               {[1,2,3,4,5].map((i) => <Star key={i} className="h-3.5 w-3.5 fill-gold text-gold" />)}
@@ -331,6 +331,30 @@ export default function TirzepatidePage() {
       </section>
 
       <CtaSection />
+
+      <section className="py-14 bg-navy-50/40 border-t border-navy-100/40">
+        <SectionShell>
+          <h2 className="text-xl font-bold text-navy mb-6 text-center">Further reading</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { href: "/blog/tirzepatide-vs-semaglutide-2026", tag: "Comparison", title: "Tirzepatide vs. Semaglutide: Which Is Better in 2026?" },
+              { href: "/blog/tirzepatide-vs-ozempic-comparison", tag: "Comparison", title: "Tirzepatide vs. Ozempic — Head-to-Head Results" },
+              { href: "/blog/tirzepatide-side-effects-week-by-week", tag: "Side Effects", title: "Tirzepatide Side Effects: Week-by-Week Breakdown" },
+              { href: "/blog/semaglutide-dosing-schedule-guide", tag: "Dosing", title: "GLP-1 Dosing Schedule: What to Expect Each Week" },
+              { href: "/blog/compounded-semaglutide-safety", tag: "Safety", title: "Is Compounded GLP-1 Medication Safe?" },
+              { href: "/glp1-cost", tag: "Cost", title: "How Much Does Tirzepatide Cost Without Insurance?" },
+              { href: "/blog/what-to-eat-on-semaglutide", tag: "Nutrition", title: "Best Foods to Eat While on GLP-1 Medication" },
+              { href: "/eligibility", tag: "Eligibility", title: "Who Qualifies for GLP-1 Weight Loss Treatment?" },
+            ].map(({ href, tag, title }) => (
+              <Link key={href} href={href} className="group flex flex-col gap-2 rounded-xl border border-navy-100/60 bg-white p-4 shadow-sm hover:shadow-md hover:border-teal/40 transition-all">
+                <span className="text-xs font-semibold uppercase tracking-wide text-teal">{tag}</span>
+                <span className="text-sm font-medium text-navy leading-snug group-hover:text-teal transition-colors">{title}</span>
+                <ArrowRight className="h-3.5 w-3.5 text-graphite-300 group-hover:text-teal mt-auto transition-colors" />
+              </Link>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
 
       <section className="py-6 bg-white">
         <SectionShell>

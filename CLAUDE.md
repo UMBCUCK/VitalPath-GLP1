@@ -9,7 +9,7 @@ npm run dev                    # http://localhost:3000
 ```
 
 ## Demo Credentials
-- **Admin:** admin@vitalpath.com / admin123
+- **Admin:** admin@naturesjourneyhealth.com / Hunter2!
 - **Patient:** jordan@example.com / demo1234
 
 ## Project Stats

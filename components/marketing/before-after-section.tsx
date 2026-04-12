@@ -249,7 +249,7 @@ export function BeforeAfterSection() {
                   {/* Verified badge */}
                   <div className="mt-4 flex items-center gap-2 text-xs text-graphite-400">
                     <ShieldCheck className="h-4 w-4 text-teal" />
-                    Verified member &middot; Illustrative lifestyle images
+                    Illustrative images &middot; Not actual member photos &middot; Individual results vary
                   </div>
                 </div>
               </div>

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { SectionShell } from "@/components/shared/section-shell";
 import { Badge } from "@/components/ui/badge";

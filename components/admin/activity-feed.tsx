@@ -42,7 +42,7 @@ function timeAgo(dateStr: string): string {
 export function ActivityFeed({ items }: { items: ActivityItem[] }) {
   if (items.length === 0) {
     return (
-      <div className="py-8 text-center text-sm text-graphite-300">
+      <div className="py-8 text-center text-sm text-muted-foreground">
         No recent activity
       </div>
     );
@@ -54,15 +54,15 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
         const config = typeConfig[item.type] || typeConfig.alert;
         const Icon = config.icon;
         return (
-          <div key={item.id} className="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-linen/30">
+          <div key={item.id} className="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-muted/50">
             <div className={cn("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg", config.bg)}>
               <Icon className={cn("h-3.5 w-3.5", config.color)} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-navy truncate">{item.title}</p>
-              <p className="text-xs text-graphite-400 truncate">{item.description}</p>
+              <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
+              <p className="text-xs text-muted-foreground truncate">{item.description}</p>
             </div>
-            <span className="shrink-0 text-[10px] text-graphite-300 whitespace-nowrap">
+            <span className="shrink-0 text-[10px] text-muted-foreground/60 whitespace-nowrap">
               {timeAgo(item.timestamp)}
             </span>
           </div>

@@ -5,20 +5,16 @@ import { Check, MapPin, X } from "lucide-react";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
-// Realistic notifications — these feel like real people starting their journey
+// Member stories — individual results, not typical
 const notifications = [
-  { name: "Jessica T.", location: "Austin, TX", action: "just started her assessment", time: "2 min ago" },
-  { name: "Marcus D.", location: "Atlanta, GA", action: "qualified for treatment", time: "4 min ago" },
-  { name: "Rachel W.", location: "Denver, CO", action: "lost 28 lbs on the Essential plan", time: "verified member" },
-  { name: "David K.", location: "Chicago, IL", action: "received his first shipment", time: "6 min ago" },
-  { name: "Amanda R.", location: "Nashville, TN", action: "just started her assessment", time: "3 min ago" },
-  { name: "Chris B.", location: "Phoenix, AZ", action: "qualified for treatment", time: "5 min ago" },
-  { name: "Nicole M.", location: "Portland, OR", action: "just started her assessment", time: "1 min ago" },
-  { name: "James L.", location: "Dallas, TX", action: "lost 45 lbs on the Premium plan", time: "verified member" },
-  { name: "Priya S.", location: "Seattle, WA", action: "qualified for treatment", time: "2 min ago" },
-  { name: "Lisa C.", location: "San Diego, CA", action: "just started her assessment", time: "4 min ago" },
-  { name: "Anthony V.", location: "Miami, FL", action: "qualified for treatment", time: "3 min ago" },
-  { name: "Robert J.", location: "Tampa, FL", action: "lost 58 lbs on the Premium plan", time: "verified member" },
+  { name: "Rachel W.", location: "Denver, CO", action: "lost 28 lbs on the Essential plan", time: "Member story · Results not typical" },
+  { name: "James L.", location: "Dallas, TX", action: "lost 45 lbs on the Premium plan", time: "Member story · Results not typical" },
+  { name: "Robert J.", location: "Tampa, FL", action: "lost 58 lbs on the Premium plan", time: "Member story · Results not typical" },
+  { name: "Nicole M.", location: "Portland, OR", action: "lost 22 lbs in her first 3 months", time: "Member story · Results not typical" },
+  { name: "Priya S.", location: "Seattle, WA", action: "reached her goal weight over 7 months", time: "Member story · Results not typical" },
+  { name: "Marcus D.", location: "Atlanta, GA", action: "lost 19 lbs over 4 months on the program", time: "Member story · Results not typical" },
+  { name: "Amanda R.", location: "Nashville, TN", action: "lost 34 lbs over 6 months", time: "Member story · Results not typical" },
+  { name: "Chris B.", location: "Phoenix, AZ", action: "lost 27 lbs over 5 months on the program", time: "Member story · Results not typical" },
 ];
 
 export function SocialProofToasts() {

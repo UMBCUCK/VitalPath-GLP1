@@ -26,9 +26,9 @@ export default function QualifyResultsPage() {
 
 function QualifyResultsContent() {
   const searchParams = useSearchParams();
-  const recommended = searchParams.get("plan") || "premium";
-  const currentWeight = parseInt(searchParams.get("weight") || "200");
-  const projectedWeight = parseInt(searchParams.get("projected") || String(Math.round(currentWeight * 0.8)));
+  const recommended = searchParams?.get("plan") || "premium";
+  const currentWeight = parseInt(searchParams?.get("weight") || "200");
+  const projectedWeight = parseInt(searchParams?.get("projected") || String(Math.round(currentWeight * 0.8)));
   const plan = plans.find((p) => p.slug === recommended) || plans[1];
 
   const totalLoss = currentWeight - projectedWeight;
@@ -72,7 +72,7 @@ function QualifyResultsContent() {
             You&apos;re in! Your intake has been submitted.
           </h1>
           <p className="mt-2 text-lg text-graphite-500 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-            A licensed provider will review your health profile within 24 hours.
+            A licensed provider will review your health profile within 1 business day.
           </p>
         </div>
 
@@ -177,7 +177,7 @@ function QualifyResultsContent() {
             <p className="text-sm font-semibold text-navy mb-3">What happens next</p>
             <div className="space-y-3">
               {[
-                { step: "1", label: "Provider reviews your health profile", time: "Within 24 hours" },
+                { step: "1", label: "Provider reviews your health profile", time: "Within 1 business day" },
                 { step: "2", label: "Personalized treatment plan created", time: "Day 1-2" },
                 { step: "3", label: "Medication ships with free 2-day shipping", time: "Day 2-3" },
                 { step: "4", label: "First check-in with your care team", time: "Day 7" },

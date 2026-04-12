@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 import { evaluateUpsells } from "@/lib/upsell-engine";
 
 export async function getDashboardData(userId: string) {
-  const [user, profile, subscription, recentProgress, notifications, referralCode, intakeSubmission, progressCount] =
+  const [user, profile, subscription, recentProgress, notifications, referralCode, intakeSubmission, progressCount, treatment] =
     await Promise.all([
       db.user.findUnique({
         where: { id: userId },
@@ -46,6 +46,11 @@ export async function getDashboardData(userId: string) {
         select: { status: true },
       }),
       db.progressEntry.count({ where: { userId } }),
+      db.treatmentPlan.findFirst({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        select: { medicationName: true, medicationDose: true, status: true, nextRefillDate: true },
+      }),
     ]);
 
   // Calculate derived values
@@ -69,6 +74,13 @@ export async function getDashboardData(userId: string) {
   // Today's entries
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  // Real logs this week count + habit adherence
+  const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const thisWeekEntries = recentProgress.filter((e) => new Date(e.date) >= sevenDaysAgo);
+  const logsThisWeek = thisWeekEntries.length;
+  const proteinDaysHit = thisWeekEntries.filter((e) => e.proteinG && e.proteinG >= 112).length; // 80% of 140g target
+  const waterDaysHit = thisWeekEntries.filter((e) => e.waterOz && e.waterOz >= 80).length;     // 80% of 100oz target
   const todayEntry = recentProgress.find((e) => {
     const d = new Date(e.date);
     d.setHours(0, 0, 0, 0);
@@ -130,6 +142,9 @@ export async function getDashboardData(userId: string) {
       weightLost,
       monthNumber,
       streakDays,
+      logsThisWeek,
+      proteinDaysHit,
+      waterDaysHit,
       todayProtein: todayEntry?.proteinG || 0,
       todayWater: todayEntry?.waterOz || 0,
       proteinTarget: 140,
@@ -147,6 +162,21 @@ export async function getDashboardData(userId: string) {
       hasViewedMeals: false, // tracked client-side via localStorage
     },
     upsellSuggestions: await evaluateUpsells(userId),
+    treatment: treatment
+      ? {
+          medicationName: treatment.medicationName,
+          medicationDose: treatment.medicationDose,
+          status: treatment.status,
+          nextRefillDaysAway: treatment.nextRefillDate
+            ? Math.ceil((treatment.nextRefillDate.getTime() - Date.now()) / 86400000)
+            : null,
+          nextRefillLabel: treatment.nextRefillDate
+            ? treatment.nextRefillDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+            : null,
+          // Hard-coded as "delivered" for demo; real implementation would pull from shipment model
+          shipmentStep: 3,
+        }
+      : null,
   };
 }
 

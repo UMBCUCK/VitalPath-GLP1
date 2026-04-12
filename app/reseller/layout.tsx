@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getResellerSession } from "@/lib/reseller-auth";
+import { db } from "@/lib/db";
 import { ResellerLogoutButton } from "./logout-button";
 import { ResellerNav } from "./reseller-nav";
+import { headers } from "next/headers";
 
 export default async function ResellerLayout({
   children,
@@ -9,6 +12,24 @@ export default async function ResellerLayout({
   children: React.ReactNode;
 }) {
   const session = await getResellerSession();
+
+  // Gate all reseller pages (except login and onboarding) behind onboarding completion
+  if (session) {
+    const headersList = await headers();
+    const pathname = headersList.get("x-pathname") || headersList.get("x-invoke-path") || "";
+    const isOnboardingPage = pathname.includes("/onboarding");
+    const isLoginPage = pathname.includes("/login");
+
+    if (!isOnboardingPage && !isLoginPage) {
+      const profile = await db.resellerProfile.findUnique({
+        where: { id: session.resellerId },
+        select: { onboardingCompletedAt: true },
+      });
+      if (profile && !profile.onboardingCompletedAt) {
+        redirect("/reseller/onboarding");
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-linen/30">
@@ -20,7 +41,7 @@ export default async function ResellerLayout({
               VP
             </div>
             <div>
-              <p className="text-sm font-bold text-navy">Nature's Journey</p>
+              <p className="text-sm font-bold text-navy">VitalPath</p>
               <p className="text-[10px] text-graphite-400">Reseller Portal</p>
             </div>
           </Link>
@@ -35,7 +56,7 @@ export default async function ResellerLayout({
           )}
         </div>
 
-        {/* Navigation */}
+        {/* Navigation — only show if onboarding is complete */}
         {session && <ResellerNav />}
       </header>
 

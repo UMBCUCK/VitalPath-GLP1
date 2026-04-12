@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, ArrowRight, Flame, Sparkles } from "lucide-react";
+import { Check, ArrowRight, Flame, Sparkles, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -73,7 +73,7 @@ export function PricingSection({ plans = defaultPlans }: { plans?: PricingPlan[]
             <Flame className="h-5 w-5 text-teal" />
             <span className="text-sm text-graphite-600">
               Brand-name GLP-1 retail:{" "}
-              <span className="font-bold text-graphite-400 line-through">$1,349+/mo</span>
+              <span className="font-bold text-graphite-400 line-through">$1,349+/mo*</span>
               {" "}&rarr;{" "}
               Nature&apos;s Journey from{" "}
               <span className="font-bold text-teal">
@@ -113,6 +113,16 @@ export function PricingSection({ plans = defaultPlans }: { plans?: PricingPlan[]
                   )}
 
                   <CardHeader className={cn(plan.badge && "pt-8")}>
+                    {plan.imageUrl && (
+                      <div className="mb-3 overflow-hidden rounded-xl aspect-video bg-graphite-50">
+                        <img
+                          src={plan.imageUrl}
+                          alt={plan.name}
+                          className="h-full w-full object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }}
+                        />
+                      </div>
+                    )}
                     <CardTitle>{plan.name}</CardTitle>
                     <CardDescription>{plan.description}</CardDescription>
                     <div className="mt-4">
@@ -163,7 +173,7 @@ export function PricingSection({ plans = defaultPlans }: { plans?: PricingPlan[]
                   </CardContent>
 
                   <CardFooter className="flex-col gap-3">
-                    <Link href={`/quiz?plan=${plan.slug}`} className="w-full">
+                    <Link href={`/qualify?plan=${plan.slug}`} className="w-full">
                       <Button
                         variant={plan.highlighted ? "default" : "outline"}
                         size="lg"
@@ -220,6 +230,9 @@ export function PricingSection({ plans = defaultPlans }: { plans?: PricingPlan[]
         <p className="mt-6 text-center text-xs text-graphite-400">
           All plans include a licensed provider evaluation. Treatment eligibility is determined by your provider.
           Medication is only available to eligible patients. Cancel or adjust anytime.
+        </p>
+        <p className="mt-2 text-center text-[10px] text-graphite-300">
+          *Brand-name retail price based on published U.S. cash-pay pricing for FDA-approved GLP-1 medications as of 2025. Prices vary by pharmacy and location. Compounded medications are not FDA-approved drug products and are not the same as branded medications.
         </p>
       </SectionShell>
     </section>

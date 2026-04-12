@@ -21,9 +21,15 @@ export const metadata: Metadata = {
 
 const categoryColors: Record<string, string> = {
   medication: "bg-teal-50 text-teal-700",
+  "clinical-research": "bg-indigo-50 text-indigo-700",
+  "medication-comparison": "bg-purple-50 text-purple-700",
+  "weight-maintenance": "bg-emerald-50 text-emerald-700",
   nutrition: "bg-gold-50 text-gold-700",
   education: "bg-atlantic/5 text-atlantic",
   lifestyle: "bg-sage text-navy-700",
+  "mental-health": "bg-rose-50 text-rose-700",
+  "success-strategies": "bg-amber-50 text-amber-700",
+  news: "bg-blue-50 text-blue-700",
 };
 
 function estimateReadTime(content: string): string {
@@ -42,13 +48,19 @@ interface DifficultyInfo {
 function getDifficulty(category: string | null): DifficultyInfo {
   switch (category) {
     case "medication":
+    case "clinical-research":
+    case "medication-comparison":
       return { label: "Clinical", dotClass: "bg-atlantic", textClass: "text-atlantic" };
     case "nutrition":
+    case "weight-maintenance":
+    case "success-strategies":
       return { label: "Intermediate", dotClass: "bg-gold-500", textClass: "text-gold-700" };
     case "lifestyle":
-      return { label: "Beginner", dotClass: "bg-teal", textClass: "text-teal-700" };
     case "education":
+    case "mental-health":
       return { label: "Beginner", dotClass: "bg-teal", textClass: "text-teal-700" };
+    case "news":
+      return { label: "News", dotClass: "bg-blue-500", textClass: "text-blue-700" };
     default:
       return { label: "General", dotClass: "bg-graphite-300", textClass: "text-graphite-500" };
   }
@@ -129,6 +141,9 @@ export default async function BlogPage() {
               { label: "Nutrition & Recipes", href: "/blog/category/nutrition" },
               { label: "Lifestyle & Habits", href: "/blog/category/lifestyle" },
               { label: "Education", href: "/blog/category/education" },
+              { label: "Clinical Research", href: "/blog/category/clinical-research" },
+              { label: "Comparisons", href: "/blog/category/medication-comparison" },
+              { label: "Mental Health", href: "/blog/category/mental-health" },
             ].map((cat) => (
               <Link
                 key={cat.href}
@@ -205,28 +220,38 @@ export default async function BlogPage() {
                 const diff = getDifficulty(post.category);
                 return (
                   <Link key={post.id} href={`/blog/${post.slug}`} className="group">
-                    <div className="rounded-2xl border border-navy-100/60 bg-white p-6 shadow-premium transition-all duration-300 hover:shadow-premium-lg hover:-translate-y-0.5 h-full flex flex-col">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${categoryColors[post.category || ""] || "bg-navy-50 text-navy"}`}>
-                          {post.category}
-                        </span>
-                        <span className="flex items-center gap-1 text-[10px] text-graphite-300">
-                          <Clock className="h-3 w-3" /> {estimateReadTime(post.content)}
-                        </span>
-                        <span className="flex items-center gap-1 ml-auto text-[10px]">
-                          <span className={`h-2 w-2 rounded-full ${diff.dotClass}`} />
-                          <span className={`font-medium ${diff.textClass}`}>{diff.label}</span>
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-bold text-navy group-hover:text-teal transition-colors">{post.title}</h3>
-                      <p className="mt-2 flex-1 text-sm leading-relaxed text-graphite-500">{post.excerpt}</p>
-                      <div className="mt-4 flex items-center justify-between">
-                        <span className="text-[10px] text-graphite-300">
-                          {post.publishedAt?.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                        </span>
-                        <span className="flex items-center gap-1 text-sm font-semibold text-teal opacity-0 group-hover:opacity-100 transition-opacity">
-                          Read <ArrowRight className="h-3.5 w-3.5" />
-                        </span>
+                    <div className="overflow-hidden rounded-2xl border border-navy-100/60 bg-white shadow-premium transition-all duration-300 hover:shadow-premium-lg hover:-translate-y-0.5 h-full flex flex-col">
+                      {post.imageUrl ? (
+                        <div className="aspect-video w-full overflow-hidden bg-graphite-50">
+                          <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }} />
+                        </div>
+                      ) : (
+                        <div className="aspect-video w-full bg-gradient-to-br from-navy-50 to-sage/20" />
+                      )}
+                      <div className="flex flex-col flex-1 p-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${categoryColors[post.category || ""] || "bg-navy-50 text-navy"}`}>
+                            {post.category}
+                          </span>
+                          <span className="flex items-center gap-1 text-[10px] text-graphite-300">
+                            <Clock className="h-3 w-3" /> {estimateReadTime(post.content)}
+                          </span>
+                          <span className="flex items-center gap-1 ml-auto text-[10px]">
+                            <span className={`h-2 w-2 rounded-full ${diff.dotClass}`} />
+                            <span className={`font-medium ${diff.textClass}`}>{diff.label}</span>
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-bold text-navy group-hover:text-teal transition-colors">{post.title}</h3>
+                        <p className="mt-2 flex-1 text-sm leading-relaxed text-graphite-500">{post.excerpt}</p>
+                        <div className="mt-4 flex items-center justify-between">
+                          <span className="text-[10px] text-graphite-300">
+                            {post.publishedAt?.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                          </span>
+                          <span className="flex items-center gap-1 text-sm font-semibold text-teal opacity-0 group-hover:opacity-100 transition-opacity">
+                            Read <ArrowRight className="h-3.5 w-3.5" />
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </Link>
@@ -250,25 +275,35 @@ export default async function BlogPage() {
                 const diff = getDifficulty(post.category);
                 return (
                   <Link key={post.id} href={`/blog/${post.slug}`} className="group">
-                    <div className="flex flex-col h-full rounded-2xl border border-navy-100/60 bg-white p-5 shadow-premium transition-all hover:shadow-premium-md hover:-translate-y-0.5">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${categoryColors[post.category || ""] || "bg-navy-50 text-navy"}`}>
-                          {post.category}
-                        </span>
-                        <span className="text-[10px] text-graphite-300">
-                          {post.publishedAt?.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-bold text-navy group-hover:text-teal transition-colors">{post.title}</h3>
-                      <p className="mt-1.5 flex-1 text-xs leading-relaxed text-graphite-400">{post.excerpt}</p>
-                      <div className="mt-3 flex items-center gap-3">
-                        <span className="flex items-center gap-1 text-xs text-graphite-300">
-                          <Clock className="h-3 w-3" /> {estimateReadTime(post.content)} read
-                        </span>
-                        <span className="flex items-center gap-1 text-xs">
-                          <span className={`h-1.5 w-1.5 rounded-full ${diff.dotClass}`} />
-                          <span className={`font-medium text-[10px] ${diff.textClass}`}>{diff.label}</span>
-                        </span>
+                    <div className="overflow-hidden flex flex-col h-full rounded-2xl border border-navy-100/60 bg-white shadow-premium transition-all hover:shadow-premium-md hover:-translate-y-0.5">
+                      {post.imageUrl ? (
+                        <div className="aspect-video w-full overflow-hidden bg-graphite-50">
+                          <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }} />
+                        </div>
+                      ) : (
+                        <div className="h-2 w-full bg-gradient-to-r from-teal/20 to-sage/30" />
+                      )}
+                      <div className="flex flex-col flex-1 p-5">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${categoryColors[post.category || ""] || "bg-navy-50 text-navy"}`}>
+                            {post.category}
+                          </span>
+                          <span className="text-[10px] text-graphite-300">
+                            {post.publishedAt?.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </span>
+                        </div>
+                        <h3 className="text-sm font-bold text-navy group-hover:text-teal transition-colors">{post.title}</h3>
+                        <p className="mt-1.5 flex-1 text-xs leading-relaxed text-graphite-400">{post.excerpt}</p>
+                        <div className="mt-3 flex items-center gap-3">
+                          <span className="flex items-center gap-1 text-xs text-graphite-300">
+                            <Clock className="h-3 w-3" /> {estimateReadTime(post.content)} read
+                          </span>
+                          <span className="flex items-center gap-1 text-xs">
+                            <span className={`h-1.5 w-1.5 rounded-full ${diff.dotClass}`} />
+                            <span className={`font-medium text-[10px] ${diff.textClass}`}>{diff.label}</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </Link>

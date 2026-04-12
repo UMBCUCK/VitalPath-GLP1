@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Calculator, TrendingDown } from "lucide-react";
+import { ArrowRight, Calculator, TrendingDown, Calendar, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
@@ -11,20 +11,29 @@ import { cn } from "@/lib/utils";
 
 export function SavingsCalculator() {
   const [weight, setWeight] = useState(230);
+  const [heightFeet, setHeightFeet] = useState(5);
+  const [heightIn, setHeightIn] = useState(8);
   const [calculated, setCalculated] = useState(false);
+
+  // Height in inches
+  const heightInches = heightFeet * 12 + heightIn;
 
   // Projected results based on 15% avg body weight loss from clinical data
   const projectedLoss = Math.round(weight * 0.15);
   const projectedWeight = weight - projectedLoss;
   const monthsToGoal = Math.max(3, Math.round(projectedLoss / 6)); // ~6 lbs/month avg
 
+  // Goal date
+  const goalDate = new Date();
+  goalDate.setMonth(goalDate.getMonth() + monthsToGoal);
+  const goalDateStr = goalDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
   // Cost comparison
   const vitalPathCost = 279 * monthsToGoal;
   const brandedCost = 1349 * monthsToGoal;
   const savings = brandedCost - vitalPathCost;
 
-  // BMI estimate (assume 5'8" average)
-  const heightInches = 68;
+  // BMI calculation with actual height
   const currentBMI = ((weight / (heightInches * heightInches)) * 703).toFixed(1);
   const projectedBMI = ((projectedWeight / (heightInches * heightInches)) * 703).toFixed(1);
 
@@ -42,6 +51,32 @@ export function SavingsCalculator() {
             <div className="grid gap-8 lg:grid-cols-2">
               {/* Input side */}
               <div>
+                {/* Height input */}
+                <label className="block text-sm font-semibold text-navy mb-2">
+                  Your height
+                </label>
+                <div className="flex items-center gap-2 mb-5">
+                  <select
+                    value={heightFeet}
+                    onChange={(e) => { setHeightFeet(Number(e.target.value)); setCalculated(true); }}
+                    className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm font-medium text-navy focus:outline-none focus:ring-2 focus:ring-teal/30"
+                  >
+                    {[4, 5, 6, 7].map((f) => (
+                      <option key={f} value={f}>{f} ft</option>
+                    ))}
+                  </select>
+                  <select
+                    value={heightIn}
+                    onChange={(e) => { setHeightIn(Number(e.target.value)); setCalculated(true); }}
+                    className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm font-medium text-navy focus:outline-none focus:ring-2 focus:ring-teal/30"
+                  >
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <option key={i} value={i}>{i} in</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Weight slider */}
                 <label className="block text-sm font-semibold text-navy mb-2">
                   Your current weight (lbs)
                 </label>
@@ -94,9 +129,19 @@ export function SavingsCalculator() {
                     </div>
                   </div>
 
-                  <p className="text-xs text-graphite-400">
-                    Based on {monthsToGoal} months at ~6 lbs/month (15% avg body weight loss from clinical trials)
-                  </p>
+                  {/* Timeline projection */}
+                  <div className="rounded-xl border border-gold-200 bg-gold-50/50 p-3">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-gold" />
+                      <p className="text-sm font-semibold text-navy">
+                        Estimated goal: <span className="text-teal">{goalDateStr}</span>
+                      </p>
+                    </div>
+                    <p className="mt-1 text-xs text-graphite-500 flex items-center gap-1">
+                      <Target className="h-3 w-3" />
+                      {monthsToGoal} months at ~6 lbs/month based on clinical trial averages
+                    </p>
+                  </div>
                 </div>
               </div>
 

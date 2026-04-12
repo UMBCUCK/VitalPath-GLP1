@@ -45,10 +45,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   };
 
   const colors = {
-    success: "bg-teal text-white",
-    error: "bg-red-500 text-white",
+    success: "bg-primary text-primary-foreground",
+    error: "bg-destructive text-destructive-foreground",
     warning: "bg-amber-500 text-white",
-    info: "bg-navy text-white",
+    info: "bg-foreground text-background",
   };
 
   return (

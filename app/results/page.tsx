@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -11,16 +11,16 @@ import { CtaSection } from "@/components/marketing/cta-section";
 import { Disclaimer } from "@/components/shared/disclaimer";
 import { siteConfig } from "@/lib/site";
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { BreadcrumbJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "GLP-1 Weight Loss Results & Member Stories | VitalPath",
+  title: "GLP-1 Weight Management Member Stories | Nature's Journey",
   description:
-    "Real member experiences and outcomes data from VitalPath's GLP-1 weight management program. See what's typical, what's possible, and what members say about the program.",
+    "Read individual member experiences from Nature's Journey's provider-guided GLP-1 weight management program. Individual results vary. Not a guarantee of outcomes.",
   openGraph: {
-    title: "GLP-1 Weight Loss Results: Real Member Stories | VitalPath",
+    title: "Member Stories | Nature's Journey GLP-1 Program",
     description:
-      "See aggregate outcomes from VitalPath's GLP-1 program and read real member stories. Individual results vary — here's what the data and member experiences actually show.",
+      "Individual member experiences from Nature's Journey. Results are not typical and vary based on adherence, health factors, and lifestyle. Shared with permission.",
   },
 };
 
@@ -59,7 +59,7 @@ const stories = [
     duration: "5 months",
     headline: "The nutrition support changed everything",
     story:
-      "Medication was helpful, but the meal plans and recipes were what really made this work for me. When my appetite changed, I needed guidance on how to eat — not just what to avoid. Lost 31 lbs and my A1C went from prediabetic back to normal. The grocery lists saved me so much time.",
+      "Medication was helpful, but the meal plans and recipes were what really made this work for me. When my appetite changed, I needed guidance on how to eat — not just what to avoid. Lost 31 lbs and I feel completely different. The grocery lists saved me so much time.",
     rating: 5,
     plan: "Premium",
   },
@@ -71,7 +71,7 @@ const stories = [
     duration: "4 months",
     headline: "Felt like actual medical care, not a sales funnel",
     story:
-      "I was skeptical about telehealth for this. But the provider evaluation was thorough, and when I had side effects early on, the care team adjusted my plan within 24 hours. That responsiveness earned my trust. 22 lbs down and my blood pressure is normal again.",
+      "I was skeptical about telehealth for this. But the provider evaluation was thorough, and when I had side effects early on, the care team adjusted my plan within 24 hours. That responsiveness earned my trust. 22 lbs down and I feel genuinely great.",
     rating: 5,
     plan: "Essential",
   },
@@ -107,7 +107,7 @@ const stories = [
     duration: "9 months",
     headline: "Finally, a program that treats this like a medical issue",
     story:
-      "For years I felt like weight management was treated as a willpower problem. Having licensed providers manage my treatment plan and regular check-ins made this feel like the healthcare experience it should be. 44 lbs down, off two blood pressure medications.",
+      "For years I felt like weight management was treated as a willpower problem. Having licensed providers manage my treatment plan and regular check-ins made this feel like the healthcare experience it should be. 44 lbs down and I feel healthier than I have in years.",
     rating: 5,
     plan: "Complete",
   },
@@ -117,9 +117,9 @@ const stories = [
     state: "WA",
     lostLbs: 28,
     duration: "5 months",
-    headline: "PCOS made weight loss nearly impossible before this",
+    headline: "Finally making progress after years of struggling",
     story:
-      "I have PCOS and have struggled with insulin resistance my whole adult life. Regular dieting didn't work because of the hormonal component. My provider understood this immediately and adjusted my plan accordingly. Down 28 lbs and my cycles are regular for the first time in a decade.",
+      "I've struggled with hormonal factors my whole adult life that made weight loss incredibly difficult. Regular dieting didn't address the underlying issues. My provider understood this immediately and built a plan specifically for me. Down 28 lbs and I feel like myself again.",
     rating: 5,
     plan: "Premium",
   },
@@ -141,9 +141,9 @@ const stories = [
     state: "CO",
     lostLbs: 52,
     duration: "10 months",
-    headline: "The SELECT trial data made me trust this for my heart",
+    headline: "My provider helped me make a confident, informed decision",
     story:
-      "I have cardiovascular risk factors and was skeptical about medication. My provider walked me through the SELECT trial data — 20% reduction in cardiovascular events. That made the decision clear. 52 lbs down, my cardiologist is thrilled, and I'm off two medications.",
+      "I had questions about whether this was right for me and my provider took the time to walk through the clinical evidence and what it meant for my situation. That transparency made the decision clear. 52 lbs down over 10 months and I feel genuinely confident about where I'm headed.",
     rating: 5,
     plan: "Premium",
   },
@@ -164,6 +164,7 @@ function ReviewsJsonLd() {
       reviewCount: 2400,
       bestRating: 5,
       worstRating: 1,
+      description: "Average rating from post-program member survey",
     },
     review: stories.map((s) => ({
       "@type": "Review",
@@ -191,6 +192,14 @@ export default function ResultsPage() {
           { name: "Results & Stories", href: "/results" },
         ]}
       />
+      <FAQPageJsonLd
+        faqs={[
+          { question: "What kind of weight loss results can I expect with GLP-1 medication?", answer: "Clinical trials show an average of 15–22% total body weight loss over 68–72 weeks. VitalPath members average ~18 lbs at 3 months, ~34 lbs at 6 months, and ~49 lbs at 12 months. Individual results vary based on starting weight, adherence, and lifestyle factors." },
+          { question: "How long does it take to see results on semaglutide or tirzepatide?", answer: "Most members notice appetite suppression within the first 1–2 weeks. Visible weight loss typically begins in weeks 4–8 as the dose escalates. Significant results are most commonly seen at the 3-month mark." },
+          { question: "Are these results typical or cherry-picked?", answer: "The outcomes data shown reflects aggregate member data, not selected success stories. Individual results vary, and all member stories are shared with consent. Clinical trial averages (STEP and SURMOUNT trials) are disclosed alongside member data for full transparency." },
+          { question: "What percentage of VitalPath members lose 10% or more of their body weight?", answer: "Based on member data, the majority of active members who complete 6+ months of treatment achieve 10% or greater total body weight loss. Completion of the full treatment course significantly correlates with better outcomes." },
+        ]}
+      />
 
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
@@ -208,7 +217,8 @@ export default function ResultsPage() {
                 <Star key={i} className="h-5 w-5 fill-gold text-gold" />
               ))}
             </div>
-            <span className="text-sm font-semibold text-navy">4.9 / 5 from 2,400+ verified members</span>
+            <span className="text-sm font-semibold text-navy">4.9 / 5 from 2,400+ members</span>
+            <span className="text-xs text-graphite-400 ml-1">(post-program survey)</span>
           </div>
         </SectionShell>
       </section>
@@ -346,7 +356,7 @@ export default function ResultsPage() {
                 <div className="mt-4 flex items-start gap-1.5 rounded-lg bg-navy-50/30 px-3 py-2">
                   <Shield className="mt-0.5 h-3 w-3 shrink-0 text-graphite-300" />
                   <p className="text-[10px] leading-relaxed text-graphite-300">
-                    Individual experience shared with permission. Results vary.
+                    Individual experience. Results not typical. Shared with permission. Your results will vary based on adherence, diet, exercise, and health factors.
                   </p>
                 </div>
               </div>
@@ -380,6 +390,30 @@ export default function ResultsPage() {
       </section>
 
       <CtaSection />
+
+      <section className="py-14 bg-navy-50/40 border-t border-navy-100/40">
+        <SectionShell>
+          <h2 className="text-xl font-bold text-navy mb-6 text-center">Further reading</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { href: "/blog/semaglutide-timeline-first-3-months", tag: "Timeline", title: "Semaglutide Weight Loss Timeline: What to Expect" },
+              { href: "/blog/tirzepatide-vs-semaglutide-2026", tag: "Comparison", title: "Tirzepatide vs. Semaglutide: Which Works Better?" },
+              { href: "/blog/is-semaglutide-safe-long-term", tag: "Safety", title: "Is GLP-1 Medication Safe for Long-Term Use?" },
+              { href: "/blog/glp1-mental-health-food-noise", tag: "Lifestyle", title: "How GLP-1 Reduces Food Noise & Cravings" },
+              { href: "/blog/what-to-eat-on-semaglutide", tag: "Nutrition", title: "What to Eat on GLP-1 for Fastest Results" },
+              { href: "/blog/semaglutide-hair-loss", tag: "Side Effects", title: "GLP-1 and Hair Loss: Causes and Prevention" },
+              { href: "/glp1-cost", tag: "Cost", title: "How Much Does GLP-1 Treatment Cost?" },
+              { href: "/qualify", tag: "Get Started", title: "Check Your Eligibility & See Your Projection" },
+            ].map(({ href, tag, title }) => (
+              <Link key={href} href={href} className="group flex flex-col gap-2 rounded-xl border border-navy-100/60 bg-white p-4 shadow-sm hover:shadow-md hover:border-teal/40 transition-all">
+                <span className="text-xs font-semibold uppercase tracking-wide text-teal">{tag}</span>
+                <span className="text-sm font-medium text-navy leading-snug group-hover:text-teal transition-colors">{title}</span>
+                <ArrowRight className="h-3.5 w-3.5 text-graphite-300 group-hover:text-teal mt-auto transition-colors" />
+              </Link>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
     </MarketingShell>
   );
 }

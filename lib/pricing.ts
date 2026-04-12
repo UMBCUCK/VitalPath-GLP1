@@ -10,6 +10,7 @@ export interface PricingPlan {
   description: string;
   features: string[];
   highlighted: boolean;
+  imageUrl?: string;
 }
 
 export interface AddOn {

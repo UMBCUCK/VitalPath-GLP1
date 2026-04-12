@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PricingSection } from "@/components/marketing/pricing-section";
@@ -10,9 +11,11 @@ import { Check } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { ProductJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
+import { ProductJsonLd, FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { fetchDbPlans, fetchDbAddOns } from "@/lib/pricing-server";
 import { faqs } from "@/lib/content";
+import { FinancingCallout } from "@/components/marketing/financing-callout";
+import { MoneyBackGuarantee } from "@/components/marketing/money-back-guarantee";
 
 export const metadata: Metadata = {
   title: "Plans & Pricing",
@@ -30,10 +33,11 @@ export default async function PricingPage() {
           name={`Nature's Journey ${plan.name} Plan`}
           description={plan.description}
           price={plan.priceMonthly / 100}
-          url={`/quiz?plan=${plan.slug}`}
+          url={`/qualify?plan=${plan.slug}`}
         />
       ))}
       <FAQPageJsonLd faqs={faqs.slice(0, 4)} />
+      <BreadcrumbJsonLd items={[{ name: "Home", href: "/" }, { name: "Pricing", href: "/pricing" }]} />
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">
@@ -84,6 +88,20 @@ export default async function PricingPage() {
               </div>
             ))}
           </div>
+        </SectionShell>
+      </section>
+
+      {/* Financing & payment options */}
+      <section className="py-12">
+        <SectionShell className="max-w-3xl">
+          <FinancingCallout />
+        </SectionShell>
+      </section>
+
+      {/* Money-back guarantee */}
+      <section className="py-8">
+        <SectionShell className="max-w-2xl">
+          <MoneyBackGuarantee variant="compact" />
         </SectionShell>
       </section>
 

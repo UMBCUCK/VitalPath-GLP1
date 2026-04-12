@@ -1,4 +1,4 @@
-// Note: Do NOT add force-static here — Railway standalone mode requires
+// Note: Do NOT add force-dynamic here — Railway standalone mode requires
 // server rendering for pages with next/dynamic imports.
 
 import type { Metadata } from "next";
@@ -13,6 +13,7 @@ import { ProcessSection } from "@/components/marketing/process-section";
 import { Disclaimer } from "@/components/shared/disclaimer";
 import { OrganizationJsonLd, FAQPageJsonLd, HowToJsonLd, ProductJsonLd, MedicalWebPageJsonLd, SiteLinksSearchBoxJsonLd } from "@/components/seo/json-ld";
 import { MarketingShell } from "@/components/layout/marketing-shell";
+import { ConditionsSection } from "@/components/marketing/conditions-section";
 import { siteConfig } from "@/lib/site";
 import { faqs } from "@/lib/content";
 import { fetchDbPlans } from "@/lib/pricing-server";
@@ -35,12 +36,16 @@ const GuaranteeSection = dynamic_import(() => import("@/components/marketing/gua
 const PricingSection = dynamic_import(() => import("@/components/marketing/pricing-section").then(m => ({ default: m.PricingSection })));
 const FaqSection = dynamic_import(() => import("@/components/marketing/faq-section").then(m => ({ default: m.FaqSection })));
 const CtaSection = dynamic_import(() => import("@/components/marketing/cta-section").then(m => ({ default: m.CtaSection })));
+const ObjectionHandler = dynamic_import(() => import("@/components/marketing/objection-handler").then(m => ({ default: m.ObjectionHandler })));
+const PartnerLogos = dynamic_import(() => import("@/components/marketing/partner-logos").then(m => ({ default: m.PartnerLogos })));
+const MoneyBackGuarantee = dynamic_import(() => import("@/components/marketing/money-back-guarantee").then(m => ({ default: m.MoneyBackGuarantee })));
+const BeforeAfterSlider = dynamic_import(() => import("@/components/marketing/before-after-slider").then(m => ({ default: m.BeforeAfterSlider })));
 
 // SEO metadata optimized for GLP-1 weight loss keywords
 export const metadata: Metadata = {
-  title: "GLP-1 Weight Loss Medication Online | From $279/mo | Nature's Journey",
+  title: "GLP-1 Weight Loss Program Online | From $279/mo | Nature's Journey",
   description:
-    "Get GLP-1 weight loss medication prescribed online by licensed providers. Same active ingredient as Ozempic & Wegovy — 79% less than retail. Free 2-day shipping. Cancel anytime.",
+    "Get compounded GLP-1 medication prescribed online by licensed providers. Provider-guided weight management starting from $279/mo. Free shipping. Cancel anytime. Individual results vary.",
   keywords: [
     "GLP-1 weight loss",
     "semaglutide online",
@@ -48,15 +53,15 @@ export const metadata: Metadata = {
     "weight loss medication",
     "compounded semaglutide",
     "telehealth weight loss",
-    "Ozempic alternative",
-    "Wegovy alternative",
     "online weight loss program",
     "GLP-1 prescription online",
+    "compounded tirzepatide",
+    "telehealth weight management",
   ],
   openGraph: {
-    title: "GLP-1 Weight Loss Medication — 79% Less Than Retail | Nature's Journey",
+    title: "GLP-1 Weight Loss Program | From $279/mo | Nature's Journey",
     description:
-      "Prescribed online by licensed providers. From $279/mo with free shipping. Join 18,000+ members. See if you qualify in 2 minutes.",
+      "Compounded GLP-1 medication prescribed online by licensed providers. Starting from $279/mo with free shipping. Join 18,000+ members. See if you qualify in 2 minutes.",
     url: siteConfig.url,
     siteName: siteConfig.name,
     type: "website",
@@ -64,9 +69,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GLP-1 Weight Loss From $279/mo — 79% Less Than Retail",
+    title: "GLP-1 Weight Loss Program From $279/mo | Nature's Journey",
     description:
-      "Same active ingredient as Ozempic & Wegovy. Prescribed by licensed providers. Free 2-day shipping. See if you qualify.",
+      "Compounded GLP-1 medication prescribed by licensed providers. Free shipping. See if you qualify in 2 minutes. Individual results vary.",
   },
   alternates: {
     canonical: siteConfig.url,
@@ -111,6 +116,15 @@ export default async function HomePage() {
       <TrustBar />
       <PressBar />
 
+      {/* COMPLIANCE: FDA disclosure — required above primary content */}
+      <div className="border-b border-navy-100/40 bg-linen/60 py-3">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 text-center">
+          <p className="text-[11px] leading-relaxed text-graphite-400">
+            <strong className="text-graphite-500">Important:</strong> Compounded semaglutide and tirzepatide are <strong>not FDA-approved drug products</strong>. They are prepared by state-licensed compounding pharmacies under individual prescriptions. Medication is only available to eligible patients as determined by a licensed provider. Individual results vary.
+          </p>
+        </div>
+      </div>
+
       {/* PROBLEM: Make them feel understood */}
       <ProblemSection />
       <PersonaSection />
@@ -133,6 +147,21 @@ export default async function HomePage() {
       <ResultsSection />
       <TimelineSection />
       <BeforeAfterSection />
+
+      {/* Interactive comparison */}
+      <section className="py-12 bg-gradient-to-b from-white to-sage/10">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider text-teal mb-2">Interactive Results</p>
+          <h2 className="text-2xl font-bold text-navy sm:text-3xl mb-8">Drag to see the transformation</h2>
+          <BeforeAfterSlider
+            beforeWeight="247 lbs"
+            afterWeight="198 lbs"
+            name="Sarah M., 34"
+            duration="5 months on Premium plan"
+          />
+          <p className="mt-4 text-[10px] text-graphite-400">Artistic simulation for illustrative purposes only &middot; Not actual photos &middot; Individual results vary and are not guaranteed</p>
+        </div>
+      </section>
       <TestimonialSection />
       <VideoTestimonials />
       <PressSection />
@@ -140,9 +169,22 @@ export default async function HomePage() {
       {/* TRUST: Final authority signals */}
       <ProviderSection />
       <GuaranteeSection />
+      <PartnerLogos />
+
+      {/* OBJECTIONS: Handle last-minute concerns */}
+      <ObjectionHandler />
 
       {/* CONVERT: Close the deal */}
       <PricingSection plans={plans} />
+
+      {/* GUARANTEE: Remove final risk */}
+      <div className="py-12">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6">
+          <MoneyBackGuarantee variant="full" />
+        </div>
+      </div>
+
+      <ConditionsSection />
       <FaqSection limit={8} />
       <CtaSection />
 

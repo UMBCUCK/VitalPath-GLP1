@@ -73,6 +73,16 @@ export const ANALYTICS_EVENTS = {
   LEAD_CAPTURE: "lead_capture",
   EMAIL_SUBSCRIBE: "email_subscribe",
 
+  // Conversion optimization events
+  URGENCY_BANNER_VIEW: "urgency_banner_view",
+  URGENCY_BANNER_CLICK: "urgency_banner_click",
+  CHAT_WIDGET_OPEN: "chat_widget_open",
+  CHAT_WIDGET_QUESTION: "chat_widget_question",
+  OBJECTION_VIEWED: "objection_viewed",
+  MONEY_BACK_GUARANTEE_VIEW: "money_back_guarantee_view",
+  PROMO_CODE_COPIED: "promo_code_copied",
+  MOBILE_SUMMARY_EXPAND: "mobile_summary_expand",
+
   // Unified Qualify flow
   QUALIFY_START: "qualify_start",
   QUALIFY_STEP_COMPLETE: "qualify_step_complete",

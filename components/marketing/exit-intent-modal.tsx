@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { X, Gift, ArrowRight, Check } from "lucide-react";
+import { X, Gift, ArrowRight, Check, Clock, ShieldCheck, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -66,7 +66,18 @@ export function ExitIntentModal() {
     if (!email) return;
 
     track(ANALYTICS_EVENTS.EMAIL_SUBSCRIBE, { source: "exit_intent", email_provided: true });
-    // In production, this would call /api/lead
+
+    // Save lead to database
+    try {
+      await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "exit_intent", tags: ["glp1-guide"] }),
+      });
+    } catch {
+      // Non-blocking — still show success even if API fails
+    }
+
     setSubmitted(true);
     if (typeof window !== "undefined") {
       sessionStorage.setItem("exit-dismissed", "true");
@@ -96,18 +107,26 @@ export function ExitIntentModal() {
 
         {!submitted ? (
           <>
+            {/* Price anchor banner */}
+            <div className="mb-4 -mx-8 -mt-8 sm:-mx-10 sm:-mt-10 rounded-t-3xl bg-gradient-to-r from-navy to-atlantic px-6 py-4 text-center text-white">
+              <p className="text-xs opacity-80">GLP-1 medication from</p>
+              <p className="text-xl font-bold">
+                $279/mo <span className="text-sm font-normal line-through opacity-50">$1,349</span>
+              </p>
+              <p className="text-xs font-semibold text-gold">Save 79% vs. brand-name retail</p>
+            </div>
+
             {/* Icon */}
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-50">
               <Gift className="h-7 w-7 text-gold" />
             </div>
 
             <h2 className="mt-5 text-2xl font-bold text-navy">
-              Wait — before you go
+              Wait — don&apos;t leave empty-handed
             </h2>
             <p className="mt-2 text-base text-graphite-500">
               Get our free <span className="font-semibold text-navy">GLP-1 Starter Guide</span>{" "}
-              — everything you need to know about GLP-1 medications, what to expect, and how to
-              maximize results. No spam, just science.
+              + a <span className="font-semibold text-teal">$50 discount code</span> for your first month.
             </p>
 
             {/* What's inside */}
@@ -134,18 +153,27 @@ export function ExitIntentModal() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="flex-1 rounded-xl border border-navy-100 bg-white px-4 py-3 text-sm text-navy placeholder:text-graphite-300 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all"
+                  className="flex-1 rounded-xl border border-navy-100 bg-white px-4 py-3 text-base text-navy placeholder:text-graphite-300 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all min-h-[48px]"
                 />
-                <Button type="submit" className="shrink-0 gap-1.5">
+                <Button type="submit" className="shrink-0 gap-1.5 min-h-[48px]">
                   Get Free Guide
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             </form>
 
-            <p className="mt-3 text-center text-[10px] text-graphite-300">
-              No spam. Unsubscribe anytime. We respect your privacy.
-            </p>
+            {/* Trust signals */}
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-[10px] text-graphite-400">
+              <span className="flex items-center gap-1">
+                <ShieldCheck className="h-3 w-3 text-emerald-500" /> 30-day guarantee
+              </span>
+              <span className="flex items-center gap-1">
+                <Star className="h-3 w-3 text-gold" /> 4.9/5 from 2,400+ reviews
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3 text-teal" /> 2-min assessment
+              </span>
+            </div>
 
             {/* Skip link */}
             <div className="mt-4 text-center">
@@ -154,7 +182,7 @@ export function ExitIntentModal() {
                 className="text-sm font-semibold text-teal hover:underline"
                 onClick={handleDismiss}
               >
-                Or skip straight to the assessment &rarr;
+                Skip the guide — take the free assessment &rarr;
               </Link>
             </div>
           </>

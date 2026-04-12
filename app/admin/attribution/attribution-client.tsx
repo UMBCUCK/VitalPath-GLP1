@@ -233,7 +233,7 @@ export function AttributionClient({
   const searchParams = useSearchParams();
 
   function updateParams(updates: Record<string, string>) {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     for (const [key, value] of Object.entries(updates)) {
       params.set(key, value);
     }

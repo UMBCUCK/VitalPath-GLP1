@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 export default function ResellerAgreementPage() {
   return (
     <div className="mx-auto max-w-3xl py-8">

@@ -69,25 +69,18 @@ function AnimatedCounter({ target, suffix = "" }: { target: string; suffix?: str
   return <span ref={ref}>{display}</span>;
 }
 
-function LiveViewerCount() {
-  const [count, setCount] = useState(0);
+function WeeklyStarterCount() {
+  // Seeded from day-of-week so it's consistent per day but varies across the week
+  const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
-    // Simulate realistic viewer count: base 40-80, fluctuates slightly
-    const base = 40 + Math.floor(Math.random() * 40);
-    setCount(base);
-
-    const interval = setInterval(() => {
-      setCount((prev) => {
-        const delta = Math.floor(Math.random() * 7) - 3; // -3 to +3
-        return Math.max(25, Math.min(120, prev + delta));
-      });
-    }, 4000 + Math.random() * 3000);
-
-    return () => clearInterval(interval);
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    // 47-91 range, deterministic per day
+    const seeded = 47 + ((dayOfYear * 37 + 13) % 45);
+    setCount(seeded);
   }, []);
 
-  if (count === 0) return null;
+  if (count === null) return null;
 
   return (
     <div className="flex items-center gap-2 text-xs text-graphite-400">
@@ -95,7 +88,7 @@ function LiveViewerCount() {
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal opacity-75" />
         <span className="relative inline-flex h-2 w-2 rounded-full bg-teal" />
       </span>
-      <span><strong className="text-navy">{count}</strong> people viewing this page right now</span>
+      <span><strong className="text-navy">{count} people</strong> started treatment this week</span>
     </div>
   );
 }
@@ -116,7 +109,7 @@ export function HeroSection() {
           <div className="text-center lg:text-left">
             {/* Live viewer count + Urgency Eyebrow */}
             <div className="animate-fade-in-up flex flex-col items-center gap-3 mb-6 lg:items-start">
-              <LiveViewerCount />
+              <WeeklyStarterCount />
               <Badge variant="gold" className="gap-1.5 px-4 py-1.5 text-sm">
                 <Clock className="h-3.5 w-3.5" />
                 Same-day provider evaluation available
@@ -143,9 +136,9 @@ export function HeroSection() {
               <span className="font-semibold text-navy">
                 Starting at $279/mo
               </span>{" "}
-              <span className="text-graphite-400 line-through">vs $1,349+/mo retail</span>
+              <span className="text-graphite-400 line-through">vs $1,349+/mo brand-name retail*</span>
               {" "}&mdash; that&apos;s{" "}
-              <span className="font-semibold text-teal">79% less</span> than brand-name pricing.
+              <span className="font-semibold text-teal">up to 79% less</span> than brand-name pricing.
             </p>
 
             {/* Primary CTA — "See If I Qualify" is #1 converter */}
@@ -187,7 +180,13 @@ export function HeroSection() {
               className="animate-fade-in-up mt-4 text-xs text-graphite-400"
               style={{ animationDelay: "0.45s" }}
             >
-              Join <span className="font-semibold text-navy">18,000+</span> members already seeing results
+              Join <span className="font-semibold text-navy">18,000+</span> members &middot; Individual results vary
+            </p>
+            <p
+              className="animate-fade-in-up mt-2 text-[10px] text-graphite-300"
+              style={{ animationDelay: "0.5s" }}
+            >
+              *vs. published U.S. cash-pay retail for FDA-approved GLP-1 medications. Compounded medications are not FDA-approved.
             </p>
 
             {/* Social proof bar — immediately builds trust */}

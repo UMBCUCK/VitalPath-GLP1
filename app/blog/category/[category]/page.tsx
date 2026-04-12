@@ -66,6 +66,71 @@ const categoryMeta = {
       { question: "What should I look for in a GLP-1 telehealth provider?", answer: "Licensed physicians (MD/DO) doing evaluations, 503B pharmacy sourcing for compounded medication, all-inclusive transparent pricing, a clinical intake that asks about contraindications (MEN2, medullary thyroid carcinoma history, pancreatitis), and ongoing provider access — not just a one-time prescription." },
     ] as { question: string; answer: string }[],
   },
+  "clinical-research": {
+    eyebrow: "Clinical Research",
+    title: "GLP-1 Clinical Trials & Weight Loss Research (2026)",
+    description: "Peer-reviewed clinical trial data on semaglutide and tirzepatide — STEP, SURMOUNT, SELECT, and emerging research explained in plain language.",
+    seoTitle: "GLP-1 Clinical Research: STEP Trials, SURMOUNT & SELECT Data",
+    seoDescription: "Clinical trial breakdowns for GLP-1 weight loss medications. STEP 1-5 semaglutide data, SURMOUNT tirzepatide trials, and SELECT cardiovascular outcomes — explained clearly.",
+    intro: `Clinical trial data is the foundation of evidence-based medicine — but most published research is written for clinicians, not patients. This section translates the pivotal GLP-1 trials into plain language without oversimplifying the data. The STEP program (semaglutide), SURMOUNT program (tirzepatide), and SELECT cardiovascular outcomes trial together represent the strongest evidence base for any weight management medication in history. Understanding what these trials actually showed — sample sizes, endpoints, responder rates, and limitations — helps patients set realistic expectations and providers make better-informed prescribing decisions.`,
+    faqs: [
+      { question: "What did the STEP trials show about semaglutide?", answer: "The STEP 1-5 trials enrolled over 4,500 adults and demonstrated average weight loss of 14.9% (STEP-1, non-diabetic) to 16.0% (STEP-3, with intensive behavioral support) at 68 weeks. About one-third of STEP-1 participants lost 20% or more. The STEP-4 withdrawal trial showed that two-thirds of lost weight returned within a year of stopping medication." },
+      { question: "How does tirzepatide compare to semaglutide in clinical trials?", answer: "The SURMOUNT-1 trial showed tirzepatide 15mg produces 20.9% average weight loss at 72 weeks vs semaglutide's ~15% in STEP-1. The SURMOUNT-5 head-to-head trial confirmed tirzepatide's advantage — 47% more weight loss on average at equivalent doses. Both are effective; tirzepatide has a statistical edge at maximum doses." },
+      { question: "What is the SELECT trial?", answer: "SELECT enrolled 17,604 adults with obesity and established cardiovascular disease (but no diabetes). After ~3 years, semaglutide 2.4mg reduced major adverse cardiovascular events (heart attack, stroke, cardiovascular death) by 20% vs placebo — the first weight management trial to demonstrate cardiovascular risk reduction." },
+    ] as { question: string; answer: string }[],
+  },
+  "medication-comparison": {
+    eyebrow: "Medication Comparisons",
+    title: "GLP-1 Medication Comparisons: Semaglutide vs Tirzepatide & More",
+    description: "Side-by-side comparisons of GLP-1 medications, brand names, compounded vs brand, and GLP-1 vs other weight loss approaches. Data-driven, not marketing-driven.",
+    seoTitle: "GLP-1 Medication Comparisons: Ozempic vs Wegovy, Semaglutide vs Tirzepatide",
+    seoDescription: "Honest side-by-side comparisons of semaglutide vs tirzepatide, Ozempic vs Wegovy, Mounjaro vs Zepbound, and GLP-1 vs other weight loss medications. Clinical data cited.",
+    intro: `Choosing between weight loss medications involves navigating a confusing landscape of brand names, generics, compounded alternatives, and competing marketing claims. This section cuts through the noise with data-driven comparisons that cite actual clinical trial results. Semaglutide vs tirzepatide, Ozempic vs Wegovy (same drug, different doses), Mounjaro vs Zepbound (same drug, different approvals), GLP-1 vs phentermine, GLP-1 vs bariatric surgery — each comparison uses the same framework: mechanism, clinical outcomes, side effect profile, cost, and who each option is best suited for.`,
+    faqs: [
+      { question: "Is tirzepatide better than semaglutide?", answer: "Tirzepatide produces greater average weight loss (21% vs 15%) and a higher proportion of patients achieving 20%+ weight loss. Both are safe and effective. Tirzepatide's edge comes from its dual GIP/GLP-1 mechanism. Individual response varies — some patients respond excellently to semaglutide." },
+      { question: "What's the difference between Ozempic and Wegovy?", answer: "Both contain semaglutide but are approved for different uses. Ozempic (max 2mg/week) is approved for type 2 diabetes. Wegovy (max 2.4mg/week) is approved for weight management. The higher dose produces greater weight loss. Insurance coverage differs by indication." },
+      { question: "What's the difference between Mounjaro and Zepbound?", answer: "Mounjaro and Zepbound are both tirzepatide made by Eli Lilly. Mounjaro is approved for type 2 diabetes; Zepbound is approved for weight management. The molecule is identical. Coverage and indication differ." },
+    ] as { question: string; answer: string }[],
+  },
+  "weight-maintenance": {
+    eyebrow: "Weight Maintenance",
+    title: "Maintaining Weight Loss After GLP-1 Treatment (2026 Guide)",
+    description: "What happens after you reach your goal weight on GLP-1 medication — how to prevent regain, transition off medication, and build the habits that make results last.",
+    seoTitle: "GLP-1 Weight Maintenance: Preventing Regain After Semaglutide",
+    seoDescription: "Evidence-based strategies for maintaining weight loss after GLP-1 medication. STEP-4 withdrawal data, habit building, and when to consider continuing vs tapering.",
+    intro: `The STEP-4 trial delivered an uncomfortable truth: two-thirds of lost weight returns within a year of stopping semaglutide without structural lifestyle changes. This isn't a medication failure — it reflects the biology of obesity as a chronic condition. The guides in this section treat weight maintenance as a distinct phase with its own strategies, challenges, and clinical evidence. Topics include the optimal rate of dose tapering, which habits most reliably maintain results, how to read early warning signs of regain, and the emerging data on longer-term GLP-1 maintenance protocols.`,
+    faqs: [
+      { question: "Will I regain weight if I stop GLP-1 medication?", answer: "The STEP-4 trial showed that on average, two-thirds of weight lost on semaglutide returns within a year of stopping. This underscores that GLP-1 medications treat a chronic condition — similar to stopping blood pressure medication. Patients who built strong protein and exercise habits during treatment maintained significantly more weight loss than those who didn't." },
+      { question: "How long do you have to take GLP-1 medication?", answer: "There's no defined endpoint. Most obesity medicine specialists now treat GLP-1 therapy as a long-term medication for chronic obesity management — similar to statins for high cholesterol. Some patients taper down to lower maintenance doses; others continue full dose indefinitely. The decision depends on your goals, weight regain risk, and provider guidance." },
+      { question: "What is a GLP-1 maintenance dose?", answer: "Some patients stabilize at a lower dose than their peak weight-loss dose — for example, maintaining at 1mg semaglutide after reaching goal weight on 2.4mg. Clinical protocols for maintenance dosing vary by provider. The key is finding the lowest dose that prevents significant regain." },
+    ] as { question: string; answer: string }[],
+  },
+  "mental-health": {
+    eyebrow: "Mental Health",
+    title: "GLP-1 Medication & Mental Health: Food Noise, Mood & More",
+    description: "How GLP-1 medications affect psychological aspects of weight loss — reducing food noise, impact on mood and anxiety, body image, and the emotional experience of significant weight change.",
+    seoTitle: "GLP-1 & Mental Health: Food Noise, Anxiety, Depression & Mood",
+    seoDescription: "Evidence-based information on GLP-1 medications and mental health — food noise reduction, mood effects, anxiety, depression safety data, and the psychology of significant weight loss.",
+    intro: `The psychological dimension of weight loss is often the most underserved aspect of GLP-1 treatment. Patients describe 'food noise' reduction — the dramatic quieting of intrusive food thoughts — as one of the most life-changing effects of GLP-1 medication. Some experience mood improvements as metabolic health improves. Others face new psychological challenges: adjusting identity, navigating changed relationships with food, and managing anxiety about discontinuation. These guides explore the psychological landscape of significant weight loss with the same evidence-based approach applied to the physical aspects.`,
+    faqs: [
+      { question: "Do GLP-1 medications reduce food noise?", answer: "Yes — 'food noise' (intrusive, compulsive food thoughts) is one of the most commonly reported improvements in patients on GLP-1 therapy. This effect is thought to be mediated by GLP-1 receptors in the brain's reward and appetite centers, which reduce the psychological salience of food. Clinical questionnaires consistently show improved control over eating and reduced emotional eating." },
+      { question: "Can semaglutide affect mood or depression?", answer: "GLP-1 receptors are expressed in areas of the brain involved in mood regulation, and some studies suggest GLP-1 agonists may have antidepressant effects. The FDA conducted a safety review in 2024 and found no evidence of increased suicidality risk. Most patients report neutral or improved mood; some experience temporary mood changes during titration." },
+      { question: "How does major weight loss affect mental health?", answer: "Significant weight loss produces complex psychological changes — often positive (improved self-esteem, mobility, reduced anxiety) but sometimes challenging (changed social dynamics, body image adjustment, relationship changes). Having support during the treatment process — coaching, community, or therapy — improves both weight loss outcomes and psychological wellbeing." },
+    ] as { question: string; answer: string }[],
+  },
+  "success-strategies": {
+    eyebrow: "Success Strategies",
+    title: "GLP-1 Weight Loss Success: Optimization Tips & Strategies",
+    description: "Practical strategies for maximizing your results on GLP-1 medication — protein tracking, exercise timing, plateau management, and building habits that outlast treatment.",
+    seoTitle: "GLP-1 Success Strategies: Maximize Weight Loss on Semaglutide",
+    seoDescription: "Actionable tips to optimize GLP-1 weight loss. How to break plateaus, hit protein targets, exercise effectively, and build habits that last beyond medication.",
+    intro: `The difference between average and exceptional outcomes on GLP-1 medication often comes down to the habits built around the medication, not the medication itself. Clinical trials provide averages — real-world patients vary enormously in outcomes, and a meaningful portion of that variation is controllable. These guides go beyond the basics to address the specific optimization strategies that produce outcomes in the upper range of clinical trial data: protein periodization, resistance training protocols, sleep quality and its impact on hunger hormones, and how to troubleshoot plateaus before they become permanent.`,
+    faqs: [
+      { question: "How can I maximize weight loss on semaglutide?", answer: "Three factors consistently correlate with better outcomes: (1) maintaining 0.7-1g protein per pound of body weight to preserve muscle, (2) resistance training 2-3x/week which prevents lean mass loss and maintains metabolic rate, and (3) adequate sleep (7-9 hours) which regulates ghrelin and leptin. Patients doing all three regularly outperform trial averages." },
+      { question: "What should I do if I hit a plateau?", answer: "First, confirm you're still hitting protein targets and check for any inadvertent calorie increases. Second, consider adding or increasing resistance training. Third, reassess your dose with your provider — some plateaus respond to dose adjustment. If you've been on a dose 4+ weeks without progress, discuss escalation." },
+      { question: "Does the timing of my injection matter?", answer: "Not significantly for weight loss outcomes — what matters is injecting on the same day each week. Some patients find injecting on Friday reduces work-week nausea (side effects peak 1-3 days after injection). Morning vs evening doesn't have meaningful clinical differences." },
+    ] as { question: string; answer: string }[],
+  },
 } as const;
 
 type CategoryKey = keyof typeof categoryMeta;

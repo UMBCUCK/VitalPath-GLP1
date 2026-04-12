@@ -39,7 +39,7 @@ export function TrustBar() {
           </div>
           <div className="flex items-center gap-2 text-xs text-graphite-400">
             <FileCheck className="h-4 w-4 text-teal" />
-            <span>LegitScript Certified</span>
+            <span>State-Licensed Providers</span>
           </div>
         </div>
       </SectionShell>

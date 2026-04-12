@@ -24,6 +24,7 @@ interface Recipe {
   tips: string | null;
   difficulty: string | null;
   tierRequired: string | null;
+  imageUrl: string | null;
 }
 
 const categoryLabels: Record<string, string> = {
@@ -105,8 +106,22 @@ export function MealsClient({ recipes }: { recipes: Recipe[] }) {
                     onClick={() => setExpandedId(isExpanded ? null : recipe.id)}
                     className="flex w-full items-center gap-4 p-4 text-left"
                   >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-50 to-sage">
-                      <ChefHat className="h-5 w-5 text-teal" />
+                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-teal-50 to-sage flex items-center justify-center">
+                      {recipe.imageUrl ? (
+                        <img
+                          src={recipe.imageUrl}
+                          alt={recipe.title}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            img.style.display = "none";
+                            (img.nextElementSibling as HTMLElement | null)?.style.setProperty("display", "flex");
+                          }}
+                        />
+                      ) : null}
+                      <ChefHat
+                        className={cn("h-5 w-5 text-teal items-center justify-center", recipe.imageUrl ? "hidden" : "flex")}
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">

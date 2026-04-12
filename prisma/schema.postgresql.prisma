@@ -1555,10 +1555,39 @@ model ResellerProfile {
   totalNetworkRevenue   Int       @default(0) // cents - total revenue from entire downline
   totalOverrideEarnings Int       @default(0) // cents - total override commissions earned
 
-  // Override commission rates (earned from sub-reseller sales)
-  tier1OverridePct      Float     @default(5.0)  // % of Tier 1 (direct recruit) sale commission
-  tier2OverridePct      Float     @default(3.0)  // % of Tier 2 sale commission
-  tier3OverridePct      Float     @default(1.5)  // % of Tier 3 sale commission
+  // Override commission rates — DISABLED for healthcare compliance (AKS/FTC)
+  // Retained for analytics only; all values must remain 0.0 in production
+  tier1OverridePct      Float     @default(0.0)  // DISABLED — was % of Tier 1 override
+  tier2OverridePct      Float     @default(0.0)  // DISABLED — was % of Tier 2 override
+  tier3OverridePct      Float     @default(0.0)  // DISABLED — was % of Tier 3 override
+
+  // ─── Compliance & Onboarding ────────────────────────────────
+  onboardingStep                Int       @default(0) // 0-7 tracks progress through required onboarding
+  onboardingCompletedAt         DateTime?             // null = not yet completed
+  complianceTrainingCompletedAt DateTime?             // when they finished the compliance training module
+  agreementSignedAt             DateTime?             // when they signed the reseller agreement
+  agreementVersion              String?               // e.g. "2026-04-01-v1" — tracks which version they signed
+  agreementIpAddress            String?               // IP address when agreement was signed
+  w9SubmittedAt                 DateTime?             // when W-9 was submitted (required before payout)
+  w9LegalName                   String?               // legal name on W-9
+  w9BusinessName                String?               // business name (if different)
+  w9TaxClassification           String?               // INDIVIDUAL, C_CORP, S_CORP, PARTNERSHIP, LLC, OTHER
+  w9AddressLine1                String?
+  w9City                        String?
+  w9State                       String?
+  w9Zip                         String?
+  w9TinType                     String?               // SSN or EIN
+  w9TinLast4                    String?               // last 4 digits only (never store full TIN)
+  w9CertificationSignedAt       DateTime?             // electronic signature timestamp
+  oigCheckPassedAt              DateTime?             // OIG exclusion database check
+  oigCheckResult                String?               // CLEAR or FLAGGED
+  samCheckPassedAt              DateTime?             // SAM.gov check
+  samCheckResult                String?               // CLEAR or FLAGGED
+  healthcareProviderAttestation Boolean   @default(false) // attests they are NOT a licensed provider
+  attestationSignedAt           DateTime?
+  marketingApprovalRequired     Boolean   @default(true) // must use pre-approved materials only
+  lastComplianceAuditAt         DateTime?             // last time admin reviewed their marketing
+  complianceViolationCount      Int       @default(0) // tracked for auto-suspension
 
   // Payout preferences
   payoutMethod          String    @default("CREDIT") // CREDIT, BANK_ACH, CHECK
@@ -2452,4 +2481,26 @@ model BehavioralReferral {
 
   @@index([userId])
   @@index([status])
+}
+
+// ─── RESELLER MARKETING CONTENT REVIEW ──────────────────────
+
+model MarketingContentSubmission {
+  id              String   @id @default(cuid())
+  resellerId      String
+  contentType     String   // SOCIAL_POST, EMAIL, BLOG, VIDEO_SCRIPT, LANDING_PAGE, OTHER
+  title           String
+  content         String   // the actual marketing copy submitted
+  platform        String?  // where they intend to use it (Instagram, TikTok, Email, etc.)
+  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED, REVISION_REQUESTED
+  reviewedBy      String?  // admin userId who reviewed
+  reviewedAt      DateTime?
+  reviewNotes     String?  // admin feedback
+  rejectionReason String?
+  submittedAt     DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([resellerId])
+  @@index([status])
+  @@index([submittedAt])
 }

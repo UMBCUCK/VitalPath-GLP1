@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { MobileStickyCta } from "@/components/layout/mobile-sticky-cta";
 import { AnnouncementBar } from "@/components/marketing/announcement-bar";
+import { CookieConsent } from "@/components/shared/cookie-consent";
 
 // Lazy-load engagement widgets — deferred JS chunk, not needed for initial render.
 // loading: () => null prevents these from triggering a Suspense fallback.
@@ -18,6 +19,14 @@ const ExitIntentModal = dynamic(
   () => import("@/components/marketing/exit-intent-modal").then((m) => ({ default: m.ExitIntentModal })),
   { loading: () => null }
 );
+const UrgencyBanner = dynamic(
+  () => import("@/components/marketing/urgency-banner").then((m) => ({ default: m.UrgencyBanner })),
+  { loading: () => null }
+);
+const LiveChatWidget = dynamic(
+  () => import("@/components/shared/live-chat-widget").then((m) => ({ default: m.LiveChatWidget })),
+  { loading: () => null }
+);
 
 export function MarketingShell({ children }: { children: React.ReactNode }) {
   return (
@@ -25,6 +34,7 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
       <a href="#main-content" className="skip-to-content">
         Skip to content
       </a>
+      <UrgencyBanner />
       <AnnouncementBar />
       <SiteHeader />
       <main id="main-content" className="flex-1">
@@ -35,6 +45,8 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
       <StickyDesktopCta />
       <SocialProofToasts />
       <ExitIntentModal />
+      <LiveChatWidget />
+      <CookieConsent />
     </>
   );
 }

@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -329,6 +329,30 @@ export default function MaintenancePage() {
       </section>
 
       <CtaSection />
+
+      <section className="py-14 bg-navy-50/40 border-t border-navy-100/40">
+        <SectionShell>
+          <h2 className="text-xl font-bold text-navy mb-6 text-center">Further reading</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { href: "/blog/stopping-semaglutide-what-happens", tag: "Maintenance", title: "What Happens When You Stop Semaglutide?" },
+              { href: "/blog/semaglutide-timeline-first-3-months", tag: "Timeline", title: "Semaglutide Weight Loss Timeline: What to Expect" },
+              { href: "/blog/what-to-eat-on-semaglutide", tag: "Nutrition", title: "What to Eat on GLP-1 Medication for Best Results" },
+              { href: "/blog/protein-intake-guide", tag: "Nutrition", title: "How Much Protein Do You Need to Preserve Muscle?" },
+              { href: "/blog/glp1-mental-health-food-noise", tag: "Lifestyle", title: "How GLP-1 Quiets Food Noise and Helps Your Mindset" },
+              { href: "/blog/hydration-guide", tag: "Lifestyle", title: "Hydration Guide: Staying Healthy on GLP-1 Medication" },
+              { href: "/calculators/tdee", tag: "Tool", title: "TDEE Calculator: Find Your Daily Calorie Needs" },
+              { href: "/glp1-cost", tag: "Cost", title: "Maintenance Plan Pricing vs. Retail Medication Costs" },
+            ].map(({ href, tag, title }) => (
+              <Link key={href} href={href} className="group flex flex-col gap-2 rounded-xl border border-navy-100/60 bg-white p-4 shadow-sm hover:shadow-md hover:border-teal/40 transition-all">
+                <span className="text-xs font-semibold uppercase tracking-wide text-teal">{tag}</span>
+                <span className="text-sm font-medium text-navy leading-snug group-hover:text-teal transition-colors">{title}</span>
+                <ArrowRight className="h-3.5 w-3.5 text-graphite-300 group-hover:text-teal mt-auto transition-colors" />
+              </Link>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
 
       <section className="py-8 border-t border-navy-100/40">
         <SectionShell>

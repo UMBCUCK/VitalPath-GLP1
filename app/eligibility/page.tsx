@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -11,14 +11,14 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { siteConfig } from "@/lib/site";
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { BreadcrumbJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "Do I Qualify for GLP-1 Weight Loss Medication? | Eligibility Criteria",
-  description: "See if you qualify for semaglutide or tirzepatide treatment. Most adults with a BMI of 27+ qualify. Eligibility is determined by a licensed medical provider — take our free 2-minute assessment.",
+  title: "GLP-1 Eligibility Criteria | Who May Qualify for Treatment?",
+  description: "Learn about the clinical criteria for GLP-1 weight management treatment. Eligibility is determined by a licensed medical provider based on your health history. Take our free 2-minute assessment.",
   openGraph: {
-    title: "GLP-1 Eligibility Criteria | Who Qualifies for Semaglutide?",
-    description: "BMI 27+ with a weight-related condition, or BMI 30+ without — most adults qualify. Find out in 2 minutes.",
+    title: "GLP-1 Eligibility Criteria | Who May Qualify for Treatment?",
+    description: "Learn who may be a candidate for provider-guided GLP-1 weight management. Eligibility is always determined by a licensed provider. Find out in 2 minutes.",
   },
 };
 
@@ -31,6 +31,12 @@ export default function EligibilityPage() {
           { name: "Eligibility", href: "/eligibility" },
         ]}
       />
+      <FAQPageJsonLd faqs={[
+        { question: "What BMI do you need to qualify for GLP-1 medication?", answer: "Clinical guidelines for GLP-1 medications generally cover adults with a BMI of 30 or higher, or BMI 27 or higher with at least one weight-related health condition such as type 2 diabetes, prediabetes, hypertension, or sleep apnea. Eligibility is always determined by a licensed provider based on a complete health evaluation." },
+        { question: "Do I need to visit a doctor in person to get a GLP-1 prescription?", answer: "No. VitalPath uses a telehealth model — you complete an online medical intake, and a licensed provider reviews your health history and determines eligibility remotely. No in-person appointment required." },
+        { question: "What conditions disqualify you from GLP-1 treatment?", answer: "Contraindications include a personal or family history of medullary thyroid carcinoma (MTC), Multiple Endocrine Neoplasia syndrome type 2 (MEN 2), active pancreatitis, or pregnancy. Your provider will screen for all contraindications during intake." },
+        { question: "How quickly can I get approved for GLP-1 treatment?", answer: "Most patients receive a provider decision within 24 hours of completing the online intake. If approved, medication typically ships within 2-3 business days." },
+      ]} />
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">
           <Badge variant="default" className="mb-6 gap-1.5">
@@ -129,11 +135,11 @@ export default function EligibilityPage() {
         <SectionShell className="text-center max-w-2xl">
           <h2 className="text-2xl font-bold text-navy">Not sure if you qualify?</h2>
           <p className="mt-4 text-graphite-500">
-            Most adults with a BMI of 27+ are good candidates. Take our free, private 2-minute assessment to find out.
+            Adults with a BMI of 27+ and a weight-related condition, or a BMI of 30+, often meet the clinical criteria. A licensed provider will review your full health profile to determine eligibility.
           </p>
           <div className="mt-6 mx-auto max-w-sm rounded-xl bg-teal-50/50 border border-teal-100 p-4">
             <p className="text-sm text-graphite-600">
-              <span className="font-semibold text-teal">87% of people</span> who complete our assessment qualify for treatment
+              Adults with a BMI of 27+ and a weight-related health condition, or a BMI of 30+, often meet the clinical criteria used by providers. <span className="font-medium text-navy">Final eligibility is always determined by your licensed provider.</span>
             </p>
           </div>
           <div className="mt-6">

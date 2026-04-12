@@ -123,4 +123,46 @@ export const emailTemplates = {
       </div>
     `,
   }),
+
+  referralConverted: (name: string, referredEmail: string, payoutCents: number, totalEarned: number) => ({
+    subject: `🎉 You earned $${(payoutCents / 100).toFixed(2)} — referral converted!`,
+    html: `
+      <div style="font-family: Inter, system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+        <div style="background: linear-gradient(135deg, #0E223D 0%, #1F6F78 100%); border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 32px;">
+          <div style="font-size: 48px; margin-bottom: 12px;">🎉</div>
+          <h1 style="color: white; font-size: 26px; margin: 0 0 8px;">You just earned $${(payoutCents / 100).toFixed(2)}!</h1>
+          <p style="color: rgba(255,255,255,0.75); font-size: 15px; margin: 0;">Someone you referred has signed up for Nature's Journey.</p>
+        </div>
+        <p style="color: #2E3742; font-size: 16px; line-height: 1.6;">
+          Hi ${name},
+        </p>
+        <p style="color: #2E3742; font-size: 16px; line-height: 1.6;">
+          Great news — <strong>${referredEmail}</strong> just completed their checkout using your referral link. You've earned <strong>$${(payoutCents / 100).toFixed(2)}</strong> in referral credit.
+        </p>
+        <div style="background: #f0faf9; border: 1px solid #b2dbd7; border-radius: 12px; padding: 20px; margin: 24px 0;">
+          <p style="color: #0E223D; font-size: 14px; margin: 0 0 8px; font-weight: 600;">Your Earnings Summary</p>
+          <div style="display: flex; justify-content: space-between; color: #2E3742; font-size: 15px;">
+            <span>This referral:</span>
+            <strong>$${(payoutCents / 100).toFixed(2)}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; color: #2E3742; font-size: 15px; margin-top: 6px;">
+            <span>Total earned:</span>
+            <strong>$${(totalEarned / 100).toFixed(2)}</strong>
+          </div>
+        </div>
+        <p style="color: #2E3742; font-size: 15px; line-height: 1.6;">
+          Keep sharing your link — the more you refer, the higher your tier and the more you earn per referral.
+        </p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/referrals" style="background-color: #1F6F78; color: white; padding: 14px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px;">
+            View Your Earnings
+          </a>
+        </div>
+        <hr style="border: none; border-top: 1px solid #E8EDF4; margin: 32px 0;" />
+        <p style="color: #97A5B0; font-size: 12px; text-align: center;">
+          Nature's Journey Health | Referral Program
+        </p>
+      </div>
+    `,
+  }),
 };

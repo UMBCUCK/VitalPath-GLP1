@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Clock, Stethoscope, Package, HeartPulse, BarChart3 } from "lucide-react";
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { HowToJsonLd } from "@/components/seo/json-ld";
+import { HowToJsonLd, FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { processSteps } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -61,6 +61,13 @@ export default function HowItWorksPage() {
         description="A four-step process from initial assessment to ongoing provider-guided care with personalized treatment plans."
         steps={processSteps.map((s) => ({ title: s.title, description: s.description }))}
       />
+      <FAQPageJsonLd faqs={[
+        { question: "How long does it take to get started?", answer: "Most members complete the intake assessment in under 10 minutes. Provider review typically happens within 24 hours. If approved, medication ships within 2-3 business days." },
+        { question: "Do I need to visit a doctor in person?", answer: "No. The entire process is online — assessment, provider review, prescribing, and ongoing care all happen through our telehealth platform. No in-person visits required." },
+        { question: "What happens after I submit my intake form?", answer: "A licensed medical provider reviews your health history and determines eligibility, usually within 24 hours. You'll receive a notification and, if approved, a personalized treatment plan and prescription." },
+        { question: "Is there a contract or long-term commitment?", answer: "No long-term contract is required. Your subscription can be paused or cancelled at any time. Most members find the best results come from staying consistent for at least 3-6 months." },
+      ]} />
+      <BreadcrumbJsonLd items={[{ name: "Home", href: "/" }, { name: "How It Works", href: "/how-it-works" }]} />
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">
@@ -129,6 +136,29 @@ export default function HowItWorksPage() {
 
       <TrustBar />
       <FaqSection limit={5} />
+
+      <section className="py-12 border-t border-navy-100/40 bg-navy-50/30">
+        <SectionShell>
+          <p className="text-xs font-semibold uppercase tracking-wider text-graphite-400 mb-4">Related guides</p>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { href: "/eligibility", label: "Eligibility criteria" },
+              { href: "/semaglutide", label: "Semaglutide guide" },
+              { href: "/tirzepatide", label: "Tirzepatide guide" },
+              { href: "/glp1-cost", label: "Cost & pricing" },
+              { href: "/guide", label: "Complete GLP-1 guide" },
+              { href: "/blog/semaglutide-timeline-first-3-months", label: "What to expect in 3 months" },
+              { href: "/results", label: "Real member results" },
+              { href: "/maintenance", label: "Maintenance program" },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href} className="rounded-full border border-navy-100/60 bg-white px-4 py-2 text-sm font-medium text-teal hover:bg-teal hover:text-white transition-colors">
+                {label}
+              </Link>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
+
       <CtaSection />
     </MarketingShell>
   );

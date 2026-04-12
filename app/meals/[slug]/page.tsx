@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `${recipe.title} | Nature's Journey Recipes`,
       description: `${recipe.calories} cal, ${recipe.proteinG}g protein. ${recipe.difficulty} difficulty. GLP-1-friendly recipe.`,
+      ...(recipe.imageUrl ? { images: [{ url: recipe.imageUrl, width: 1200, height: 630, alt: recipe.title }] } : {}),
     },
   };
 }
@@ -71,6 +72,17 @@ export default async function PublicRecipePage({ params }: PageProps) {
             {recipe.isGlp1Friendly && <Badge variant="default">GLP-1 Friendly</Badge>}
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-navy sm:text-4xl">{recipe.title}</h1>
+
+          {/* Recipe hero image */}
+          {recipe.imageUrl && (
+            <div className="mt-6 overflow-hidden rounded-2xl aspect-video bg-graphite-50">
+              <img
+                src={recipe.imageUrl}
+                alt={recipe.title}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          )}
 
           {/* Nutrition stats */}
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">

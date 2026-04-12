@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatPrice, cn } from "@/lib/utils";
+import { ImageUploader } from "@/components/ui/image-uploader";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -42,12 +43,14 @@ interface ProductItem {
   stripePriceIdAnnual: string | null;
   features: unknown;
   sortOrder: number;
+  imageUrl: string | null;
 }
 
 interface PlanEditState {
   name: string;
   badge: string;
   description: string;
+  imageUrl: string | null;
   priceMonthly: number;
   priceQuarterly: number | null;
   priceAnnual: number | null;
@@ -124,6 +127,7 @@ function initState(p: ProductItem): PlanEditState {
     name: p.name,
     badge: p.badge ?? "",
     description: p.description ?? "",
+    imageUrl: p.imageUrl ?? null,
     priceMonthly: p.priceMonthly,
     priceQuarterly: p.priceQuarterly,
     priceAnnual: p.priceAnnual,
@@ -418,6 +422,7 @@ function PlanEditorPane({ product, allProducts, onCancel, onSaved }: {
           name: state.name,
           description: state.description || null,
           badge: state.badge || null,
+          imageUrl: state.imageUrl || null,
           priceMonthly: state.priceMonthly,
           priceQuarterly: state.priceQuarterly,
           priceAnnual: state.priceAnnual,
@@ -441,6 +446,7 @@ function PlanEditorPane({ product, allProducts, onCancel, onSaved }: {
         name: state.name,
         description: state.description || null,
         badge: state.badge || null,
+        imageUrl: state.imageUrl || null,
         priceMonthly: state.priceMonthly,
         priceQuarterly: state.priceQuarterly,
         priceAnnual: state.priceAnnual,
@@ -542,6 +548,15 @@ function PlanEditorPane({ product, allProducts, onCancel, onSaved }: {
               <div className="sm:col-span-2">
                 <FieldLabel>Description</FieldLabel>
                 <Input value={state.description} onChange={(e) => setState((s) => ({ ...s, description: e.target.value }))} className="h-9 text-sm" placeholder="Short plan description shown below the name" />
+              </div>
+              <div className="sm:col-span-2">
+                <ImageUploader
+                  label="Product Image (optional)"
+                  value={state.imageUrl}
+                  onChange={(url) => setState((s) => ({ ...s, imageUrl: url }))}
+                  hint="Shown in the product catalog. Drag & drop or click to upload."
+                  defaultAspect={1}
+                />
               </div>
               <div className="sm:col-span-2">
                 <FieldLabel optional>Card Style</FieldLabel>

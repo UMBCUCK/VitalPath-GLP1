@@ -13,7 +13,7 @@ import { siteConfig } from "@/lib/site";
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/dashboard";
+  const redirect = searchParams?.get("redirect") || "/dashboard";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,7 +40,8 @@ export default function LoginPage() {
         return;
       }
 
-      router.push(redirect);
+      const destination = data.user?.role === "ADMIN" ? "/admin" : redirect;
+      router.push(destination);
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");

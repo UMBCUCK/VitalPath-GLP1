@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
+import { db } from "@/lib/db";
 import {
   getCommissions,
   approveCommission,
@@ -55,20 +56,83 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    let commission;
+    // ── Payout compliance gate ──────────────────────────────
+    // Before approving or paying, verify the reseller has completed
+    // onboarding, submitted W-9, and passed OIG/SAM checks.
+    if (action === "approve" || action === "pay") {
+      const commission = await db.commission.findUnique({
+        where: { id },
+        select: { resellerId: true, type: true },
+      });
+      if (!commission) {
+        return NextResponse.json({ error: "Commission not found" }, { status: 404 });
+      }
+
+      // Block all override commissions (AKS/FTC compliance)
+      if (
+        commission.type === "OVERRIDE_TIER1" ||
+        commission.type === "OVERRIDE_TIER2" ||
+        commission.type === "OVERRIDE_TIER3"
+      ) {
+        return NextResponse.json({
+          error: "Override commissions are disabled for healthcare regulatory compliance (AKS/FTC). This commission cannot be approved or paid.",
+        }, { status: 403 });
+      }
+
+      const reseller = await db.resellerProfile.findUnique({
+        where: { id: commission.resellerId },
+        select: {
+          status: true,
+          onboardingCompletedAt: true,
+          w9SubmittedAt: true,
+          oigCheckResult: true,
+        },
+      });
+
+      if (!reseller) {
+        return NextResponse.json({ error: "Reseller not found" }, { status: 404 });
+      }
+
+      if (reseller.status !== "ACTIVE") {
+        return NextResponse.json({
+          error: `Payout blocked: reseller status is ${reseller.status}. Only ACTIVE resellers can receive payments.`,
+        }, { status: 403 });
+      }
+
+      if (!reseller.onboardingCompletedAt) {
+        return NextResponse.json({
+          error: "Payout blocked: reseller has not completed compliance onboarding.",
+        }, { status: 403 });
+      }
+
+      if (!reseller.w9SubmittedAt) {
+        return NextResponse.json({
+          error: "Payout blocked: reseller has not submitted W-9 tax information.",
+        }, { status: 403 });
+      }
+
+      if (reseller.oigCheckResult === "FLAGGED") {
+        return NextResponse.json({
+          error: "Payout blocked: reseller flagged on OIG exclusion database.",
+        }, { status: 403 });
+      }
+    }
+
+    // ── Execute the action ──────────────────────────────────
+    let result;
     switch (action) {
       case "approve":
-        commission = await approveCommission(id);
+        result = await approveCommission(id);
         break;
       case "reject":
-        commission = await rejectCommission(id);
+        result = await rejectCommission(id);
         break;
       case "pay":
-        commission = await markCommissionPaid(id);
+        result = await markCommissionPaid(id);
         break;
     }
 
-    return NextResponse.json({ commission });
+    return NextResponse.json({ commission: result });
   } catch (error) {
     if (error instanceof Error && error.message === "FORBIDDEN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

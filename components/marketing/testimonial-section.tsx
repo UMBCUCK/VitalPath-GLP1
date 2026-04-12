@@ -123,7 +123,7 @@ export function TestimonialSection() {
               <div className="h-4 w-px bg-navy-100/40" />
               <div className="flex items-center gap-1.5 text-xs text-graphite-400">
                 <BadgeCheck className="h-3.5 w-3.5 text-teal" />
-                <span>Verified member reviews</span>
+                <span>Member reviews (post-program survey)</span>
               </div>
             </div>
           </div>

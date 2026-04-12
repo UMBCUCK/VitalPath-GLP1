@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { createEmailService, emailTemplates } from "@/lib/services/email";
+import { sendLifecycleEmail, welcomeSequence } from "@/lib/services/lifecycle-emails";
+import { trackServerEvent } from "@/lib/analytics";
 import Stripe from "stripe";
 import { safeError, safeLog } from "@/lib/logger";
 
@@ -58,6 +60,7 @@ export async function POST(req: NextRequest) {
         const subscriptionId = session.subscription as string;
         const planSlug = session.metadata?.planSlug;
         const interval = session.metadata?.interval || "monthly";
+        const referralCode = session.metadata?.referralCode;
 
         if (!email) break;
 
@@ -110,10 +113,119 @@ export async function POST(req: NextRequest) {
           });
         }
 
-        // Send welcome email
+        // Convert referral if a referral code was used at checkout
+        if (referralCode) {
+          try {
+            const refCodeRecord = await db.referralCode.findUnique({ where: { code: referralCode } });
+            if (refCodeRecord && refCodeRecord.userId !== user.id) {
+              // Get payout amount from settings or code override
+              const settings = await db.referralSetting.findFirst({ where: { isActive: true } });
+              const payoutCents = refCodeRecord.payoutCents ?? settings?.defaultPayoutCents ?? 5000;
+
+              // Find an existing pending invite for this email, or create a new conversion record
+              const existingReferral = await db.referral.findFirst({
+                where: { referralCodeId: refCodeRecord.id, referredEmail: email, status: "PENDING" },
+              });
+
+              if (existingReferral) {
+                await db.referral.update({
+                  where: { id: existingReferral.id },
+                  data: { status: "CONVERTED", referredId: user.id, payoutCents },
+                });
+              } else {
+                await db.referral.create({
+                  data: {
+                    referralCodeId: refCodeRecord.id,
+                    referrerId: refCodeRecord.userId,
+                    referredId: user.id,
+                    referredEmail: email,
+                    status: "CONVERTED",
+                    payoutCents,
+                  },
+                });
+              }
+
+              // Increment referral code stats
+              await db.referralCode.update({
+                where: { id: refCodeRecord.id },
+                data: {
+                  totalReferred: { increment: 1 },
+                  totalEarned: { increment: payoutCents },
+                },
+              });
+
+              // Notify referrer (in-app)
+              await db.notification.create({
+                data: {
+                  userId: refCodeRecord.userId,
+                  type: "OFFER",
+                  title: "Referral converted!",
+                  body: `Someone you referred just signed up. You earned $${(payoutCents / 100).toFixed(2)} in referral credit.`,
+                  link: "/dashboard/referrals",
+                },
+              });
+
+              // Email referrer
+              try {
+                const referrer = await db.user.findUnique({
+                  where: { id: refCodeRecord.userId },
+                  select: { email: true, firstName: true },
+                });
+                if (referrer) {
+                  const updatedCode = await db.referralCode.findUnique({
+                    where: { id: refCodeRecord.id },
+                    select: { totalEarned: true },
+                  });
+                  const emailService = createEmailService();
+                  const template = emailTemplates.referralConverted(
+                    referrer.firstName || "there",
+                    email,
+                    payoutCents,
+                    updatedCode?.totalEarned || payoutCents
+                  );
+                  await emailService.send({ to: referrer.email, ...template });
+                }
+              } catch (emailErr) {
+                safeError("[Webhook] Referrer notification email failed", emailErr);
+              }
+            }
+          } catch (refErr) {
+            safeError("[Webhook] Referral conversion error", refErr);
+            // Non-fatal — don't block the rest of checkout processing
+          }
+        }
+
+        // Send welcome email + queue lifecycle sequence
         const emailService = createEmailService();
         const template = emailTemplates.welcome(user.firstName || "there");
         await emailService.send({ to: email, ...template });
+
+        // Fire day-0 lifecycle welcome email with onboarding tips
+        try {
+          const day0 = welcomeSequence.day0(user.firstName || "there");
+          await sendLifecycleEmail(email, day0, ["welcome", "day0"]);
+        } catch (lifecycleErr) {
+          safeError("[Webhook] Lifecycle welcome email failed", lifecycleErr);
+        }
+
+        // Meta CAPI: Purchase event for ROAS optimization
+        try {
+          const userAgent = req.headers.get("user-agent") || undefined;
+          const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || undefined;
+          await trackServerEvent("Purchase", {
+            email,
+            userAgent,
+            ip,
+          }, {
+            currency: "USD",
+            value: (session.amount_total || 0) / 100,
+            content_name: planSlug || "subscription",
+            content_type: "product",
+            order_id: session.id,
+          });
+        } catch (metaErr) {
+          safeError("[Webhook] Meta CAPI Purchase event failed", metaErr);
+        }
 
         safeLog("[Webhook]", "Checkout completed and persisted");
         break;

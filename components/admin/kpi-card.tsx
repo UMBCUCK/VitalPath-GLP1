@@ -36,10 +36,10 @@ export function KPICard({
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <p className="text-xs font-medium text-graphite-400 uppercase tracking-wider">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               {title}
             </p>
-            <p className="mt-1.5 text-2xl font-bold text-navy">{value}</p>
+            <p className="mt-1.5 text-2xl font-bold text-card-foreground">{value}</p>
             {change !== undefined && (
               <div className="mt-2 flex items-center gap-1">
                 {isPositive ? (

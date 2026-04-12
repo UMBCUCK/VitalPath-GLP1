@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -328,6 +328,32 @@ export default function GLP1CostPage() {
           </div>
         </SectionShell>
       </section>
+
+      <section className="py-14 bg-navy-50/40 border-t border-navy-100/40">
+        <SectionShell>
+          <h2 className="text-xl font-bold text-navy mb-6 text-center">Further reading</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { href: "/blog/does-insurance-cover-wegovy-ozempic-2026", tag: "Insurance", title: "Does Insurance Cover Wegovy or Ozempic in 2026?" },
+              { href: "/blog/semaglutide-insurance-prior-authorization", tag: "Insurance", title: "How to Get Prior Authorization for GLP-1 Medication" },
+              { href: "/blog/compounded-semaglutide-safety", tag: "Compounded", title: "Is Compounded GLP-1 Medication Safe?" },
+              { href: "/blog/tirzepatide-vs-semaglutide-2026", tag: "Comparison", title: "Tirzepatide vs. Semaglutide: Best Value in 2026?" },
+              { href: "/compare", tag: "Compare", title: "VitalPath vs. Other GLP-1 Programs" },
+              { href: "/pricing", tag: "Pricing", title: "VitalPath Plan Pricing & What's Included" },
+              { href: "/eligibility", tag: "Eligibility", title: "Check Your Eligibility for Treatment" },
+              { href: "/semaglutide", tag: "Medication", title: "Semaglutide: Complete Treatment Guide" },
+            ].map(({ href, tag, title }) => (
+              <Link key={href} href={href} className="group flex flex-col gap-2 rounded-xl border border-navy-100/60 bg-white p-4 shadow-sm hover:shadow-md hover:border-teal/40 transition-all">
+                <span className="text-xs font-semibold uppercase tracking-wide text-teal">{tag}</span>
+                <span className="text-sm font-medium text-navy leading-snug group-hover:text-teal transition-colors">{title}</span>
+                <ArrowRight className="h-3.5 w-3.5 text-graphite-300 group-hover:text-teal mt-auto transition-colors" />
+              </Link>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
+
+      <CtaSection />
 
       <section className="py-8 border-t border-navy-100/40">
         <SectionShell>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
   Plus, ChefHat, Calendar, Utensils, ChevronDown, ChevronUp,
-  ToggleLeft, ToggleRight,
+  ToggleLeft, ToggleRight, Loader2, Trash2,
 } from "lucide-react";
 
 interface Recipe {
@@ -73,9 +74,12 @@ const MODE_COLORS: Record<string, string> = {
 };
 
 export function MealPlansClient({ initialMealPlans, recipes, total }: Props) {
+  const router = useRouter();
   const [mealPlans, setMealPlans] = useState(initialMealPlans);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [toggling, setToggling] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState("");
 
   // Builder state
   const [showBuilder, setShowBuilder] = useState(false);
@@ -93,19 +97,76 @@ export function MealPlansClient({ initialMealPlans, recipes, total }: Props) {
     const plan = mealPlans.find((p) => p.id === id);
     if (!plan || toggling) return;
     setToggling(id);
+    // Optimistic update
+    setMealPlans((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, isPublished: !p.isPublished } : p))
+    );
     try {
-      const res = await fetch("/api/admin/recipes", {
-        // Reuse a generic toggle or inline fetch
+      const res = await fetch("/api/admin/meal-plans", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }), // We'll handle this below
+        body: JSON.stringify({ id, isPublished: !plan.isPublished }),
       });
-      // Optimistic update
+      if (!res.ok) {
+        // Revert on failure
+        setMealPlans((prev) =>
+          prev.map((p) => (p.id === id ? { ...p, isPublished: plan.isPublished } : p))
+        );
+      }
+    } catch {
       setMealPlans((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, isPublished: !p.isPublished } : p))
+        prev.map((p) => (p.id === id ? { ...p, isPublished: plan.isPublished } : p))
       );
     } finally {
       setToggling(null);
+    }
+  }
+
+  async function deletePlan(id: string, title: string) {
+    if (!confirm(`Delete meal plan "${title}"? This cannot be undone.`)) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/admin/meal-plans?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setMealPlans((prev) => prev.filter((p) => p.id !== id));
+        if (expandedId === id) setExpandedId(null);
+      } else {
+        alert("Failed to delete meal plan.");
+      }
+    } catch {
+      alert("Failed to delete meal plan.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
+  async function handleSavePlan(e: React.FormEvent) {
+    e.preventDefault();
+    setSaveError("");
+    if (!newPlan.title.trim()) { setSaveError("Title is required."); return; }
+    if (assignedCount < 7) { setSaveError("Assign at least 7 meals before saving."); return; }
+
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/meal-plans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...newPlan, assignments }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSaveError(data.error || "Failed to save meal plan.");
+        return;
+      }
+      setMealPlans((prev) => [data.plan, ...prev]);
+      setShowBuilder(false);
+      setNewPlan({ title: "", weekNumber: 15, year: 2026, mode: "standard" });
+      setAssignments({});
+      router.refresh();
+    } catch {
+      setSaveError("Network error. Please try again.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -253,6 +314,7 @@ export function MealPlansClient({ initialMealPlans, recipes, total }: Props) {
             <CardTitle className="text-base">Build New Week</CardTitle>
           </CardHeader>
           <CardContent>
+          <form onSubmit={handleSavePlan}>
             <div className="grid gap-3 sm:grid-cols-4 mb-6">
               <div>
                 <label className="block text-xs font-semibold text-navy mb-1">Title</label>
@@ -341,14 +403,16 @@ export function MealPlansClient({ initialMealPlans, recipes, total }: Props) {
             <div className="mt-4 flex items-center justify-between">
               <p className="text-xs text-graphite-400">{assignedCount} meals assigned</p>
               <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={() => setShowBuilder(false)}>
+                <Button type="button" variant="ghost" size="sm" onClick={() => { setShowBuilder(false); setSaveError(""); }}>
                   Cancel
                 </Button>
-                <Button size="sm" disabled={assignedCount < 7 || saving}>
-                  {saving ? "Saving..." : "Save Meal Plan"}
+                <Button type="submit" size="sm" disabled={saving}>
+                  {saving ? <><Loader2 className="mr-1 h-3 w-3 animate-spin" />Saving…</> : "Save Meal Plan"}
                 </Button>
               </div>
             </div>
+            {saveError && <p className="mt-2 text-xs text-red-500">{saveError}</p>}
+          </form>
           </CardContent>
         </Card>
       )}
@@ -426,6 +490,19 @@ export function MealPlansClient({ initialMealPlans, recipes, total }: Props) {
                     <Badge variant={plan.isPublished ? "success" : "secondary"} className="text-[10px]">
                       {plan.isPublished ? "Published" : "Draft"}
                     </Badge>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deletePlan(plan.id, plan.title || `Week ${plan.weekNumber}, ${plan.year}`);
+                      }}
+                      disabled={deletingId === plan.id}
+                      className="text-graphite-300 hover:text-red-500 transition-colors disabled:opacity-50 ml-1"
+                      title="Delete meal plan"
+                    >
+                      {deletingId === plan.id
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : <Trash2 className="h-4 w-4" />}
+                    </button>
                   </div>
                 </div>
 

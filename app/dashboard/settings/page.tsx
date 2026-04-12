@@ -8,11 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   User, CreditCard, Bell, LogOut, Pause, ArrowDown, Tag,
-  AlertTriangle, Check, ChevronRight, Sparkles, TrendingUp, Zap,
+  AlertTriangle, Check, ChevronRight, Sparkles, TrendingUp, Zap, Lock, Eye, EyeOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { ResellerPromoModal } from "@/components/dashboard/reseller-promo-modal";
+import { WearablesSection } from "./wearables-section";
 
 type CancelStep = "none" | "reason" | "offer" | "confirm" | "done";
 
@@ -26,22 +27,79 @@ const cancelReasons = [
   "Other",
 ];
 
+interface SubscriptionData {
+  planName: string;
+  status: string;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+}
+
 export default function SettingsPage() {
   const router = useRouter();
   const [profileForm, setProfileForm] = useState({ firstName: "", lastName: "", phone: "" });
   const [profileSaved, setProfileSaved] = useState(false);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [cancelStep, setCancelStep] = useState<CancelStep>("none");
   const [cancelReason, setCancelReason] = useState("");
   const [saveOfferAccepted, setSaveOfferAccepted] = useState(false);
   const [showResellerModal, setShowResellerModal] = useState(false);
   const [resellerStatus, setResellerStatus] = useState<{ applied: boolean; appliedAt: string | null; status: string | null }>({ applied: false, appliedAt: null, status: null });
+  // Password change state
+  const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
+  const [pwVisible, setPwVisible] = useState(false);
+  const [pwStatus, setPwStatus] = useState<"idle" | "saving" | "ok" | "error">("idle");
+  const [pwError, setPwError] = useState("");
+  // Notification prefs (controlled)
+  const [notifPrefs, setNotifPrefs] = useState({ email: true, sms: false, marketing: true });
 
   useEffect(() => {
     fetch("/api/reseller/apply")
       .then((r) => r.json())
       .then(setResellerStatus)
       .catch(() => {});
+
+    // Load real profile data
+    fetch("/api/user/profile")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.firstName !== undefined) {
+          setProfileForm({ firstName: d.firstName, lastName: d.lastName, phone: d.phone });
+          setUserEmail(d.email || "");
+          setProfileLoaded(true);
+        }
+        if (d.subscription) setSubscription(d.subscription);
+      })
+      .catch(() => setProfileLoaded(true));
   }, []);
+
+  async function changePassword() {
+    setPwError("");
+    if (!pwForm.current || !pwForm.next) { setPwError("Please fill in all fields."); return; }
+    if (pwForm.next.length < 8) { setPwError("New password must be at least 8 characters."); return; }
+    if (pwForm.next !== pwForm.confirm) { setPwError("New passwords don't match."); return; }
+    setPwStatus("saving");
+    try {
+      const res = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPwStatus("ok");
+        setPwForm({ current: "", next: "", confirm: "" });
+        setTimeout(() => setPwStatus("idle"), 3000);
+      } else {
+        setPwStatus("error");
+        setPwError(data.error || "Failed to update password.");
+      }
+    } catch {
+      setPwStatus("error");
+      setPwError("Something went wrong. Please try again.");
+    }
+  }
 
   async function saveProfile() {
     await fetch("/api/user/profile", {
@@ -101,12 +159,59 @@ export default function SettingsPage() {
       <Card>
         <CardHeader><CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4 text-teal" /> Account</CardTitle></CardHeader>
         <CardContent className="space-y-4">
+          {userEmail && (
+            <div className="rounded-xl bg-navy-50/50 px-4 py-2.5">
+              <p className="text-xs text-graphite-400">Email address</p>
+              <p className="text-sm font-medium text-navy">{userEmail}</p>
+            </div>
+          )}
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><label className="block text-xs font-semibold text-navy mb-1">First Name</label><Input value={profileForm.firstName} onChange={(e) => setProfileForm((p) => ({ ...p, firstName: e.target.value }))} placeholder="Jordan" /></div>
-            <div><label className="block text-xs font-semibold text-navy mb-1">Last Name</label><Input value={profileForm.lastName} onChange={(e) => setProfileForm((p) => ({ ...p, lastName: e.target.value }))} placeholder="Miller" /></div>
+            <div><label className="block text-xs font-semibold text-navy mb-1">First Name</label><Input value={profileForm.firstName} onChange={(e) => setProfileForm((p) => ({ ...p, firstName: e.target.value }))} placeholder={profileLoaded ? "Jordan" : "Loading…"} disabled={!profileLoaded} /></div>
+            <div><label className="block text-xs font-semibold text-navy mb-1">Last Name</label><Input value={profileForm.lastName} onChange={(e) => setProfileForm((p) => ({ ...p, lastName: e.target.value }))} placeholder={profileLoaded ? "Miller" : "Loading…"} disabled={!profileLoaded} /></div>
           </div>
           <div><label className="block text-xs font-semibold text-navy mb-1">Phone</label><Input value={profileForm.phone} onChange={(e) => setProfileForm((p) => ({ ...p, phone: e.target.value }))} placeholder="(555) 123-4567" type="tel" /></div>
-          <Button variant="outline" size="sm" onClick={saveProfile}>{profileSaved ? "Saved!" : "Save Changes"}</Button>
+          <Button variant="outline" size="sm" onClick={saveProfile} disabled={!profileLoaded}>
+            {profileSaved ? <><Check className="h-3.5 w-3.5 mr-1.5" />Saved!</> : "Save Changes"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Password */}
+      <Card>
+        <CardHeader><CardTitle className="text-base flex items-center gap-2"><Lock className="h-4 w-4 text-navy" /> Change Password</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          {pwStatus === "ok" ? (
+            <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3">
+              <Check className="h-4 w-4 text-emerald-600" />
+              <p className="text-sm font-medium text-emerald-700">Password updated successfully!</p>
+            </div>
+          ) : (
+            <>
+              <div>
+                <label className="block text-xs font-semibold text-navy mb-1">Current Password</label>
+                <div className="relative">
+                  <Input type={pwVisible ? "text" : "password"} value={pwForm.current} onChange={(e) => setPwForm((p) => ({ ...p, current: e.target.value }))} placeholder="Current password" className="pr-10" />
+                  <button type="button" onClick={() => setPwVisible((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-graphite-400 hover:text-navy">
+                    {pwVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold text-navy mb-1">New Password</label>
+                  <Input type={pwVisible ? "text" : "password"} value={pwForm.next} onChange={(e) => setPwForm((p) => ({ ...p, next: e.target.value }))} placeholder="Min 8 characters" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-navy mb-1">Confirm New Password</label>
+                  <Input type={pwVisible ? "text" : "password"} value={pwForm.confirm} onChange={(e) => setPwForm((p) => ({ ...p, confirm: e.target.value }))} placeholder="Repeat new password" />
+                </div>
+              </div>
+              {pwError && <p className="text-xs text-red-600">{pwError}</p>}
+              <Button variant="outline" size="sm" onClick={changePassword} disabled={pwStatus === "saving"}>
+                {pwStatus === "saving" ? "Updating…" : "Update Password"}
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -114,16 +219,47 @@ export default function SettingsPage() {
       <Card>
         <CardHeader><CardTitle className="text-base flex items-center gap-2"><CreditCard className="h-4 w-4 text-gold-600" /> Subscription</CardTitle></CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between rounded-xl bg-teal-50/50 p-4 mb-4">
-            <div>
-              <p className="text-sm font-bold text-navy">Premium Plan</p>
-              <p className="text-xs text-graphite-400">$397/month &middot; Next billing: Apr 15, 2026</p>
+          {subscription ? (
+            <>
+              <div className={cn(
+                "flex items-center justify-between rounded-xl p-4 mb-4",
+                subscription.cancelAtPeriodEnd ? "bg-amber-50 border border-amber-200" : "bg-teal-50/50"
+              )}>
+                <div>
+                  <p className="text-sm font-bold text-navy">{subscription.planName || "Active Plan"}</p>
+                  {subscription.currentPeriodEnd && (
+                    <p className="text-xs text-graphite-400">
+                      {subscription.cancelAtPeriodEnd ? "Cancels" : "Next billing"}:{" "}
+                      {new Date(subscription.currentPeriodEnd).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                    </p>
+                  )}
+                </div>
+                <Badge variant={subscription.status === "ACTIVE" ? "success" : subscription.status === "PAST_DUE" ? "warning" : "secondary"}>
+                  {subscription.cancelAtPeriodEnd ? "Canceling" : subscription.status}
+                </Badge>
+              </div>
+              {subscription.cancelAtPeriodEnd && (
+                <div className="mb-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+                  <p className="text-sm text-amber-800">Your subscription is set to cancel at the end of the billing period. You&apos;ll retain access until then.</p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex items-center justify-between rounded-xl bg-navy-50/40 p-4 mb-4">
+              <div>
+                <p className="text-sm font-bold text-navy">No active subscription</p>
+                <p className="text-xs text-graphite-400">Start a plan to access treatment services</p>
+              </div>
+              <Badge variant="secondary">Inactive</Badge>
             </div>
-            <Badge variant="success">Active</Badge>
-          </div>
+          )}
           <div className="flex gap-3">
-            <Button variant="outline" size="sm">Change Plan</Button>
-            <Button variant="outline" size="sm">Update Payment</Button>
+            <Button variant="outline" size="sm" onClick={async () => {
+              const res = await fetch("/api/billing/portal", { method: "POST" });
+              const d = await res.json();
+              if (d.url) window.location.href = d.url;
+            }}>Manage Billing</Button>
+            <Button variant="outline" size="sm" asChild><a href="/pricing">Change Plan</a></Button>
           </div>
         </CardContent>
       </Card>
@@ -132,21 +268,34 @@ export default function SettingsPage() {
       <Card>
         <CardHeader><CardTitle className="text-base flex items-center gap-2"><Bell className="h-4 w-4 text-navy" /> Notifications</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          {[
-            { label: "Email notifications", description: "Refill reminders, check-in prompts, milestone alerts", default: true },
-            { label: "SMS notifications", description: "Shipping updates and urgent care messages", default: false },
-            { label: "Marketing emails", description: "Tips, recipes, and program updates", default: true },
-          ].map((n) => (
-            <label key={n.label} className="flex items-start justify-between rounded-xl border border-navy-100/40 p-4 cursor-pointer hover:bg-navy-50/30 transition-colors">
+          {(
+            [
+              { key: "email" as const, label: "Email notifications", description: "Refill reminders, check-in prompts, and milestone alerts" },
+              { key: "sms" as const, label: "SMS notifications", description: "Shipping updates and urgent care messages" },
+              { key: "marketing" as const, label: "Marketing emails", description: "Tips, recipes, and program updates. Unsubscribe anytime." },
+            ] as const
+          ).map((n) => (
+            <label key={n.key} className="flex items-start justify-between rounded-xl border border-navy-100/40 p-4 cursor-pointer hover:bg-navy-50/30 transition-colors">
               <div>
                 <p className="text-sm font-medium text-navy">{n.label}</p>
                 <p className="text-xs text-graphite-400">{n.description}</p>
               </div>
-              <input type="checkbox" defaultChecked={n.default} className="mt-1 h-4 w-4 rounded border-navy-300 text-teal focus:ring-teal" />
+              <input
+                type="checkbox"
+                checked={notifPrefs[n.key]}
+                onChange={(e) => setNotifPrefs((p) => ({ ...p, [n.key]: e.target.checked }))}
+                className="mt-1 h-4 w-4 rounded border-navy-300 text-teal focus:ring-teal"
+              />
             </label>
           ))}
+          <p className="text-xs text-graphite-400 pt-1">
+            Clinical notifications (dose reminders, provider messages) cannot be disabled for patient safety.
+          </p>
         </CardContent>
       </Card>
+
+      {/* Connected Devices / Wearables */}
+      <WearablesSection />
 
       {/* Partner Program */}
       <Card className={cn(

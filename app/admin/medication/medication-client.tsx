@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ImageUploader } from "@/components/ui/image-uploader";
 import { DataTable, type ColumnDef } from "@/components/admin/data-table";
 import { KPICard } from "@/components/admin/kpi-card";
 import {
@@ -357,7 +358,7 @@ export function MedicationClient({
             <div>
               <h2 className="text-base font-semibold text-navy">Medication Catalog</h2>
               <p className="text-xs text-graphite-400 mt-0.5">
-                Medications shown to patients during the intake flow. Add images via URL (S3, CDN, or any hosted image).
+                Medications shown to patients during the intake flow. Upload images directly — drag & drop or click to browse.
               </p>
             </div>
             <Button onClick={openCreate} className="gap-2">
@@ -404,25 +405,13 @@ export function MedicationClient({
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-navy mb-1">Image URL</label>
-                  <Input
-                    value={form.imageUrl ?? ""}
-                    onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
-                    placeholder="https://example.com/image.png (leave blank for icon placeholder)"
-                  />
-                  {form.imageUrl && (
-                    <div className="mt-2 flex items-center gap-3">
-                      <img
-                        src={form.imageUrl}
-                        alt="Preview"
-                        className="h-14 w-14 rounded-lg object-contain border border-navy-100"
-                        onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0.3"; }}
-                      />
-                      <p className="text-xs text-graphite-400">Image preview</p>
-                    </div>
-                  )}
-                </div>
+                <ImageUploader
+                  label="Medication Image"
+                  value={form.imageUrl}
+                  onChange={(url) => setForm((f) => ({ ...f, imageUrl: url ?? "" }))}
+                  hint="Shown to patients during the intake flow. Drag & drop or click to upload."
+                  defaultAspect={1}
+                />
 
                 <div>
                   <label className="block text-xs font-semibold text-navy mb-1">Description (shown to patient)</label>

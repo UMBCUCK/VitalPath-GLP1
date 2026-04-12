@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -17,11 +17,12 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { Badge } from "@/components/ui/badge";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { MarketingShell } from "@/components/layout/marketing-shell";
+import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "Health Calculators",
+  title: "Free GLP-1 Health Calculators: BMI, TDEE, Protein & More | VitalPath",
   description:
-    "Free health calculators: BMI, TDEE, protein intake, hydration, weight loss timeline, and more. Evidence-based tools to support your health decisions.",
+    "Free evidence-based health calculators for GLP-1 weight loss: BMI, TDEE, protein intake, hydration, and weight loss timeline. Know your numbers before starting treatment.",
 };
 
 const calculators = [
@@ -70,16 +71,18 @@ const calculators = [
     iconColor: "text-emerald-600",
     tag: null,
   },
+  {
+    icon: DollarSign,
+    title: "GLP-1 Cost Calculator",
+    description: "Compare brand vs. compounded pricing and see exactly how much you'll save.",
+    href: "/calculators/cost",
+    color: "from-gold-50 to-linen",
+    iconColor: "text-gold-600",
+    tag: "New",
+  },
 ];
 
 const comingSoon = [
-  {
-    icon: DollarSign,
-    title: "Subscription Value",
-    description: "See the total value of what's included in each membership plan.",
-    color: "from-gold-50 to-linen-100",
-    iconColor: "text-gold-700",
-  },
   {
     icon: Users,
     title: "Referral Earnings",
@@ -94,6 +97,13 @@ const comingSoon = [
     color: "from-navy-50 to-sage/50",
     iconColor: "text-navy-500",
   },
+];
+
+const calcFaqs = [
+  { question: "What is a healthy BMI for starting GLP-1 treatment?", answer: "GLP-1 medications are typically prescribed for adults with a BMI of 30 or higher, or BMI 27+ with a weight-related condition such as type 2 diabetes, hypertension, or high cholesterol. Use the BMI calculator above to check your number." },
+  { question: "How many calories should I eat on semaglutide or tirzepatide?", answer: "Most providers recommend eating at a modest deficit (300–500 calories below your TDEE) rather than extreme restriction. GLP-1 medication reduces appetite significantly — the TDEE calculator helps you find a starting target to avoid under-eating." },
+  { question: "How much protein do I need while on GLP-1 medication?", answer: "Most clinical guidelines recommend 1.2–1.6g of protein per kg of body weight during active weight loss to preserve lean muscle. Since GLP-1 medications suppress appetite, it's easy to under-eat protein — the protein calculator gives you a personalized target." },
+  { question: "How much water should I drink on GLP-1 medication?", answer: "Nausea and reduced food intake can both decrease fluid consumption. A general target is body weight (lbs) ÷ 2 = ounces of water per day, adjusted for activity. The hydration calculator provides a personalized goal with a time-of-day schedule." },
 ];
 
 export default function CalculatorsPage() {
@@ -231,6 +241,39 @@ export default function CalculatorsPage() {
                   <p className="text-xs text-graphite-400">{calc.description}</p>
                 </div>
               </div>
+            ))}
+          </div>
+        </SectionShell>
+      </section>
+
+      {/* FAQ section */}
+      <section className="py-16 border-t border-navy-100/40 bg-navy-50/30">
+        <SectionShell className="max-w-3xl">
+          <FAQPageJsonLd faqs={calcFaqs.map((f) => ({ question: f.question, answer: f.answer }))} />
+          <BreadcrumbJsonLd items={[{ name: "Home", href: "/" }, { name: "Health Calculators", href: "/calculators" }]} />
+          <h2 className="text-xl font-bold text-navy mb-6">Frequently asked questions</h2>
+          <div className="divide-y divide-navy-100/40">
+            {calcFaqs.map((faq) => (
+              <details key={faq.question} className="group py-5">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 font-semibold text-navy text-sm list-none">
+                  {faq.question}
+                  <span className="shrink-0 text-graphite-300 group-open:rotate-180 transition-transform">▾</span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-graphite-500">{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+          <div className="mt-8 flex flex-wrap gap-2">
+            {[
+              { href: "/eligibility", label: "Eligibility criteria" },
+              { href: "/guide", label: "GLP-1 complete guide" },
+              { href: "/blog/what-to-eat-on-semaglutide", label: "What to eat on GLP-1" },
+              { href: "/blog/protein-intake-guide", label: "Protein guide" },
+              { href: "/blog/hydration-guide", label: "Hydration tips" },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href} className="rounded-full border border-navy-100/60 bg-white px-3.5 py-1.5 text-xs font-medium text-teal hover:bg-teal hover:text-white transition-colors">
+                {label}
+              </Link>
             ))}
           </div>
         </SectionShell>

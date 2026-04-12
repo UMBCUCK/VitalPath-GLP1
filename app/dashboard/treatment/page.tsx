@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -57,12 +58,48 @@ export default async function TreatmentPage() {
     DISCONTINUED: "destructive",
   } as const;
 
-  // Treatment timeline (simulated dose history)
-  const timeline = [
-    { date: treatment.prescribedAt ? new Date(treatment.prescribedAt.getTime()).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Start", event: "Treatment started", detail: "Initial dose: 0.25mg weekly" },
-    { date: treatment.prescribedAt ? new Date(treatment.prescribedAt.getTime() + 28 * 86400000).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Week 4", event: "Dose titration", detail: "Increased to 0.5mg weekly" },
-    { date: "Upcoming", event: "Month 3 check-in", detail: "Review for potential titration to 1mg" },
-  ];
+  // Treatment timeline — built from real treatment dates
+  const prescribedDate = treatment.prescribedAt ? new Date(treatment.prescribedAt) : null;
+  const fmt = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  const timeline: { date: string; event: string; detail: string; upcoming?: boolean }[] = [];
+
+  if (prescribedDate) {
+    timeline.push({
+      date: fmt(prescribedDate),
+      event: "Treatment started",
+      detail: treatment.medicationName
+        ? `${treatment.medicationName} · ${treatment.medicationDose || "initial dose"}`
+        : "Initial provider prescription",
+    });
+  } else {
+    timeline.push({ date: "Pending", event: "Awaiting provider evaluation", detail: "Your provider will review your intake and create a plan.", upcoming: true });
+  }
+
+  if (daysSincePrescribed >= 28 && treatment.medicationDose) {
+    timeline.push({
+      date: prescribedDate ? fmt(new Date(prescribedDate.getTime() + 28 * 86400000)) : "Week 4",
+      event: "First check-in completed",
+      detail: `Dose reviewed: ${treatment.medicationDose}`,
+    });
+  } else if (prescribedDate) {
+    const week4 = new Date(prescribedDate.getTime() + 28 * 86400000);
+    timeline.push({
+      date: fmt(week4),
+      event: "4-week check-in",
+      detail: "Dose review and tolerance assessment",
+      upcoming: week4 > new Date(),
+    });
+  }
+
+  if (treatment.nextCheckInDate) {
+    timeline.push({
+      date: fmt(treatment.nextCheckInDate),
+      event: "Next scheduled check-in",
+      detail: "Discuss progress, side effects, and potential titration",
+      upcoming: treatment.nextCheckInDate > new Date(),
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -170,17 +207,17 @@ export default async function TreatmentPage() {
         <Card>
           <CardHeader><CardTitle className="text-base flex items-center gap-2"><TrendingUp className="h-4 w-4 text-teal" /> Treatment Timeline</CardTitle></CardHeader>
           <CardContent>
-            <div className="relative space-y-6">
+            <div className="relative space-y-5">
               <div className="absolute left-3 top-2 bottom-2 w-px bg-gradient-to-b from-teal via-atlantic to-navy-200" />
               {timeline.map((item, i) => (
                 <div key={i} className="relative flex gap-4">
-                  <div className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${i < timeline.length - 1 ? "bg-teal" : "bg-navy-200"}`}>
-                    <div className={`h-2 w-2 rounded-full ${i < timeline.length - 1 ? "bg-white" : "bg-navy-400"}`} />
+                  <div className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${item.upcoming ? "border-2 border-navy-200 bg-white" : "bg-teal"}`}>
+                    <div className={`h-2 w-2 rounded-full ${item.upcoming ? "bg-navy-300" : "bg-white"}`} />
                   </div>
-                  <div className="flex-1 pb-2">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-navy">{item.event}</p>
-                      <span className="text-[10px] text-graphite-400">{item.date}</span>
+                  <div className="flex-1 pb-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className={`text-sm font-bold ${item.upcoming ? "text-graphite-400" : "text-navy"}`}>{item.event}</p>
+                      <span className={`text-[10px] rounded-full px-2 py-0.5 ${item.upcoming ? "bg-navy-50 text-graphite-400" : "bg-teal-50 text-teal"}`}>{item.date}</span>
                     </div>
                     <p className="mt-0.5 text-xs text-graphite-500">{item.detail}</p>
                   </div>
@@ -193,28 +230,59 @@ export default async function TreatmentPage() {
 
       {/* Shipment tracking */}
       <Card>
-        <CardHeader><CardTitle className="text-base flex items-center gap-2"><Package className="h-4 w-4 text-teal" /> Recent Shipment</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base flex items-center gap-2"><Package className="h-4 w-4 text-teal" /> Medication Shipment</CardTitle></CardHeader>
         <CardContent>
-          <div className="flex items-center gap-8">
-            {["Order Received", "Processing", "Shipped", "Delivered"].map((step, i) => (
-              <div key={step} className="flex-1">
-                <div className="flex items-center">
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${i <= 3 ? "bg-teal text-white" : "bg-navy-100 text-graphite-400"}`}>
-                    {i + 1}
-                  </div>
-                  {i < 3 && <div className={`h-0.5 flex-1 ${i < 3 ? "bg-teal" : "bg-navy-200"}`} />}
-                </div>
-                <p className={`mt-2 text-xs ${i <= 3 ? "text-navy font-medium" : "text-graphite-400"}`}>{step}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex items-center justify-between rounded-xl bg-navy-50/50 px-4 py-3">
-            <div>
-              <p className="text-sm font-medium text-navy">Tracking: 1Z999AA10123456784</p>
-              <p className="text-xs text-graphite-400">UPS &middot; Delivered Apr 4</p>
+          {treatment.status === "PENDING" ? (
+            <div className="py-6 text-center">
+              <Package className="mx-auto h-10 w-10 text-graphite-200 mb-3" />
+              <p className="text-sm font-medium text-navy">Awaiting provider approval</p>
+              <p className="text-xs text-graphite-400 mt-1">Your first shipment will be tracked here once your provider approves your treatment plan.</p>
             </div>
-            <Badge variant="success">Delivered</Badge>
-          </div>
+          ) : treatment.status === "PRESCRIBED" ? (
+            <div>
+              <div className="flex items-center gap-0 overflow-x-auto">
+                {["Order Received", "Processing", "Shipped", "Delivered"].map((step, i) => (
+                  <div key={step} className="flex-1 min-w-0">
+                    <div className="flex items-center">
+                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${i <= 1 ? "bg-teal text-white" : "bg-navy-100 text-graphite-400"}`}>
+                        {i + 1}
+                      </div>
+                      {i < 3 && <div className={`h-0.5 flex-1 ${i < 1 ? "bg-teal" : "bg-navy-200"}`} />}
+                    </div>
+                    <p className={`mt-2 text-xs truncate ${i <= 1 ? "text-navy font-medium" : "text-graphite-400"}`}>{step}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+                <p className="text-sm font-medium text-navy">Prescription received — preparing your order</p>
+                <p className="text-xs text-graphite-500 mt-0.5">Your medication is being prepared. Tracking info will appear here once shipped (typically 1-2 business days).</p>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="flex items-center gap-0 overflow-x-auto">
+                {["Order Received", "Processing", "Shipped", "Delivered"].map((step, i) => (
+                  <div key={step} className="flex-1 min-w-0">
+                    <div className="flex items-center">
+                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold bg-teal text-white`}>
+                        {i + 1}
+                      </div>
+                      {i < 3 && <div className="h-0.5 flex-1 bg-teal" />}
+                    </div>
+                    <p className="mt-2 text-xs truncate text-navy font-medium">{step}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3">
+                <p className="text-sm font-medium text-navy">Your most recent shipment was delivered</p>
+                <p className="text-xs text-graphite-500 mt-0.5">
+                  Contact your care team via{" "}
+                  <Link href="/dashboard/messages" className="text-teal hover:underline">secure messaging</Link>
+                  {" "}if you have questions about your medication or next refill.
+                </p>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

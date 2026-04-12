@@ -173,8 +173,10 @@ export function ReportEventClient({ medicationName }: ReportEventClientProps) {
                 required
                 minLength={20}
               />
-              <p className="mt-1 text-xs text-graphite-300">
-                {description.length}/20 minimum characters
+              <p className={`mt-1 text-xs ${description.length >= 20 ? "text-teal" : "text-graphite-300"}`}>
+                {description.length >= 20
+                  ? `${description.length} characters — good detail`
+                  : `${20 - description.length} more character${20 - description.length === 1 ? "" : "s"} needed`}
               </p>
             </div>
 

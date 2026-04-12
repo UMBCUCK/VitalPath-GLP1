@@ -15,9 +15,8 @@ export interface ResellerDashboardData {
 
 export interface ResellerCustomerRow {
   id: string;
-  firstName: string | null;
-  lastName: string | null;
-  email: string;
+  // PHI REMOVED — resellers see anonymized data only (HIPAA compliance)
+  displayLabel: string; // e.g. "Customer #4a2f" — anonymized identifier
   plan: string;
   status: string;
   signupDate: Date;
@@ -89,15 +88,14 @@ export async function getResellerCustomers(
   const skip = (page - 1) * limit;
 
   // Find subscriptions referred by this reseller
+  // HIPAA COMPLIANCE: Do NOT return patient names or emails to resellers
   const subscriptions = await db.subscription.findMany({
     where: { referredByReseller: resellerId },
     include: {
       user: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
-          email: true,
+          // firstName, lastName, email INTENTIONALLY EXCLUDED — PHI protection
         },
       },
       items: {
@@ -115,16 +113,16 @@ export async function getResellerCustomers(
     where: { referredByReseller: resellerId },
   });
 
-  const customers: ResellerCustomerRow[] = subscriptions.map((sub) => {
+  const customers: ResellerCustomerRow[] = subscriptions.map((sub, index) => {
     const plan =
       sub.items.map((i) => i.product.name).join(", ") || "Unknown Plan";
 
-    // Get total revenue from orders for this user
+    // Anonymized label using last 4 chars of user ID
+    const anonymizedId = sub.user.id.slice(-4);
+
     return {
       id: sub.user.id,
-      firstName: sub.user.firstName,
-      lastName: sub.user.lastName,
-      email: sub.user.email,
+      displayLabel: `Customer #${anonymizedId}`,
       plan,
       status: sub.status,
       signupDate: sub.createdAt,

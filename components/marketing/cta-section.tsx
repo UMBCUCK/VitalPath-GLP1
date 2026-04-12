@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ArrowRight, Clock, Shield, Check } from "lucide-react";
+import { ArrowRight, Clock, Shield, Check, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/shared/section-shell";
 import { TrackedLink } from "@/components/shared/tracked-link";
@@ -64,6 +64,9 @@ export function CtaSection() {
 
         {/* Trust reinforcement */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-navy-400">
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="h-4 w-4 text-emerald-400" /> 30-day money-back guarantee
+          </span>
           <span className="flex items-center gap-1.5">
             <Check className="h-4 w-4 text-teal-400" /> No commitment required
           </span>

@@ -1,5 +1,7 @@
+export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { getResellerSession } from "@/lib/reseller-auth";
+import { db } from "@/lib/db";
 import {
   getResellerDashboard,
   getResellerCustomers,
@@ -17,7 +19,7 @@ export default async function ResellerPage() {
   const session = await getResellerSession();
   if (!session) redirect("/reseller/login");
 
-  const [dashboard, customers, commissions, earnings, referralLink, marketingData, tierProgress, payoutSummary, networkData] =
+  const [dashboard, customers, commissions, earnings, referralLink, marketingData, tierProgress, payoutSummary, networkData, complianceStatus] =
     await Promise.all([
       getResellerDashboard(session.resellerId),
       getResellerCustomers(session.resellerId, 1, 10),
@@ -30,7 +32,17 @@ export default async function ResellerPage() {
       getResellerTierProgress(session.resellerId),
       getResellerPayoutSummary(session.resellerId),
       getResellerNetwork(session.resellerId),
+      // Check if re-attestation is needed (signed > 90 days ago)
+      db.resellerProfile.findUnique({
+        where: { id: session.resellerId },
+        select: { attestationSignedAt: true, complianceViolationCount: true },
+      }),
     ]);
+
+  const ninetyDaysAgo = new Date(Date.now() - 90 * 86400000);
+  const reattestationRequired = complianceStatus?.attestationSignedAt
+    ? new Date(complianceStatus.attestationSignedAt) < ninetyDaysAgo
+    : false;
 
   return (
     <ResellerDashboardClient
@@ -48,6 +60,7 @@ export default async function ResellerPage() {
         totalSubResellers: networkData.totalDirectRecruits,
         totalOverrideEarnings: networkData.totalOverrideEarnings,
       }}
+      reattestationRequired={reattestationRequired}
     />
   );
 }

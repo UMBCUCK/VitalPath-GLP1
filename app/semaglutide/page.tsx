@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -374,12 +374,44 @@ export default function SemaglutidePage() {
           <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-graphite-400">
             <span className="flex items-center gap-2"><Shield className="h-4 w-4 text-teal" /> HIPAA Compliant</span>
             <span className="flex items-center gap-2"><Award className="h-4 w-4 text-teal" /> Licensed Medical Providers</span>
-            <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-teal" /> 24-Hour Provider Review</span>
+            <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-teal" /> Fast Provider Review</span>
             <span className="flex items-center gap-2"><Users className="h-4 w-4 text-teal" /> 18,000+ Patients</span>
             <span className="flex items-center gap-2">
               {[1,2,3,4,5].map((i) => <Star key={i} className="h-3.5 w-3.5 fill-gold text-gold" />)}
               4.9/5 Rating
             </span>
+          </div>
+        </SectionShell>
+      </section>
+
+      {/* Further reading */}
+      <section className="py-12 bg-cloud/40 border-y border-sage/20">
+        <SectionShell>
+          <h2 className="text-lg font-semibold text-navy mb-2">Further reading</h2>
+          <p className="text-sm text-graphite-500 mb-6">Clinical evidence, practical guides, and what to expect on semaglutide</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: "Is Semaglutide Safe Long-Term?", href: "/blog/is-semaglutide-safe-long-term", tag: "Safety" },
+              { label: "Semaglutide Dosing Schedule Guide", href: "/blog/semaglutide-dosing-schedule-guide", tag: "Dosing" },
+              { label: "Month-by-Month Weight Loss Timeline", href: "/blog/semaglutide-timeline-first-3-months", tag: "Results" },
+              { label: "Managing Common Side Effects", href: "/blog/managing-side-effects", tag: "Side Effects" },
+              { label: "What to Eat on Semaglutide", href: "/blog/what-to-eat-on-semaglutide", tag: "Nutrition" },
+              { label: "Semaglutide vs Tirzepatide (2026)", href: "/blog/tirzepatide-vs-semaglutide-2026", tag: "Comparison" },
+              { label: "Compounded Semaglutide Safety", href: "/blog/compounded-semaglutide-safety", tag: "Safety" },
+              { label: "GLP-1 Cost Guide", href: "/glp1-cost", tag: "Pricing" },
+            ].map((article) => (
+              <Link
+                key={article.href}
+                href={article.href}
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+              >
+                <div>
+                  <span className="text-xs font-medium text-teal">{article.tag}</span>
+                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-teal transition-colors leading-snug">{article.label}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+              </Link>
+            ))}
           </div>
         </SectionShell>
       </section>

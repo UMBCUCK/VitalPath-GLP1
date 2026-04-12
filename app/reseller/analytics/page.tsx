@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { getResellerSession } from "@/lib/reseller-auth";
 import { getResellerAnalytics } from "@/lib/reseller-data";

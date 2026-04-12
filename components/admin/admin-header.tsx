@@ -5,6 +5,7 @@ import { Search, PanelLeftClose, PanelLeft } from "lucide-react";
 import { AdminNotificationBell } from "./admin-notification-bell";
 import { DarkModeToggle } from "./dark-mode-toggle";
 import { cn } from "@/lib/utils";
+import { UserAvatarDropdown } from "@/components/shared/user-avatar-dropdown";
 
 interface AdminHeaderProps {
   sidebarCollapsed: boolean;
@@ -23,14 +24,14 @@ function getBreadcrumbs(pathname: string) {
 
 export function AdminHeader({ sidebarCollapsed, onToggleSidebar, onOpenCommandPalette }: AdminHeaderProps) {
   const pathname = usePathname();
-  const breadcrumbs = getBreadcrumbs(pathname);
+  const breadcrumbs = getBreadcrumbs(pathname || "/admin");
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-navy-100/40 bg-white px-4">
+    <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleSidebar}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-graphite-400 transition-colors hover:bg-navy-50 hover:text-navy lg:flex"
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex"
         >
           {sidebarCollapsed ? (
             <PanelLeft className="h-4 w-4" />
@@ -47,8 +48,8 @@ export function AdminHeader({ sidebarCollapsed, onToggleSidebar, onOpenCommandPa
               <span
                 className={cn(
                   crumb.isLast
-                    ? "font-medium text-navy"
-                    : "text-graphite-400"
+                    ? "font-medium text-foreground"
+                    : "text-muted-foreground"
                 )}
               >
                 {crumb.label}
@@ -62,11 +63,11 @@ export function AdminHeader({ sidebarCollapsed, onToggleSidebar, onOpenCommandPa
         {/* Search trigger */}
         <button
           onClick={onOpenCommandPalette}
-          className="hidden items-center gap-2 rounded-xl border border-navy-100/60 bg-linen/30 px-3 py-1.5 text-sm text-graphite-400 transition-colors hover:border-navy-200 hover:bg-white sm:flex"
+          className="hidden items-center gap-2 rounded-xl border border-border bg-muted px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-ring/30 hover:bg-card sm:flex"
         >
           <Search className="h-3.5 w-3.5" />
           <span>Search...</span>
-          <kbd className="ml-4 rounded bg-navy-50 px-1.5 py-0.5 text-[10px] font-medium text-graphite-500">
+          <kbd className="ml-4 rounded bg-background px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground border border-border">
             Ctrl+K
           </kbd>
         </button>
@@ -74,11 +75,14 @@ export function AdminHeader({ sidebarCollapsed, onToggleSidebar, onOpenCommandPa
         <DarkModeToggle />
         <AdminNotificationBell />
 
-        <div className="flex items-center gap-2 border-l border-navy-100/40 pl-3 ml-1">
-          <div className="h-7 w-7 rounded-full bg-navy-100 flex items-center justify-center text-[10px] font-bold text-navy">
-            A
-          </div>
-          <span className="hidden text-xs text-graphite-400 lg:block">admin@naturesjourneyhealth.com</span>
+        <div className="flex items-center gap-2 border-l border-border pl-3 ml-1">
+          <UserAvatarDropdown
+            initials="A"
+            displayName="Admin"
+            email="admin@vitalpath.com"
+            settingsHref="/admin/settings"
+            size="sm"
+          />
         </div>
       </div>
     </header>

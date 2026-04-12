@@ -16,12 +16,18 @@ import { formatPrice, cn } from "@/lib/utils";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { BillingToggle, getIntervalPrice, type BillingInterval } from "@/components/marketing/billing-toggle";
 import { useFunnelStore } from "@/hooks/use-funnel-store";
+import { TrustBadges } from "@/components/checkout/trust-badges";
+import { PriceAnchor } from "@/components/checkout/price-anchor";
+import { SocialProofBanner } from "@/components/checkout/social-proof-banner";
+import { CheckoutProgress } from "@/components/checkout/checkout-progress";
+import { MoneyBackGuarantee } from "@/components/marketing/money-back-guarantee";
+import { MobileOrderSummary } from "@/components/checkout/mobile-order-summary";
 
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { state: funnelState } = useFunnelStore();
-  const selectedPlanSlug = searchParams.get("plan") || funnelState.recommendedPlan || "premium";
+  const selectedPlanSlug = searchParams?.get("plan") || funnelState.recommendedPlan || "premium";
 
   const [plans, setPlans] = useState<PricingPlan[]>(defaultPlans);
   const [addOns, setAddOns] = useState<AddOn[]>(defaultAddOns);
@@ -32,6 +38,10 @@ export default function CheckoutPage() {
   const [billingInterval, setBillingInterval] = useState<BillingInterval>("monthly");
   const [couponCode, setCouponCode] = useState("");
   const [couponApplied, setCouponApplied] = useState<{ code: string; discountPct: number } | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [manualRefCode, setManualRefCode] = useState("");
+  const [showRefInput, setShowRefInput] = useState(false);
   const [email, setEmail] = useState(funnelState.email || "");
   const [loading, setLoading] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
@@ -77,6 +87,8 @@ export default function CheckoutPage() {
 
   async function applyCoupon() {
     if (!couponCode.trim()) return;
+    setCouponError(null);
+    setCouponLoading(true);
     try {
       const res = await fetch("/api/coupons/validate", {
         method: "POST",
@@ -86,9 +98,15 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (data.valid && data.coupon) {
         setCouponApplied({ code: data.coupon.code, discountPct: data.coupon.valuePct || 0 });
+        setCouponCode("");
+        setCouponError(null);
+      } else {
+        setCouponError(data.error || "That code isn't valid or has expired. Please check and try again.");
       }
     } catch {
-      // Validation failed silently
+      setCouponError("Couldn't verify the code right now. Please try again.");
+    } finally {
+      setCouponLoading(false);
     }
   }
 
@@ -114,6 +132,8 @@ export default function CheckoutPage() {
           interval: billingInterval,
           addOnSlugs: selectedAddOns.map(id => addOns.find(a => a.id === id)?.slug).filter(Boolean),
           email: email || undefined,
+          couponCode: couponApplied?.code || undefined,
+          referralCode: searchParams?.get("ref") || manualRefCode.trim() || undefined,
         }),
       });
 
@@ -134,12 +154,36 @@ export default function CheckoutPage() {
   return (
     <MarketingShell><section className="min-h-[80vh] bg-gradient-to-b from-cloud to-white py-12">
       <SectionShell className="max-w-4xl">
+        {/* Progress indicator */}
+        <div className="mb-8">
+          <CheckoutProgress currentStep={3} />
+        </div>
+
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-navy sm:text-3xl">Complete Your Membership</h1>
           <p className="mt-2 text-sm text-graphite-400">Review your plan and start your journey</p>
           <div className="mt-6">
             <BillingToggle value={billingInterval} onChange={setBillingInterval} />
           </div>
+        </div>
+
+        {searchParams?.get("ref") && (
+          <div className="mb-6 flex items-center gap-3 rounded-2xl border border-teal/30 bg-gradient-to-r from-teal-50 to-sage px-5 py-4 shadow-sm">
+            <span className="text-2xl shrink-0">🎁</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-navy">You were referred by a friend!</p>
+              <p className="text-xs text-graphite-500 mt-0.5">Complete your signup and they&apos;ll earn a reward for sharing VitalPath with you.</p>
+            </div>
+            <div className="shrink-0 rounded-xl bg-teal/10 px-3 py-2 text-center">
+              <p className="text-[10px] font-semibold text-teal uppercase tracking-wide">Referral</p>
+              <p className="text-xs font-bold text-navy font-mono">{searchParams?.get("ref")}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Social proof banner */}
+        <div className="mb-8">
+          <SocialProofBanner />
         </div>
 
         <div className="grid gap-8 lg:grid-cols-5">
@@ -163,11 +207,21 @@ export default function CheckoutPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div className={cn(
-                          "flex h-5 w-5 items-center justify-center rounded-full border-2",
+                          "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2",
                           selectedPlan.id === plan.id ? "border-teal bg-teal" : "border-navy-300"
                         )}>
                           {selectedPlan.id === plan.id && <Check className="h-3 w-3 text-white" />}
                         </div>
+                        {plan.imageUrl && (
+                          <div className="h-10 w-10 shrink-0 rounded-lg overflow-hidden border border-navy-100 bg-graphite-50">
+                            <img
+                              src={plan.imageUrl}
+                              alt={plan.name}
+                              className="h-full w-full object-cover"
+                              onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }}
+                            />
+                          </div>
+                        )}
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-bold text-navy">{plan.name}</span>
@@ -257,20 +311,72 @@ export default function CheckoutPage() {
                   <div className="flex items-center justify-between rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Tag className="h-4 w-4 text-emerald-600" />
-                      <span className="text-sm font-semibold text-emerald-700">{couponApplied.code} — {couponApplied.discountPct}% off</span>
+                      <span className="text-sm font-semibold text-emerald-700">{couponApplied.code} — {couponApplied.discountPct}% off applied!</span>
                     </div>
-                    <button onClick={() => setCouponApplied(null)} className="text-graphite-400 hover:text-navy">
+                    <button onClick={() => { setCouponApplied(null); setCouponError(null); }} className="text-graphite-400 hover:text-navy">
                       <X className="h-4 w-4" />
                     </button>
                   </div>
                 ) : (
-                  <div className="flex gap-3">
-                    <Input value={couponCode} onChange={(e) => setCouponCode(e.target.value)} placeholder="Enter promo code" className="flex-1" />
-                    <Button variant="outline" onClick={applyCoupon}>Apply</Button>
+                  <div className="space-y-2">
+                    <div className="flex gap-3">
+                      <Input
+                        value={couponCode}
+                        onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); }}
+                        onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
+                        placeholder="Enter promo code"
+                        className={cn("flex-1 font-mono uppercase", couponError && "border-red-300 focus-visible:ring-red-300")}
+                        disabled={couponLoading}
+                      />
+                      <Button variant="outline" onClick={applyCoupon} disabled={couponLoading || !couponCode.trim()}>
+                        {couponLoading ? "Checking…" : "Apply"}
+                      </Button>
+                    </div>
+                    {couponError && (
+                      <p className="flex items-center gap-1.5 text-xs text-red-600">
+                        <X className="h-3.5 w-3.5 shrink-0" /> {couponError}
+                      </p>
+                    )}
                   </div>
                 )}
               </CardContent>
             </Card>
+
+            {!searchParams?.get("ref") && (
+              <div className="rounded-xl border border-navy-100/40 bg-navy-50/20 px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => setShowRefInput((v) => !v)}
+                  className="flex w-full items-center justify-between text-sm text-graphite-500 hover:text-navy transition-colors"
+                >
+                  <span>Have a referral code?</span>
+                  <span className="text-xs">{showRefInput ? "▲" : "▼"}</span>
+                </button>
+                {showRefInput && (
+                  <div className="mt-3 flex gap-2">
+                    <Input
+                      value={manualRefCode}
+                      onChange={(e) => setManualRefCode(e.target.value.toUpperCase())}
+                      placeholder="Enter code (e.g. JOHN1234)"
+                      className="flex-1 font-mono text-sm uppercase"
+                      maxLength={20}
+                    />
+                    {manualRefCode && (
+                      <button
+                        type="button"
+                        onClick={() => setManualRefCode("")}
+                        className="rounded-lg border border-navy-200 px-2.5 text-xs text-graphite-400 hover:text-navy"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                )}
+                {manualRefCode.trim() && (
+                  <p className="mt-2 text-xs text-teal font-medium">✓ Referral code applied: {manualRefCode.trim()}</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Right: Order summary */}
@@ -317,12 +423,8 @@ export default function CheckoutPage() {
                     </span>
                   </div>
 
-                  {/* Retail savings callout */}
-                  <div className="rounded-lg bg-teal-50/60 px-3 py-2 text-center">
-                    <p className="text-xs font-semibold text-teal-700">
-                      You save {formatPrice(134900 - selectedPlan.priceMonthly)}/mo vs brand-name retail
-                    </p>
-                  </div>
+                  {/* Price anchoring — your price vs brand retail */}
+                  <PriceAnchor currentPrice={selectedPlan.priceMonthly} />
 
                   {/* Annual plan nudge — only shown for monthly billing */}
                   {billingInterval === "monthly" && (
@@ -371,6 +473,16 @@ export default function CheckoutPage() {
                   <li className="flex items-start gap-1.5"><Check className="mt-0.5 h-3 w-3 shrink-0 text-teal" />Cancel, pause, or change plan anytime</li>
                 </ul>
 
+                {/* Money-back guarantee */}
+                <div className="mt-5">
+                  <MoneyBackGuarantee variant="compact" />
+                </div>
+
+                {/* Trust badges */}
+                <div className="mt-5">
+                  <TrustBadges />
+                </div>
+
                 {/* Mini testimonial near purchase */}
                 <div className="mt-5 rounded-xl bg-navy-50/50 p-3">
                   <div className="flex gap-0.5 mb-1">
@@ -387,6 +499,14 @@ export default function CheckoutPage() {
         </div>
       </SectionShell>
     </section>
+    {/* Mobile sticky order summary */}
+    <MobileOrderSummary
+      planName={selectedPlan.name}
+      total={total}
+      billingLabel={billingInterval === "monthly" ? "/mo" : billingInterval === "quarterly" ? "/qtr" : "/yr"}
+      loading={loading}
+      onCheckout={handleCheckout}
+    />
   </MarketingShell>
   );
 }

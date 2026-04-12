@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
-import { WebPageJsonLd } from "@/components/seo/json-ld";
+import { WebPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { providers } from "@/lib/content";
 import { siteConfig } from "@/lib/site";
 
@@ -88,6 +88,7 @@ export default function AboutPage() {
         description="Meet the team and mission behind Nature's Journey weight management."
         path="/about"
       />
+      <BreadcrumbJsonLd items={[{ name: "Home", href: "/" }, { name: "About Us", href: "/about" }]} />
 
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">

@@ -1,4 +1,4 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { WebPageJsonLd } from "@/components/seo/json-ld";
+import { WebPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "Weight Loss & GLP-1 Glossary — Key Terms Explained",
@@ -58,8 +58,17 @@ const glossary = [
   { term: "Thermic Effect of Food (TEF)", definition: "The energy your body uses to digest, absorb, and process nutrients. Protein has the highest TEF (20-30%), meaning your body burns 20-30% of protein calories during digestion." },
   { term: "Tirzepatide", definition: "A dual-action GLP-1/GIP receptor agonist medication. Brand names: Mounjaro (diabetes) and Zepbound (weight management). May produce greater weight loss than semaglutide in some patients.", link: "/blog/semaglutide-vs-tirzepatide" },
   { term: "Titration", definition: "See Dose Titration." },
-  { term: "Wegovy", definition: "Brand name for semaglutide injection at higher doses, manufactured by Novo Nordisk. FDA-approved specifically for weight management (unlike Ozempic, which is approved for diabetes).", link: "/blog/understanding-glp1" },
-  { term: "Zepbound", definition: "Brand name for tirzepatide at higher doses, manufactured by Eli Lilly. FDA-approved specifically for weight management.", link: "/blog/semaglutide-vs-tirzepatide" },
+  { term: "Visceral Fat", definition: "Fat stored deep in the abdominal cavity, surrounding internal organs. Metabolically active — produces inflammatory compounds and worsens insulin resistance. Men disproportionately store visceral fat. GLP-1 medications preferentially reduce visceral fat.", link: "/men" },
+  { term: "Wegovy", definition: "Brand name for semaglutide 2.4mg injection, manufactured by Novo Nordisk. FDA-approved specifically for chronic weight management in adults with BMI ≥30 or ≥27 with a weight-related condition. Different from Ozempic (lower dose, diabetes-only approval).", link: "/semaglutide" },
+  { term: "Zepbound", definition: "Brand name for tirzepatide at higher doses (up to 15mg), manufactured by Eli Lilly. FDA-approved specifically for weight management. The same molecule as Mounjaro, which is approved for type 2 diabetes.", link: "/tirzepatide" },
+  { term: "Obstructive Sleep Apnea (OSA)", definition: "A sleep disorder where breathing repeatedly stops and starts during sleep due to throat muscle relaxation. Obesity is a primary driver. Tirzepatide (Zepbound) received FDA approval in 2024 as the first medication approved to treat OSA.", link: "/sleep-apnea" },
+  { term: "PCOS (Polycystic Ovary Syndrome)", definition: "A hormonal disorder in women causing irregular periods, excess androgen, and ovarian cysts. Associated with insulin resistance and weight gain. GLP-1 medications improve insulin sensitivity and produce weight loss that can reduce PCOS symptoms.", link: "/pcos" },
+  { term: "Prediabetes", definition: "A condition where blood sugar levels are higher than normal but not yet in the type 2 diabetes range (A1c 5.7–6.4%). GLP-1 medications significantly reduce the risk of progression to type 2 diabetes and can reverse prediabetes in many patients.", link: "/prediabetes" },
+  { term: "SELECT Trial", definition: "A landmark 2023 clinical trial (New England Journal of Medicine) that enrolled 17,604 adults with obesity and cardiovascular disease (no diabetes). Semaglutide 2.4mg reduced major adverse cardiovascular events by 20% vs placebo — the first weight management medication to demonstrate cardiovascular risk reduction.", link: "/heart-health" },
+  { term: "SURMOUNT Trials", definition: "A series of phase 3 clinical trials evaluating tirzepatide for weight management. SURMOUNT-1 showed average weight loss of 20.9% at maximum dose (15mg), with 57% of participants losing 20%+ of body weight — the highest weight loss percentage ever recorded in a weight management medication trial.", link: "/tirzepatide" },
+  { term: "Compounding Pharmacy (503B)", definition: "An FDA-registered outsourcing facility that manufactures medications in bulk under current Good Manufacturing Practice (cGMP) standards — the same manufacturing standards as branded pharmaceutical companies. Compounded semaglutide and tirzepatide from 503B pharmacies offer the same active molecule at significantly lower cost.", link: "/medications" },
+  { term: "GLP-1 Food Noise", definition: "A colloquial term for the reduction in intrusive food thoughts and cravings that most patients experience on GLP-1 medication. Caused by GLP-1 receptors in the brain's reward and appetite centers reducing the psychological salience of food. One of the most commonly reported quality-of-life improvements.", link: "/blog/glp1-mental-health-food-noise" },
+  { term: "Maintenance Phase", definition: "The period after reaching goal weight when the focus shifts from active weight loss to preventing regain. May involve dose reduction, continued medication at lower dose, or tapering off medication with structured lifestyle support.", link: "/maintenance" },
 ];
 
 // Group by first letter
@@ -80,6 +89,7 @@ export default function GlossaryPage() {
         description="Complete glossary of weight loss and GLP-1 medication terms."
         path="/glossary"
       />
+      <BreadcrumbJsonLd items={[{ name: "Home", href: "/" }, { name: "GLP-1 Glossary", href: "/glossary" }]} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

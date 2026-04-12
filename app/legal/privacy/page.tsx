@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { SectionShell } from "@/components/shared/section-shell";
 import { Badge } from "@/components/ui/badge";
@@ -78,8 +79,14 @@ export default function PrivacyPage() {
               <p className="mt-1">If you are a resident of Virginia, Colorado, or Connecticut, you may have similar privacy rights under your state&apos;s respective privacy law, including the right to access, correct, and delete your personal data, as well as the right to opt out of targeted advertising and the sale of personal data. To exercise your rights under these state laws, please contact us at privacy@naturesjourneyhealth.com.</p>
             </div>
 
-            <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
-              <p className="text-xs font-semibold text-amber-800">[LEGAL REVIEW REQUIRED — state privacy compliance requires legal counsel review to ensure all applicable state privacy laws are addressed and response procedures meet statutory requirements]</p>
+            <div className="mt-4">
+              <h3 className="text-base font-bold text-navy">Texas (TDPSA), Oregon (OCPA), Montana (MCDPA), and Other States</h3>
+              <p className="mt-1">Residents of Texas, Oregon, Montana, and other states with enacted consumer privacy laws may have rights similar to those described above, including rights to access, correct, delete, and opt out of targeted advertising and the sale of personal data. To exercise your rights under applicable state law, contact us at privacy@naturesjourneyhealth.com with the subject line &quot;State Privacy Rights Request.&quot; We will identify the applicable law and respond within the timeframe required by your state.</p>
+            </div>
+
+            <div className="mt-4">
+              <h3 className="text-base font-bold text-navy">Health Data Privacy</h3>
+              <p className="mt-1">Because Nature&apos;s Journey collects health information, we treat all health data with heightened protection regardless of your state of residence. Health data is not used for targeted advertising, profiling, or sold to third parties. We comply with applicable state health data privacy laws, including Washington&apos;s My Health MY Data Act (MHMDA) where applicable. Washington residents may contact us at privacy@naturesjourneyhealth.com to exercise rights specific to consumer health data.</p>
             </div>
           </section>
 

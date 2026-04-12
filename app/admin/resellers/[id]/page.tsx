@@ -1,6 +1,8 @@
+export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getReseller, getResellerPerformance, getCommissions } from "@/lib/admin-resellers";
+import { db } from "@/lib/db";
 import { ResellerDetailClient } from "./reseller-detail-client";
 
 interface PageProps {
@@ -20,6 +22,34 @@ export default async function ResellerDetailPage({ params }: PageProps) {
   ]);
 
   if (!reseller) redirect("/admin/resellers");
+
+  // Fetch compliance data
+  const complianceData = await db.resellerProfile.findUnique({
+    where: { id },
+    select: {
+      onboardingStep: true,
+      onboardingCompletedAt: true,
+      complianceTrainingCompletedAt: true,
+      agreementSignedAt: true,
+      agreementVersion: true,
+      agreementIpAddress: true,
+      w9SubmittedAt: true,
+      w9LegalName: true,
+      w9BusinessName: true,
+      w9TaxClassification: true,
+      w9TinType: true,
+      w9TinLast4: true,
+      healthcareProviderAttestation: true,
+      attestationSignedAt: true,
+      oigCheckPassedAt: true,
+      oigCheckResult: true,
+      samCheckPassedAt: true,
+      samCheckResult: true,
+      marketingApprovalRequired: true,
+      lastComplianceAuditAt: true,
+      complianceViolationCount: true,
+    },
+  });
 
   // Serialize dates
   const serializedReseller = {
@@ -50,6 +80,7 @@ export default async function ResellerDetailPage({ params }: PageProps) {
       performance={performance}
       commissions={serializedCommissions}
       commissionsTotal={commissionsData.total}
+      compliance={complianceData ? JSON.parse(JSON.stringify(complianceData)) : null}
     />
   );
 }

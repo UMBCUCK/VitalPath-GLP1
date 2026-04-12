@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getSalesOverview, getSalesPerformance, getSalesTrend } from "@/lib/admin-sales";

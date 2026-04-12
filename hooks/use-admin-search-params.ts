@@ -9,13 +9,13 @@ export function useAdminSearchParams() {
   const pathname = usePathname();
 
   const get = useCallback(
-    (key: string, fallback?: string) => searchParams.get(key) ?? fallback ?? "",
+    (key: string, fallback?: string) => searchParams?.get(key) ?? fallback ?? "",
     [searchParams]
   );
 
   const getNumber = useCallback(
     (key: string, fallback: number) => {
-      const val = searchParams.get(key);
+      const val = searchParams?.get(key);
       return val ? parseInt(val, 10) : fallback;
     },
     [searchParams]
@@ -23,7 +23,7 @@ export function useAdminSearchParams() {
 
   const set = useCallback(
     (updates: Record<string, string | number | null>) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParams?.toString() ?? "");
       Object.entries(updates).forEach(([key, value]) => {
         if (value === null || value === "") {
           params.delete(key);
