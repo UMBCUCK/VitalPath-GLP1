@@ -155,7 +155,7 @@ export function ExitIntentModal() {
                   required
                   className="flex-1 rounded-xl border border-navy-100 bg-white px-4 py-3 text-base text-navy placeholder:text-graphite-300 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all min-h-[48px]"
                 />
-                <Button type="submit" className="shrink-0 gap-1.5 min-h-[48px]">
+                <Button variant="emerald" type="submit" className="shrink-0 gap-1.5 min-h-[48px] rounded-full">
                   Get Free Guide
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -199,7 +199,7 @@ export function ExitIntentModal() {
               Your GLP-1 Starter Guide is on its way. While you wait...
             </p>
             <Link href="/qualify" className="mt-6 inline-block" onClick={handleDismiss}>
-              <Button size="lg" className="gap-2">
+              <Button variant="emerald" size="lg" className="gap-2 rounded-full">
                 Take the Free Assessment
                 <ArrowRight className="h-4 w-4" />
               </Button>

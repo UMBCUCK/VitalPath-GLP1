@@ -91,6 +91,9 @@ export const ANALYTICS_EVENTS = {
   QUALIFY_CONTRAINDICATION_FLAG: "qualify_contraindication_flag",
   QUALIFY_COMPLETE: "qualify_complete",
   QUALIFY_ABANDON: "qualify_abandon",
+
+  // LP Theme tracking
+  LP_THEME_VIEW: "lp_theme_view",
 } as const;
 
 // ─── Track function ─────────────────────────────────────────

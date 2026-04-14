@@ -18,11 +18,11 @@ import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 export const metadata: Metadata = {
   title: "GLP-1 Weight Loss Maintenance Program | Keeping Weight Off After Treatment",
   description:
-    "The STEP-4 trial showed 2/3 of weight returns within a year of stopping semaglutide without a maintenance plan. Here's how VitalPath's maintenance program prevents that — and what the science says actually works.",
+    "The STEP-4 trial showed 2/3 of weight returns within a year of stopping semaglutide without a maintenance plan. Here's how Nature's Journey's maintenance program prevents that — and what the science says actually works.",
   openGraph: {
-    title: "GLP-1 Maintenance Program: How to Keep the Weight Off | VitalPath",
+    title: "GLP-1 Maintenance Program: How to Keep the Weight Off | Nature's Journey",
     description:
-      "Clinical data shows most people regain weight after stopping GLP-1 medication without a structured plan. VitalPath's maintenance program is built around the biology that makes keeping weight off hard.",
+      "Clinical data shows most people regain weight after stopping GLP-1 medication without a structured plan. Nature's Journey's maintenance program is built around the biology that makes keeping weight off hard.",
   },
 };
 
@@ -89,7 +89,7 @@ const faqs = [
   },
   {
     q: "When should I start thinking about maintenance?",
-    a: "From day one, ideally. VitalPath's care approach builds maintenance habits in parallel with active weight loss — not as an afterthought when you're near your goal. The resistance training, protein targets, and sleep habits you build during the active phase are the foundation for maintenance. Starting to think about it only when you're about to stop medication is too late.",
+    a: "From day one, ideally. Nature's Journey's care approach builds maintenance habits in parallel with active weight loss — not as an afterthought when you're near your goal. The resistance training, protein targets, and sleep habits you build during the active phase are the foundation for maintenance. Starting to think about it only when you're about to stop medication is too late.",
   },
   {
     q: "What's the lowest dose I can maintain on?",
@@ -100,7 +100,7 @@ const faqs = [
     a: "Not inevitable, but statistically probable without intentional planning. The patients who maintain results after stopping share specific characteristics: they built genuine lifestyle habits (not just followed meal plans during treatment), they maintained or increased resistance training, they kept protein high, and they addressed any underlying conditions that contributed to weight gain. The medication window is most valuable as a habit-building period, not just a weight loss intervention.",
   },
   {
-    q: "What's different about VitalPath's maintenance program vs just stopping treatment?",
+    q: "What's different about Nature's Journey's maintenance program vs just stopping treatment?",
     a: "The maintenance program includes continued provider access for medication tapering guidance, adapted nutrition plans calibrated for your new maintenance caloric needs (which are different from both your pre-treatment baseline and your active weight loss phase), ongoing body composition monitoring, and coaching focused specifically on the psychological and behavioral challenges of the transition. Most of the structural support continues — the focus shifts from losing to holding.",
   },
 ];
@@ -126,7 +126,7 @@ export default function MaintenancePage() {
             Losing weight is the hard part. Keeping it off is harder.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500 leading-relaxed">
-            The STEP-4 trial showed that most people regain the majority of lost weight within a year of stopping GLP-1 medication — without a plan. VitalPath&apos;s maintenance program is built around the biology of what actually prevents that.
+            The STEP-4 trial showed that most people regain the majority of lost weight within a year of stopping GLP-1 medication — without a plan. Nature's Journey&apos;s maintenance program is built around the biology of what actually prevents that.
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/qualify">
@@ -295,7 +295,7 @@ export default function MaintenancePage() {
             <AlertCircle className="h-8 w-8 text-teal mx-auto mb-4" />
             <h2 className="text-xl font-bold text-navy">Built into every plan from day one</h2>
             <p className="mt-3 text-sm leading-relaxed text-graphite-600">
-              Maintenance transition planning is included in VitalPath&apos;s Premium and Complete plans from the start — not added on at the end. Your care team discusses maintenance strategy at your first provider visit and continues throughout treatment.
+              Maintenance transition planning is included in Nature's Journey&apos;s Premium and Complete plans from the start — not added on at the end. Your care team discusses maintenance strategy at your first provider visit and continues throughout treatment.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Link href="/pricing">

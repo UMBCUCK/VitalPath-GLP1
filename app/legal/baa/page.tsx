@@ -42,9 +42,6 @@ export default function BaaPage() {
               <li>Provisions for subcontractor management, ensuring that any downstream entities also comply with HIPAA requirements</li>
               <li>Audit and compliance monitoring rights</li>
             </ul>
-            <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
-              <p className="text-xs font-semibold text-amber-800">[LEGAL REVIEW REQUIRED — BAA template and policy provisions should be reviewed by legal counsel to ensure compliance with current HIPAA regulations and state requirements]</p>
-            </div>
           </section>
 
           <section>
@@ -57,9 +54,6 @@ export default function BaaPage() {
               <li><strong>Cloud Infrastructure Providers:</strong> Hosting and cloud storage providers where PHI is stored, processed, or transmitted, including database hosting, file storage, and application hosting services.</li>
               <li><strong>Payment Processors:</strong> Vendors that process subscription payments and billing, which may handle limited PHI in connection with healthcare payment transactions.</li>
             </ul>
-            <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
-              <p className="text-xs font-semibold text-amber-800">[LEGAL REVIEW REQUIRED — vendor categories and BAA coverage should be reviewed periodically to ensure all PHI-handling vendors are identified and covered]</p>
-            </div>
           </section>
 
           <section>

@@ -33,7 +33,7 @@ export function MobileStickyCta() {
           </p>
         </div>
         <Link href="/qualify" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { location: "mobile_sticky", target: "/qualify" })}>
-          <Button size="sm" className="shrink-0 gap-1.5 px-5 shadow-glow">
+          <Button variant="emerald" size="sm" className="shrink-0 gap-1.5 px-5 rounded-full">
             Start Free Assessment
             <ArrowRight className="h-3.5 w-3.5" />
           </Button>

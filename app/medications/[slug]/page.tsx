@@ -196,7 +196,7 @@ export default async function MedicationPage({ params }: PageProps) {
           <div className="mt-8 grid gap-4 sm:grid-cols-3 text-left">
             {[
               { step: "1", title: "Take the assessment", desc: "2-minute online health questionnaire" },
-              { step: "2", title: "Provider evaluation", desc: "Licensed provider reviews your profile within 24 hours" },
+              { step: "2", title: "Provider evaluation", desc: "Licensed provider reviews your profile within 1 business day" },
               { step: "3", title: "Medication delivered", desc: "Free 2-day shipping to your door" },
             ].map((s) => (
               <div key={s.step} className="rounded-xl border border-navy-100/60 bg-white p-5">

@@ -4,34 +4,34 @@
 
 @layer base {
   :root {
-    --chart-primary: #1F6F78;
-    --chart-secondary: #163A63;
+    --chart-primary: #00BAEE;
+    --chart-secondary: #005066;
     --chart-positive: #059669;
     --chart-negative: #dc2626;
-    --background: 210 33% 98%;
-    --foreground: 213 22% 22%;
-    --card: 0 0% 100%;
-    --card-foreground: 213 22% 22%;
+    --background: 0 0% 100%;
+    --foreground: 195 75% 11%;
+    --card: 200 40% 98%;
+    --card-foreground: 195 75% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 213 22% 22%;
-    --primary: 186 59% 30%;
-    --primary-foreground: 210 33% 98%;
-    --secondary: 150 16% 89%;
-    --secondary-foreground: 213 22% 22%;
-    --muted: 40 30% 94%;
-    --muted-foreground: 213 12% 45%;
-    --accent: 37 33% 57%;
+    --popover-foreground: 195 75% 11%;
+    --primary: 195 100% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 195 60% 92%;
+    --secondary-foreground: 195 75% 15%;
+    --muted: 200 30% 96%;
+    --muted-foreground: 195 18% 38%;
+    --accent: 195 100% 20%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 210 16% 90%;
-    --input: 210 16% 90%;
-    --ring: 186 59% 30%;
+    --border: 195 20% 88%;
+    --input: 195 20% 88%;
+    --ring: 195 100% 42%;
     --radius: 0.75rem;
   }
 
-  /* ─── Cerulean Light Theme (Nature's Journey inspired) ─── */
-  /* White + Cerulean Blue + Black/Dark Navy                  */
+  /* ─── Cerulean Light Theme — matches naturesjourneyhealth.com ─── */
+  /* White (#fff) + Cerulean (#005066 / #00BAEE) + Dark (#0b2a33) */
   html.theme-cerulean {
     color-scheme: light;
     --chart-primary: #00baee;
@@ -39,24 +39,24 @@
     --chart-positive: #059669;
     --chart-negative: #dc2626;
     --background: 0 0% 100%;
-    --foreground: 196 69% 12%;
-    --card: 194 80% 97%;
-    --card-foreground: 196 69% 12%;
+    --foreground: 195 75% 11%;
+    --card: 200 40% 98%;
+    --card-foreground: 195 75% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 196 69% 12%;
-    --primary: 194 100% 47%;
+    --popover-foreground: 195 75% 11%;
+    --primary: 195 100% 37%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 194 65% 88%;
-    --secondary-foreground: 196 60% 18%;
-    --muted: 194 40% 94%;
-    --muted-foreground: 196 20% 40%;
-    --accent: 196 100% 20%;
+    --secondary: 195 60% 92%;
+    --secondary-foreground: 195 75% 15%;
+    --muted: 200 30% 96%;
+    --muted-foreground: 195 18% 38%;
+    --accent: 195 100% 20%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 194 35% 82%;
-    --input: 194 35% 82%;
-    --ring: 194 100% 47%;
+    --border: 195 20% 88%;
+    --input: 195 20% 88%;
+    --ring: 195 100% 37%;
     --radius: 0.75rem;
   }
 
@@ -90,6 +90,38 @@
   }
 }
 
+/* ─── LP Theme Variables (defaults = Cerulean brand) ─── */
+[data-lp-theme] {
+  --lp-heading: #0B2A33;
+  --lp-body: #2A4A58;
+  --lp-body-muted: #4A6A75;
+  --lp-page-bg: #FFFFFF;
+  --lp-section-alt: #F6FAFC;
+  --lp-card-bg: #FFFFFF;
+  --lp-card-border: rgba(0,80,102,0.08);
+  --lp-hero-from: #F0FAFF;
+  --lp-hero-via: #F6FAFC;
+  --lp-hero-to: #FFFFFF;
+  --lp-accent-from: #00BAEE;
+  --lp-accent-to: #005066;
+  --lp-badge-bg: #E0F7FF;
+  --lp-badge-text: #005066;
+  --lp-badge-border: #BAE6FD;
+  --lp-cta-from: #E0F7FF;
+  --lp-cta-to: #F0FAFF;
+  --lp-btn-bg: #0098D4;
+  --lp-btn-text: #FFFFFF;
+  --lp-btn-hover: #0077A8;
+  --lp-icon: #00BAEE;
+  --lp-icon-bg: #E0F7FF;
+  --lp-price-bg: #005066;
+  --lp-price-text: #FFFFFF;
+  --lp-stat-border: #BAE6FD;
+  --lp-divider: #00BAEE;
+  --lp-logo-from: #00BAEE;
+  --lp-logo-to: #005066;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -117,34 +149,34 @@
 /* Section divider gradient */
 .section-divider {
   @apply h-px w-full;
-  background: linear-gradient(90deg, transparent, #1F6F78 20%, #B79B6C 50%, #1F6F78 80%, transparent);
+  background: linear-gradient(90deg, transparent, #00BAEE 20%, #005066 50%, #00BAEE 80%, transparent);
   opacity: 0.2;
 }
 
 /* Gradient text */
 .gradient-text {
   @apply bg-clip-text text-transparent;
-  background-image: linear-gradient(135deg, #0E223D 0%, #1F6F78 50%, #163A63 100%);
+  background-image: linear-gradient(135deg, #005066 0%, #00BAEE 50%, #0B2A33 100%);
 }
 
 .gradient-text-gold {
   @apply bg-clip-text text-transparent;
-  background-image: linear-gradient(135deg, #B79B6C 0%, #D2BA8A 50%, #B79B6C 100%);
+  background-image: linear-gradient(135deg, #0098D4 0%, #00BAEE 50%, #0098D4 100%);
 }
 
 /* Premium backgrounds */
 .bg-premium-gradient {
-  background: linear-gradient(180deg, #FAFCFD 0%, #F5EFE7 50%, #DDE9E3 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F7FBFD 50%, #F0F7FA 100%);
 }
 
 .bg-navy-gradient {
-  background: linear-gradient(180deg, #0E223D 0%, #163A63 100%);
+  background: linear-gradient(180deg, #0B2A33 0%, #005066 100%);
 }
 
 .bg-subtle-grid {
   background-image:
-    linear-gradient(rgba(14, 34, 61, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14, 34, 61, 0.02) 1px, transparent 1px);
+    linear-gradient(rgba(0, 80, 102, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 80, 102, 0.03) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
@@ -194,15 +226,15 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #1F6F78;
+  background: #0098D4;
   border: 3px solid white;
-  box-shadow: 0 2px 8px rgba(31,111,120,0.3);
+  box-shadow: 0 2px 8px rgba(0,152,212,0.3);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .weight-slider::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 2px 12px rgba(31,111,120,0.45);
+  box-shadow: 0 2px 12px rgba(0,152,212,0.45);
 }
 .weight-slider::-webkit-slider-thumb:active {
   transform: scale(1.05);
@@ -211,13 +243,13 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #1F6F78;
+  background: #0098D4;
   border: 3px solid white;
-  box-shadow: 0 2px 8px rgba(31,111,120,0.3);
+  box-shadow: 0 2px 8px rgba(0,152,212,0.3);
   cursor: pointer;
 }
 .weight-slider:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid #1F6F78;
+  outline: 2px solid #0098D4;
   outline-offset: 2px;
 }
 
@@ -353,59 +385,223 @@
   transition-duration: 150ms;
 }
 
-/* ─────────────────────────────────────────────────────────
-   CERULEAN THEME — Admin panel overrides
-   These target hardcoded Tailwind brand classes that bypass
-   CSS variables, ensuring full visual coherence.
-   ───────────────────────────────────────────────────────── */
-html.theme-cerulean .bg-linen\/30 {
-  background-color: #f0f9ff !important;
-}
-html.theme-cerulean .bg-linen {
-  background-color: #e0f2fe !important;
-}
-html.theme-cerulean .bg-white {
-  background-color: #ffffff !important;
-}
-html.theme-cerulean .border-navy-100\/40 {
-  border-color: rgba(186, 230, 253, 0.7) !important;
-}
-html.theme-cerulean .border-navy-100\/60 {
-  border-color: rgba(186, 230, 253, 0.9) !important;
-}
-html.theme-cerulean .bg-navy-50\/70 {
-  background-color: rgba(224, 242, 254, 0.7) !important;
-}
-html.theme-cerulean .bg-navy-50 {
-  background-color: #e0f2fe !important;
-}
-html.theme-cerulean .hover\:bg-navy-50\/70:hover {
-  background-color: rgba(186, 230, 253, 0.5) !important;
-}
-html.theme-cerulean .hover\:bg-navy-50:hover {
-  background-color: #bae6fd !important;
-}
-/* Active sidebar nav item — distinctly cerulean, not generic teal */
-html.theme-cerulean .bg-teal-50 {
-  background-color: rgba(0, 186, 238, 0.13) !important;
-}
-html.theme-cerulean .text-teal-800 {
-  color: #005f87 !important;
-}
-html.theme-cerulean .text-teal {
-  color: #0098d4 !important;
-}
-html.theme-cerulean .bg-linen\/30 {
-  background-color: #f0f9ff !important;
-}
-html.theme-cerulean .section-divider {
-  background: linear-gradient(90deg, transparent, #00baee 20%, #005066 50%, #00baee 80%, transparent);
-}
-html.theme-cerulean .gradient-text {
-  background-image: linear-gradient(135deg, #005066 0%, #00baee 50%, #0b2a33 100%);
+/* ═══════════════════════════════════════════════════════════
+   CERULEAN THEME — Full site-wide color override
+   Remaps ALL hardcoded brand colors to cerulean blue / white / black.
+   Inspired by naturesjourneyhealth.com color palette.
+   ═══════════════════════════════════════════════════════════
+
+   COLOR MAP:
+   navy    (#0E223D) → #0b2a33 (dark cerulean-navy)
+   teal    (#1F6F78) → #0098d4 (cerulean blue)
+   atlantic(#163A63) → #005066 (deep cerulean)
+   linen   (#F5EFE7) → #f0f9ff (ice blue)
+   sage    (#DDE9E3) → #e0f7ff (pale cyan)
+   gold    (#B79B6C) → kept warm (accent contrast)
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── NAVY backgrounds ── */
+html.theme-cerulean .bg-navy       { background-color: #0b2a33 !important; }
+html.theme-cerulean .bg-navy-50    { background-color: #e0f2fe !important; }
+html.theme-cerulean .bg-navy-100   { background-color: #bae6fd !important; }
+html.theme-cerulean .bg-navy-200   { background-color: #7dd3fc !important; }
+html.theme-cerulean .bg-navy-300   { background-color: #38bdf8 !important; }
+html.theme-cerulean .bg-navy-400   { background-color: #0ea5e9 !important; }
+html.theme-cerulean .bg-navy-600   { background-color: #005f87 !important; }
+html.theme-cerulean .bg-navy-700   { background-color: #005066 !important; }
+html.theme-cerulean .bg-navy-800   { background-color: #003d4f !important; }
+html.theme-cerulean .bg-navy-900   { background-color: #002a35 !important; }
+html.theme-cerulean .bg-navy-50\/70 { background-color: rgba(224, 242, 254, 0.7) !important; }
+html.theme-cerulean .hover\:bg-navy-50:hover  { background-color: #bae6fd !important; }
+html.theme-cerulean .hover\:bg-navy-50\/70:hover { background-color: rgba(186, 230, 253, 0.5) !important; }
+
+/* ── NAVY text — headings match Nature's Journey #005066 cerulean ── */
+html.theme-cerulean .text-navy     { color: #005066 !important; }
+html.theme-cerulean .text-navy-200 { color: #7dd3fc !important; }
+html.theme-cerulean .text-navy-300 { color: #4a6a75 !important; }
+html.theme-cerulean .text-navy-400 { color: #1a5a70 !important; }
+html.theme-cerulean .text-navy-500 { color: #0b5068 !important; }
+html.theme-cerulean .text-navy-600 { color: #005f87 !important; }
+html.theme-cerulean .text-navy-700 { color: #005066 !important; }
+html.theme-cerulean .text-navy-800 { color: #003d4f !important; }
+html.theme-cerulean .hover\:text-navy:hover { color: #005066 !important; }
+
+/* ── NAVY borders ── */
+html.theme-cerulean .border-navy       { border-color: #0b2a33 !important; }
+html.theme-cerulean .border-navy-100   { border-color: #bae6fd !important; }
+html.theme-cerulean .border-navy-100\/40 { border-color: rgba(186, 230, 253, 0.7) !important; }
+html.theme-cerulean .border-navy-100\/60 { border-color: rgba(186, 230, 253, 0.9) !important; }
+html.theme-cerulean .border-navy-200   { border-color: #7dd3fc !important; }
+html.theme-cerulean .border-navy-300   { border-color: #38bdf8 !important; }
+
+/* ── TEAL backgrounds → cerulean blue ── */
+html.theme-cerulean .bg-teal       { background-color: #0098d4 !important; }
+html.theme-cerulean .bg-teal-50    { background-color: rgba(0, 186, 238, 0.1) !important; }
+html.theme-cerulean .bg-teal-100   { background-color: #cffafe !important; }
+html.theme-cerulean .bg-teal-200   { background-color: #a5f3fc !important; }
+html.theme-cerulean .bg-teal-300   { background-color: #67e8f9 !important; }
+html.theme-cerulean .bg-teal-400   { background-color: #0ea5e9 !important; }
+html.theme-cerulean .bg-teal-500   { background-color: #0098d4 !important; }
+html.theme-cerulean .bg-teal-600   { background-color: #0284c7 !important; }
+html.theme-cerulean .bg-teal-700   { background-color: #0077a8 !important; }
+html.theme-cerulean .bg-teal-800   { background-color: #005f87 !important; }
+html.theme-cerulean .hover\:bg-teal:hover  { background-color: #0088be !important; }
+html.theme-cerulean .hover\:bg-teal-50:hover { background-color: rgba(0, 186, 238, 0.18) !important; }
+
+/* ── TEAL text → cerulean blue ── */
+html.theme-cerulean .text-teal     { color: #0098d4 !important; }
+html.theme-cerulean .text-teal-100 { color: #bae6fd !important; }
+html.theme-cerulean .text-teal-200 { color: #7dd3fc !important; }
+html.theme-cerulean .text-teal-300 { color: #38bdf8 !important; }
+html.theme-cerulean .text-teal-400 { color: #0ea5e9 !important; }
+html.theme-cerulean .text-teal-600 { color: #0284c7 !important; }
+html.theme-cerulean .text-teal-700 { color: #0077a8 !important; }
+html.theme-cerulean .text-teal-800 { color: #005f87 !important; }
+html.theme-cerulean .text-teal-900 { color: #004d6e !important; }
+
+/* ── TEAL borders → cerulean blue ── */
+html.theme-cerulean .border-teal     { border-color: #0098d4 !important; }
+html.theme-cerulean .border-teal-100 { border-color: #bae6fd !important; }
+html.theme-cerulean .border-teal-200 { border-color: #7dd3fc !important; }
+html.theme-cerulean .border-teal-400 { border-color: #0ea5e9 !important; }
+html.theme-cerulean .border-teal-500 { border-color: #0098d4 !important; }
+
+/* ── TEAL ring / focus ── */
+html.theme-cerulean .ring-teal     { --tw-ring-color: #0098d4 !important; }
+html.theme-cerulean .ring-navy     { --tw-ring-color: #0b2a33 !important; }
+html.theme-cerulean .focus-ring    { --tw-ring-color: #0098d4 !important; }
+
+/* ── ATLANTIC → deep cerulean ── */
+html.theme-cerulean .bg-atlantic   { background-color: #005066 !important; }
+html.theme-cerulean .text-atlantic { color: #005066 !important; }
+html.theme-cerulean .border-atlantic { border-color: #005066 !important; }
+
+/* ── FILL colors for SVG icons ── */
+html.theme-cerulean .fill-gold     { fill: #d4a843 !important; }
+html.theme-cerulean .fill-teal     { fill: #0098d4 !important; }
+
+/* ── LINEN → Nature's Journey off-white blue ── */
+html.theme-cerulean .bg-linen      { background-color: #f7fbfd !important; }
+html.theme-cerulean .bg-linen\/30  { background-color: rgba(247, 251, 253, 0.5) !important; }
+html.theme-cerulean .bg-linen\/50  { background-color: rgba(247, 251, 253, 0.65) !important; }
+html.theme-cerulean .bg-linen\/60  { background-color: rgba(247, 251, 253, 0.75) !important; }
+
+/* ── SAGE → light cyan ── */
+html.theme-cerulean .bg-sage       { background-color: #CCF4FF !important; }
+
+/* ── CLOUD → subtle blue-white ── */
+html.theme-cerulean .bg-cloud      { background-color: #f6fafc !important; }
+
+/* ── GRAPHITE text — match Nature's Journey gray tones ── */
+html.theme-cerulean .text-graphite-200 { color: #b8cdd8 !important; }
+html.theme-cerulean .text-graphite-300 { color: #7a96a6 !important; }
+html.theme-cerulean .text-graphite-400 { color: #4a6a75 !important; }
+html.theme-cerulean .text-graphite-500 { color: #3a5a68 !important; }
+html.theme-cerulean .text-graphite-600 { color: #2a4a58 !important; }
+
+/* ── GRADIENTS — from/to/via remapping ── */
+html.theme-cerulean .from-navy     { --tw-gradient-from: #0b2a33 !important; }
+html.theme-cerulean .to-navy       { --tw-gradient-to: #005066 !important; }
+html.theme-cerulean .via-navy      { --tw-gradient-via: #003d4f !important; }
+html.theme-cerulean .from-teal     { --tw-gradient-from: #00baee !important; }
+html.theme-cerulean .to-teal       { --tw-gradient-to: #0098d4 !important; }
+html.theme-cerulean .via-teal      { --tw-gradient-via: #0098d4 !important; }
+html.theme-cerulean .from-teal-300 { --tw-gradient-from: #38bdf8 !important; }
+html.theme-cerulean .to-teal-100   { --tw-gradient-to: #bae6fd !important; }
+html.theme-cerulean .from-teal-50  { --tw-gradient-from: #e0f7ff !important; }
+html.theme-cerulean .to-teal-600   { --tw-gradient-to: #0284c7 !important; }
+html.theme-cerulean .from-atlantic { --tw-gradient-from: #005066 !important; }
+html.theme-cerulean .to-atlantic   { --tw-gradient-to: #003d5c !important; }
+html.theme-cerulean .via-atlantic  { --tw-gradient-via: #004a60 !important; }
+html.theme-cerulean .from-sage     { --tw-gradient-from: #e0f7ff !important; }
+html.theme-cerulean .to-sage       { --tw-gradient-to: #cffafe !important; }
+html.theme-cerulean .from-sage\/20 { --tw-gradient-from: rgba(224, 247, 255, 0.2) !important; }
+
+/* ── GOLD — keep warm for accent contrast with cerulean ── */
+/* Gold stays mostly the same (warm accent on cool theme). Minor tint shifts: */
+html.theme-cerulean .border-gold\/30 { border-color: rgba(183, 155, 108, 0.3) !important; }
+html.theme-cerulean .bg-gold\/10   { background-color: rgba(183, 155, 108, 0.1) !important; }
+
+/* ── NAVY-GRADIENT (custom class) → cerulean dark gradient ── */
+html.theme-cerulean .bg-navy-gradient {
+  background: linear-gradient(180deg, #0b2a33 0%, #005066 100%) !important;
 }
 
-/* Cerulean scrollbar */
+/* ── PREMIUM GRADIENT → Nature's Journey subtle blue-white ── */
+html.theme-cerulean .bg-premium-gradient {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbfd 50%, #f0f7fa 100%) !important;
+}
+
+/* ── GRADIENT TEXT → cerulean ── */
+html.theme-cerulean .gradient-text {
+  background-image: linear-gradient(135deg, #005066 0%, #00baee 50%, #0b2a33 100%) !important;
+}
+html.theme-cerulean .gradient-text-gold {
+  background-image: linear-gradient(135deg, #0098d4 0%, #00baee 50%, #0098d4 100%) !important;
+}
+
+/* ── SECTION DIVIDER → cerulean ── */
+html.theme-cerulean .section-divider {
+  background: linear-gradient(90deg, transparent, #00baee 20%, #005066 50%, #00baee 80%, transparent) !important;
+}
+
+/* ── SUBTLE GRID → cool blue ── */
+html.theme-cerulean .bg-subtle-grid {
+  background-image:
+    linear-gradient(rgba(0, 152, 212, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 152, 212, 0.03) 1px, transparent 1px) !important;
+}
+
+/* ── PRIMARY BUTTON ── */
+html.theme-cerulean .bg-primary  { background-color: #00baee !important; }
+html.theme-cerulean .bg-primary:hover { background-color: #009ccb !important; }
+html.theme-cerulean .text-primary { color: #00baee !important; }
+html.theme-cerulean .border-primary { border-color: #00baee !important; }
+html.theme-cerulean .ring-primary { --tw-ring-color: #00baee !important; }
+
+/* ── SHADOWS → blue-tinted ── */
+html.theme-cerulean .shadow-premium {
+  box-shadow: 0 1px 2px rgba(0, 80, 102, 0.05), 0 4px 16px rgba(0, 80, 102, 0.07) !important;
+}
+html.theme-cerulean .shadow-premium-md {
+  box-shadow: 0 2px 4px rgba(0, 80, 102, 0.05), 0 8px 32px rgba(0, 80, 102, 0.09) !important;
+}
+html.theme-cerulean .shadow-premium-lg {
+  box-shadow: 0 4px 8px rgba(0, 80, 102, 0.06), 0 16px 48px rgba(0, 80, 102, 0.1) !important;
+}
+html.theme-cerulean .shadow-premium-xl {
+  box-shadow: 0 8px 16px rgba(0, 80, 102, 0.08), 0 24px 64px rgba(0, 80, 102, 0.12) !important;
+}
+html.theme-cerulean .shadow-glow {
+  box-shadow: 0 0 20px rgba(0, 186, 238, 0.25), 0 0 40px rgba(0, 186, 238, 0.1) !important;
+}
+html.theme-cerulean .shadow-gold-glow {
+  box-shadow: 0 0 20px rgba(0, 186, 238, 0.2), 0 0 40px rgba(0, 152, 212, 0.1) !important;
+}
+
+/* ── BADGE STATUS CHIPS → cerulean variants ── */
+html.theme-cerulean .bg-emerald-100  { background-color: #d0f4ff !important; }
+html.theme-cerulean .bg-emerald-50   { background-color: #e8faff !important; }
+html.theme-cerulean .text-emerald-700 { color: #0077a8 !important; }
+html.theme-cerulean .text-emerald-600 { color: #0098d4 !important; }
+html.theme-cerulean .text-emerald-400 { color: #38bdf8 !important; }
+html.theme-cerulean .bg-teal-100    { background-color: #cffafe !important; }
+html.theme-cerulean .text-teal-700  { color: #0077a8 !important; }
+
+/* ── WHITE overrides (keep white or very slight blue) ── */
+html.theme-cerulean .bg-white   { background-color: #ffffff !important; }
+html.theme-cerulean .bg-white\/80 { background-color: rgba(255, 255, 255, 0.85) !important; }
+html.theme-cerulean .bg-white\/90 { background-color: rgba(255, 255, 255, 0.92) !important; }
+html.theme-cerulean .bg-white\/5  { background-color: rgba(224, 242, 254, 0.08) !important; }
+html.theme-cerulean .bg-white\/10 { background-color: rgba(224, 242, 254, 0.15) !important; }
+html.theme-cerulean .border-white\/10 { border-color: rgba(186, 230, 253, 0.25) !important; }
+html.theme-cerulean .border-white\/20 { border-color: rgba(186, 230, 253, 0.35) !important; }
+html.theme-cerulean .text-white\/40 { color: rgba(186, 230, 253, 0.55) !important; }
+html.theme-cerulean .text-white\/50 { color: rgba(186, 230, 253, 0.65) !important; }
+html.theme-cerulean .text-white\/60 { color: rgba(224, 242, 254, 0.75) !important; }
+html.theme-cerulean .text-white\/70 { color: rgba(224, 242, 254, 0.8) !important; }
+
+/* ── SCROLLBAR → cerulean ── */
 html.theme-cerulean ::-webkit-scrollbar-thumb {
   background-color: #7dd3fc !important;
 }
@@ -413,7 +609,7 @@ html.theme-cerulean ::-webkit-scrollbar-thumb:hover {
   background-color: #38bdf8 !important;
 }
 
-/* Sidebar top accent stripe — cerulean brand bar + subtle tinted bg */
+/* ── SIDEBAR → cerulean accent stripe ── */
 html.theme-cerulean aside {
   background-color: #f4fbff !important;
   background-image: linear-gradient(to bottom, #00baee 0px, #00baee 4px, transparent 4px) !important;
@@ -421,32 +617,81 @@ html.theme-cerulean aside {
   border-right-color: rgba(0, 186, 238, 0.2) !important;
 }
 
-/* Cerulean header */
+/* ── NAVBAR → Nature's Journey style: clean white, cerulean accent ── */
 html.theme-cerulean header {
-  background-color: rgba(255, 255, 255, 0.92) !important;
+  background-color: rgba(255, 255, 255, 0.97) !important;
   backdrop-filter: blur(12px) !important;
-  border-bottom-color: rgba(0, 186, 238, 0.2) !important;
+  border-bottom-color: rgba(0, 80, 102, 0.08) !important;
+}
+html.theme-cerulean .bg-white\/80 {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+}
+html.theme-cerulean .bg-white\/95 {
+  background-color: rgba(255, 255, 255, 0.97) !important;
+}
+/* Nav link hover */
+html.theme-cerulean .hover\:text-navy:hover { color: #003d5c !important; }
+html.theme-cerulean .hover\:text-teal:hover { color: #0098d4 !important; }
+html.theme-cerulean .hover\:bg-teal:hover   { background-color: #0088be !important; }
+/* Mobile nav overlay */
+html.theme-cerulean .hover\:bg-navy-50:hover { background-color: #e0f2fe !important; }
+
+/* ── BRAND LOGO — shift green leaves to cerulean blue ── */
+html.theme-cerulean svg [id^="leaf-"] stop {
+  stop-color: #0098d4 !important;
+}
+html.theme-cerulean svg [id="leaf-left"] stop:first-child { stop-color: #005066 !important; }
+html.theme-cerulean svg [id="leaf-left"] stop:last-child  { stop-color: #0098d4 !important; }
+html.theme-cerulean svg [id="leaf-center"] stop:first-child { stop-color: #0077a8 !important; }
+html.theme-cerulean svg [id="leaf-center"] stop:last-child  { stop-color: #00baee !important; }
+html.theme-cerulean svg [id="leaf-right"] stop:first-child { stop-color: #005066 !important; }
+html.theme-cerulean svg [id="leaf-right"] stop:last-child  { stop-color: #0098d4 !important; }
+
+/* ── CALCULATOR / FORM INPUTS ── */
+html.theme-cerulean .calculator-input {
+  border-color: #bae6fd !important;
+}
+html.theme-cerulean .calculator-input:focus {
+  border-color: #0098d4 !important;
+  --tw-ring-color: rgba(0, 152, 212, 0.3) !important;
+}
+html.theme-cerulean .calculator-result {
+  background: linear-gradient(to bottom right, #e0f7ff, #f0f9ff) !important;
+  border-color: #bae6fd !important;
 }
 
-/* Cerulean badges — ACTIVE/STATUS chips */
-html.theme-cerulean .bg-emerald-100 { background-color: #d0f4ff !important; }
-html.theme-cerulean .text-emerald-700 { color: #0077a8 !important; }
-html.theme-cerulean .bg-teal-100 { background-color: #cffafe !important; }
-html.theme-cerulean .text-teal-700 { color: #0077a8 !important; }
-
-/* Cerulean primary button */
-html.theme-cerulean .bg-primary { background-color: #00baee !important; }
-html.theme-cerulean .bg-primary:hover { background-color: #009ccb !important; }
-html.theme-cerulean .text-primary { color: #00baee !important; }
-html.theme-cerulean .border-primary { border-color: #00baee !important; }
-html.theme-cerulean .ring-primary { --tw-ring-color: #00baee !important; }
-
-/* Cerulean card shadows with subtle blue tint */
-html.theme-cerulean .shadow-premium {
-  box-shadow: 0 1px 2px rgba(0, 98, 158, 0.05), 0 4px 16px rgba(0, 98, 158, 0.07) !important;
+/* ── QUIZ PROGRESS ── */
+html.theme-cerulean .quiz-progress {
+  background-color: #e0f2fe !important;
 }
-html.theme-cerulean .shadow-premium-md {
-  box-shadow: 0 2px 4px rgba(0, 98, 158, 0.05), 0 8px 32px rgba(0, 98, 158, 0.09) !important;
+html.theme-cerulean .quiz-progress-fill {
+  background: linear-gradient(to right, #00baee, #005066) !important;
+}
+
+/* ── WEIGHT SLIDER → cerulean ── */
+html.theme-cerulean .weight-slider::-webkit-slider-thumb {
+  background: #0098d4 !important;
+  box-shadow: 0 2px 8px rgba(0, 152, 212, 0.3) !important;
+}
+html.theme-cerulean .weight-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 2px 12px rgba(0, 152, 212, 0.45) !important;
+}
+html.theme-cerulean .weight-slider::-moz-range-thumb {
+  background: #0098d4 !important;
+  box-shadow: 0 2px 8px rgba(0, 152, 212, 0.3) !important;
+}
+html.theme-cerulean .weight-slider:focus-visible::-webkit-slider-thumb {
+  outline-color: #0098d4 !important;
+}
+
+/* ── FOCUS RING → cerulean ── */
+html.theme-cerulean .focus-ring:focus-visible {
+  --tw-ring-color: #0098d4 !important;
+}
+
+/* ── SKIP TO CONTENT → cerulean ── */
+html.theme-cerulean .skip-to-content:focus {
+  background-color: #0b2a33 !important;
 }
 
 /* ─────────────────────────────────────────────────────────

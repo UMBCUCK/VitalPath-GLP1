@@ -33,9 +33,9 @@ export default function EligibilityPage() {
       />
       <FAQPageJsonLd faqs={[
         { question: "What BMI do you need to qualify for GLP-1 medication?", answer: "Clinical guidelines for GLP-1 medications generally cover adults with a BMI of 30 or higher, or BMI 27 or higher with at least one weight-related health condition such as type 2 diabetes, prediabetes, hypertension, or sleep apnea. Eligibility is always determined by a licensed provider based on a complete health evaluation." },
-        { question: "Do I need to visit a doctor in person to get a GLP-1 prescription?", answer: "No. VitalPath uses a telehealth model — you complete an online medical intake, and a licensed provider reviews your health history and determines eligibility remotely. No in-person appointment required." },
+        { question: "Do I need to visit a doctor in person to get a GLP-1 prescription?", answer: "No. Nature's Journey uses a telehealth model — you complete an online medical intake, and a licensed provider reviews your health history and determines eligibility remotely. No in-person appointment required." },
         { question: "What conditions disqualify you from GLP-1 treatment?", answer: "Contraindications include a personal or family history of medullary thyroid carcinoma (MTC), Multiple Endocrine Neoplasia syndrome type 2 (MEN 2), active pancreatitis, or pregnancy. Your provider will screen for all contraindications during intake." },
-        { question: "How quickly can I get approved for GLP-1 treatment?", answer: "Most patients receive a provider decision within 24 hours of completing the online intake. If approved, medication typically ships within 2-3 business days." },
+        { question: "How quickly can I get approved for GLP-1 treatment?", answer: "Most patients receive a provider decision within 1 business day of completing the online intake. If approved, medication typically ships within 2-3 business days." },
       ]} />
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
         <SectionShell className="text-center">

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import { ToastProvider } from "@/components/ui/toast";
+import { ThemeProvider } from "@/components/shared/theme-provider";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   other: {
-    "theme-color": "#0E223D",
+    "theme-color": "#005066",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
   },
@@ -53,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         {/* Anti-FOUC: apply saved admin theme before React hydrates */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('vp-admin-theme')||'';var d=localStorage.getItem('vp-admin-dark');if(t==='dark'||d==='true'){document.documentElement.classList.add('dark')}else if(t==='cerulean'){document.documentElement.classList.add('theme-cerulean')}}catch(e){}})()` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('vp-admin-theme')||'';if(t==='cerulean'){document.documentElement.classList.add('theme-cerulean')}else if(t==='dark'||localStorage.getItem('vp-admin-dark')==='true'){document.documentElement.classList.add('dark')}}catch(e){}})()` }} />
         {/* PWA manifest + meta */}
         <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -71,6 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://api.stripe.com" />
       </head>
       <body className="min-h-screen font-sans antialiased">
+        <ThemeProvider />
         <ToastProvider>
           {children}
         </ToastProvider>

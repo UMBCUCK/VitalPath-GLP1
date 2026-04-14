@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "VitalPath",
-  legalName: "VitalPath Health, LLC",
+  legalName: "Nature's Journey Health, LLC",
   tagline: "Clinically informed weight management, delivered to your door.",
   description:
     "Provider-guided care with personalized treatment plans, ongoing support, and practical tools designed to help you build real momentum.",
@@ -42,15 +42,18 @@ export const siteConfig = {
     footer: {
       programs: [
         { label: "Weight Management", href: "/pricing" },
-        { label: "Semaglutide", href: "/semaglutide" },
-        { label: "Tirzepatide", href: "/tirzepatide" },
-        { label: "For Women (PCOS & Menopause)", href: "/women" },
-        { label: "For Men (Visceral Fat)", href: "/men" },
-        { label: "PCOS Weight Loss", href: "/pcos" },
-        { label: "Heart Health & GLP-1", href: "/heart-health" },
-        { label: "Weight Loss After 50", href: "/over-50" },
-        { label: "Prediabetes Treatment", href: "/prediabetes" },
-        { label: "Maintenance Program", href: "/maintenance" },
+        { label: "Semaglutide", href: "/lp/semaglutide" },
+        { label: "Tirzepatide", href: "/lp/tirzepatide" },
+        { label: "Ozempic Alternative", href: "/lp/ozempic-alternative" },
+        { label: "For Women", href: "/lp/women-weight-loss" },
+        { label: "For Men", href: "/lp/men" },
+        { label: "PCOS Weight Loss", href: "/lp/pcos" },
+        { label: "Menopause Weight Loss", href: "/lp/menopause" },
+        { label: "Weight Loss After 50", href: "/lp/over50" },
+        { label: "Belly Fat Treatment", href: "/lp/belly-fat" },
+        { label: "Without Surgery", href: "/lp/no-surgery" },
+        { label: "Affordable Plans", href: "/lp/affordable" },
+        { label: "Postpartum Weight Loss", href: "/lp/postpartum" },
         { label: "Compare Programs", href: "/compare" },
       ],
       resources: [
@@ -66,7 +69,8 @@ export const siteConfig = {
         { label: "Free GLP-1 Starter Guide", href: "/free-guide" },
       ],
       company: [
-        { label: "About VitalPath", href: "/about" },
+        { label: "About Nature's Journey", href: "/about" },
+        { label: "Our Providers", href: "/providers" },
         { label: "Results & Stories", href: "/results" },
         { label: "Blog", href: "/blog" },
         { label: "Refer a Friend", href: "/referrals" },

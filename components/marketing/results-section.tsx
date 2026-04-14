@@ -49,8 +49,8 @@ export function ResultsSection() {
       <SectionShell className="text-center">
         <SectionHeading
           eyebrow="Clinical Results"
-          title="Proven results backed by clinical data"
-          description="GLP-1 medications are among the most studied weight loss treatments in history. Here's what the data shows."
+          title="15–20% body weight loss. Proven in clinical trials."
+          description="Backed by 25,000+ clinical trial participants — the same science your provider uses to build your personalized plan."
         />
 
         {/* Override heading colors for dark bg */}
@@ -81,7 +81,17 @@ export function ResultsSection() {
           ))}
         </div>
 
-        <p className="mt-8 text-xs text-white/40">
+        <div className="mt-10 flex flex-col items-center gap-3">
+          <a
+            href="/qualify"
+            className="inline-flex items-center gap-2 rounded-full bg-emerald px-10 py-4 text-base font-semibold text-white shadow-[0_4px_14px_rgba(5,150,105,0.35)] transition-all duration-200 hover:scale-[1.02] hover:bg-emerald-700"
+          >
+            Start Free Assessment →
+          </a>
+          <p className="text-xs text-white/40">Takes 2 minutes. No commitment. No credit card.</p>
+        </div>
+
+        <p className="mt-6 text-xs text-white/30">
           * {siteConfig.compliance.resultsDisclaimer}
         </p>
       </SectionShell>

@@ -62,9 +62,9 @@ export default function HowItWorksPage() {
         steps={processSteps.map((s) => ({ title: s.title, description: s.description }))}
       />
       <FAQPageJsonLd faqs={[
-        { question: "How long does it take to get started?", answer: "Most members complete the intake assessment in under 10 minutes. Provider review typically happens within 24 hours. If approved, medication ships within 2-3 business days." },
+        { question: "How long does it take to get started?", answer: "Most members complete the intake assessment in under 10 minutes. Provider review typically happens within 1 business day. If approved, medication ships within 2-3 business days." },
         { question: "Do I need to visit a doctor in person?", answer: "No. The entire process is online — assessment, provider review, prescribing, and ongoing care all happen through our telehealth platform. No in-person visits required." },
-        { question: "What happens after I submit my intake form?", answer: "A licensed medical provider reviews your health history and determines eligibility, usually within 24 hours. You'll receive a notification and, if approved, a personalized treatment plan and prescription." },
+        { question: "What happens after I submit my intake form?", answer: "A licensed medical provider reviews your health history and determines eligibility, typically within 1 business day. You'll receive a notification and, if approved, a personalized treatment plan and prescription." },
         { question: "Is there a contract or long-term commitment?", answer: "No long-term contract is required. Your subscription can be paused or cancelled at any time. Most members find the best results come from staying consistent for at least 3-6 months." },
       ]} />
       <BreadcrumbJsonLd items={[{ name: "Home", href: "/" }, { name: "How It Works", href: "/how-it-works" }]} />

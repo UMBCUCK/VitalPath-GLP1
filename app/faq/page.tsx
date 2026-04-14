@@ -13,11 +13,11 @@ import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { faqs } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Frequently Asked Questions About GLP-1 Weight Loss | VitalPath",
+  title: "Frequently Asked Questions About GLP-1 Weight Loss | Nature's Journey",
   description:
-    "Answers to the most common questions about GLP-1 weight loss medication, semaglutide, tirzepatide, cost, eligibility, side effects, and getting started with VitalPath.",
+    "Answers to the most common questions about GLP-1 weight loss medication, semaglutide, tirzepatide, cost, eligibility, side effects, and getting started with Nature's Journey.",
   openGraph: {
-    title: "GLP-1 Weight Loss FAQ | VitalPath",
+    title: "GLP-1 Weight Loss FAQ | Nature's Journey",
     description:
       "Find clear, evidence-based answers to common questions about semaglutide, tirzepatide, cost without insurance, side effects, and how to get started.",
   },
@@ -136,7 +136,7 @@ export default function FaqPage() {
         <SectionShell>
           <SectionHeading
             eyebrow="General FAQ"
-            title="Common questions about VitalPath"
+            title="Common questions about Nature's Journey"
           />
         </SectionShell>
       </section>

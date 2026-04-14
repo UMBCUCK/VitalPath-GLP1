@@ -20,7 +20,7 @@ import { MarketingShell } from "@/components/layout/marketing-shell";
 import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "Free GLP-1 Health Calculators: BMI, TDEE, Protein & More | VitalPath",
+  title: "Free GLP-1 Health Calculators: BMI, TDEE, Protein & More | Nature's Journey",
   description:
     "Free evidence-based health calculators for GLP-1 weight loss: BMI, TDEE, protein intake, hydration, and weight loss timeline. Know your numbers before starting treatment.",
 };

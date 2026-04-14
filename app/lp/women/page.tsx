@@ -4,10 +4,22 @@ import { ArrowRight, Check, ShieldCheck, Star, Heart, Sparkles, Users, Clock } f
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LpFaq } from "@/components/lp/lp-faq";
+import { LpConversionWidgets } from "@/components/lp/lp-conversion-widgets";
+import { MedicalWebPageJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "GLP-1 Weight Loss for Women | PCOS, Perimenopause, Hormonal Weight | Nature's Journey",
   description: "GLP-1 medication designed around women's biology. Specialized protocols for PCOS, perimenopause, and hormonal weight gain. Board-certified providers. From $279/mo.",
+  openGraph: {
+    title: "GLP-1 Weight Loss for Women | PCOS, Perimenopause, Hormonal Weight",
+    description: "Specialized GLP-1 protocols for PCOS, perimenopause, and hormonal weight gain. Board-certified providers. From $279/mo.",
+    type: "website",
+  },
+  robots: { index: true, follow: true },
+  alternates: {
+    canonical: "/lp/women",
+  },
 };
 
 const womenSpecificBenefits = [
@@ -21,6 +33,14 @@ const testimonials = [
   { name: "Rachel K.", age: 38, condition: "PCOS", lbs: 34, months: 5, quote: "After years of being told to 'just eat less,' finally a treatment that works with my PCOS — not against it." },
   { name: "Lisa M.", age: 47, condition: "Perimenopause", lbs: 28, months: 4, quote: "Perimenopause weight was the last straw. Down 28 lbs and my hot flashes have even improved." },
   { name: "Priya S.", age: 33, condition: "Hormonal", lbs: 42, months: 6, quote: "My provider understood that my weight wasn't about willpower. The meal plans for GLP-1 were a game-changer." },
+];
+
+const womenFaqs = [
+  { question: "How does GLP-1 help with PCOS weight?", answer: "GLP-1 medication improves insulin sensitivity — the primary metabolic driver of PCOS-related weight gain. By addressing insulin resistance directly, GLP-1 helps your body respond to weight loss efforts that previously felt impossible." },
+  { question: "Is it safe during perimenopause?", answer: "Yes. GLP-1 medication can be used during perimenopause. Your provider will evaluate your complete hormonal profile, including any hormone replacement therapy, to ensure safe and effective treatment." },
+  { question: "Will it interact with my thyroid medication?", answer: "Your provider reviews all current medications, including thyroid treatments, before prescribing. GLP-1 medications may require monitoring of thyroid function. Full disclosure of your medications ensures safe treatment." },
+  { question: "How is this different from other weight loss programs for women?", answer: "Most programs take a one-size-fits-all approach. Our providers specialize in women's hormonal health and adjust GLP-1 protocols for conditions like PCOS, perimenopause, and thyroid issues that conventional programs ignore." },
+  { question: "Can I take GLP-1 if I'm planning to get pregnant?", answer: "GLP-1 medication should be discontinued before attempting to conceive. Many women use GLP-1 to reach a healthier weight before pregnancy. Your provider will discuss timing and family planning as part of your treatment." },
 ];
 
 const stats = [
@@ -161,6 +181,12 @@ export default function WomenLandingPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <LpFaq
+        faqs={womenFaqs}
+        heading="Questions About Women's GLP-1 Treatment"
+      />
+
       {/* Final CTA */}
       <section className="bg-gradient-to-r from-pink-50 to-purple-50 py-14">
         <div className="mx-auto max-w-xl px-4 text-center">
@@ -182,6 +208,10 @@ export default function WomenLandingPage() {
       <footer className="border-t border-navy-100/40 py-6 text-center text-[10px] text-graphite-400">
         <p>Nature&apos;s Journey Health &middot; Compounded medications from licensed pharmacies &middot; Eligibility determined by providers</p>
       </footer>
+
+      <MedicalWebPageJsonLd name="GLP-1 Weight Loss for Women" description="Specialized GLP-1 protocols for PCOS, perimenopause, and hormonal weight gain" url="/lp/women" />
+      <FAQPageJsonLd faqs={womenFaqs} />
+      <LpConversionWidgets />
     </div>
   );
 }

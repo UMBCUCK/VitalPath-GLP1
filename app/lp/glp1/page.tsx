@@ -2,10 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, ShieldCheck, Star, Clock, Users, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LpFaq } from "@/components/lp/lp-faq";
+import { LpConversionWidgets } from "@/components/lp/lp-conversion-widgets";
+import { MedicalWebPageJsonLd, FAQPageJsonLd, ProductJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "GLP-1 Weight Loss from $279/mo — Same Active Ingredient, 79% Less",
-  description: "Get GLP-1 weight loss medication prescribed online by licensed providers. Same active ingredient as Ozempic & Wegovy. Free 2-day shipping. 30-day guarantee.",
+  title: "Provider-Guided GLP-1 Weight Management from $279/mo | Nature's Journey",
+  description: "Compounded GLP-1 medication prescribed online by licensed providers. Provider evaluation included. Free 2-day shipping. 30-day satisfaction guarantee. Individual results vary.",
+  openGraph: {
+    title: "Provider-Guided GLP-1 Weight Management from $279/mo",
+    description: "Compounded GLP-1 medication prescribed online by licensed providers. 79% less than retail. Free 2-day shipping.",
+    type: "website",
+  },
+  robots: { index: true, follow: true },
+  alternates: {
+    canonical: "/lp/glp1",
+  },
 };
 
 const trustStats = [
@@ -36,9 +48,14 @@ export default function GLP1LandingPage() {
             </div>
             <span className="text-sm font-bold text-navy">Nature&apos;s Journey</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-graphite-400">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-            <span>HIPAA Compliant</span>
+          <div className="flex items-center gap-4 text-xs text-graphite-400">
+            <a href="tel:18885092745" className="flex items-center gap-1.5 hover:text-navy transition-colors">
+              <span className="font-medium">(888) 509-2745</span>
+            </a>
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+              <span>HIPAA Compliant</span>
+            </div>
           </div>
         </div>
       </header>
@@ -117,20 +134,45 @@ export default function GLP1LandingPage() {
         </div>
       </section>
 
-      {/* Testimonial */}
+      {/* Testimonials */}
       <section className="bg-navy-50/30 py-12">
-        <div className="mx-auto max-w-xl px-4 text-center">
-          <div className="flex justify-center gap-0.5 mb-3">
-            {[1,2,3,4,5].map((i) => <Star key={i} className="h-5 w-5 text-gold fill-gold" />)}
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-navy text-center mb-8">What Our Members Say</h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              { name: "Marcus D.", age: 44, location: "Atlanta, GA", lbs: 39, months: 5, quote: "My provider adjusts my plan every month. The meal plans made the biggest difference — I actually know what to eat now." },
+              { name: "Jennifer L.", age: 38, location: "Austin, TX", lbs: 28, months: 4, quote: "I was skeptical about telehealth, but my provider is more attentive than any doctor I've seen in person." },
+              { name: "Robert K.", age: 52, location: "Denver, CO", lbs: 47, months: 6, quote: "The all-inclusive pricing sealed it for me. No hidden fees, no insurance battles. Just results." },
+            ].map((t) => (
+              <div key={t.name} className="rounded-xl border border-navy-100/40 bg-white p-5 shadow-sm">
+                <div className="flex gap-0.5 mb-2">
+                  {[1,2,3,4,5].map((i) => <Star key={i} className="h-3.5 w-3.5 text-gold fill-gold" />)}
+                </div>
+                <p className="text-xs text-graphite-600 italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                <div className="mt-3 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold text-navy">{t.name}, {t.age}</p>
+                    <p className="text-[10px] text-graphite-400">{t.location}</p>
+                  </div>
+                  <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold text-teal">-{t.lbs} lbs</span>
+                </div>
+              </div>
+            ))}
           </div>
-          <blockquote className="text-lg text-graphite-600 italic leading-relaxed">
-            &ldquo;Down 39 lbs in 5 months. My provider adjusts my plan every month. The meal plans
-            made the biggest difference — I actually know what to eat now.&rdquo;
-          </blockquote>
-          <p className="mt-3 text-sm font-semibold text-navy">— Marcus D., Atlanta, GA</p>
-          <p className="text-[10px] text-graphite-400">Verified member. Individual results vary.</p>
+          <p className="mt-4 text-center text-[10px] text-graphite-400">Verified members. Individual results vary.</p>
         </div>
       </section>
+
+      {/* FAQ */}
+      <LpFaq
+        faqs={[
+          { question: "How does GLP-1 medication work?", answer: "GLP-1 receptor agonists mimic a natural hormone that regulates appetite and blood sugar. They help you feel satisfied with less food, reduce cravings, and support sustained weight management when combined with lifestyle changes." },
+          { question: "What does the $279/mo include?", answer: "Everything. Provider evaluation and ongoing monitoring, GLP-1 medication (if prescribed), personalized meal plans, progress tracking, care team messaging, and free 2-day shipping. No hidden fees." },
+          { question: "How quickly will I see results?", answer: "Most members notice reduced appetite within 1-2 weeks. Visible weight loss typically begins within 4-6 weeks. Average weight loss in clinical studies is 15-20% of body weight over the treatment period." },
+          { question: "Is it safe?", answer: "GLP-1 medications have been extensively studied. Common side effects are mild and temporary: nausea, decreased appetite, and digestive changes during the initial titration period. Your provider monitors your progress throughout." },
+          { question: "What if I don't qualify?", answer: "Not everyone is a candidate for GLP-1 medication. If our providers determine it's not right for you, you won't be charged. The initial assessment is completely free." },
+        ]}
+      />
 
       {/* Final CTA */}
       <section className="py-12 sm:py-16">
@@ -162,6 +204,17 @@ export default function GLP1LandingPage() {
         <p>Nature&apos;s Journey Health &middot; Compounded medications from licensed 503A/503B pharmacies &middot; Not FDA-approved</p>
         <p className="mt-1">Eligibility determined by licensed providers. Individual results vary.</p>
       </footer>
+
+      <MedicalWebPageJsonLd name="GLP-1 Weight Management Program" description="Provider-guided GLP-1 weight loss medication prescribed online. All-inclusive from $279/mo." url="/lp/glp1" />
+      <FAQPageJsonLd faqs={[
+        { question: "How does GLP-1 medication work?", answer: "GLP-1 receptor agonists mimic a natural hormone that regulates appetite and blood sugar." },
+        { question: "What does the $279/mo include?", answer: "Provider evaluation, medication if prescribed, meal plans, progress tracking, and free shipping." },
+        { question: "How quickly will I see results?", answer: "Most members notice reduced appetite within 1-2 weeks. Visible weight loss typically begins within 4-6 weeks." },
+        { question: "Is it safe?", answer: "GLP-1 medications have been extensively studied. Common side effects are mild and temporary." },
+        { question: "What if I don't qualify?", answer: "If our providers determine it's not right for you, you won't be charged. The assessment is free." },
+      ]} />
+      <ProductJsonLd name="GLP-1 Weight Management Program" description="All-inclusive GLP-1 weight loss program with provider, medication, and support" price={279} url="/lp/glp1" />
+      <LpConversionWidgets />
     </div>
   );
 }

@@ -22,11 +22,11 @@ import { siteConfig } from "@/lib/site";
 import { FAQPageJsonLd, MedicalConditionJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "GLP-1 Medication for Type 2 Diabetes & Weight Loss | VitalPath",
+  title: "GLP-1 Medication for Type 2 Diabetes & Weight Loss | Nature's Journey",
   description:
     "GLP-1 medications like semaglutide and tirzepatide treat type 2 diabetes while producing 15-21% weight loss. Get online evaluation by a licensed provider.",
   openGraph: {
-    title: "GLP-1 Medication for Type 2 Diabetes & Weight Loss | VitalPath",
+    title: "GLP-1 Medication for Type 2 Diabetes & Weight Loss | Nature's Journey",
     description:
       "GLP-1 medications like semaglutide and tirzepatide treat type 2 diabetes while producing 15-21% weight loss. Get online evaluation by a licensed provider.",
   },
@@ -249,7 +249,7 @@ export default function Type2DiabetesPage() {
                   <strong className="text-navy">Months 4–12:</strong> Continuation at maintenance dose. The majority of A1c improvement and weight loss occurs in this window. Clinical trials measure primary endpoints at 68 weeks (semaglutide STEP trials) or 40–76 weeks (SURPASS trials).
                 </p>
                 <p>
-                  <strong className="text-navy">Ongoing:</strong> Continued treatment maintains metabolic improvements. Stopping the medication typically reverses A1c and weight loss benefits within 12 months. Your VitalPath provider will discuss long-term treatment planning during your follow-ups.
+                  <strong className="text-navy">Ongoing:</strong> Continued treatment maintains metabolic improvements. Stopping the medication typically reverses A1c and weight loss benefits within 12 months. Your your provider will discuss long-term treatment planning during your follow-ups.
                 </p>
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function Type2DiabetesPage() {
                 </p>
               </div>
               <div className="rounded-2xl border border-navy-100/40 bg-white p-6 shadow-premium">
-                <h3 className="font-bold text-navy text-sm mb-3">What to tell your VitalPath provider</h3>
+                <h3 className="font-bold text-navy text-sm mb-3">What to tell your your provider</h3>
                 {[
                   "Most recent A1c and fasting glucose values",
                   "Current diabetes medications (metformin, insulin, SGLT-2, etc.)",

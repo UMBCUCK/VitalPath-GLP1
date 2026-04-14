@@ -58,7 +58,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // Protect provider routes
-  if (providerRoutes.some((r) => pathname.startsWith(r))) {
+  if (providerRoutes.some((r) => pathname === r || pathname.startsWith(r + "/"))) {
     if (!session) {
       return NextResponse.redirect(new URL("/login", req.url));
     }

@@ -14,6 +14,7 @@ const buttonVariants = cva(
         ghost: "text-foreground hover:bg-muted",
         link: "text-primary underline-offset-4 hover:underline",
         gold: "bg-gold text-white hover:bg-gold-700 shadow-gold-glow hover:shadow-premium-md active:scale-[0.98]",
+        emerald: "bg-emerald text-white hover:bg-emerald-700 shadow-[0_4px_14px_rgba(5,150,105,0.35)] hover:shadow-[0_6px_20px_rgba(5,150,105,0.45)] active:scale-[0.98]",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
       },
       size: {

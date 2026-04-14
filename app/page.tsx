@@ -5,41 +5,27 @@ import type { Metadata } from "next";
 import dynamic_import from "next/dynamic";
 import { HeroSection } from "@/components/marketing/hero-section";
 import { TrustBar } from "@/components/marketing/trust-bar";
-import { PressBar } from "@/components/marketing/press-bar";
+import { MedicationStrip } from "@/components/marketing/medication-strip";
 import { ProblemSection } from "@/components/marketing/problem-section";
-import { PersonaSection } from "@/components/marketing/persona-section";
 import { SolutionSection } from "@/components/marketing/solution-section";
 import { ProcessSection } from "@/components/marketing/process-section";
 import { Disclaimer } from "@/components/shared/disclaimer";
 import { OrganizationJsonLd, FAQPageJsonLd, HowToJsonLd, ProductJsonLd, MedicalWebPageJsonLd, SiteLinksSearchBoxJsonLd } from "@/components/seo/json-ld";
 import { MarketingShell } from "@/components/layout/marketing-shell";
-import { ConditionsSection } from "@/components/marketing/conditions-section";
 import { siteConfig } from "@/lib/site";
 import { faqs } from "@/lib/content";
 import { fetchDbPlans } from "@/lib/pricing-server";
 
 // Lazy load below-fold sections to reduce initial JS bundle (~40% faster LCP)
 const MedicationShowcase = dynamic_import(() => import("@/components/marketing/medication-showcase").then(m => ({ default: m.MedicationShowcase })));
-const MedicationSection = dynamic_import(() => import("@/components/marketing/medication-section").then(m => ({ default: m.MedicationSection })));
 const EligibilityChecker = dynamic_import(() => import("@/components/marketing/eligibility-checker").then(m => ({ default: m.EligibilityChecker })));
-const ComparisonSection = dynamic_import(() => import("@/components/marketing/comparison-section").then(m => ({ default: m.ComparisonSection })));
-const DifferentiatorSection = dynamic_import(() => import("@/components/marketing/differentiator-section").then(m => ({ default: m.DifferentiatorSection })));
-const SavingsCalculator = dynamic_import(() => import("@/components/marketing/savings-calculator").then(m => ({ default: m.SavingsCalculator })));
 const ResultsSection = dynamic_import(() => import("@/components/marketing/results-section").then(m => ({ default: m.ResultsSection })));
-const TimelineSection = dynamic_import(() => import("@/components/marketing/timeline-section").then(m => ({ default: m.TimelineSection })));
-const BeforeAfterSection = dynamic_import(() => import("@/components/marketing/before-after-section").then(m => ({ default: m.BeforeAfterSection })));
 const TestimonialSection = dynamic_import(() => import("@/components/marketing/testimonial-section").then(m => ({ default: m.TestimonialSection })));
-const VideoTestimonials = dynamic_import(() => import("@/components/marketing/video-testimonials").then(m => ({ default: m.VideoTestimonials })));
-const PressSection = dynamic_import(() => import("@/components/marketing/press-section").then(m => ({ default: m.PressSection })));
-const ProviderSection = dynamic_import(() => import("@/components/marketing/provider-section").then(m => ({ default: m.ProviderSection })));
 const GuaranteeSection = dynamic_import(() => import("@/components/marketing/guarantee-section").then(m => ({ default: m.GuaranteeSection })));
 const PricingSection = dynamic_import(() => import("@/components/marketing/pricing-section").then(m => ({ default: m.PricingSection })));
 const FaqSection = dynamic_import(() => import("@/components/marketing/faq-section").then(m => ({ default: m.FaqSection })));
 const CtaSection = dynamic_import(() => import("@/components/marketing/cta-section").then(m => ({ default: m.CtaSection })));
 const ObjectionHandler = dynamic_import(() => import("@/components/marketing/objection-handler").then(m => ({ default: m.ObjectionHandler })));
-const PartnerLogos = dynamic_import(() => import("@/components/marketing/partner-logos").then(m => ({ default: m.PartnerLogos })));
-const MoneyBackGuarantee = dynamic_import(() => import("@/components/marketing/money-back-guarantee").then(m => ({ default: m.MoneyBackGuarantee })));
-const BeforeAfterSlider = dynamic_import(() => import("@/components/marketing/before-after-slider").then(m => ({ default: m.BeforeAfterSlider })));
 
 // SEO metadata optimized for GLP-1 weight loss keywords
 export const metadata: Metadata = {
@@ -111,10 +97,10 @@ export default async function HomePage() {
         />
       ))}
 
-      {/* ATTENTION: Hook them immediately (eagerly loaded — above the fold) */}
+      {/* === PHASE 1: HOOK — above the fold === */}
       <HeroSection />
       <TrustBar />
-      <PressBar />
+      <MedicationStrip />
 
       {/* COMPLIANCE: FDA disclosure — required above primary content */}
       <div className="border-b border-navy-100/40 bg-linen/60 py-3">
@@ -125,66 +111,23 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* PROBLEM: Make them feel understood */}
-      <ProblemSection />
-      <PersonaSection />
+      {/* === PHASE 2: PROVE — early social proof === */}
+      <TestimonialSection />
+      <ResultsSection />
 
-      {/* SOLUTION: Show the way out */}
+      {/* === PHASE 3: EXPLAIN — what it is, how it works === */}
+      <ProblemSection />
       <SolutionSection />
       <MedicationShowcase />
-      <MedicationSection />
 
-      {/* ACTION: Make it easy */}
+      {/* === PHASE 4: CONVERT — pricing and action === */}
       <ProcessSection />
+      <PricingSection plans={plans} />
       <EligibilityChecker />
 
-      {/* VALUE: Justify the investment */}
-      <ComparisonSection />
-      <DifferentiatorSection />
-      <SavingsCalculator />
-
-      {/* PROOF: Remove all doubt */}
-      <ResultsSection />
-      <TimelineSection />
-      <BeforeAfterSection />
-
-      {/* Interactive comparison */}
-      <section className="py-12 bg-gradient-to-b from-white to-sage/10">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
-          <p className="text-xs font-semibold uppercase tracking-wider text-teal mb-2">Interactive Results</p>
-          <h2 className="text-2xl font-bold text-navy sm:text-3xl mb-8">Drag to see the transformation</h2>
-          <BeforeAfterSlider
-            beforeWeight="247 lbs"
-            afterWeight="198 lbs"
-            name="Sarah M., 34"
-            duration="5 months on Premium plan"
-          />
-          <p className="mt-4 text-[10px] text-graphite-400">Artistic simulation for illustrative purposes only &middot; Not actual photos &middot; Individual results vary and are not guaranteed</p>
-        </div>
-      </section>
-      <TestimonialSection />
-      <VideoTestimonials />
-      <PressSection />
-
-      {/* TRUST: Final authority signals */}
-      <ProviderSection />
-      <GuaranteeSection />
-      <PartnerLogos />
-
-      {/* OBJECTIONS: Handle last-minute concerns */}
+      {/* === PHASE 5: REASSURE — handle objections and close === */}
       <ObjectionHandler />
-
-      {/* CONVERT: Close the deal */}
-      <PricingSection plans={plans} />
-
-      {/* GUARANTEE: Remove final risk */}
-      <div className="py-12">
-        <div className="mx-auto max-w-2xl px-4 sm:px-6">
-          <MoneyBackGuarantee variant="full" />
-        </div>
-      </div>
-
-      <ConditionsSection />
+      <GuaranteeSection />
       <FaqSection limit={8} />
       <CtaSection />
 

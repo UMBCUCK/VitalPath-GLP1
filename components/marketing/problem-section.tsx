@@ -72,7 +72,7 @@ export function ProblemSection() {
                 </p>
                 <Link href="/qualify" className="mt-4 inline-block">
                   <Button size="sm" className="gap-1.5">
-                    See If You Qualify <ArrowRight className="h-3.5 w-3.5" />
+                    Start Free Assessment <ArrowRight className="h-3.5 w-3.5" />
                   </Button>
                 </Link>
               </div>

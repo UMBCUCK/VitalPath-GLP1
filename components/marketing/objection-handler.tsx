@@ -70,7 +70,7 @@ export function ObjectionHandler() {
             Questions you&apos;re probably thinking right now
           </h2>
           <p className="mt-2 text-sm text-graphite-500">
-            We answer these hundreds of times a week. Here&apos;s the honest truth.
+            We&apos;ve helped 18,000+ members work through these exact concerns. Here&apos;s the honest truth.
           </p>
         </div>
 
@@ -98,6 +98,10 @@ export function ObjectionHandler() {
                   <obj.icon className="h-4.5 w-4.5" />
                 </div>
                 <span className="flex-1 text-sm font-bold text-navy">{obj.question}</span>
+                <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-0.5 mr-2">
+                  <span className="text-xs font-bold text-teal">{obj.stat}</span>
+                  <span className="text-[10px] text-graphite-400">{obj.statLabel}</span>
+                </span>
                 <ChevronDown
                   className={cn(
                     "h-4 w-4 shrink-0 text-graphite-400 transition-transform duration-200",

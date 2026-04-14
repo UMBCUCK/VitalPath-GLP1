@@ -116,7 +116,7 @@ export default function EnterprisePage() {
           <h2 className="text-2xl font-bold text-navy text-center mb-8">What&apos;s Included for Every Employee</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {[
-              "Licensed provider evaluation within 24 hours",
+              "Licensed provider evaluation within 1 business day",
               "GLP-1 medication if prescribed (compounded)",
               "Free 2-day shipping to employee's address",
               "Structured weekly meal plans and recipes",

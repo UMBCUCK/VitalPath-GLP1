@@ -88,7 +88,7 @@ export function SolutionSection() {
           <div>
             <SectionHeading
               eyebrow="The Science"
-              title="GLP-1: The medical breakthrough changing weight loss"
+              title="The science that finally explains why nothing else worked"
               align="left"
             />
 
@@ -114,6 +114,17 @@ export function SolutionSection() {
                 );
               })}
             </div>
+
+            {/* CTA — after science explanation, catch visitors ready to act */}
+            <AnimateOnView className="mt-8" delay={0.5}>
+              <a
+                href="/qualify"
+                className="inline-flex items-center gap-2 rounded-full bg-emerald px-8 py-4 text-base font-semibold text-white shadow-[0_4px_14px_rgba(5,150,105,0.35)] transition-all duration-200 hover:scale-[1.02] hover:bg-emerald-700"
+              >
+                Start Free Assessment →
+              </a>
+              <p className="mt-2 text-xs text-graphite-400">Takes 2 minutes. Same-day provider evaluation.</p>
+            </AnimateOnView>
           </div>
         </div>
       </SectionShell>

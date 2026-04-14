@@ -16,8 +16,8 @@ export function ProcessSection() {
       <SectionShell>
         <SectionHeading
           eyebrow="How It Works"
-          title="3 simple steps. No waiting rooms."
-          description="From assessment to doorstep delivery — most patients start treatment within 48 hours."
+          title="From your couch to treatment in 48 hours."
+          description="No waiting rooms. No awkward appointments. A licensed provider reviews your case the same day."
         />
 
         <div className="grid gap-8 lg:grid-cols-3">
@@ -82,12 +82,12 @@ export function ProcessSection() {
 
         <AnimateOnView className="mt-8 text-center" delay={0.5}>
           <TrackedLink href="/qualify" cta="process_assessment" location="process_section">
-            <Button size="xl" className="gap-2 px-10">
-              Start My Assessment
+            <Button variant="emerald" size="xl" className="gap-2 px-10 rounded-full">
+              Start Free Assessment
               <ArrowRight className="h-5 w-5" />
             </Button>
           </TrackedLink>
-          <p className="mt-3 text-xs text-graphite-400">Takes about 2 minutes. No commitment required.</p>
+          <p className="mt-3 text-xs text-graphite-400">Takes 2 minutes. No commitment. Same-day provider evaluation.</p>
         </AnimateOnView>
       </SectionShell>
     </section>

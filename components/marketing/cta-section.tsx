@@ -31,22 +31,22 @@ export function CtaSection() {
         </div>
 
         <h2 className="mx-auto max-w-3xl text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-          Every month you wait costs you
+          Ready to lose the weight
           <br />
           <span className="bg-gradient-to-r from-teal-300 to-teal-100 bg-clip-text text-transparent">
-            another month of results
+            that's held you back for years?
           </span>
         </h2>
 
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-navy-300">
-          Your biology won&apos;t change on its own. Take the first step today &mdash;
-          a free, private assessment takes just 2 minutes.
+        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-white/70">
+          Join 18,000+ members who stopped fighting their biology and started working with it.
+          Free assessment. Same-day provider evaluation. Medication at your door in 48 hours.
         </p>
 
         {/* Main CTA */}
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <TrackedLink href="/qualify" cta="final_cta_qualify" location="cta_section">
-            <Button size="xl" variant="gold" className="gap-2 px-12 h-16 text-lg rounded-2xl shadow-gold-glow hover:shadow-premium-lg transition-all duration-300 hover:scale-[1.02]">
+            <Button size="xl" variant="emerald" className="gap-2 px-12 h-16 text-lg rounded-full transition-all duration-300 hover:scale-[1.02] hover:brightness-110">
               See If I Qualify
               <ArrowRight className="h-5 w-5" />
             </Button>
@@ -58,20 +58,16 @@ export function CtaSection() {
           </TrackedLink>
         </div>
 
-        <p className="mt-4 text-sm text-navy-400">
-          Join <span className="font-semibold text-white">18,000+</span> members already on their journey
-        </p>
-
         {/* Trust reinforcement */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-navy-400">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-white/60">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="h-4 w-4 text-emerald-400" /> 30-day money-back guarantee
           </span>
           <span className="flex items-center gap-1.5">
-            <Check className="h-4 w-4 text-teal-400" /> No commitment required
+            <Check className="h-4 w-4 text-teal-400" /> Free assessment — no credit card
           </span>
           <span className="flex items-center gap-1.5">
-            <Check className="h-4 w-4 text-teal-400" /> Free to start
+            <Check className="h-4 w-4 text-teal-400" /> Medication ships in 48 hours
           </span>
           <span className="flex items-center gap-1.5">
             <Shield className="h-4 w-4 text-teal-400" /> HIPAA protected

@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "development" ? "http://localhost:3000" : "");
 
-  const disallowPaths = ["/admin/", "/dashboard/", "/api/", "/checkout/"];
+  const disallowPaths = ["/admin/", "/dashboard/", "/provider/", "/reseller/", "/api/", "/checkout/", "/intake/", "/login", "/register", "/success"];
 
   return {
     rules: [

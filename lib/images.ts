@@ -26,11 +26,11 @@ const BLUR_DARK = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNCIgaGVpZ2h0PSI1IiB
 // ─── HERO ──────────────────────────────────────────────────
 // Confident, warm, natural — someone who looks like they've found something that works
 export const heroImage = {
-  src: unsplash("photo-1607746882042-944635dfe10e", 800), // Confident woman outdoors, warm light, natural smile
-  alt: "Confident woman enjoying an active, healthy lifestyle outdoors",
+  src: "/hero-glp1-pens.png.png", // GLP-1 pen image — file is in public/hero-glp1-pens.png.png
+  alt: "GLP-1 weight loss medication injection pens",
   width: 600,
-  height: 720,
-  blurDataURL: BLUR_WARM,
+  height: 600,
+  blurDataURL: BLUR_COOL,
 };
 
 // ─── BEFORE / AFTER (lifestyle progression — low energy → high energy) ───

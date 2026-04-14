@@ -1,13 +1,31 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Link from "next/link";
+
+const ObjectionHandler = dynamic(
+  () => import("@/components/marketing/objection-handler").then((m) => m.ObjectionHandler),
+  { loading: () => null }
+);
 import { ArrowRight, Check, ShieldCheck, Star, Clock, Stethoscope, Activity, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LpFaq } from "@/components/lp/lp-faq";
+import { LpConversionWidgets } from "@/components/lp/lp-conversion-widgets";
+import { MedicalWebPageJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: "GLP-1 Weight Loss for Adults Over 40 | Nature's Journey",
   description: "Medically supervised GLP-1 weight loss designed for adults 40+. Providers experienced with metabolic slowdown, joint health, and age-related weight gain. From $279/mo.",
+  openGraph: {
+    title: "GLP-1 Weight Loss for Adults Over 40",
+    description: "Medically supervised weight loss for adults 40+. Metabolic slowdown, joint health, muscle preservation. From $279/mo.",
+    type: "website",
+  },
+  robots: { index: true, follow: true },
+  alternates: {
+    canonical: "/lp/over40",
+  },
 };
 
 const ageSpecificBenefits = [
@@ -21,6 +39,14 @@ const testimonials = [
   { name: "Robert T.", age: 54, lbs: 47, months: 7, quote: "At 54, I'd accepted the weight. Down 47 lbs in 7 months. My knees feel like they did in my 30s." },
   { name: "Karen W.", age: 46, lbs: 31, months: 4, quote: "My doctor said my cholesterol and A1C both improved dramatically. The weight loss is a bonus." },
   { name: "James L.", age: 62, lbs: 38, months: 6, quote: "I was skeptical at my age. My provider adjusted everything for my medications. Best health investment I've made." },
+];
+
+const over40Faqs = [
+  { question: "Am I too old for GLP-1 medication?", answer: "Age alone is not a disqualifying factor. Many of our most successful members are in their 50s and 60s. Your provider evaluates your complete health picture — including other medications, conditions, and goals." },
+  { question: "What about my other medications?", answer: "Your provider conducts a thorough medication review before prescribing. GLP-1 medications are generally well-tolerated alongside common medications for blood pressure, cholesterol, and diabetes. Always disclose your full medication list." },
+  { question: "Will it affect my joints?", answer: "Weight loss typically improves joint health. Every pound lost reduces approximately 4 pounds of pressure on your knees. Many members over 40 report significant improvements in joint comfort and mobility." },
+  { question: "How is this different from diet programs?", answer: "After 40, metabolic slowdown, hormonal changes, and medication interactions make diet-only approaches less effective. GLP-1 works at the biological level to address the hormonal factors that make weight loss harder with age." },
+  { question: "Will I lose muscle mass?", answer: "We prioritize muscle preservation with protein-optimized meal guidance and provider monitoring. Your provider tracks your progress to ensure you're losing fat, not muscle. Strength training recommendations are included." },
 ];
 
 export default function Over40LandingPage() {
@@ -117,6 +143,15 @@ export default function Over40LandingPage() {
         </div>
       </section>
 
+      {/* Objection Handler */}
+      <ObjectionHandler />
+
+      {/* FAQ */}
+      <LpFaq
+        faqs={over40Faqs}
+        heading="Questions About GLP-1 After 40"
+      />
+
       <section className="py-14">
         <div className="mx-auto max-w-xl px-4 text-center">
           <h2 className="text-2xl font-bold text-navy">It&apos;s not too late. It&apos;s actually the perfect time.</h2>
@@ -135,6 +170,10 @@ export default function Over40LandingPage() {
       <footer className="border-t border-navy-100/40 py-6 text-center text-[10px] text-graphite-400">
         <p>Nature&apos;s Journey Health &middot; Compounded medications from licensed pharmacies &middot; Eligibility determined by providers</p>
       </footer>
+
+      <MedicalWebPageJsonLd name="GLP-1 Weight Loss for Adults Over 40" description="Medically supervised weight loss for adults 40+. Metabolic slowdown, joint health, muscle preservation." url="/lp/over40" />
+      <FAQPageJsonLd faqs={over40Faqs} />
+      <LpConversionWidgets />
     </div>
   );
 }

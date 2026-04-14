@@ -52,7 +52,7 @@ export function StickyDesktopCta() {
           </div>
           <span className="text-xs font-semibold text-teal">Save 79%</span>
           <Link href="/qualify" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { location: "sticky_desktop", target: "/qualify" })}>
-            <Button size="sm" className="gap-1.5 shadow-glow">
+            <Button variant="emerald" size="sm" className="gap-1.5 rounded-full">
               See If I Qualify
               <ArrowRight className="h-3.5 w-3.5" />
             </Button>

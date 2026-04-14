@@ -31,8 +31,8 @@ export function PricingSection({ plans = defaultPlans }: { plans?: PricingPlan[]
       <SectionShell>
         <SectionHeading
           eyebrow="Plans & Pricing"
-          title="Invest in your health for less than you think"
-          description="Every plan includes provider evaluation, personalized treatment, and medication if prescribed. Up to 79% less than brand-name retail."
+          title="Complete GLP-1 care. Starting at $279/mo."
+          description="Every plan includes provider evaluation, personalized treatment plan, and medication if prescribed. Up to 79% less than brand-name retail."
         />
 
         {/* Billing toggle */}
@@ -175,9 +175,9 @@ export function PricingSection({ plans = defaultPlans }: { plans?: PricingPlan[]
                   <CardFooter className="flex-col gap-3">
                     <Link href={`/qualify?plan=${plan.slug}`} className="w-full">
                       <Button
-                        variant={plan.highlighted ? "default" : "outline"}
+                        variant={plan.highlighted ? "emerald" : "outline"}
                         size="lg"
-                        className="w-full gap-2"
+                        className={cn("w-full gap-2", plan.highlighted && "rounded-full")}
                       >
                         {plan.highlighted ? "See If I Qualify" : "Get Started"}
                         <ArrowRight className="h-4 w-4" />
@@ -230,6 +230,9 @@ export function PricingSection({ plans = defaultPlans }: { plans?: PricingPlan[]
         <p className="mt-6 text-center text-xs text-graphite-400">
           All plans include a licensed provider evaluation. Treatment eligibility is determined by your provider.
           Medication is only available to eligible patients. Cancel or adjust anytime.
+        </p>
+        <p className="mt-2 text-center text-xs text-graphite-400">
+          Membership fees cover the program, provider evaluation, and care team access. <strong>Medication pricing is separate</strong> and determined at the time of prescribing based on dose, formulation, and pharmacy. Your provider will discuss medication costs before prescribing.
         </p>
         <p className="mt-2 text-center text-[10px] text-graphite-300">
           *Brand-name retail price based on published U.S. cash-pay pricing for FDA-approved GLP-1 medications as of 2025. Prices vary by pharmacy and location. Compounded medications are not FDA-approved drug products and are not the same as branded medications.

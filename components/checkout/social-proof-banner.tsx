@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 const messages = [
   "142 people started their journey this week",
   "Sarah from TX lost 34 lbs in 4 months",
-  "94% of members would recommend VitalPath",
-  "Average weight loss: 15% of body weight",
+  "94% of members would recommend Nature's Journey",
+  "Average weight loss: 15% of body weight (member survey, individual results vary)",
 ];
 
 export function SocialProofBanner() {

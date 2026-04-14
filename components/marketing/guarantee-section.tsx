@@ -61,10 +61,10 @@ export function GuaranteeSection() {
             <div className="p-8 sm:p-12">
               <div className="text-center mb-10">
                 <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-                  Our promise to you
+                  No risk. No contracts. No wasted time.
                 </h2>
                 <p className="mt-2 text-base text-graphite-500">
-                  We&apos;re confident this works. That&apos;s why we make it risk-free to start.
+                  Try it for 90 days. If you&apos;re not on track, we adjust your plan — at no extra cost.
                 </p>
               </div>
 
@@ -84,8 +84,8 @@ export function GuaranteeSection() {
 
               <div className="mt-8 text-center">
                 <Link href="/qualify">
-                  <Button size="lg" className="gap-2">
-                    Start Risk-Free <ArrowRight className="h-4 w-4" />
+                  <Button variant="emerald" size="lg" className="gap-2 rounded-full">
+                    Start Free Assessment <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <p className="mt-2 text-xs text-graphite-400">Free assessment &middot; No commitment &middot; Cancel anytime</p>

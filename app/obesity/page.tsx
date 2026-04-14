@@ -22,7 +22,7 @@ import { MedicalConditionJsonLd, BreadcrumbJsonLd, FAQPageJsonLd } from "@/compo
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "GLP-1 Medication for Obesity | FDA-Approved Weight Loss Treatment | VitalPath",
+  title: "GLP-1 Medication for Obesity | FDA-Approved Weight Loss Treatment | Nature's Journey",
   description:
     "GLP-1 medications are FDA-approved for obesity (BMI 30+). Semaglutide and tirzepatide produce 15-22% total body weight loss in clinical trials. Get provider-evaluated treatment online.",
   openGraph: {
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
 const stats = [
   { stat: "~21%", label: "Avg weight loss with tirzepatide (SURMOUNT-1 trial, max dose)" },
   { stat: "FDA-approved", label: "For adults with BMI 30+ for chronic weight management" },
-  { stat: "18,000+", label: "Members treated through VitalPath" },
-  { stat: "87%", label: "Of applicants qualify at BMI 30+ or higher" },
+  { stat: "18,000+", label: "Members served" },
+  { stat: "Board-certified", label: "Physicians evaluate every patient" },
 ];
 
 const mechanismCards = [
@@ -89,7 +89,7 @@ const qualifiesCriteria = [
 const faqs = [
   {
     q: "Is GLP-1 medication FDA-approved for obesity?",
-    a: "Yes. Semaglutide (brand name Wegovy) received FDA approval in 2021 for chronic weight management in adults with a BMI of 30 or higher, or 27+ with a weight-related condition. Tirzepatide (brand name Zepbound) received FDA approval in 2023 for the same indications. VitalPath uses compounded versions of these active ingredients at significantly lower cost.",
+    a: "Yes. Semaglutide (brand name Wegovy) received FDA approval in 2021 for chronic weight management in adults with a BMI of 30 or higher, or 27+ with a weight-related condition. Tirzepatide (brand name Zepbound) received FDA approval in 2023 for the same indications. Nature's Journey uses compounded versions of these active ingredients at significantly lower cost.",
   },
   {
     q: "What BMI is required to get GLP-1 medication for obesity?",
@@ -223,7 +223,7 @@ export default function ObesityPage() {
             </div>
             <div className="mt-6 rounded-2xl border border-teal/20 bg-teal-50/30 p-5">
               <p className="text-xs text-teal-700 leading-relaxed">
-                Trial data cited from original publications. Results represent average weight loss in the full trial population; individual results vary. VitalPath uses compounded semaglutide and tirzepatide — not FDA-approved branded products. Compounded medications are not FDA-approved.
+                Trial data cited from original publications. Results represent average weight loss in the full trial population; individual results vary. Nature's Journey uses compounded semaglutide and tirzepatide — not FDA-approved branded products. Compounded medications are not FDA-approved.
               </p>
             </div>
           </div>
@@ -354,7 +354,7 @@ export default function ObesityPage() {
       <section className="py-8 border-t border-navy-100/40">
         <SectionShell>
           <p className="mx-auto max-w-3xl text-center text-xs text-graphite-300 leading-relaxed">
-            {siteConfig.compliance.shortDisclaimer} Clinical data cited from published peer-reviewed research including STEP-1 (Wilding JP et al., NEJM 2021) and SURMOUNT-1 (Jastreboff AM et al., NEJM 2022). Individual results vary. Treatment eligibility determined by a licensed medical provider. VitalPath uses compounded semaglutide and tirzepatide, which are not FDA-approved branded medications.
+            {siteConfig.compliance.shortDisclaimer} Clinical data cited from published peer-reviewed research including STEP-1 (Wilding JP et al., NEJM 2021) and SURMOUNT-1 (Jastreboff AM et al., NEJM 2022). Individual results vary. Treatment eligibility determined by a licensed medical provider. Nature's Journey uses compounded semaglutide and tirzepatide, which are not FDA-approved branded medications.
           </p>
         </SectionShell>
       </section>

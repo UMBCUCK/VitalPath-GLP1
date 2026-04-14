@@ -211,7 +211,7 @@ export default function SuccessPage() {
             </h3>
             <p className="mt-2 text-sm text-graphite-500">
               Members who add meal plans and recipes to their program report higher satisfaction
-              and better adherence. Add it now and get your first month at 20% off.
+              with the program. Add it now and get your first month at 20% off.
             </p>
             <div className="mt-4">
               <Button variant="gold" className="gap-2">

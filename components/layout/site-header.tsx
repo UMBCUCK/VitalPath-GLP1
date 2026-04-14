@@ -43,7 +43,7 @@ export function SiteHeader() {
             </Button>
           </Link>
           <Link href="/qualify" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { location: "header", target: "/qualify" })}>
-            <Button size="sm">Get Started</Button>
+            <Button variant="emerald" size="sm" className="rounded-full px-5">Get Started</Button>
           </Link>
         </div>
 
@@ -82,7 +82,7 @@ export function SiteHeader() {
               </Button>
             </Link>
             <Link href="/qualify" onClick={() => { track(ANALYTICS_EVENTS.CTA_CLICK, { location: "header_mobile", target: "/qualify" }); setMobileOpen(false); }}>
-              <Button className="w-full">Get Started</Button>
+              <Button variant="emerald" className="w-full rounded-full">Get Started</Button>
             </Link>
           </div>
         </nav>

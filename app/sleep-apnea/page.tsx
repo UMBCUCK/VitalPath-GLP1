@@ -22,11 +22,11 @@ import { siteConfig } from "@/lib/site";
 import { FAQPageJsonLd, MedicalConditionJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "GLP-1 Medication for Sleep Apnea & Weight Loss | VitalPath",
+  title: "GLP-1 Medication for Sleep Apnea & Weight Loss | Nature's Journey",
   description:
     "GLP-1 medications like tirzepatide are now FDA-approved to treat obesity-related sleep apnea. Clinical trials show significant AHI reduction with weight loss. Get evaluated online.",
   openGraph: {
-    title: "GLP-1 Medication for Sleep Apnea & Weight Loss | VitalPath",
+    title: "GLP-1 Medication for Sleep Apnea & Weight Loss | Nature's Journey",
     description:
       "GLP-1 medications like tirzepatide are now FDA-approved to treat obesity-related sleep apnea. Clinical trials show significant AHI reduction with weight loss. Get evaluated online.",
   },
@@ -275,7 +275,7 @@ export default function SleepApneaPage() {
                 <ul className="mt-2 space-y-1.5 text-xs text-graphite-600 leading-relaxed">
                   <li>• Do not stop CPAP or other prescribed PAP therapy without your sleep specialist's guidance. GLP-1 treatment and PAP therapy are complementary, not mutually exclusive.</li>
                   <li>• As your weight decreases, CPAP pressure settings may need adjustment — work with your sleep specialist to monitor and reassess.</li>
-                  <li>• Share your sleep apnea diagnosis with your VitalPath provider during intake. It is a qualifying comorbidity for treatment and relevant to your clinical plan.</li>
+                  <li>• Share your sleep apnea diagnosis with your provider during intake. It is a qualifying comorbidity for treatment and relevant to your clinical plan.</li>
                 </ul>
               </div>
             </div>

@@ -70,6 +70,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/accessibility`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
     { url: `${baseUrl}/free-guide`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${baseUrl}/press`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+
+    // Landing pages — high-value conversion pages for paid ads and organic search
+    { url: `${baseUrl}/lp/glp1`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/ozempic-alternative`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/semaglutide`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/tirzepatide`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/women`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/women-weight-loss`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/men`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/over40`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/over50`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/menopause`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/pcos`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/belly-fat`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/no-surgery`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/affordable`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/postpartum`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
   ];
 
   // Dynamic pages from DB — wrapped in try/catch for build-time when DB isn't available

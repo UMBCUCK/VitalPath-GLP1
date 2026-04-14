@@ -77,7 +77,7 @@ export function TestimonialSection() {
       <SectionShell>
         <SectionHeading
           eyebrow="Verified Reviews"
-          title="Real people. Real results. Real reviews."
+          title="Thousands of real transformations. Here are a few."
         />
 
         {/* Google-style Rating Summary */}
@@ -320,9 +320,22 @@ export function TestimonialSection() {
           </div>
         </AnimateOnView>
 
-        <p className="mt-4 text-center text-[10px] text-graphite-300">
-          Individual experiences. Results vary and depend on many factors including adherence to treatment plans, diet, exercise, and individual health conditions.
+        <p className="mt-4 text-center text-xs text-graphite-400">
+          Individual experiences. <strong>Results not typical.</strong> Results vary based on adherence, diet, exercise, and individual health factors.
         </p>
+
+        {/* CTA — capture high-intent visitors who read reviews */}
+        <AnimateOnView className="mt-10 text-center" delay={0.4}>
+          <a
+            href="/qualify"
+            className="inline-flex items-center gap-2 rounded-full bg-emerald px-10 py-4 text-base font-semibold text-white shadow-[0_4px_14px_rgba(5,150,105,0.35)] transition-all duration-200 hover:scale-[1.02] hover:bg-emerald-700"
+          >
+            Start Free Assessment →
+          </a>
+          <p className="mt-3 text-xs text-graphite-400">
+            Join 18,000+ members already losing weight &middot; 2 minutes &middot; No commitment
+          </p>
+        </AnimateOnView>
       </SectionShell>
     </section>
   );

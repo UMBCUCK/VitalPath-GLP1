@@ -34,16 +34,16 @@ export function LeafIcon({ className }: { className?: string }) {
       />
       <defs>
         <linearGradient id="leaf-left" x1="8" y1="28" x2="18" y2="8" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#1B5E20" />
-          <stop offset="1" stopColor="#388E3C" />
+          <stop stopColor="#005066" />
+          <stop offset="1" stopColor="#0098D4" />
         </linearGradient>
         <linearGradient id="leaf-center" x1="20" y1="26" x2="20" y2="4" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#2E7D32" />
-          <stop offset="1" stopColor="#43A047" />
+          <stop stopColor="#0077A8" />
+          <stop offset="1" stopColor="#00BAEE" />
         </linearGradient>
         <linearGradient id="leaf-right" x1="32" y1="28" x2="22" y2="8" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#1B5E20" />
-          <stop offset="1" stopColor="#388E3C" />
+          <stop stopColor="#005066" />
+          <stop offset="1" stopColor="#0098D4" />
         </linearGradient>
       </defs>
     </svg>

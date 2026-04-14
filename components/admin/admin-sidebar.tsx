@@ -57,6 +57,7 @@ import {
   MousePointerClick,
   BookOpen,
   PieChart,
+  Layers,
   Filter,
   GitBranch,
   Watch,
@@ -153,6 +154,7 @@ const navGroups: NavGroup[] = [
       { label: "Media Library", href: "/admin/media", icon: Image },
       { label: "Intelligence", href: "/admin/content-intelligence", icon: Sparkles },
       { label: "Marketing Assets", href: "/admin/marketing-assets", icon: Image },
+      { label: "Landing Pages", href: "/admin/landing-pages", icon: Layers },
     ],
   },
   {

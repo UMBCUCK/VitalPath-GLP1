@@ -25,17 +25,17 @@ export const metadata: Metadata = {
 };
 
 const outcomeStats = [
-  { value: "~18 lbs", label: "Average loss at 3 months", sub: "based on member data" },
-  { value: "~34 lbs", label: "Average loss at 6 months", sub: "members reaching therapeutic dose" },
-  { value: "~49 lbs", label: "Average loss at 12 months", sub: "members completing full year" },
-  { value: "91%", label: "Reported reduced food cravings", sub: "within first 60 days" },
+  { value: "~18 lbs", label: "Average loss at 3 months", sub: "members who reported weight data†" },
+  { value: "~34 lbs", label: "Average loss at 6 months", sub: "members at therapeutic dose†" },
+  { value: "~49 lbs", label: "Average loss at 12 months", sub: "members completing full year†" },
+  { value: "Most", label: "Report reduced appetite", sub: "within first 60 days (member survey)†" },
 ];
 
 const milestones = [
-  { pct: "73%", label: "Hit 5% weight loss milestone", time: "within 3 months" },
-  { pct: "61%", label: "Hit 10% weight loss milestone", time: "within 6 months" },
-  { pct: "38%", label: "Hit 15% weight loss milestone", time: "within 12 months" },
-  { pct: "94%", label: "Would recommend VitalPath", time: "survey of active members" },
+  { pct: "73%", label: "Hit 5% weight loss milestone", time: "within 3 months†" },
+  { pct: "61%", label: "Hit 10% weight loss milestone", time: "within 6 months†" },
+  { pct: "38%", label: "Hit 15% weight loss milestone", time: "within 12 months†" },
+  { pct: "94%", label: "Would recommend Nature's Journey", time: "post-program member survey†" },
 ];
 
 const stories = [
@@ -238,6 +238,9 @@ export default function ResultsPage() {
               </div>
             ))}
           </div>
+          <p className="mt-6 text-center text-[10px] text-graphite-300 max-w-3xl mx-auto">
+            † Outcomes data based on Nature&apos;s Journey member records for members who actively reported weight or survey data within each timeframe. Not all members report data. Members who discontinued treatment early are not included in completion-based figures. Individual results vary based on adherence, starting weight, dose achieved, diet, exercise, and health factors. This data has not been independently verified.
+          </p>
         </SectionShell>
       </section>
 
@@ -259,7 +262,7 @@ export default function ResultsPage() {
             ))}
           </div>
           <p className="mt-6 text-center text-xs text-graphite-300 max-w-2xl mx-auto">
-            Milestone data based on VitalPath members who completed at least 3 months of treatment and reported weight data. Individual results vary.
+            † Milestone data based on Nature&apos;s Journey members who completed at least 3 months of treatment and reported weight data. Members who did not report data or discontinued early are not included. Individual results vary significantly.
           </p>
         </SectionShell>
       </section>
@@ -354,9 +357,9 @@ export default function ResultsPage() {
 
                 {/* Disclosure */}
                 <div className="mt-4 flex items-start gap-1.5 rounded-lg bg-navy-50/30 px-3 py-2">
-                  <Shield className="mt-0.5 h-3 w-3 shrink-0 text-graphite-300" />
-                  <p className="text-[10px] leading-relaxed text-graphite-300">
-                    Individual experience. Results not typical. Shared with permission. Your results will vary based on adherence, diet, exercise, and health factors.
+                  <Shield className="mt-0.5 h-3 w-3 shrink-0 text-graphite-400" />
+                  <p className="text-xs leading-relaxed text-graphite-400">
+                    Individual experience. <strong>Results not typical.</strong> Shared with permission. Your results will vary.
                   </p>
                 </div>
               </div>
