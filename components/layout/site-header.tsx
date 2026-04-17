@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchDialog } from "@/components/layout/search-dialog";
 import { BrandLogo } from "@/components/layout/brand-logo";
@@ -10,8 +10,75 @@ import { siteConfig } from "@/lib/site";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
+// TEMP preview directory — all landing pages grouped for quick QA access.
+// Remove (or gate behind ADMIN) before public launch.
+const LP_GROUPS = [
+  {
+    category: "By Condition",
+    pages: [
+      { label: "Belly Fat", slug: "belly-fat" },
+      { label: "PCOS", slug: "pcos" },
+      { label: "Menopause", slug: "menopause" },
+      { label: "Postpartum", slug: "postpartum" },
+      { label: "Medical Weight Management", slug: "medical-weight-management" },
+    ],
+  },
+  {
+    category: "By Audience",
+    pages: [
+      { label: "Men", slug: "men" },
+      { label: "Women", slug: "women" },
+      { label: "Women (Every Phase)", slug: "women-weight-loss" },
+      { label: "Over 40", slug: "over40" },
+      { label: "Over 50", slug: "over50" },
+    ],
+  },
+  {
+    category: "By Medication",
+    pages: [
+      { label: "GLP-1 (Overview)", slug: "glp1" },
+      { label: "Semaglutide", slug: "semaglutide" },
+      { label: "Tirzepatide", slug: "tirzepatide" },
+      { label: "Ozempic Alternative", slug: "ozempic-alternative" },
+      { label: "Wegovy Alternative", slug: "wegovy-alternative" },
+      { label: "Mounjaro Alternative", slug: "mounjaro-alternative" },
+      { label: "Zepbound Alternative", slug: "zepbound-alternative" },
+    ],
+  },
+  {
+    category: "Other Angles",
+    pages: [
+      { label: "Affordable", slug: "affordable" },
+      { label: "No Surgery", slug: "no-surgery" },
+      { label: "Telehealth", slug: "telehealth" },
+    ],
+  },
+] as const;
+
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [lpDesktopOpen, setLpDesktopOpen] = useState(false);
+  const [lpMobileOpen, setLpMobileOpen] = useState(false);
+  const lpDesktopRef = useRef<HTMLDivElement>(null);
+
+  // Close desktop LP dropdown on click outside or Escape
+  useEffect(() => {
+    if (!lpDesktopOpen) return;
+    function onDocClick(e: MouseEvent) {
+      if (lpDesktopRef.current && !lpDesktopRef.current.contains(e.target as Node)) {
+        setLpDesktopOpen(false);
+      }
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setLpDesktopOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [lpDesktopOpen]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-navy-100/40 bg-white/80 backdrop-blur-xl">
@@ -32,6 +99,58 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+
+          {/* TEMP: Landing Pages dropdown — QA preview directory */}
+          <div className="relative" ref={lpDesktopRef}>
+            <button
+              type="button"
+              onClick={() => setLpDesktopOpen((v) => !v)}
+              aria-expanded={lpDesktopOpen}
+              aria-haspopup="true"
+              className={cn(
+                "inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-graphite-600 transition-colors hover:bg-navy-50 hover:text-navy",
+                lpDesktopOpen && "bg-navy-50 text-navy"
+              )}
+            >
+              Landing Pages
+              <ChevronDown
+                className={cn(
+                  "h-3.5 w-3.5 transition-transform",
+                  lpDesktopOpen && "rotate-180"
+                )}
+              />
+            </button>
+
+            {lpDesktopOpen && (
+              <div className="absolute left-1/2 top-full mt-2 w-[680px] -translate-x-1/2 rounded-2xl border border-navy-100/60 bg-white p-5 shadow-2xl">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-5 lg:grid-cols-4">
+                  {LP_GROUPS.map((group) => (
+                    <div key={group.category}>
+                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-graphite-400">
+                        {group.category}
+                      </p>
+                      <ul className="space-y-1">
+                        {group.pages.map((p) => (
+                          <li key={p.slug}>
+                            <Link
+                              href={`/lp/${p.slug}`}
+                              onClick={() => setLpDesktopOpen(false)}
+                              className="block rounded-md px-2 py-1.5 text-xs text-graphite-600 transition-colors hover:bg-teal-50 hover:text-navy"
+                            >
+                              {p.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 border-t border-navy-100/40 pt-3 text-[10px] text-graphite-400">
+                  QA preview directory — {LP_GROUPS.reduce((n, g) => n + g.pages.length, 0)} landing pages. Remove before public launch.
+                </p>
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Desktop CTAs */}
@@ -61,7 +180,7 @@ export function SiteHeader() {
       <div
         className={cn(
           "overflow-hidden border-t border-navy-100/40 bg-white transition-all duration-300 md:hidden",
-          mobileOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
+          mobileOpen ? "max-h-[80vh] overflow-y-auto opacity-100" : "max-h-0 opacity-0"
         )}
       >
         <nav className="flex flex-col gap-1 px-4 py-4">
@@ -75,6 +194,47 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+
+          {/* TEMP: Mobile Landing Pages collapsible */}
+          <button
+            type="button"
+            onClick={() => setLpMobileOpen((v) => !v)}
+            aria-expanded={lpMobileOpen}
+            className="flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm font-medium text-graphite-600 transition-colors hover:bg-navy-50"
+          >
+            Landing Pages
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform",
+                lpMobileOpen && "rotate-180"
+              )}
+            />
+          </button>
+          {lpMobileOpen && (
+            <div className="pl-3">
+              {LP_GROUPS.map((group) => (
+                <div key={group.category} className="mb-2">
+                  <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-graphite-400">
+                    {group.category}
+                  </p>
+                  {group.pages.map((p) => (
+                    <Link
+                      key={p.slug}
+                      href={`/lp/${p.slug}`}
+                      onClick={() => {
+                        setLpMobileOpen(false);
+                        setMobileOpen(false);
+                      }}
+                      className="block rounded-md px-3 py-2 text-xs text-graphite-600 transition-colors hover:bg-teal-50"
+                    >
+                      {p.label}
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="mt-3 flex flex-col gap-2 border-t border-navy-100/40 pt-3">
             <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
               <Button variant="outline" className="w-full">
