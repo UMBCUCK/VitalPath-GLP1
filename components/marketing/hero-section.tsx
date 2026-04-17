@@ -8,7 +8,38 @@ import { Badge } from "@/components/ui/badge";
 import { siteConfig } from "@/lib/site";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { heroImage } from "@/lib/images";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+
+export interface HeroSectionProps {
+  headline?: ReactNode;
+  subContent?: ReactNode;
+  footnote?: string;
+  analyticsLocation?: string;
+}
+
+const DEFAULT_HEADLINE = (
+  <>
+    The weight-loss medication that{" "}
+    <span className="relative inline-block">
+      actually works.
+      <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 200 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 5.5C40 2 80 2 100 3.5C120 5 160 6 199 3" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" opacity="0.45" />
+      </svg>
+    </span>
+  </>
+);
+
+const DEFAULT_SUBCONTENT = (
+  <p
+    className="animate-fade-in-up mt-5 max-w-xl text-base leading-relaxed text-graphite-500 sm:text-lg lg:mx-0 mx-auto"
+    style={{ animationDelay: "0.2s" }}
+  >
+    Clinically shown to help you lose <strong className="text-navy">up to 3x more weight</strong><sup className="text-graphite-400">†</sup> than diet and exercise alone. Licensed providers prescribe GLP-1 medication online — delivered to your door in 48 hours.
+  </p>
+);
+
+const DEFAULT_FOOTNOTE =
+  "† STEP-1 trial (Wilding et al., NEJM 2021): participants on once-weekly semaglutide 2.4mg plus lifestyle averaged ~14.9% body-weight loss vs ~2.4% with placebo plus lifestyle at 68 weeks. Individual results vary.  *Price comparison vs published U.S. cash-pay retail for FDA-approved GLP-1 medications. Compounded medications are not FDA-approved.";
 
 function AnimatedCounter({ target, suffix = "" }: { target: string; suffix?: string }) {
   const [display, setDisplay] = useState(target);
@@ -93,7 +124,12 @@ function WeeklyStarterCount() {
   );
 }
 
-export function HeroSection() {
+export function HeroSection({
+  headline = DEFAULT_HEADLINE,
+  subContent = DEFAULT_SUBCONTENT,
+  footnote = DEFAULT_FOOTNOTE,
+  analyticsLocation = "hero",
+}: HeroSectionProps = {}) {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-white via-sage-50/30 to-white">
       {/* Background pattern */}
@@ -124,32 +160,21 @@ export function HeroSection() {
               className="animate-fade-in-up text-4xl font-bold tracking-tight text-navy sm:text-5xl lg:text-[3.5rem] lg:leading-[1.1]"
               style={{ animationDelay: "0.1s" }}
             >
-              The weight-loss medication that{" "}
-              <span className="relative inline-block">
-                actually works.
-                <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 200 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 5.5C40 2 80 2 100 3.5C120 5 160 6 199 3" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" opacity="0.45"/>
-                </svg>
-              </span>
+              {headline}
             </h1>
 
-            {/* Subheadline — what, how, speed, cost — all in one clean read */}
-            <p
-              className="animate-fade-in-up mt-5 max-w-xl text-base leading-relaxed text-graphite-500 sm:text-lg lg:mx-0 mx-auto"
-              style={{ animationDelay: "0.2s" }}
-            >
-              Clinically proven to help you lose <strong className="text-navy">3x more weight</strong> than diet and exercise alone. Licensed providers prescribe GLP-1 medication online — delivered to your door in 48 hours.
-            </p>
+            {/* Subheadline slot — paragraph on v1, bullet list + disclaimer chip on v2 */}
+            {subContent}
 
             {/* Price anchor — separated for visual impact */}
             <div
               className="animate-fade-in-up mt-4 inline-flex items-center gap-3 rounded-xl bg-navy-50/60 px-4 py-2.5 lg:mx-0 mx-auto"
               style={{ animationDelay: "0.25s" }}
             >
-              <span className="text-2xl font-bold text-navy">$279<span className="text-sm font-normal text-graphite-400">/mo</span></span>
+              <span className="text-2xl font-bold text-navy">$179<span className="text-sm font-normal text-graphite-400">/mo</span></span>
               <span className="h-6 w-px bg-navy-200" />
               <span className="text-sm text-graphite-400 line-through">$1,349/mo retail</span>
-              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald">SAVE 79%</span>
+              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald">PLANS FROM $179</span>
             </div>
 
             {/* Primary CTA — "See If I Qualify" is #1 converter */}
@@ -157,13 +182,13 @@ export function HeroSection() {
               className="animate-fade-in-up mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start"
               style={{ animationDelay: "0.3s" }}
             >
-              <Link href="/qualify" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_qualify", location: "hero" })}>
+              <Link href="/qualify" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_qualify", location: analyticsLocation })}>
                 <Button variant="emerald" size="xl" className="gap-2 w-full sm:w-auto text-lg px-12 h-16 rounded-full transition-all duration-300 hover:scale-[1.02] hover:brightness-110">
                   See If I Qualify
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/pricing" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_pricing", location: "hero" })}>
+              <Link href="/pricing" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_pricing", location: analyticsLocation })}>
                 <Button variant="outline" size="xl" className="w-full sm:w-auto rounded-full border-navy-200 text-navy hover:bg-navy-50">
                   View Plans & Pricing
                 </Button>
@@ -222,7 +247,7 @@ export function HeroSection() {
               className="animate-fade-in-up mt-3 text-[10px] text-graphite-300"
               style={{ animationDelay: "0.55s" }}
             >
-              *vs. published U.S. cash-pay retail for FDA-approved GLP-1 medications. Compounded medications are not FDA-approved.
+              {footnote}
             </p>
           </div>
 

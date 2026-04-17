@@ -65,6 +65,70 @@ export const beforeAfterImages = [
 ];
 export const beforeAfterBlur = { before: BLUR_NEUTRAL, after: BLUR_COOL };
 
+// ─── V2 HOMEPAGE TRANSFORMATIONS ────────────────────────────
+// 4 transformations for /home-v2, matching the user-provided sample before/after images.
+// Drop real photo files into public/before-after/ using these filenames, then flip V2_PHOTOS_READY to true.
+// Until then, the carousel renders gradient placeholders with weight + Before/After labels (graceful fallback).
+const V2_PHOTOS_READY = false;
+
+export const transformationsV2 = [
+  {
+    name: "Sarah M.",
+    age: 37,
+    location: "Phoenix, AZ",
+    startWeight: 208,
+    currentWeight: 163,
+    lbs: 45,
+    months: 6,
+    quote: "For the first time in 15 years my jeans actually fit the way they're supposed to. I can't stop smiling.",
+    plan: "Premium",
+  },
+  {
+    name: "James K.",
+    age: 38,
+    location: "Columbus, OH",
+    startWeight: 232,
+    currentWeight: 192,
+    lbs: 40,
+    months: 5,
+    quote: "My resting heart rate dropped 12 beats. My doctor was genuinely shocked at my last check-in.",
+    plan: "Complete",
+  },
+  {
+    name: "Tyler B.",
+    age: 32,
+    location: "Nashville, TN",
+    startWeight: 276,
+    currentWeight: 208,
+    lbs: 68,
+    months: 8,
+    quote: "60 days in I could see my abs for the first time in a decade. Still can't believe the after photo is me.",
+    plan: "Complete",
+  },
+  {
+    name: "Ryan S.",
+    age: 34,
+    location: "Charlotte, NC",
+    startWeight: 265,
+    currentWeight: 189,
+    lbs: 76,
+    months: 9,
+    quote: "Had to buy a whole new wardrobe. My wife says I walk differently now — shoulders back, head up.",
+    plan: "Premium",
+  },
+];
+
+export const beforeAfterImagesV2 = V2_PHOTOS_READY
+  ? [
+      { before: { src: "/before-after/woman-01-before.jpg", alt: "Sarah before starting treatment" }, after: { src: "/before-after/woman-01-after.jpg", alt: "Sarah after 6 months of treatment" } },
+      { before: { src: "/before-after/man-01-before.jpg", alt: "James before starting treatment" }, after: { src: "/before-after/man-01-after.jpg", alt: "James after 5 months of treatment" } },
+      { before: { src: "/before-after/man-02-start.jpg", alt: "Tyler at the start of treatment" }, after: { src: "/before-after/man-02-60days.jpg", alt: "Tyler after 60 days of treatment" } },
+      { before: { src: "/before-after/man-03-before.jpg", alt: "Ryan before starting treatment" }, after: { src: "/before-after/man-03-after.jpg", alt: "Ryan after 9 months of treatment" } },
+    ]
+  : [];
+
+export const beforeAfterBlurV2 = { before: BLUR_NEUTRAL, after: BLUR_COOL };
+
 // ─── TESTIMONIAL AVATARS ─────────────────────────────────
 // Diverse, warm, candid headshots — look like real people, not stock models
 // Larger (128px) for more prominent display in review cards

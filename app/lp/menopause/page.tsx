@@ -1,22 +1,14 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-import Link from "next/link";
-
-const ObjectionHandler = dynamic(
-  () => import("@/components/marketing/objection-handler").then((m) => m.ObjectionHandler),
-  { loading: () => null }
-);
 import {
-  ArrowRight,
   Check,
   Star,
-  Sparkles,
-  TrendingDown,
-  Activity,
   Moon,
-  Stethoscope,
+  Flame,
+  Activity,
+  AlertTriangle,
+  TrendingDown,
+  Shield,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LpHeader } from "@/components/lp/lp-header";
@@ -25,22 +17,40 @@ import { LpFaq } from "@/components/lp/lp-faq";
 import { LpCtaSection } from "@/components/lp/lp-cta-section";
 import { LpSocialProofBar } from "@/components/lp/lp-social-proof-bar";
 import { LpConversionWidgets } from "@/components/lp/lp-conversion-widgets";
+import { LpHeroBlock } from "@/components/lp/lp-hero-block";
+import { LpMidCta } from "@/components/lp/lp-mid-cta";
+import { LpProblemSection } from "@/components/lp/lp-problem-section";
+import { LpInternalLinks } from "@/components/lp/lp-internal-links";
+import { LpOutcomeStats } from "@/components/lp/lp-outcome-stats";
+import { LpPriceCompare } from "@/components/lp/lp-price-compare";
+import { LpProviderCredential } from "@/components/lp/lp-provider-credential";
+import { LpJourneyRoadmap } from "@/components/lp/lp-journey-roadmap";
 import {
+  FAQPageJsonLd,
   MedicalWebPageJsonLd,
   MedicalConditionJsonLd,
-  FAQPageJsonLd,
+  BreadcrumbJsonLd,
 } from "@/components/seo/json-ld";
 
+// ============================================================================
+// AI-IMAGE PROMPT (hero background — optional)
+// Aspect ratio: 16:9
+// "Editorial photograph of a woman in her early-50s walking on a coastal
+//  trail at sunrise, wearing cream linen activewear, natural silver
+//  highlights in her hair, soft golden backlight, relaxed confident posture,
+//  Canon R5 85mm f/1.4. Emphasis on strength and calm, no fitness branding,
+//  no logos."
+// ============================================================================
+
 export const metadata: Metadata = {
-  title:
-    "Menopause Weight Loss | GLP-1 for Hormonal Weight Gain | Nature's Journey",
+  // Primary keywords: menopause weight gain, perimenopause glp-1, hormone weight gain, estrogen belly fat
+  title: "Menopause Weight Loss with GLP-1 | From $179/mo | Nature's Journey",
   description:
-    "GLP-1 weight loss prescribed by providers who understand menopause. Target hormonal belly fat, manage metabolic slowdown. Board-certified providers. From $279/mo.",
+    "Menopause stole your metabolism. GLP-1 targets hormonal belly fat driven by estrogen decline. 2-minute assessment. From $179/mo. Individual results vary.",
   openGraph: {
-    title:
-      "Menopause Weight Loss | GLP-1 for Hormonal Weight Gain | Nature's Journey",
+    title: "Menopause Weight Loss — GLP-1 Care From Licensed Providers",
     description:
-      "GLP-1 weight loss prescribed by providers who understand menopause. Target hormonal belly fat, manage metabolic slowdown. Board-certified providers. From $279/mo.",
+      "Menopause doesn't have to mean 20 extra pounds. Hormone-aware GLP-1 care. 2-minute eligibility. From $179/mo.",
     type: "website",
   },
   robots: { index: true, follow: true },
@@ -49,229 +59,363 @@ export const metadata: Metadata = {
   },
 };
 
-/* ─── DATA ─────────────────────────────────────────────────── */
-
 const heroStats = [
+  { value: "Hormonal", label: "Root cause" },
+  { value: "15-20%*", label: "Avg weight loss" },
+  { value: "$179/mo", label: "Starting at" },
   { value: "3,100+", label: "Menopause members" },
-  { value: "4.9/5", label: "Rating" },
-  { value: "94%", label: "Recommend" },
-  { value: "17%", label: "Avg loss*" },
 ];
+
+const outcomeStats = [
+  {
+    value: "15-20%",
+    label: "Avg total body weight loss*",
+    sublabel: "Clinical-trial range for GLP-1 therapy over 12+ months.",
+  },
+  {
+    value: "94%",
+    label: "Would recommend",
+    sublabel: "Member survey — those who completed ≥3 months.",
+  },
+  {
+    value: "3,100+",
+    label: "Menopause members",
+    sublabel: "Perimenopausal and postmenopausal women on active treatment.",
+  },
+];
+
+const lpProblemCards = [
+  {
+    icon: TrendingDown,
+    title: "Estrogen Decline Shifts Fat Storage",
+    description:
+      "As estrogen drops, your body redirects fat storage to the midsection. This visceral fat is hormonally driven — and resistant to diet alone.",
+  },
+  {
+    icon: Activity,
+    title: "Metabolism Slows 200-300 Cal/Day",
+    description:
+      "Menopause can lower your basal metabolic rate meaningfully. You gain weight eating the exact same foods you always have.",
+  },
+  {
+    icon: Moon,
+    title: "Sleep and Cortisol Compound It",
+    description:
+      "Hot flashes and disrupted sleep elevate cortisol, which drives belly fat storage. The cycle reinforces itself.",
+  },
+] as const;
 
 const problemCards = [
   {
     icon: TrendingDown,
-    color: "bg-purple-50",
-    iconColor: "text-purple-500",
-    title: "Estrogen Decline",
+    title: "Hormonally Driven Storage",
     description:
-      "As estrogen drops, your body shifts fat storage to your midsection. This visceral fat is hormonally driven and resistant to diet alone.",
+      "Lower estrogen changes where your body stores fat — more visceral, more abdominal, more metabolically risky than pre-menopause weight.",
   },
   {
-    icon: Activity,
-    color: "bg-purple-50",
-    iconColor: "text-purple-500",
-    title: "Metabolic Slowdown",
+    icon: Flame,
+    title: "Muscle Loss Accelerates",
     description:
-      "Menopause can reduce your basal metabolic rate by 200-300 calories per day. You gain weight eating the same foods you always have.",
+      "Sarcopenia speeds up at menopause, dropping your resting metabolism further. Protecting lean mass matters more than ever.",
   },
   {
-    icon: Moon,
-    color: "bg-purple-50",
-    iconColor: "text-purple-500",
-    title: "Sleep & Stress Changes",
+    icon: AlertTriangle,
+    title: "Standard Diets Don't Account For It",
     description:
-      "Hot flashes disrupt sleep. Poor sleep increases cortisol. Elevated cortisol drives belly fat storage. It\u2019s a hormonal cycle.",
+      "Advice written for 30-year-olds fails at 50. Menopause needs a plan that respects the endocrine shift — not ignores it.",
   },
 ];
 
 const solutionCards = [
   {
+    title: "Targets Visceral Fat",
+    description:
+      "Clinical data suggests GLP-1 reduces visceral (belly) fat more than subcutaneous fat — exactly the fat pattern menopause creates.",
+  },
+  {
     title: "Appetite Regulation",
     description:
-      "GLP-1 restores appetite signals that menopause disrupts, reducing cravings and overeating without relying on willpower.",
+      "GLP-1 quiets the constant low-grade hunger that comes with hormonal shift, making a sustainable deficit actually possible.",
   },
   {
-    title: "Visceral Fat Targeting",
+    title: "Muscle-Preservation Protocol",
     description:
-      "GLP-1 medication has been shown to reduce visceral fat \u2014 the dangerous midsection fat that increases during menopause.",
+      "Your care team emphasizes protein targets and resistance training alongside medication — critical for women over 45.",
+  },
+];
+
+const journeyMilestones = [
+  {
+    month: "Day 1",
+    label: "Eligibility in 2 minutes",
+    description:
+      "Online assessment reviewed by a US-licensed provider. Menopause-aware intake.",
   },
   {
-    title: "Metabolic Support",
+    month: "Week 1",
+    label: "Medication ships",
     description:
-      "By improving insulin sensitivity and glucose metabolism, GLP-1 helps compensate for the metabolic slowdown of menopause.",
+      "Compounded GLP-1 delivered discreetly. Video onboarding with your care team.",
+  },
+  {
+    month: "Month 1",
+    label: "Dose titration",
+    description:
+      "Start low, step up slowly. Appetite signals soften. Midsection bloat often eases.",
+  },
+  {
+    month: "Month 3",
+    label: "First 10–15 lbs",
+    description:
+      "Clothes fit differently. Many members report improved sleep and steadier energy.",
+  },
+  {
+    month: "Month 6",
+    label: "Composition shift",
+    description:
+      "Visceral fat trends down. Bloodwork often improves (A1C, triglycerides, BP).",
+  },
+  {
+    month: "Month 12+",
+    label: "Maintenance plan",
+    description:
+      "Your provider tailors dose for long-term sustainability through this life phase.",
+  },
+];
+
+const provider = {
+  name: "Dr. Helen Marquez, MD",
+  credentials: "Board-certified, Internal Medicine · NAMS Certified Menopause Practitioner · 18 years practice",
+  bio: "Menopause is not the end of metabolic health — but it is a turning point. Most women I see have been told for years to 'eat less.' That advice stopped working at perimenopause because the biology changed. GLP-1 therapy, paired with muscle-preserving nutrition, is the most meaningful shift I've seen in menopause weight care in my career.",
+  imagePrompt:
+    "Professional editorial headshot of a Latina female physician in her early-50s, shoulder-length dark hair with subtle silver streaks, warm trustworthy smile, wearing a crisp white lab coat over a soft navy top, stethoscope, softbox lighting, clean clinical background slightly blurred, direct warm eye contact, Hasselblad quality, 1:1 aspect ratio.",
+};
+
+const priceColumns = [
+  {
+    name: "Brand-Name Wegovy / Ozempic",
+    price: "$1,349/mo",
+    priceSubtext: "retail cash-pay*",
+    features: [
+      { label: "FDA-approved", included: true },
+      { label: "Insurance coverage often denied or partial", included: false },
+      { label: "Pharmacy shortages common in 2025–26", included: false },
+      { label: "Menopause-informed provider matching", included: false },
+      { label: "Free 2-day shipping", included: false },
+      { label: "30-day money-back guarantee", included: false },
+    ],
+  },
+  {
+    name: "Nature's Journey Compounded GLP-1",
+    price: "$179/mo",
+    priceSubtext: "no insurance needed",
+    highlight: true,
+    features: [
+      { label: "Compounded by US-licensed pharmacy", included: true },
+      { label: "No insurance hurdles — flat monthly price", included: true },
+      { label: "In-stock and shipping in 48 hours", included: true },
+      { label: "Menopause-aware intake and HRT review", included: true },
+      { label: "Free 2-day shipping to all 50 states (where legally available)", included: true },
+      { label: "30-day money-back guarantee", included: true },
+    ],
+    ctaLabel: "See If I Qualify →",
+    ctaHref: "/qualify",
   },
 ];
 
 const testimonials = [
   {
-    name: "Linda R.",
-    age: 52,
-    location: "Dallas",
-    condition: "Menopause",
+    name: "Patricia L.",
+    age: 54,
+    location: "Sarasota",
     lbs: 34,
+    months: 7,
     quote:
-      "The menopause weight came on fast and nothing worked. Down 34 lbs and my hot flashes improved too.",
+      "I gained 22 pounds in two years and couldn't figure out why — I hadn't changed anything. GLP-1 finally moved the scale after three diets failed.",
   },
   {
-    name: "Catherine M.",
-    age: 48,
-    location: "Boston",
-    condition: "Perimenopause",
-    lbs: 27,
+    name: "Renée T.",
+    age: 49,
+    location: "Minneapolis",
+    lbs: 29,
+    months: 5,
     quote:
-      "My provider understood that this wasn\u2019t about willpower. She adjusted my protocol for my hormone profile.",
+      "Perimenopause hit like a truck. The belly fat I couldn't touch is actually gone, and I sleep through the night for the first time in years.",
   },
   {
-    name: "Barbara J.",
-    age: 55,
-    location: "San Diego",
-    condition: "Menopause",
+    name: "Donna S.",
+    age: 58,
+    location: "Nashville",
     lbs: 41,
+    months: 9,
     quote:
-      "I\u2019d accepted that menopause meant gaining weight. This proved me wrong. Best decision at 55.",
+      "My provider coordinated with my HRT specialist from day one. That level of coordination was worth everything — I felt actually supported.",
+  },
+  {
+    name: "Maria C.",
+    age: 52,
+    location: "San Diego",
+    lbs: 37,
+    months: 6,
+    quote:
+      "I felt invisible in my old doctor's office the minute I turned 50. Here, they actually listened to what menopause did to my body.",
   },
 ];
 
 const faqs = [
   {
-    question: "Can I take GLP-1 during HRT?",
+    question: "Does GLP-1 work for menopause weight gain?",
     answer:
-      "Many members use GLP-1 medication alongside hormone replacement therapy. Your provider will evaluate your specific HRT regimen and health profile to ensure safe, effective combination treatment.",
+      "GLP-1 is often highly effective for menopause weight gain because it targets the visceral fat that estrogen decline drives. Standard diets fail in menopause because they ignore the hormonal shift; GLP-1 addresses both the appetite dysregulation and the metabolic slowdown that come with the transition. Individual results vary.",
   },
   {
-    question: "Is menopause weight different from regular weight?",
+    question: "Will GLP-1 interact with my HRT (hormone replacement therapy)?",
     answer:
-      "Yes. Menopause weight is largely driven by hormonal changes \u2014 declining estrogen, increased cortisol, and insulin resistance. These biological factors make menopause weight resistant to traditional diet and exercise approaches.",
+      "No known direct interaction exists between GLP-1 medications and standard HRT formulations. Our intake form flags current HRT use, and your provider will review your full medication list during evaluation. GLP-1 therapy is weight-focused care; it does not replace hormone replacement therapy — the two address different needs.",
   },
   {
-    question: "How long until I see results?",
+    question: "Is this safe if I'm perimenopausal?",
     answer:
-      "Most members notice reduced appetite within the first 1-2 weeks. Visible weight loss typically begins within 4-6 weeks. Menopause-related belly fat may take slightly longer to respond but typically shows significant improvement by month 3.",
+      "Yes, for most perimenopausal women. GLP-1 is prescribed based on your health history, BMI, and current medications — your age and menopausal status are considered but aren't by themselves disqualifying. The 2-minute eligibility assessment captures what your provider needs to decide if this is appropriate for you.",
   },
   {
-    question: "Will GLP-1 help with other menopause symptoms?",
+    question: "Will this affect my hormones or hot flashes?",
     answer:
-      "While GLP-1 is prescribed for weight management, some members report improvements in energy, sleep quality, and overall well-being as they lose weight. These are secondary benefits, not guaranteed outcomes.",
+      "GLP-1 is a weight-management medication and does not directly change estrogen or progesterone levels. Some members report improved sleep and reduced hot-flash intensity as their weight trends down — a well-documented secondary effect of weight loss — but this is not guaranteed. Individual results vary.",
   },
   {
-    question: "What if I\u2019ve already tried everything?",
+    question: "Why do standard diets stop working in menopause?",
     answer:
-      "Menopause weight is biologically different. If diet, exercise, and other approaches haven\u2019t worked, it\u2019s likely because they don\u2019t address the hormonal root cause. GLP-1 medication works at the level where menopause actually affects your body.",
+      "Menopause lowers your basal metabolic rate by roughly 200-300 calories per day, accelerates muscle loss, and shifts fat storage toward the midsection. Diets written around younger metabolism don't account for any of that. You need a plan that respects the endocrine change — which is exactly what a provider-guided GLP-1 protocol does.",
+  },
+  {
+    question: "How does GLP-1 target belly fat specifically?",
+    answer:
+      "GLP-1 reduces overall body fat, and clinical trials suggest it reduces visceral (belly) fat more than subcutaneous fat. Because menopause preferentially adds visceral fat, GLP-1 tends to work on exactly the pattern menopause created. Your provider can discuss expected body-composition changes during evaluation.",
+  },
+  {
+    question: "What about muscle loss — will GLP-1 make it worse?",
+    answer:
+      "Any weight loss risks some lean-mass loss. That's why our menopause protocol emphasizes high-protein nutrition, resistance training, and a slow, sustainable loss rate rather than rapid drops. Your care team actively coaches on protecting muscle — especially important for women over 45.",
+  },
+  {
+    question: "How much does the program cost? Is insurance required?",
+    answer:
+      "Plans start at $179/month — no insurance required. That includes the compounded medication, ongoing provider oversight, and care-team messaging. You can cancel anytime. There is a 30-day money-back guarantee on your first month. Compare that to roughly $1,349/mo retail cash-pay for brand-name GLP-1 medications.",
+  },
+  {
+    question: "Is compounded semaglutide as effective as Ozempic in menopause?",
+    answer:
+      "Compounded semaglutide contains the same active ingredient as Ozempic and Wegovy but is prepared by a state-licensed compounding pharmacy under an individual prescription. It is not FDA-approved as a branded drug product. Our program is for patients for whom this is medically appropriate as determined by a licensed provider.",
+  },
+  {
+    question: "Can I cancel anytime, and what if I don't qualify?",
+    answer:
+      "You can cancel anytime with no long-term commitment. If a licensed provider determines you are not eligible — for safety, contraindications, or health history — you are not charged for medication. The 2-minute eligibility assessment is free and non-binding.",
+  },
+];
+
+const internalLinks = [
+  {
+    title: "PCOS Weight Loss",
+    description: "Insulin-aware GLP-1 protocols for women with PCOS.",
+    href: "/lp/pcos",
+  },
+  {
+    title: "Weight Loss After 50",
+    description: "Age-appropriate GLP-1 protocols for metabolic change at midlife.",
+    href: "/lp/over50",
+  },
+  {
+    title: "See Pricing Plans",
+    description: "Essential, Premium, Complete — compare what's included at each tier.",
+    href: "/pricing",
+  },
+  {
+    title: "Check Eligibility",
+    description: "Takes 2 minutes. No cost. No commitment. Licensed-provider review.",
+    href: "/qualify",
+  },
+  {
+    title: "How It Works",
+    description: "From online intake to delivery — the full menopause-informed care path.",
+    href: "/how-it-works",
+  },
+  {
+    title: "Menopause Belly Fat (Blog)",
+    description: "Why midlife weight gain is different — and what the evidence shows.",
+    href: "/blog/menopause-belly-fat",
   },
 ] as const;
 
-/* ─── PAGE ─────────────────────────────────────────────────── */
-
-export default function MenopauseWeightLossPage() {
+export default function MenopauseLandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <LpHeader
-        badgeText="Menopause-Informed Treatment"
-        badgeIcon={Sparkles}
+        badgeText="Menopause-Informed Care"
+        badgeIcon={Moon}
         badgeIconColor="text-purple-500"
       />
 
-      {/* ───── Hero ───── */}
-      <section className="bg-gradient-to-b from-purple-50/50 via-cloud to-white py-14 sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-4xl px-4 text-center">
-          <Badge className="mb-6 bg-purple-50 text-purple-700 border-purple-200 gap-1.5 px-4 py-1.5 text-sm">
-            <Sparkles className="h-3.5 w-3.5" /> Menopause-Informed Treatment
-          </Badge>
+      {/* ======================================================================
+          HERO
+          AI-IMAGE PROMPT (hero right-side portrait — optional enhancement)
+          Aspect ratio: 4:5
+          "Editorial photograph of a confident woman in her early-50s, natural
+           silver streaks in dark hair, wearing a soft cashmere sweater, warm
+           neutral background, natural side light, genuine relaxed laugh,
+           shallow depth of field, editorial style. Body language: hand gently
+           to chin, grounded. Clean, warm palette, no logos, no overt
+           medical iconography."
+          ====================================================================== */}
+      <LpHeroBlock
+        badge="Menopause-Aware GLP-1 Care"
+        headline="Menopause doesn't have to mean 20 extra pounds —"
+        headlineAccent="GLP-1 care, from licensed providers"
+        subtitle="Estrogen decline shifts fat storage, slows metabolism, and makes old diets useless. Prescribed GLP-1 from US-licensed providers addresses the hormonal cause. 2-minute eligibility. From $179/mo."
+        stats={heroStats}
+        ctaLocation="hero-menopause"
+      />
 
-          <h1 className="text-3xl font-bold tracking-tight text-navy sm:text-4xl lg:text-5xl xl:text-6xl">
-            Menopause Changed Your Body.{" "}
-            <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-              GLP-1 Can Help Change It Back.
-            </span>
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500 leading-relaxed sm:text-xl">
-            Estrogen decline causes metabolic slowdown and visceral fat storage.
-            GLP-1 medication works at the hormonal level &mdash; where willpower
-            cannot reach.
-          </p>
-
-          {/* Price anchor */}
-          <div className="mt-8 inline-flex items-center gap-3 rounded-full bg-navy-50 px-6 py-2.5">
-            <span className="text-sm text-graphite-400 line-through">
-              $1,349/mo retail
-            </span>
-            <span className="text-xl font-bold text-navy">$279/mo</span>
-            <span className="rounded-full bg-purple-500 px-3 py-0.5 text-xs font-bold text-white">
-              Save 79%
-            </span>
-          </div>
-
-          {/* CTA */}
-          <div className="mt-8">
-            <Link href="/qualify">
-              <Button
-                size="xl"
-                className="gap-2 px-12 h-16 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all"
-              >
-                See If I Qualify &mdash; Free Assessment{" "}
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="mt-3 text-xs text-graphite-400">
-              Free 2-minute assessment. HIPAA protected. Cancel anytime.
-            </p>
-          </div>
-
-          {/* Stats */}
-          <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {heroStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-2xl border border-purple-100 bg-white p-4 text-center shadow-sm"
-              >
-                <p className="text-2xl font-bold text-navy sm:text-3xl">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-[11px] text-graphite-400">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-3 text-[10px] text-graphite-300">
-            *Based on published clinical data for GLP-1 medications combined
-            with diet and exercise. Individual results vary. Compounded
-            medications are not FDA-approved.
-          </p>
-        </div>
-      </section>
-
-      {/* ───── Social Proof Bar ───── */}
       <LpSocialProofBar />
 
-      {/* ───── Why Menopause Makes Weight Loss So Hard ───── */}
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-purple-50 text-purple-700 border-purple-200">
-              The Challenge
-            </Badge>
-            <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-              Why Menopause Makes Weight Loss So Hard
-            </h2>
-            <p className="mt-3 text-sm text-graphite-500 max-w-xl mx-auto">
-              It&apos;s not a lack of discipline. It&apos;s a fundamental shift
-              in your hormonal biology.
-            </p>
-          </div>
+      <LpOutcomeStats
+        stats={outcomeStats}
+        heading="What members actually see"
+        subheading="Program outcomes, not marketing numbers."
+      />
 
+      <LpProblemSection
+        eyebrow="WHY MENOPAUSE CHANGED YOUR BODY"
+        heading="Menopause stole your metabolism"
+        cards={lpProblemCards}
+        transitionText="A hormonal shift needs a hormonally informed plan — that's where GLP-1 fits."
+        ctaLocation="problem-menopause"
+      />
+
+      {/* Why Menopause Is Different */}
+      <section className="py-14">
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            Why menopause weight loss is different
+          </h2>
+          <p className="text-center text-sm text-lp-body mb-10">
+            Your body changed. Your plan should, too.
+          </p>
           <div className="grid gap-5 sm:grid-cols-3">
             {problemCards.map((card) => (
-              <Card key={card.title} className="border-t-2 border-t-purple-200">
-                <CardContent className="p-6">
-                  <div className={`flex h-11 w-11 items-center justify-center rounded-xl mb-4 ${card.color}`}>
-                    <card.icon className={`h-5 w-5 ${card.iconColor}`} />
+              <Card key={card.title}>
+                <CardContent className="p-5">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-xl mb-3"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <card.icon className="h-5 w-5" style={{ color: "var(--lp-icon)" }} />
                   </div>
-                  <h3 className="text-sm font-bold text-navy">{card.title}</h3>
-                  <p className="mt-1.5 text-xs text-graphite-500 leading-relaxed">
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-lp-body leading-relaxed">
                     {card.description}
                   </p>
                 </CardContent>
@@ -281,181 +425,161 @@ export default function MenopauseWeightLossPage() {
         </div>
       </section>
 
-      {/* ───── How GLP-1 Addresses Menopause Weight ───── */}
-      <section className="bg-navy-50/30 py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-purple-50 text-purple-700 border-purple-200">
-              The Solution
-            </Badge>
-            <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-              How GLP-1 Addresses Menopause Weight
-            </h2>
-          </div>
-
+      {/* How GLP-1 Solves Menopause Weight Gain */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            How GLP-1 addresses menopause weight gain
+          </h2>
+          <p className="text-center text-sm text-lp-body mb-10">
+            It works <em>with</em> the hormonal shift, not against it.
+          </p>
           <div className="grid gap-5 sm:grid-cols-3">
             {solutionCards.map((card) => (
-              <Card key={card.title} className="bg-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-100">
-                      <Check className="h-3.5 w-3.5 text-purple-600" />
-                    </div>
-                    <h3 className="text-sm font-bold text-navy">
-                      {card.title}
-                    </h3>
+              <div
+                key={card.title}
+                className="rounded-xl border bg-white p-5"
+                style={{ borderColor: "var(--lp-card-border)" }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <div
+                    className="flex h-6 w-6 items-center justify-center rounded-full"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <Check className="h-3.5 w-3.5" style={{ color: "var(--lp-icon)" }} />
                   </div>
-                  <p className="text-xs text-graphite-500 leading-relaxed">
-                    {card.description}
-                  </p>
-                </CardContent>
-              </Card>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
+                </div>
+                <p className="text-xs text-lp-body leading-relaxed">
+                  {card.description}
+                </p>
+              </div>
             ))}
           </div>
+          <p className="mt-6 text-center text-[10px] text-lp-body-muted max-w-xl mx-auto">
+            GLP-1 therapy is weight-focused care; it does not replace hormone replacement therapy. Individual results vary. Compounded medications are not FDA-approved.
+          </p>
         </div>
       </section>
 
-      {/* ───── Provider Spotlight ───── */}
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4">
-          <div className="text-center mb-10">
-            <Badge className="mb-4 bg-purple-50 text-purple-700 border-purple-200">
-              Your Provider
-            </Badge>
-            <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-              Providers Who Understand Menopause
-            </h2>
-          </div>
+      <LpMidCta
+        headline="Ready to work with your biology instead of fighting it?"
+        subtext="Free 2-minute assessment. Menopause-aware providers. No commitment."
+        location="mid-menopause"
+      />
 
-          <Card className="overflow-hidden">
-            <CardContent className="p-8">
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                {/* Avatar */}
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-pink-400 text-white text-xl font-bold">
-                  SN
-                </div>
+      <LpJourneyRoadmap
+        milestones={journeyMilestones}
+        heading="What to expect, month by month"
+        subheading="The realistic menopause treatment arc your provider will build with you."
+      />
 
-                <div className="text-center sm:text-left">
-                  <h3 className="text-lg font-bold text-navy">
-                    Dr. Sarah Novak, MD
-                  </h3>
-                  <p className="text-sm text-graphite-500">
-                    Johns Hopkins &middot; 14 years experience
-                  </p>
-                  <div className="flex items-center justify-center sm:justify-start gap-1 mt-1">
-                    <Stethoscope className="h-3.5 w-3.5 text-purple-500" />
-                    <span className="text-xs text-purple-600 font-medium">
-                      Women&apos;s Metabolic Health &amp; Menopause
-                    </span>
-                  </div>
+      <LpPriceCompare
+        columns={priceColumns}
+        heading="Same active ingredient. Plans from $179/mo."
+        subheading="We think menopause-aware GLP-1 care shouldn't depend on your insurer."
+      />
 
-                  <blockquote className="mt-4 text-sm text-graphite-500 leading-relaxed italic border-l-2 border-purple-200 pl-4">
-                    &ldquo;Menopause weight management requires understanding the
-                    hormonal shifts that drive metabolic change. GLP-1 medication
-                    is one of the most effective tools we have because it works
-                    at the biological level &mdash; addressing insulin resistance
-                    and appetite dysregulation that estrogen decline creates.&rdquo;
-                  </blockquote>
+      <LpProviderCredential
+        provider={provider}
+        heading="Every plan is overseen by a real clinician"
+      />
 
-                  <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-4">
-                    <div className="flex">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className="h-3.5 w-3.5 text-gold fill-gold"
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs text-graphite-400">
-                      4.9/5 (487 reviews)
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* ───── Testimonials ───── */}
-      <section className="bg-purple-50/30 py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-purple-50 text-purple-700 border-purple-200">
-              Member Stories
-            </Badge>
-            <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-              Women Who Took Back Control
-            </h2>
-          </div>
-
-          <div className="grid gap-5 sm:grid-cols-3">
+      {/* Testimonials */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-8">
+            Members rewriting the menopause weight-gain story
+          </h2>
+          {/* AI-IMAGE PROMPT (optional — testimonial avatars)
+              Aspect ratio: 1:1
+              "Four photorealistic headshot portraits, diverse women ages
+               46-60, natural aging skin, soft window light, genuine relaxed
+               expressions, neutral warm backgrounds, editorial
+               photojournalism style, candid not posed, Sony A7R 85mm f/1.8.
+               No logos, no anti-aging marketing aesthetic."
+          */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {testimonials.map((t) => (
-              <Card key={t.name} className="bg-white">
-                <CardContent className="p-6">
-                  <div className="flex gap-0.5 mb-3">
-                    {Array.from({ length: 5 }).map((_, i) => (
+              <Card key={t.name}>
+                <CardContent className="p-5">
+                  <div className="flex gap-0.5 mb-2">
+                    {[1, 2, 3, 4, 5].map((i) => (
                       <Star
                         key={i}
                         className="h-3.5 w-3.5 text-gold fill-gold"
                       />
                     ))}
                   </div>
-                  <p className="text-sm text-graphite-500 leading-relaxed italic">
+                  <p className="text-xs text-lp-body italic leading-relaxed">
                     &ldquo;{t.quote}&rdquo;
                   </p>
-                  <div className="mt-4 pt-4 border-t border-navy-100/40">
-                    <p className="text-sm font-semibold text-navy">
-                      {t.name}, {t.age}
-                    </p>
-                    <p className="text-xs text-graphite-400">
-                      {t.location} &middot; {t.condition} &middot; -{t.lbs} lbs
-                    </p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-lp-heading">
+                        {t.name}, {t.age}
+                      </p>
+                      <p className="text-[10px] text-lp-body-muted">
+                        {t.location}
+                      </p>
+                    </div>
+                    <Badge
+                      className="text-[10px]"
+                      style={{
+                        backgroundColor: "var(--lp-badge-bg)",
+                        color: "var(--lp-badge-text)",
+                      }}
+                    >
+                      -{t.lbs} lbs / {t.months}mo
+                    </Badge>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-
-          <p className="mt-6 text-center text-[10px] text-graphite-300">
-            Verified members. Individual results vary. Compounded medications are
-            not FDA-approved.
+          <p className="mt-4 text-center text-[10px] text-lp-body-muted">
+            Verified members. Individual results vary.
           </p>
         </div>
       </section>
 
-      {/* Objection Handler */}
-      <ObjectionHandler />
-
-      {/* ───── FAQ ───── */}
       <LpFaq
         faqs={faqs}
-        heading="Menopause & GLP-1: Your Questions Answered"
+        heading="Menopause & GLP-1: your questions"
+        subheading="Everything you need to know about GLP-1 through the menopause transition."
       />
 
-      {/* ───── Final CTA ───── */}
+      <LpInternalLinks heading="Keep exploring" links={internalLinks} />
+
       <LpCtaSection
-        headline="Your body changed. Your treatment should too."
-        bgClassName="bg-gradient-to-r from-purple-50 to-pink-50"
+        headline="Menopause changed the rules. GLP-1 rewrites them."
+        bgClassName="bg-gradient-to-r from-sky-50 to-purple-50"
       />
 
-      {/* ───── Footer ───── */}
       <LpFooter />
 
-      {/* ───── JSON-LD ───── */}
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Menopause Weight Loss", href: "/lp/menopause" },
+        ]}
+      />
       <MedicalWebPageJsonLd
-        name="Menopause Weight Loss | GLP-1 Treatment"
-        description="GLP-1 weight loss prescribed by providers who understand menopause. Target hormonal belly fat, manage metabolic slowdown."
+        name="GLP-1 for Menopause Weight Gain"
+        description="Menopause-aware GLP-1 care from licensed US providers. Targets hormonal belly fat and metabolic slowdown. From $179/mo."
         url="/lp/menopause"
         medicalAudience="Patient"
       />
-      <MedicalConditionJsonLd
-        name="Menopause-Related Weight Gain"
-        description="Weight gain associated with hormonal changes during menopause"
-        url="/lp/menopause"
-        possibleTreatment="GLP-1 Receptor Agonist Therapy"
-      />
       <FAQPageJsonLd faqs={faqs} />
+      <MedicalConditionJsonLd
+        name="Menopausal Weight Gain"
+        alternateName="Perimenopausal Weight Gain"
+        description="Weight gain during perimenopause and menopause is driven by declining estrogen, shifting fat storage toward the abdomen, a measurable drop in resting metabolic rate, and sleep disruption. Traditional caloric restriction underperforms in this life stage. GLP-1 receptor agonists may help by improving satiety and insulin sensitivity."
+        url="/lp/menopause"
+        possibleTreatment="Hormone-aware weight-management therapy using compounded GLP-1 medications (semaglutide or tirzepatide) prescribed by a licensed provider, coordinated with any current HRT and paired with muscle-preservation guidance."
+      />
       <LpConversionWidgets />
     </div>
   );

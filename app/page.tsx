@@ -29,9 +29,9 @@ const ObjectionHandler = dynamic_import(() => import("@/components/marketing/obj
 
 // SEO metadata optimized for GLP-1 weight loss keywords
 export const metadata: Metadata = {
-  title: "GLP-1 Weight Loss Program Online | From $279/mo | Nature's Journey",
+  title: "GLP-1 Weight Loss Program Online | From $179/mo | Nature's Journey",
   description:
-    "Get compounded GLP-1 medication prescribed online by licensed providers. Provider-guided weight management starting from $279/mo. Free shipping. Cancel anytime. Individual results vary.",
+    "Get compounded GLP-1 medication prescribed online by licensed providers. Provider-guided weight management starting from $179/mo. Free shipping. Cancel anytime. Individual results vary.",
   keywords: [
     "GLP-1 weight loss",
     "semaglutide online",
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
     "telehealth weight management",
   ],
   openGraph: {
-    title: "GLP-1 Weight Loss Program | From $279/mo | Nature's Journey",
+    title: "GLP-1 Weight Loss Program | From $179/mo | Nature's Journey",
     description:
-      "Compounded GLP-1 medication prescribed online by licensed providers. Starting from $279/mo with free shipping. Join 18,000+ members. See if you qualify in 2 minutes.",
+      "Compounded GLP-1 medication prescribed online by licensed providers. Starting from $179/mo with free shipping. Join 18,000+ members. See if you qualify in 2 minutes.",
     url: siteConfig.url,
     siteName: siteConfig.name,
     type: "website",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GLP-1 Weight Loss Program From $279/mo | Nature's Journey",
+    title: "GLP-1 Weight Loss Program From $179/mo | Nature's Journey",
     description:
       "Compounded GLP-1 medication prescribed by licensed providers. Free shipping. See if you qualify in 2 minutes. Individual results vary.",
   },
@@ -73,7 +73,7 @@ export default async function HomePage() {
       <SiteLinksSearchBoxJsonLd />
       <MedicalWebPageJsonLd
         name="GLP-1 Weight Loss Medication Online — Nature's Journey"
-        description="Provider-guided GLP-1 weight management with personalized treatment plans, medication if prescribed, and ongoing support. From $279/mo."
+        description="Provider-guided GLP-1 weight management with personalized treatment plans, medication if prescribed, and ongoing support. From $179/mo."
         url="/"
         medicalAudience="Patient"
       />

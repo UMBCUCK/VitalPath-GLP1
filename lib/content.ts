@@ -126,7 +126,7 @@ export const processSteps = [
 export const comparisonRows = [
   {
     feature: "Monthly cost",
-    vitalpath: "From $279/mo",
+    vitalpath: "From $179/mo",
     branded: "$1,349+/mo",
     surgery: "$20,000-$35,000",
     diets: "$150-$500/mo",
@@ -441,7 +441,7 @@ export const faqs = [
   {
     question: "How much does it cost compared to Ozempic or Wegovy?",
     answer:
-      "Brand-name GLP-1 medications like Ozempic and Wegovy can cost $1,000-$1,500+ per month without insurance. Nature's Journey plans start at $279/month and include not just the medication (if prescribed), but also provider consultations, progress tracking, meal plans, and ongoing support. That's up to 79% less than the retail price of branded medications alone.",
+      "Brand-name GLP-1 medications like Ozempic and Wegovy can cost $1,000-$1,500+ per month without insurance. Nature's Journey plans start at $179/month and include not just the medication (if prescribed), but also provider consultations, progress tracking, meal plans, and ongoing support. That's up to 79% less than the retail price of branded medications alone.",
   },
   {
     question: "How quickly will I see results?",
@@ -514,9 +514,9 @@ export const faqs = [
       "You're not alone — needle hesitancy is one of the top reasons people delay starting. Here's the truth: the injection is a tiny subcutaneous needle (think insulin pen, not a doctor's office needle). It's a small pinch once a week that takes about 10 seconds. Our care team can walk you through it via video call before your first dose. As one member put it: 'I was terrified of needles and almost didn't start. It's honestly nothing — if that's what's holding you back, PLEASE just try it.' Over 95% of members report the injection is far easier than they expected.",
   },
   {
-    question: "Is it worth $279/month?",
+    question: "Is it worth $179/month?",
     answer:
-      "Let's do the math. The average American spends $2,000+/year on diets, gym memberships, and supplements — with a 95% failure rate. Brand-name GLP-1 costs $1,349+/month. Weight loss surgery runs $20,000-$35,000. Nature's Journey includes the medication, provider care, meal plans, progress tracking, and coaching for $279/month. Most members say the real cost was the years they spent on programs that didn't address the root cause. And unlike diets, GLP-1 medication has a clinical success rate of 85%+.",
+      "Let's do the math. The average American spends $2,000+/year on diets, gym memberships, and supplements — with a 95% failure rate. Brand-name GLP-1 costs $1,349+/month. Weight loss surgery runs $20,000-$35,000. Nature's Journey includes the medication, provider care, meal plans, progress tracking, and coaching for $179/month. Most members say the real cost was the years they spent on programs that didn't address the root cause. And unlike diets, GLP-1 medication has a clinical success rate of 85%+.",
   },
 ] as const;
 

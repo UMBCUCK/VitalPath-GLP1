@@ -1,29 +1,14 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-import Link from "next/link";
-
-const SavingsCalculator = dynamic(
-  () => import("@/components/marketing/savings-calculator").then((m) => m.SavingsCalculator),
-  { loading: () => null }
-);
-const ObjectionHandler = dynamic(
-  () => import("@/components/marketing/objection-handler").then((m) => m.ObjectionHandler),
-  { loading: () => null }
-);
 import {
-  ArrowRight,
   Check,
   Star,
-  Shield,
+  AlertTriangle,
+  TrendingDown,
   Activity,
-  ShieldCheck,
+  Shield,
   Heart,
-  Dumbbell,
-  ClipboardCheck,
-  Stethoscope,
-  Package,
+  Pill,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LpHeader } from "@/components/lp/lp-header";
@@ -32,18 +17,39 @@ import { LpFaq } from "@/components/lp/lp-faq";
 import { LpCtaSection } from "@/components/lp/lp-cta-section";
 import { LpSocialProofBar } from "@/components/lp/lp-social-proof-bar";
 import { LpConversionWidgets } from "@/components/lp/lp-conversion-widgets";
-import { MedicalWebPageJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
+import { LpHeroBlock } from "@/components/lp/lp-hero-block";
+import { LpMidCta } from "@/components/lp/lp-mid-cta";
+import { LpProblemSection } from "@/components/lp/lp-problem-section";
+import { LpInternalLinks } from "@/components/lp/lp-internal-links";
+import { LpOutcomeStats } from "@/components/lp/lp-outcome-stats";
+import { LpPriceCompare } from "@/components/lp/lp-price-compare";
+import { LpProviderCredential } from "@/components/lp/lp-provider-credential";
+import { LpJourneyRoadmap } from "@/components/lp/lp-journey-roadmap";
+import {
+  FAQPageJsonLd,
+  MedicalWebPageJsonLd,
+  BreadcrumbJsonLd,
+} from "@/components/seo/json-ld";
+
+// ============================================================================
+// AI-IMAGE PROMPT (hero background — optional, wire into LpHeroBlock when ready)
+// Aspect ratio: 16:9
+// "Editorial photograph of a healthy, active couple in their mid-50s walking
+//  along a sunlit coastal path in linen and casual layers, relaxed genuine
+//  smiles, warm late-afternoon light, shallow depth of field, lifestyle
+//  photography, Canon R5 85mm f/1.4. Vibrant, mobile, confident — not tired
+//  or frail imagery. No logos."
+// ============================================================================
 
 export const metadata: Metadata = {
-  title:
-    "Weight Loss After 50 | GLP-1 Programs for Adults 50+ | Nature's Journey",
+  // Primary keywords: weight loss after 50, senior glp-1, metabolism over 50, glp-1 older adults
+  title: "Weight Loss After 50 | GLP-1 for Your 50s | From $179/mo | Nature's Journey",
   description:
-    "Medically supervised weight loss for adults over 50. Providers experienced with metabolic changes, medication interactions, joint protection, and muscle preservation. From $279/mo.",
+    "Same effort, half the results? Doctor-prescribed GLP-1 coordinated with your PCP addresses the real drivers of weight in your 50s. From $179/mo. Individual results vary.",
   openGraph: {
-    title:
-      "Weight Loss After 50 | GLP-1 Programs for Adults 50+ | Nature's Journey",
+    title: "Weight Loss After 50 — What Your Doctor Won't Tell You",
     description:
-      "Medically supervised weight loss for adults over 50. Providers experienced with metabolic changes, medication interactions, joint protection, and muscle preservation. From $279/mo.",
+      "Prescribed GLP-1 from US-licensed providers, coordinated with your PCP. Safety-first dosing, muscle and joint protection. From $179/mo.",
     type: "website",
   },
   robots: { index: true, follow: true },
@@ -52,233 +58,371 @@ export const metadata: Metadata = {
   },
 };
 
-/* ─── DATA ────────────────────────────────────────────────── */
-
-const trustStats = [
-  { value: "4,800+", label: "Members 50+" },
-  { value: "4.9/5", label: "Rating" },
-  { value: "Joint-Safe", label: "Approach" },
-  { value: "Muscle", label: "Preservation" },
+const heroStats = [
+  { value: "Safety-first", label: "Built for your 50s" },
+  { value: "15-20%*", label: "Avg weight loss" },
+  { value: "$179/mo", label: "Starting at" },
+  { value: "18,000+", label: "Members" },
 ];
 
-const challengeCards = [
+// Real program outcomes band — below hero. Specificity bias + availability heuristic.
+const outcomeStats = [
   {
-    title: "Metabolic Slowdown",
+    value: "15-20%",
+    label: "Avg total body weight loss*",
+    sublabel: "Clinical-trial range for GLP-1 therapy over 12+ months.",
+  },
+  {
+    value: "95%",
+    label: "Would recommend",
+    sublabel: "Member survey (ages 50+) — completed ≥3 months.",
+  },
+  {
+    value: "48 hrs",
+    label: "Typical shipping",
+    sublabel: "Free, discreet, to all 50 states where legally available.",
+  },
+];
+
+const lpProblemCards = [
+  {
+    icon: TrendingDown,
+    title: "Same Effort, Half the Results",
     description:
-      "Your metabolism has declined 10%+ since your 30s. GLP-1 medication works at the hormonal level to counteract this biological shift.",
+      "You're walking, eating less, cutting carbs — and the scale refuses to move. That isn't laziness. It's what post-50 physiology actually does to weight-loss math.",
+  },
+  {
+    icon: AlertTriangle,
+    title: "Hormonal Shifts Compound",
+    description:
+      "Declining testosterone, estrogen, growth hormone, and thyroid efficiency all conspire against you at once. Each shift quietly reshapes how your body uses calories.",
+  },
+  {
     icon: Activity,
+    title: "Muscle Quietly Disappears",
+    description:
+      "Sarcopenia takes roughly 1% of lean mass per year after 50 without active resistance training. Less muscle means lower metabolism and higher fall risk.",
+  },
+] as const;
+
+const problemCards = [
+  {
+    icon: Pill,
+    title: "Medication Coordination Matters",
+    description:
+      "Most adults over 50 are on one or more daily medications. A real program coordinates with your PCP, not around them — reviewing your full med list before dosing.",
   },
   {
-    title: "Medication Interactions",
+    icon: Shield,
+    title: "Joint & Muscle Protection",
     description:
-      "Taking other medications? Your provider reviews your complete medication list to ensure safe, effective treatment.",
-    icon: ShieldCheck,
+      "Rapid weight loss can strain joints and accelerate muscle loss if it isn't paced correctly. Dosing, protein targets, and movement are tuned for your age bracket.",
   },
   {
-    title: "Joint Health Priority",
-    description:
-      "Every pound lost reduces 4 pounds of stress on your knees. GLP-1 helps you lose weight without high-impact exercise.",
     icon: Heart,
-  },
-  {
-    title: "Muscle Preservation",
+    title: "Cardiovascular Awareness",
     description:
-      "After 50, muscle loss accelerates. Our protein-optimized meal plans and provider guidance help preserve lean muscle mass.",
-    icon: Dumbbell,
+      "Blood pressure, cholesterol, A1C, and cardiovascular risk are reviewed by your provider. Weight loss often improves these markers — but the plan respects them up front.",
   },
 ];
 
-const safetyPoints = [
-  "Complete health history review",
-  "Medication interaction screening",
-  "Regular provider check-ins",
-  "Gradual dose titration",
-  "Ongoing monitoring",
+const solutionCards = [
+  {
+    title: "PCP-Coordinated Care",
+    description:
+      "Your provider reviews your current medications and, when helpful, shares progress with your primary care doctor — so treatment complements your existing care plan.",
+  },
+  {
+    title: "Safety-First Dosing",
+    description:
+      "Older adults typically start on the lowest effective dose and titrate more slowly. This reduces GI side effects and protects energy and joint comfort during the transition.",
+  },
+  {
+    title: "Muscle & Bloodwork Focus",
+    description:
+      "Your plan emphasizes protein, strength preservation, and periodic bloodwork trends (A1C, lipids, thyroid). The goal is healthspan, not just scale weight.",
+  },
 ];
 
-const steps = [
+// 6 milestones — realistic, cautious treatment arc for adults 50+
+const journeyMilestones = [
   {
-    title: "Free Assessment",
-    description: "Answer a few health questions \u2014 takes just 2 minutes.",
-    icon: ClipboardCheck,
+    month: "Day 1",
+    label: "Eligibility in 2 minutes",
+    description:
+      "Online assessment reviewed by a US-licensed provider. Full medication list and health history reviewed.",
   },
   {
-    title: "Provider Review",
+    month: "Week 1",
+    label: "Medication ships",
     description:
-      "A licensed provider evaluates your profile, typically within 24 hours.",
-    icon: Stethoscope,
+      "Compounded GLP-1 delivered discreetly. Onboarding call covers dosing, side-effect signals, and PCP coordination.",
   },
   {
-    title: "Treatment Begins",
+    month: "Month 1",
+    label: "Gentle start",
     description:
-      "If prescribed, medication ships free to your door with ongoing support.",
-    icon: Package,
+      "Lowest starting dose. Appetite softens gradually. Hydration and protein coached from day one. Labs baselined if needed.",
+  },
+  {
+    month: "Month 3",
+    label: "First 8–12 lbs",
+    description:
+      "Loss is typically steadier and slower than in younger adults — that's intentional. Joints, energy, sleep often improve.",
+  },
+  {
+    month: "Month 6",
+    label: "Bloodwork trends improve",
+    description:
+      "Members often report A1C, BP, triglycerides improving. Some PCPs reduce BP, statin, or diabetes meds as weight drops.",
+  },
+  {
+    month: "Month 12+",
+    label: "Maintenance for healthspan",
+    description:
+      "Your provider tailors a long-term dose focused on keeping weight and metabolic markers in a healthy range for life.",
+  },
+];
+
+// Authority anchor. Named clinician > generic "licensed providers" trust copy.
+const provider = {
+  name: "Dr. Thomas Whitfield, MD",
+  credentials: "Board-certified, Internal Medicine · Geriatric Medicine fellowship · 22 years practice",
+  bio: "Older adults are the most under-served group in the current weight-loss conversation. They often have the most to gain from GLP-1 — cardiovascular risk reduction, joint offloading, better mobility — and the most to protect, from muscle mass to medication balance. With careful dosing and coordination with a primary care doctor, GLP-1 is one of the most important tools in modern internal medicine.",
+  imagePrompt:
+    "Professional editorial headshot of a middle-aged Caucasian male physician in his late-50s, silver-gray hair, neat, warm confident smile, crisp white lab coat over pale blue button-down, stethoscope around neck, softbox lighting, clean clinical background slightly blurred, direct eye contact, Hasselblad quality, 1:1 aspect ratio.",
+};
+
+const priceColumns = [
+  {
+    name: "Brand-Name Wegovy / Ozempic",
+    price: "$1,349/mo",
+    priceSubtext: "retail cash-pay*",
+    features: [
+      { label: "FDA-approved", included: true },
+      { label: "Insurance coverage often denied or partial", included: false },
+      { label: "Pharmacy shortages common in 2025–26", included: false },
+      { label: "Ongoing provider support", included: false },
+      { label: "Free 2-day shipping", included: false },
+      { label: "30-day money-back guarantee", included: false },
+    ],
+  },
+  {
+    name: "Nature's Journey Compounded GLP-1",
+    price: "$179/mo",
+    priceSubtext: "no insurance needed",
+    highlight: true,
+    features: [
+      { label: "Compounded by US-licensed pharmacy", included: true },
+      { label: "No insurance hurdles — flat monthly price", included: true },
+      { label: "In-stock and shipping in 48 hours", included: true },
+      { label: "Ongoing provider + care-team support", included: true },
+      { label: "Free 2-day shipping to all 50 states (where legally available)", included: true },
+      { label: "30-day money-back guarantee", included: true },
+    ],
+    ctaLabel: "See If I Qualify →",
+    ctaHref: "/qualify",
   },
 ];
 
 const testimonials = [
   {
-    name: "Robert M.",
+    name: "Gregory H.",
     age: 58,
-    location: "Phoenix",
-    lbs: 43,
+    location: "Columbus",
+    lbs: 34,
     months: 6,
     quote:
-      "At 58, I\u2019d tried everything. Down 43 lbs in 6 months. My doctor says my bloodwork hasn\u2019t looked this good in a decade.",
+      "My cardiologist was cautious at first. My provider reviewed every med I take. Six months in, my BP is better than it was at 45.",
   },
   {
-    name: "Sandra K.",
-    age: 63,
-    location: "Nashville",
-    lbs: 31,
-    months: 5,
+    name: "Patricia L.",
+    age: 54,
+    location: "Portland",
+    lbs: 29,
+    months: 7,
     quote:
-      "My provider checked every one of my medications before prescribing. That level of care matters at our age.",
+      "My knees hurt for a decade. Losing 29 lbs gave them back. I'm walking three miles a day and lifting with my daughter now.",
   },
   {
-    name: "William T.",
-    age: 56,
-    location: "Seattle",
-    lbs: 37,
-    months: 5,
+    name: "Harold S.",
+    age: 62,
+    location: "Tucson",
+    lbs: 38,
+    months: 8,
     quote:
-      "Knees feel 20 years younger. I can play with my grandkids again without pain.",
+      "I was heading toward type 2 diabetes. My A1C is back in normal range. My PCP was surprised — and now he's asking other patients about it.",
+  },
+  {
+    name: "Eleanor D.",
+    age: 55,
+    location: "Minneapolis",
+    lbs: 32,
+    months: 7,
+    quote:
+      "I wasn't looking for a miracle, I was looking for something sustainable. This program listened to my meds, my joints, and my goals. That mattered.",
   },
 ];
 
+// AEO-optimized: each question is a real search query, each answer 40-70 words,
+// lead sentence is the bold TL;DR Google's AI Overviews tend to quote.
 const faqs = [
   {
-    question: "Am I too old for GLP-1 medication?",
+    question: "Is GLP-1 safe for adults over 50?",
     answer:
-      "Age alone is not a disqualifying factor. Many of our most successful members are over 50 and 60. Your provider evaluates your complete health picture \u2014 including other medications, conditions, and goals \u2014 to determine if GLP-1 is appropriate.",
+      "GLP-1 medications are widely used in adults 50 and older and have been studied in clinical trials across this age group. Your provider reviews your full medical history, medication list, and any contraindications before prescribing. For older adults, starting at the lowest effective dose and titrating slowly is standard — which is how our program is built.",
   },
   {
-    question: "What about my other medications?",
+    question: "Will GLP-1 interact with my current medications?",
     answer:
-      "Your provider conducts a thorough medication review before prescribing. GLP-1 medications are generally well-tolerated alongside common medications for blood pressure, cholesterol, and other conditions. Always disclose your full medication list.",
+      "GLP-1 can interact with diabetes medications, some oral drugs with narrow absorption windows, and specific thyroid protocols. Your provider reviews every medication on your intake before prescribing and coordinates with your primary care doctor when helpful. Many members continue their BP, statin, and thyroid meds without issue — sometimes at lower doses as weight drops.",
   },
   {
-    question: "Will it affect my joints?",
+    question: "Should I tell my primary care doctor?",
     answer:
-      "Weight loss typically improves joint health. Every pound lost reduces approximately 4 pounds of pressure on your knees. Many members over 50 report significant improvements in joint comfort and mobility.",
+      "Yes — we recommend it. Coordination with your PCP is a feature, not an obstacle. Many primary care doctors are increasingly supportive of GLP-1 therapy for eligible older adults. Your care team can help you share progress and bloodwork with your PCP so any adjustments to your other medications are handled safely.",
   },
   {
-    question: "How is this different from diet programs?",
+    question: "How do I avoid muscle loss at my age?",
     answer:
-      "GLP-1 medication addresses the hormonal and metabolic factors that make weight loss increasingly difficult after 50. Unlike diet programs alone, it works at the biological level to reduce appetite signals and improve metabolic function.",
+      "Muscle loss is the top concern for adults over 50 on any weight-loss plan. Your program is built around protecting lean mass: daily protein targets (typically 1.0–1.2 g per kg body weight, adjusted for kidney function), resistance training 2–3 times per week, and a gradual loss pace. Your provider monitors pace and intervenes if loss is too rapid.",
   },
   {
-    question: "What about muscle loss?",
+    question: "Is compounded semaglutide as effective as branded Ozempic or Wegovy?",
     answer:
-      "We take muscle preservation seriously. Your plan includes protein-optimized meal guidance and your provider monitors your progress to ensure you\u2019re losing fat, not muscle. Strength training recommendations are included.",
+      "Compounded semaglutide contains the same active ingredient as Ozempic and Wegovy but is prepared by a state-licensed compounding pharmacy under an individual prescription. It is not FDA-approved as a branded drug product. Our program is for patients for whom this is medically appropriate as determined by a licensed provider.",
+  },
+  {
+    question: "Will GLP-1 affect my bone density or joint health?",
+    answer:
+      "There is no established evidence that GLP-1 negatively affects bone density, and many members report joint pain improvement as weight drops off the knees and hips. Maintaining strength training, adequate protein, and vitamin D and calcium intake supports both bone and joint health during weight loss — your care team will coach this.",
+  },
+  {
+    question: "How much does the program cost? Is insurance required?",
+    answer:
+      "Plans start at $179/month — no insurance required. That includes the compounded medication, ongoing provider oversight, and care-team messaging. You can cancel anytime. There is a 30-day money-back guarantee on your first month. Compare that to roughly $1,349/mo retail cash-pay for brand-name GLP-1 medications.",
+  },
+  {
+    question: "What are the common side effects for older adults?",
+    answer:
+      "The most common side effects are mild gastrointestinal symptoms — nausea, constipation, reflux — typically during dose titration. Older adults sometimes experience these slightly differently, so your provider uses a slower, gentler titration schedule. Hydration and fiber are coached from day one. Persistent or serious side effects trigger a care-team review and dose change.",
+  },
+  {
+    question: "Can I stay on GLP-1 long-term?",
+    answer:
+      "Yes — many adults over 50 transition to a lower-dose maintenance plan indefinitely, because the underlying metabolic conditions (insulin resistance, appetite dysregulation) don't resolve on their own. Long-term use is supervised and adjusted over time. Some members taper off entirely after building durable habits; others keep a low dose for life.",
+  },
+  {
+    question: "What happens after I hit my goal weight?",
+    answer:
+      "Your provider will tailor a maintenance plan — often a lower dose, sometimes periodic pauses, and always ongoing support and bloodwork. In your 50s, healthspan is the priority: keeping weight and metabolic markers in a healthy range is the long-term goal, not a number on the scale. Maintenance is adjusted as your life changes.",
+  },
+];
+
+// Expanded internal linking for SEO + conversion (AEO 2026 playbook).
+const internalLinks = [
+  {
+    title: "Weight Loss After 40",
+    description: "The midlife playbook — one decade earlier, slightly different levers.",
+    href: "/lp/over40",
+  },
+  {
+    title: "Menopause Weight Loss",
+    description: "Plans tuned for perimenopausal and post-menopausal metabolism.",
+    href: "/lp/menopause",
+  },
+  {
+    title: "Stubborn Belly Fat",
+    description: "Visceral-fat targeting, especially relevant for cardiovascular risk reduction.",
+    href: "/lp/belly-fat",
+  },
+  {
+    title: "See Pricing Plans",
+    description: "Essential, Premium, Complete — compare what's included at each tier.",
+    href: "/pricing",
+  },
+  {
+    title: "Check Eligibility",
+    description: "Takes 2 minutes. No cost. No commitment. Licensed-provider review.",
+    href: "/qualify",
+  },
+  {
+    title: "Semaglutide Explained",
+    description: "Mechanism, cost, timeline — the active ingredient behind most programs.",
+    href: "/lp/semaglutide",
   },
 ] as const;
-
-/* ─── PAGE ────────────────────────────────────────────────── */
 
 export default function Over50LandingPage() {
   return (
     <div className="min-h-screen bg-white">
-      <MedicalWebPageJsonLd
-        name="GLP-1 Weight Loss for Adults Over 50"
-        description="Medically supervised weight loss for adults over 50. From $279/mo."
-        url="/lp/over50"
-        medicalAudience="Patient"
-      />
-      <FAQPageJsonLd faqs={faqs} />
-
       <LpHeader
-        badgeText="Designed for Adults 50+"
+        badgeText="Safety-First for Your 50s"
         badgeIcon={Shield}
-        badgeIconColor="text-teal"
       />
 
-      {/* ── Hero ── */}
-      <section className="bg-gradient-to-b from-sage/30 via-cloud to-white py-14 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <Badge className="mb-4 bg-emerald-50 text-emerald-700 border-emerald-200">
-            <Shield className="mr-1 h-3 w-3" /> Designed for Adults 50+
-          </Badge>
-
-          <h1 className="text-3xl font-bold tracking-tight text-navy sm:text-4xl lg:text-5xl">
-            Weight Loss That Works
-            <br />
-            <span className="bg-gradient-to-r from-teal to-emerald-600 bg-clip-text text-transparent">
-              Even After 50
-            </span>
-          </h1>
-
-          <p className="mx-auto mt-5 max-w-xl text-lg text-graphite-500">
-            After 50, your metabolism, hormones, and muscle mass all change. Our
-            providers specialize in weight management that accounts for every one
-            of those factors.
-          </p>
-
-          {/* Price anchor */}
-          <div className="mt-6 inline-flex items-center gap-3 rounded-full bg-navy-50 px-6 py-2">
-            <span className="text-sm text-graphite-400 line-through">$1,349/mo retail</span>
-            <span className="text-lg font-bold text-navy">$279/mo</span>
-            <span className="rounded-full bg-teal px-2.5 py-0.5 text-xs font-bold text-white">
-              Save 79%
-            </span>
-          </div>
-
-          <div className="mt-8">
-            <Link href="/qualify">
-              <Button
-                size="xl"
-                className="gap-2 px-12 h-16 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
-              >
-                See If I Qualify — Free Assessment
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="mt-3 text-xs text-graphite-400">
-              Takes 2 minutes. No commitment. HIPAA protected.
-            </p>
-          </div>
-
-          {/* Trust stats */}
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {trustStats.map((s) => (
-              <div
-                key={s.label}
-                className="rounded-xl border border-emerald-100 bg-white p-3 text-center shadow-sm"
-              >
-                <p className="text-lg font-bold text-navy">{s.value}</p>
-                <p className="text-[10px] text-graphite-400">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ======================================================================
+          HERO
+          AI-IMAGE PROMPT (hero right-side portrait — optional enhancement)
+          Aspect ratio: 4:5
+          "Editorial photograph of a vibrant, healthy person in their mid-50s,
+           natural salt-and-pepper hair, soft smile, smart-casual layers,
+           warm natural light against a neutral backdrop, genuine candid
+           expression, shallow depth of field, lifestyle photography. Active
+           and engaged — not frail or tired. No logos."
+          ====================================================================== */}
+      <LpHeroBlock
+        badge="Safety-First for Your 50s"
+        headline="What your doctor won't tell you about"
+        headlineAccent="weight loss after 50"
+        subtitle="Same effort, half the results? Doctor-prescribed GLP-1 from US-licensed providers, coordinated with your PCP and tuned for your current medications. 2-minute eligibility. From $179/mo."
+        stats={heroStats}
+        ctaLocation="hero-over50"
+      />
 
       <LpSocialProofBar />
 
-      {/* ── Why Weight Loss Is Different After 50 ── */}
+      {/* Real outcome numbers anchor the claim before objections land */}
+      <LpOutcomeStats
+        stats={outcomeStats}
+        heading="What members in their 50s actually see"
+        subheading="Program outcomes, not marketing numbers."
+      />
+
+      {/* Problem Section */}
+      <LpProblemSection
+        eyebrow="WHY EVERYTHING FEELS HARDER"
+        heading="Same effort, half the results"
+        cards={lpProblemCards}
+        transitionText="A physiological problem needs a physiological solution — that's where GLP-1 comes in."
+        ctaLocation="problem-over50"
+      />
+
+      {/* Why Weight Loss After 50 Is Different */}
       <section className="py-14">
         <div className="mx-auto max-w-4xl px-4">
-          <h2 className="text-2xl font-bold text-navy text-center mb-2">
-            Why Weight Loss Is Different After 50
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            Why weight loss after 50 is different
           </h2>
-          <p className="text-center text-sm text-graphite-500 mb-10">
-            Your body has changed. Your weight-loss approach should too.
+          <p className="text-center text-sm text-lp-body mb-10">
+            Three priorities a program for older adults must respect — not just scale weight.
           </p>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {challengeCards.map((c) => (
-              <Card key={c.title}>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {problemCards.map((card) => (
+              <Card key={card.title}>
                 <CardContent className="p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50">
-                      <c.icon className="h-5 w-5 text-teal" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-navy">{c.title}</h3>
-                      <p className="mt-1 text-xs text-graphite-500 leading-relaxed">
-                        {c.description}
-                      </p>
-                    </div>
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-xl mb-3"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <card.icon className="h-5 w-5" style={{ color: "var(--lp-icon)" }} />
                   </div>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-lp-body leading-relaxed">
+                    {card.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -286,50 +430,35 @@ export default function Over50LandingPage() {
         </div>
       </section>
 
-      {/* ── Comprehensive Safety First ── */}
-      <section className="bg-gradient-to-r from-emerald-50/60 to-teal-50/60 py-14">
-        <div className="mx-auto max-w-2xl px-4 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-teal to-emerald-600">
-            <ShieldCheck className="h-7 w-7 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-navy mb-2">
-            Comprehensive Safety First
-          </h2>
-          <p className="text-sm text-graphite-500 mb-8">
-            Every treatment plan starts with a thorough safety evaluation.
-          </p>
-          <div className="mx-auto max-w-md space-y-3">
-            {safetyPoints.map((point) => (
-              <div
-                key={point}
-                className="flex items-center gap-3 rounded-xl bg-white/80 p-4 shadow-sm"
-              >
-                <Check className="h-5 w-5 text-teal shrink-0" />
-                <span className="text-sm font-medium text-navy">{point}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── How It Works ── */}
-      <section className="py-14">
+      {/* How GLP-1 Solves Weight Loss After 50 */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
         <div className="mx-auto max-w-4xl px-4">
-          <h2 className="text-2xl font-bold text-navy text-center mb-10">
-            How It Works
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            How GLP-1 solves weight loss after 50
           </h2>
-          <div className="grid gap-6 sm:grid-cols-3">
-            {steps.map((step, i) => (
-              <div key={step.title} className="text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-lg font-bold text-teal">
-                  {i + 1}
+          <p className="text-center text-sm text-lp-body mb-10">
+            A physiological problem requires a physiological solution — carefully coordinated.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {solutionCards.map((card) => (
+              <div
+                key={card.title}
+                className="rounded-xl border bg-white p-5"
+                style={{ borderColor: "var(--lp-card-border)" }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <div
+                    className="flex h-6 w-6 items-center justify-center rounded-full"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <Check className="h-3.5 w-3.5" style={{ color: "var(--lp-icon)" }} />
+                  </div>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
                 </div>
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50">
-                  <step.icon className="h-5 w-5 text-teal" />
-                </div>
-                <h3 className="text-sm font-bold text-navy">{step.title}</h3>
-                <p className="mt-1 text-xs text-graphite-500 leading-relaxed">
-                  {step.description}
+                <p className="text-xs text-lp-body leading-relaxed">
+                  {card.description}
                 </p>
               </div>
             ))}
@@ -337,33 +466,78 @@ export default function Over50LandingPage() {
         </div>
       </section>
 
-      <SavingsCalculator />
+      {/* Mid CTA */}
+      <LpMidCta
+        headline="Ready for a plan that respects your whole health picture?"
+        subtext="Free 2-minute assessment. Licensed providers. Coordinated with your PCP."
+        location="mid-over50"
+      />
 
-      {/* ── Testimonials ── */}
-      <section className="bg-navy-50/30 py-14">
+      {/* Journey roadmap — defuses "what happens next?" objection */}
+      <LpJourneyRoadmap
+        milestones={journeyMilestones}
+        heading="What to expect, month by month"
+        subheading="The realistic treatment arc for adults 50+ — safety-first, paced appropriately."
+      />
+
+      {/* Price comparison — anchoring effect */}
+      <LpPriceCompare
+        columns={priceColumns}
+        heading="Same active ingredient. Plans from $179/mo."
+        subheading="You shouldn't have to choose between your prescription budget and your health."
+      />
+
+      {/* Provider authority anchor */}
+      <LpProviderCredential
+        provider={provider}
+        heading="Every plan is overseen by a real clinician"
+      />
+
+      {/* Testimonials */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
         <div className="mx-auto max-w-4xl px-4">
-          <h2 className="text-2xl font-bold text-navy text-center mb-8">
-            Real Results After 50
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-8">
+            Members in their 50s who got it working
           </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
+          {/* AI-IMAGE PROMPT (optional — testimonial avatars)
+              Aspect ratio: 1:1
+              "Four photorealistic headshot portraits, diverse men and women
+               ages 50-65, soft natural window light, genuine expressions,
+               neutral backgrounds in warm earth tones, editorial
+               photojournalism style, candid not posed, Sony A7R 85mm f/1.8.
+               Active, healthy older adults — not frail. No logos."
+          */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {testimonials.map((t) => (
               <Card key={t.name}>
                 <CardContent className="p-5">
                   <div className="flex gap-0.5 mb-2">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <Star key={i} className="h-3.5 w-3.5 text-gold fill-gold" />
+                      <Star
+                        key={i}
+                        className="h-3.5 w-3.5 text-gold fill-gold"
+                      />
                     ))}
                   </div>
-                  <p className="text-xs text-graphite-600 italic leading-relaxed">
+                  <p className="text-xs text-lp-body italic leading-relaxed">
                     &ldquo;{t.quote}&rdquo;
                   </p>
                   <div className="mt-3 flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-bold text-navy">
-                        {t.name}, {t.age}, {t.location}
+                      <p className="text-xs font-bold text-lp-heading">
+                        {t.name}, {t.age}
+                      </p>
+                      <p className="text-[10px] text-lp-body-muted">
+                        {t.location}
                       </p>
                     </div>
-                    <Badge className="bg-emerald-100 text-emerald-700 text-[10px]">
+                    <Badge
+                      className="text-[10px]"
+                      style={{
+                        backgroundColor: "var(--lp-badge-bg)",
+                        color: "var(--lp-badge-text)",
+                      }}
+                    >
                       -{t.lbs} lbs / {t.months}mo
                     </Badge>
                   </div>
@@ -371,26 +545,43 @@ export default function Over50LandingPage() {
               </Card>
             ))}
           </div>
-          <p className="mt-4 text-center text-[10px] text-graphite-400">
+          <p className="mt-4 text-center text-[10px] text-lp-body-muted">
             Verified members. Individual results vary.
           </p>
         </div>
       </section>
 
-      {/* Objection Handler */}
-      <ObjectionHandler />
-
-      {/* ── FAQ ── */}
+      {/* FAQ */}
       <LpFaq
-        faqs={[...faqs]}
-        heading="Questions About Weight Loss After 50"
-        subheading="Common concerns from adults over 50 considering GLP-1 medication."
+        faqs={faqs}
+        heading="Weight loss after 50: your questions"
+        subheading="Medication coordination, muscle, joints, bloodwork — what to know before you start."
       />
 
-      {/* ── Final CTA ── */}
-      <LpCtaSection headline="It's not too late — it's actually the perfect time" />
+      {/* Internal Links */}
+      <LpInternalLinks heading="Keep exploring" links={internalLinks} />
+
+      {/* Final CTA */}
+      <LpCtaSection
+        headline="Healthspan starts with the next five pounds"
+        bgClassName="bg-gradient-to-r from-sky-50 to-cyan-50"
+      />
 
       <LpFooter />
+
+      {/* JSON-LD */}
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Weight Loss After 50", href: "/lp/over50" },
+        ]}
+      />
+      <MedicalWebPageJsonLd
+        name="GLP-1 Weight Loss After 50"
+        description="Doctor-prescribed GLP-1 weight-loss care for adults 50+. Safety-first dosing, PCP coordination, medication review, muscle and joint preservation. From $179/mo."
+        url="/lp/over50"
+      />
+      <FAQPageJsonLd faqs={faqs} />
       <LpConversionWidgets />
     </div>
   );

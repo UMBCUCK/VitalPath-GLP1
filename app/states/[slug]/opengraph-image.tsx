@@ -79,7 +79,7 @@ export default function OGImage({ params }: { params: { slug: string } }) {
             </div>
             <span style={{ fontSize: "20px", fontWeight: 700, color: "white" }}>Nature's Journey</span>
           </div>
-          <span style={{ fontSize: "16px", color: "#97A5B0" }}>From $279/mo &middot; Free 2-day shipping</span>
+          <span style={{ fontSize: "16px", color: "#97A5B0" }}>From $179/mo &middot; Free 2-day shipping</span>
         </div>
       </div>
     ),

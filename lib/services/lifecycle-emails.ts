@@ -101,6 +101,27 @@ export const quizAbandonment = (name?: string) => ({
   `),
 });
 
+// ─── Qualify Resume (magic link — fired after qualify abandon) ─
+//
+// Called from /api/lead/resume (POST) when we want to ping a lead back
+// into a partially-completed /qualify flow. The resumeUrl is a signed
+// 14-day JWT magic link that deep-links into /qualify?resume=<token>.
+export const qualifyResumeEmail = (name: string | undefined, resumeUrl: string) => ({
+  subject: name
+    ? `${name}, pick up where you left off — 1 click`
+    : "Pick up where you left off — 1 click",
+  html: baseTemplate(`
+    <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">${name ? `Hi ${name}, your` : "Your"} assessment is saved</h1>
+    <p style="font-size: 16px; line-height: 1.6;">You're already most of the way through. Click below and we'll drop you right back in — your answers are pre-filled, no re-typing.</p>
+    <div style="background: #F0FAF9; border: 1px solid #B2DBD7; border-radius: 12px; padding: 18px; margin: 20px 0;">
+      <p style="margin: 0; font-size: 14px; color: #0E223D;"><strong>It takes about 60 seconds to finish.</strong></p>
+      <p style="margin: 8px 0 0; font-size: 13px; color: #677A8A;">A licensed provider reviews your profile and determines eligibility — usually within 1 business day.</p>
+    </div>
+    ${ctaButton("Resume My Assessment", resumeUrl)}
+    <p style="font-size: 13px; color: #97A5B0; margin-top: 16px;">This link is unique to you and expires in 14 days. Don't share it.</p>
+  `),
+});
+
 // ─── Checkout Abandonment (1hr and 24hr after checkout start) ─
 
 export const checkoutAbandonment = {
@@ -186,6 +207,51 @@ export const cancellationSaveOffer = (name: string) => ({
     <p style="font-size: 14px; color: #677A8A;">Reply to this email anytime and our support team will help you find the best path forward.</p>
   `),
 });
+
+// ─── Tier 3.7 — Peptide Intro (day 30 after activation) ─────
+//
+// Fires for active members who have been on their GLP-1 treatment for 30+
+// days and don't yet have any HEALTHY_AGING add-on. The top peptide offer
+// is typically selected by evaluateUpsells() from lib/upsell-engine.ts and
+// passed in as `recommendation` for personalization.
+export const peptideIntroEmail = (
+  name: string,
+  recommendation?: { productName: string; headline: string; description: string; priceMonthly?: number },
+) => {
+  const recName = recommendation?.productName ?? "BPC-157 Recovery";
+  const recHeadline = recommendation?.headline ?? "Add provider-supervised recovery support";
+  const recDesc =
+    recommendation?.description ??
+    "BPC-157 is a body-protective compound that many GLP-1 members add at month 1 for digestive comfort and soft-tissue recovery.";
+  const recPrice = recommendation?.priceMonthly ? Math.round(recommendation.priceMonthly / 100) : 129;
+
+  return {
+    subject: `${name}, a month in — ready to layer in recovery support?`,
+    html: baseTemplate(`
+      <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">You've hit the 30-day mark, ${name}</h1>
+      <p style="font-size: 16px; line-height: 1.6;">Your body has adapted to GLP-1 therapy. Many members at this stage add a peptide protocol to support recovery, energy, or anti-aging — prescribed by the same provider, shipped from the same pharmacy.</p>
+
+      <div style="background: #F0FAF9; border: 1px solid #B2DBD7; border-radius: 12px; padding: 20px; margin: 24px 0;">
+        <p style="margin: 0 0 6px; font-weight: 700; color: #0E223D; font-size: 16px;">${recHeadline}</p>
+        <p style="margin: 0 0 12px; font-size: 14px; color: #677A8A; line-height: 1.6;">${recDesc}</p>
+        <p style="margin: 0; font-size: 14px; color: #0E223D;"><strong>${recName}</strong> — from <strong>$${recPrice}/mo</strong></p>
+      </div>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #677A8A;">Other popular options at this stage:</p>
+      <ul style="font-size: 14px; line-height: 1.8; padding-left: 20px; color: #2E3742;">
+        <li><strong>NAD+ Injection</strong> — cellular energy & mental clarity ($149/mo)</li>
+        <li><strong>Glow Stack</strong> — skin, hair, and nail support on rapid weight loss ($89/mo)</li>
+        <li><strong>Sermorelin</strong> — sleep quality and overnight recovery ($199/mo)</li>
+      </ul>
+
+      ${ctaButton("Browse Peptide Therapy →", `${APP_URL}/dashboard/shop`)}
+
+      <p style="font-size: 12px; color: #97A5B0; line-height: 1.5; margin-top: 20px;">
+        Eligibility, protocol, and dosing determined by your licensed provider based on your individual health profile. Compounded peptides are not FDA-approved products — they are prepared by state-licensed compounding pharmacies under individual prescription. You can add, pause, or cancel any add-on anytime from your dashboard.
+      </p>
+    `),
+  };
+};
 
 // ─── Referral Invite Reminder (48hr after invite, not yet converted) ─
 
@@ -437,4 +503,50 @@ export async function sendLifecycleEmail(
     html: template.html,
     tags,
   });
+}
+
+// ─── Tier 3.7 trigger — fires peptide intro email for one user ─
+//
+// Intended to be called from a day-30 cron or a webhook handler that
+// receives "30 days since activation" events. Uses the upsell engine
+// to personalize the recommended peptide based on the user's state,
+// then renders peptideIntroEmail and sends via the configured provider.
+//
+// Safe to call for any user — if they aren't eligible for a peptide
+// (e.g. already have one, not yet 30 days in), the engine returns no
+// peptide suggestions and we skip sending.
+export async function sendPeptideIntro(userId: string): Promise<{ sent: boolean; reason?: string }> {
+  // Lazy-imported to avoid pulling prisma into cold-start paths that don't need it
+  const [{ evaluateUpsells }, { db }] = await Promise.all([
+    import("@/lib/upsell-engine"),
+    import("@/lib/db"),
+  ]);
+
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { email: true, firstName: true },
+  });
+  if (!user?.email) return { sent: false, reason: "no_user_email" };
+
+  const suggestions = await evaluateUpsells(userId);
+  // Only peptide rules — see lib/upsell-engine.ts
+  const peptideSlugs = ["bpc-157", "nad-plus", "sermorelin", "ipamorelin-cjc", "glow-stack", "thymosin-beta-4"];
+  const peptideSuggestion = suggestions.find((s) => peptideSlugs.includes(s.productSlug));
+  if (!peptideSuggestion) return { sent: false, reason: "no_peptide_suggestion" };
+
+  // Enrich with current price from the product catalog
+  const product = await db.product.findUnique({
+    where: { slug: peptideSuggestion.productSlug },
+    select: { priceMonthly: true },
+  });
+
+  const template = peptideIntroEmail(user.firstName || "there", {
+    productName: peptideSuggestion.productName,
+    headline: peptideSuggestion.headline,
+    description: peptideSuggestion.description,
+    priceMonthly: product?.priceMonthly,
+  });
+
+  await sendLifecycleEmail(user.email, template, ["peptide-intro-day30"]);
+  return { sent: true };
 }

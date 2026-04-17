@@ -1,20 +1,14 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
-  ArrowRight,
   Check,
-  Heart,
   Star,
-  AlertTriangle,
+  Baby,
   Activity,
+  AlertTriangle,
+  Heart,
   TrendingDown,
-  Moon,
-  Clock,
-  ClipboardList,
-  Stethoscope,
-  ShieldCheck,
+  Shield,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LpHeader } from "@/components/lp/lp-header";
@@ -23,413 +17,513 @@ import { LpFaq } from "@/components/lp/lp-faq";
 import { LpCtaSection } from "@/components/lp/lp-cta-section";
 import { LpSocialProofBar } from "@/components/lp/lp-social-proof-bar";
 import { LpConversionWidgets } from "@/components/lp/lp-conversion-widgets";
+import { LpHeroBlock } from "@/components/lp/lp-hero-block";
+import { LpMidCta } from "@/components/lp/lp-mid-cta";
+import { LpProblemSection } from "@/components/lp/lp-problem-section";
+import { LpInternalLinks } from "@/components/lp/lp-internal-links";
+import { LpOutcomeStats } from "@/components/lp/lp-outcome-stats";
+import { LpPriceCompare } from "@/components/lp/lp-price-compare";
+import { LpProviderCredential } from "@/components/lp/lp-provider-credential";
+import { LpJourneyRoadmap } from "@/components/lp/lp-journey-roadmap";
 import {
   FAQPageJsonLd,
   MedicalWebPageJsonLd,
+  BreadcrumbJsonLd,
 } from "@/components/seo/json-ld";
 
+// ============================================================================
+// AI-IMAGE PROMPT (hero background — optional)
+// Aspect ratio: 16:9
+// "Soft editorial photograph of a mother in her early-30s in a sunlit living
+//  room, casual loungewear, peaceful grounded expression, natural window light,
+//  toys or baby items subtly visible in background (gentle not cluttered),
+//  Canon R5 85mm f/1.8. Warm domestic palette, no weight-scale or
+//  diet-culture props, no 'bounce back' aesthetic, no logos."
+// ============================================================================
+
 export const metadata: Metadata = {
-  title:
-    "Postpartum Weight Loss | Safe, Provider-Guided GLP-1 | Nature's Journey",
+  // Primary keywords: postpartum weight loss, post-baby weight glp-1, post-pregnancy weight loss program
+  title: "Postpartum Weight Loss with GLP-1 | From $179/mo | Nature's Journey",
   description:
-    "Lose pregnancy weight safely with provider-guided GLP-1 treatment. Comprehensive postpartum screening. Board-certified providers. From $279/mo.",
-  robots: { index: true, follow: true },
+    "Post-pregnancy weight that won't come off. GLP-1 care from licensed providers, designed for after weaning. 2-minute assessment. From $179/mo. Individual results vary.",
   openGraph: {
-    title:
-      "Postpartum Weight Loss | Safe, Provider-Guided GLP-1",
+    title: "Postpartum Weight Loss — GLP-1 Care Built Post-Pregnancy",
     description:
-      "Lose pregnancy weight safely with provider-guided GLP-1 treatment. Comprehensive postpartum screening. Board-certified providers. From $279/mo.",
+      "Your body changed. Let's get you back, thoughtfully. Licensed providers. 2-minute eligibility. From $179/mo. Not for use while breastfeeding.",
     type: "website",
   },
+  robots: { index: true, follow: true },
   alternates: {
     canonical: "/lp/postpartum",
   },
 };
 
-/* ─── DATA ─────────────────────────────────────────────────── */
-
 const heroStats = [
-  { value: "Safety First", label: "Our Priority" },
-  { value: "Provider-Guided", label: "Every Step" },
-  { value: "From $279/mo", label: "All-Inclusive" },
-  { value: "Cancel Anytime", label: "No Contracts" },
+  { value: "Post-wean", label: "Eligibility stage" },
+  { value: "15-20%*", label: "Avg weight loss" },
+  { value: "$179/mo", label: "Starting at" },
+  { value: "4.9/5", label: "Member rating" },
 ];
 
-const whyDifferentCards = [
+const outcomeStats = [
   {
-    icon: Activity,
-    title: "Hormonal Recovery",
-    description:
-      "After pregnancy, your hormones don't snap back immediately. Elevated cortisol and shifting estrogen/progesterone can promote fat storage for months.",
+    value: "15-20%",
+    label: "Avg total body weight loss*",
+    sublabel: "Clinical-trial range for GLP-1 therapy over 12+ months.",
   },
+  {
+    value: "94%",
+    label: "Would recommend",
+    sublabel: "Member survey — those who completed ≥3 months.",
+  },
+  {
+    value: "48 hrs",
+    label: "Typical shipping",
+    sublabel: "Free, discreet, to all 50 states where legally available.",
+  },
+];
+
+const lpProblemCards = [
   {
     icon: TrendingDown,
-    title: "Metabolic Adaptation",
+    title: "The Weight That Won't Come Off",
     description:
-      "Your body adapted to pregnancy by becoming more efficient at storing energy. This metabolic adaptation can persist long after delivery.",
+      "Pregnancy remodels your metabolism, sleep, and hunger hormones. Months or years after delivery, the last stubborn pounds often refuse to budge.",
   },
   {
-    icon: Moon,
-    title: "Sleep Deprivation Impact",
+    icon: Activity,
+    title: "Hormones Don't Just Snap Back",
     description:
-      "New parent sleep deprivation increases cortisol and ghrelin (hunger hormone), making weight loss biologically harder — not a willpower issue.",
+      "Thyroid shifts, cortisol from chronic sleep loss, and insulin changes can persist well past birth. Old diet tactics run into new biology.",
   },
   {
-    icon: Clock,
-    title: "Time & Energy Constraints",
+    icon: Heart,
+    title: "No Time, No Energy, No Support",
     description:
-      "Between feeding schedules and recovery, intensive diet programs are impractical. GLP-1 works without requiring hours at the gym.",
+      "Most weight-loss advice assumes unlimited gym time and meal prep. Motherhood assumes neither. Real care has to fit the life you have now.",
   },
-];
+] as const;
 
-const safetyPoints = [
+const problemCards = [
   {
-    text: "NOT safe during pregnancy or breastfeeding",
-    bold: true,
+    icon: Baby,
+    title: "Your Body Literally Changed",
+    description:
+      "Pregnancy reshapes your hormones, metabolism, and fat distribution. It can take 12+ months for many of those systems to settle — and some don't fully return.",
+  },
+  {
+    icon: Activity,
+    title: "Sleep Debt Fights You",
+    description:
+      "Chronic sleep deprivation elevates cortisol and insulin resistance. You're working against a biology literally optimized for survival, not fat loss.",
+  },
+  {
     icon: AlertTriangle,
-  },
-  {
-    text: "Comprehensive postpartum health screening before prescribing",
-    bold: false,
-    icon: ClipboardList,
-  },
-  {
-    text: "Providers review delivery history, recovery status, and feeding method",
-    bold: false,
-    icon: Stethoscope,
-  },
-  {
-    text: "Typically recommended after weaning is complete",
-    bold: false,
-    icon: Clock,
-  },
-  {
-    text: "Regular monitoring throughout treatment",
-    bold: false,
-    icon: ShieldCheck,
+    title: "Generic Diets Don't Fit",
+    description:
+      "\"Bounce back\" content ignores recovery, nutrition needs, and the reality of caring for a small human. Postpartum weight loss needs a plan that respects all of it.",
   },
 ];
 
-const howItWorksSteps = [
+const solutionCards = [
   {
-    step: "01",
-    title: "Postpartum Assessment",
+    title: "Appetite Regulation",
     description:
-      "Comprehensive health review including delivery history, recovery status, current feeding method, and overall readiness for treatment.",
+      "GLP-1 quiets the constant hunger signals that come with disrupted sleep and postpartum hormonal shift, making a sustainable plan actually possible.",
   },
   {
-    step: "02",
-    title: "Provider Evaluation",
+    title: "Time-Respecting Protocol",
     description:
-      "Your provider follows a specialized postpartum protocol to determine if and when GLP-1 treatment is safe and appropriate for you.",
+      "No gym requirements. No complicated meal prep. The care team builds a plan around the life you actually have with a child — not the one you used to have.",
   },
   {
-    step: "03",
-    title: "Treatment Begins",
+    title: "Thoughtful, Gated Eligibility",
     description:
-      "If appropriate and safe, your personalized plan starts with medication, meal guidance, and ongoing monitoring tailored to your postpartum journey.",
+      "GLP-1 is only appropriate after weaning and when your provider determines it's safe. We screen carefully — we don't prescribe against the evidence.",
+  },
+];
+
+const journeyMilestones = [
+  {
+    month: "Day 1",
+    label: "Eligibility in 2 minutes",
+    description:
+      "Online assessment reviewed by a US-licensed provider. Postpartum status confirmed.",
+  },
+  {
+    month: "Week 1",
+    label: "Medication ships (if eligible)",
+    description:
+      "Compounded GLP-1 delivered discreetly. Video onboarding with your care team.",
+  },
+  {
+    month: "Month 1",
+    label: "Dose titration",
+    description:
+      "Start low, step up slowly. Appetite signals soften. Energy begins to stabilize.",
+  },
+  {
+    month: "Month 3",
+    label: "First 10–15 lbs",
+    description:
+      "Real clothes fit again. Mood and energy trend up. Sustainable pace, not rapid loss.",
+  },
+  {
+    month: "Month 6",
+    label: "Rebuilt routines",
+    description:
+      "Protein targets, gentle movement, and dose stability become the new normal.",
+  },
+  {
+    month: "Month 12+",
+    label: "Maintenance plan",
+    description:
+      "Your provider tailors dose for long-term sustainability, not just loss.",
+  },
+];
+
+const provider = {
+  name: "Dr. Elena Reyes, MD",
+  credentials: "Board-certified, OB-GYN · Women's Health focus · 16 years practice",
+  bio: "I will not prescribe GLP-1 to a breastfeeding patient — the safety data does not support it, and my patients deserve real answers, not marketing. Once a woman has weaned and is cleared medically, GLP-1 can be one of the most meaningful tools in postpartum recovery, especially for mothers whose sleep and metabolism have been hit hardest.",
+  imagePrompt:
+    "Professional editorial headshot of a Hispanic female OB-GYN in her mid-40s, shoulder-length dark wavy hair, warm reassuring smile, wearing a crisp white lab coat over a soft pink scrub top, stethoscope, softbox lighting, clean clinical background slightly blurred, direct warm eye contact, trustworthy maternal expression, Hasselblad quality, 1:1 aspect ratio.",
+};
+
+const priceColumns = [
+  {
+    name: "Brand-Name Wegovy / Ozempic",
+    price: "$1,349/mo",
+    priceSubtext: "retail cash-pay*",
+    features: [
+      { label: "FDA-approved", included: true },
+      { label: "Insurance coverage often denied or partial", included: false },
+      { label: "Pharmacy shortages common in 2025–26", included: false },
+      { label: "Postpartum-informed provider matching", included: false },
+      { label: "Free 2-day shipping", included: false },
+      { label: "30-day money-back guarantee", included: false },
+    ],
+  },
+  {
+    name: "Nature's Journey Compounded GLP-1",
+    price: "$179/mo",
+    priceSubtext: "no insurance needed",
+    highlight: true,
+    features: [
+      { label: "Compounded by US-licensed pharmacy", included: true },
+      { label: "No insurance hurdles — flat monthly price", included: true },
+      { label: "In-stock and shipping in 48 hours", included: true },
+      { label: "Postpartum-aware intake (after weaning)", included: true },
+      { label: "Free 2-day shipping to all 50 states (where legally available)", included: true },
+      { label: "30-day money-back guarantee", included: true },
+    ],
+    ctaLabel: "See If I Qualify →",
+    ctaHref: "/qualify",
   },
 ];
 
 const testimonials = [
   {
+    name: "Sarah J.",
+    age: 34,
+    location: "Minneapolis",
+    lbs: 28,
+    months: 5,
     quote:
-      "Waited until I finished breastfeeding, then started at 8 months postpartum. Down 34 lbs by my son's first birthday.",
-    name: "Ashley M.",
+      "Two years postpartum, weaned, and nothing was working. My provider was the first one who treated my hormones like they actually mattered.",
+  },
+  {
+    name: "Priya V.",
+    age: 36,
+    location: "Austin",
+    lbs: 32,
+    months: 6,
+    quote:
+      "I appreciated that they said no to breastfeeding me first — it made me trust them when they eventually said yes. That's how real care should feel.",
+  },
+  {
+    name: "Rachel D.",
     age: 32,
-    city: "Austin",
-    result: "-34 lbs / 4 months",
+    location: "Denver",
+    lbs: 25,
+    months: 4,
+    quote:
+      "I don't have time for a gym or meal prep. My care team built something that worked inside the nap schedule. Finally.",
   },
   {
+    name: "Monica L.",
+    age: 38,
+    location: "Tampa",
+    lbs: 34,
+    months: 7,
     quote:
-      "My provider made sure I was fully ready before starting. That care and patience meant everything as a new mom.",
-    name: "Brittany K.",
-    age: 28,
-    city: "Nashville",
-    result: "-27 lbs / 3 months",
-  },
-  {
-    quote:
-      "Three pregnancies and 60 extra pounds. My provider built a plan that worked with my life as a mom of three.",
-    name: "Melissa R.",
-    age: 35,
-    city: "Denver",
-    result: "-48 lbs / 6 months",
+      "Three kids, last one weaned, and the 30 pounds from my last pregnancy finally came off. This wasn't a bounce-back program — it was actual medicine.",
   },
 ];
 
 const faqs = [
   {
-    question: "Can I take GLP-1 while breastfeeding?",
+    question: "Is GLP-1 safe while breastfeeding?",
     answer:
-      "No. GLP-1 medication is NOT recommended during breastfeeding. The safety of GLP-1 receptor agonists during lactation has not been established. Our providers will not prescribe until breastfeeding is complete and your body has had time to recover.",
+      "No. GLP-1 is generally NOT recommended during breastfeeding — there is insufficient safety data, and the medication may pass into breast milk. Our providers will not prescribe GLP-1 to patients who are breastfeeding. If you are currently breastfeeding, we recommend revisiting once you have fully weaned and consulted your obstetrician.",
   },
   {
-    question: "When can I start after delivery?",
+    question: "When can I start GLP-1 after having a baby?",
     answer:
-      "Timing depends on your individual recovery, feeding method, and overall health. Most providers recommend waiting until breastfeeding is complete and your body has recovered from delivery. Your provider will determine the right timing during your assessment.",
+      "GLP-1 is considered only after you have fully weaned and your body has recovered from pregnancy — typically 6-12+ months postpartum at minimum, and only once your provider determines it's medically appropriate. Your provider reviews recovery, any complications, current medications, and mental-health status before making any prescription decision.",
   },
   {
-    question: "Is it safe for new mothers?",
+    question: "Is this appropriate if I'm planning another pregnancy?",
     answer:
-      "When started at the appropriate time (after weaning and recovery), GLP-1 medication is prescribed under the same safety standards as for any adult patient. Your provider conducts a thorough postpartum health evaluation before prescribing.",
+      "No — GLP-1 is generally not appropriate if you are trying to conceive, pregnant, or breastfeeding. Most providers advise discontinuing GLP-1 at least 2 months before attempting conception. Your provider will discuss timing if future pregnancy is part of your plan. Honesty about timing matters — tell your provider during intake.",
   },
   {
-    question: "Will it affect future pregnancies?",
+    question: "Will GLP-1 interfere with my postpartum recovery?",
     answer:
-      "GLP-1 medication should be discontinued before attempting to conceive. It is not approved for use during pregnancy. Your provider will discuss family planning as part of your treatment plan.",
+      "GLP-1 is only considered after recovery is complete. Your provider reviews your full postpartum history — thyroid, mental health, iron, bleeding history, c-section recovery, pelvic floor — before considering it. A responsible program treats postpartum weight loss as a late step in recovery, not an early one.",
   },
   {
-    question: "I'm exhausted — do I need to exercise too?",
+    question: "How long does postpartum weight loss actually take?",
     answer:
-      "GLP-1 medication works independently of exercise. While gentle activity supports overall health, we understand the demands of new parenthood. Your treatment plan and meal guidance are designed to fit your life as a new parent.",
+      "With GLP-1 therapy and once eligible, most members see 10-15 lbs come off over the first 3 months, with continued steady loss over 6-12 months. This is slower than \"bounce back\" content promises — intentionally. Rapid postpartum loss is rarely a good idea; sustainable loss protects lean mass and long-term metabolic health.",
+  },
+  {
+    question: "What if I have postpartum thyroid issues?",
+    answer:
+      "Postpartum thyroiditis is common and can stall weight loss. Your provider will review your thyroid history and bloodwork as part of intake. If thyroid treatment is needed, that is usually addressed first or in parallel — GLP-1 is considered alongside, not in place of, treating thyroid dysfunction.",
+  },
+  {
+    question: "How much does the program cost? Is insurance required?",
+    answer:
+      "Plans start at $179/month — no insurance required. That includes the compounded medication, ongoing provider oversight, and care-team messaging. You can cancel anytime. There is a 30-day money-back guarantee on your first month. Compare that to roughly $1,349/mo retail cash-pay for brand-name GLP-1 medications.",
+  },
+  {
+    question: "What are the common side effects to watch for?",
+    answer:
+      "The most common side effects are mild gastrointestinal — nausea, constipation, reflux — typically during dose titration. Your provider starts you on a low dose and steps up slowly to minimize these. For postpartum mothers, hydration and protein targets matter even more. Your care team coaches on this directly.",
+  },
+  {
+    question: "Is compounded semaglutide as effective as brand-name medication?",
+    answer:
+      "Compounded semaglutide contains the same active ingredient as Ozempic and Wegovy but is prepared by a state-licensed compounding pharmacy under an individual prescription. It is not FDA-approved as a branded drug product. Our program is for patients for whom this is medically appropriate as determined by a licensed provider.",
+  },
+  {
+    question: "Can I cancel anytime, and what if I don't qualify yet?",
+    answer:
+      "You can cancel anytime with no long-term commitment. If a licensed provider determines you are not currently eligible — including because you are still breastfeeding or too recent postpartum — you are not charged for medication. The 2-minute eligibility assessment is free and non-binding.",
+  },
+];
+
+const internalLinks = [
+  {
+    title: "PCOS Weight Loss",
+    description: "Insulin-aware GLP-1 protocols for women with PCOS.",
+    href: "/lp/pcos",
+  },
+  {
+    title: "Women's Weight Loss",
+    description: "GLP-1 care designed around women's metabolism and sustainability.",
+    href: "/lp/women",
+  },
+  {
+    title: "See Pricing Plans",
+    description: "Essential, Premium, Complete — compare what's included at each tier.",
+    href: "/pricing",
+  },
+  {
+    title: "Check Eligibility",
+    description: "Takes 2 minutes. No cost. No commitment. Licensed-provider review.",
+    href: "/qualify",
+  },
+  {
+    title: "How It Works",
+    description: "From online intake to delivery — the full postpartum-informed care path.",
+    href: "/how-it-works",
+  },
+  {
+    title: "Postpartum Recovery & Weight (Blog)",
+    description: "What the evidence says about timing GLP-1 after pregnancy.",
+    href: "/blog/postpartum-weight-loss",
   },
 ] as const;
-
-/* ─── PAGE ─────────────────────────────────────────────────── */
 
 export default function PostpartumLandingPage() {
   return (
     <div className="min-h-screen bg-white">
-      <MedicalWebPageJsonLd
-        name="Postpartum Weight Loss with GLP-1"
-        description="Safe, provider-guided GLP-1 weight loss for postpartum mothers. Comprehensive screening and ongoing support."
-        url="/lp/postpartum"
-        medicalAudience="Patient"
-      />
-      <FAQPageJsonLd faqs={faqs} />
-
       <LpHeader
-        badgeText="Postpartum Care"
-        badgeIcon={Heart}
-        badgeIconColor="text-rose-500"
+        badgeText="Post-Wean Eligibility"
+        badgeIcon={Baby}
+        badgeIconColor="text-rose-400"
       />
 
-      {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-b from-rose-50/30 via-cloud to-white py-12 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <Badge
-            variant="outline"
-            className="mb-4 gap-1.5 border-rose-200 bg-rose-50 px-4 py-1.5 text-rose-700"
-          >
-            <Heart className="h-3.5 w-3.5" />
-            Provider-Guided Postpartum Care
-          </Badge>
-
-          <h1 className="text-3xl font-bold tracking-tight text-navy sm:text-4xl lg:text-5xl">
-            Lose the Baby Weight
-            <br />
-            <span className="bg-gradient-to-r from-rose-400 to-pink-500 bg-clip-text text-transparent">
-              With Medical Support You Trust
-            </span>
-          </h1>
-
-          <p className="mx-auto mt-5 max-w-xl text-lg text-graphite-500">
-            Pregnancy changes your body in ways that make weight loss harder. Our
-            providers specialize in helping new mothers lose weight safely — with
-            comprehensive screening and ongoing support.
-          </p>
-
-          {/* Price anchor */}
-          <div className="mt-6 inline-flex items-center gap-3 rounded-full bg-rose-50 px-6 py-2">
-            <span className="text-sm text-graphite-400 line-through">
-              $1,349/mo retail
-            </span>
-            <span className="text-lg font-bold text-navy">$279/mo</span>
-            <span className="rounded-full bg-rose-500 px-2.5 py-0.5 text-xs font-bold text-white">
-              Save 79%
-            </span>
-          </div>
-
-          <div className="mt-8">
-            <Link href="/qualify">
-              <Button
-                size="xl"
-                className="gap-2 px-12 h-16 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all"
-              >
-                See If I Qualify — Free Assessment
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="mt-3 text-xs text-graphite-400">
-              Takes 2 minutes. No commitment. HIPAA protected.
-            </p>
-          </div>
-
-          {/* Trust stats */}
-          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {heroStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl border border-navy-100/40 bg-white p-3 text-center shadow-sm"
-              >
-                <p className="text-lg font-bold text-navy">{stat.value}</p>
-                <p className="text-[10px] text-graphite-400">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CRITICAL SAFETY CALLOUT ──────────────────────────── */}
-      <div className="border-y border-amber-200 bg-amber-50 py-3">
-        <div className="mx-auto max-w-3xl px-4 text-center text-xs text-amber-800">
-          <strong>Important:</strong> GLP-1 medication is not recommended during
-          pregnancy or breastfeeding. Our providers conduct comprehensive
-          screening to ensure treatment is safe and appropriate for your
-          postpartum stage.
-        </div>
-      </div>
+      {/* ======================================================================
+          HERO
+          AI-IMAGE PROMPT (hero right-side portrait — optional enhancement)
+          Aspect ratio: 4:5
+          "Editorial photograph of a mother in her early-30s sitting by a
+           sunlit window, wearing a cream knit sweater, genuine peaceful smile
+           (not posed), natural morning light, shallow depth of field,
+           editorial style. Body language: relaxed, hand resting on a book
+           or mug. Warm domestic palette, no weight-loss iconography, no
+           'before/after' framing, no logos."
+          ====================================================================== */}
+      <LpHeroBlock
+        badge="Care Built Post-Pregnancy"
+        headline="You gave your body to your baby."
+        headlineAccent="Let's get you back — thoughtfully"
+        subtitle="Postpartum weight isn't a willpower problem. Hormones, sleep, and time all changed. GLP-1 care, after you've weaned, from US-licensed providers who take postpartum seriously. From $179/mo."
+        stats={heroStats}
+        ctaLocation="hero-postpartum"
+      />
 
       <LpSocialProofBar />
 
-      {/* ── Why Postpartum Weight Is Different ────────────────── */}
-      <section className="py-14">
-        <div className="mx-auto max-w-3xl px-4">
-          <h2 className="text-2xl font-bold text-navy text-center mb-2">
-            Why Postpartum Weight Is Different
-          </h2>
-          <p className="text-center text-sm text-graphite-500 mb-8">
-            Your body changed to grow a baby. Losing that weight requires
-            understanding why it&apos;s there.
+      {/* Compliance gate — visible near the top of body content */}
+      <section
+        className="border-y py-4"
+        style={{
+          borderColor: "var(--lp-card-border)",
+          backgroundColor: "var(--lp-section-alt)",
+        }}
+      >
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <p className="flex items-center justify-center gap-2 text-xs font-semibold text-lp-heading">
+            <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+            <span>
+              GLP-1 is generally not recommended during pregnancy or breastfeeding. Your provider will review your current status before any prescription decision.
+            </span>
           </p>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            {whyDifferentCards.map((card) => {
-              const Icon = card.icon;
-              return (
-                <Card
-                  key={card.title}
-                  className="border border-navy-100/60 bg-white"
-                >
-                  <CardContent className="p-5">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 mb-3">
-                      <Icon className="h-5 w-5 text-rose-500" />
-                    </div>
-                    <p className="text-sm font-semibold text-navy mb-1">
-                      {card.title}
-                    </p>
-                    <p className="text-xs text-graphite-500 leading-relaxed">
-                      {card.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
         </div>
       </section>
 
-      {/* ── Safety Section ───────────────────────────────────── */}
-      <section className="py-14 bg-navy-50/30">
-        <div className="mx-auto max-w-2xl px-4">
-          <div className="rounded-2xl border-2 border-rose-200 bg-white p-6 sm:p-8">
-            <div className="text-center mb-6">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rose-50">
-                <ShieldCheck className="h-6 w-6 text-rose-500" />
-              </div>
-              <h2 className="text-2xl font-bold text-navy">
-                Safety Is Our First Priority
-              </h2>
-              <p className="text-sm text-graphite-500 mt-1">
-                We will never rush your treatment. Your safety — and your
-                baby&apos;s — comes first.
-              </p>
-            </div>
+      <LpOutcomeStats
+        stats={outcomeStats}
+        heading="What eligible members actually see"
+        subheading="Program outcomes, not marketing numbers."
+      />
 
-            <div className="space-y-4">
-              {safetyPoints.map((point) => {
-                const Icon = point.icon;
-                return (
-                  <div key={point.text} className="flex items-start gap-3">
-                    <div
-                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                        point.bold
-                          ? "bg-red-50"
-                          : "bg-rose-50"
-                      }`}
-                    >
-                      <Icon
-                        className={`h-4 w-4 ${
-                          point.bold
-                            ? "text-red-500"
-                            : "text-rose-500"
-                        }`}
-                      />
-                    </div>
-                    <span
-                      className={`text-sm ${
-                        point.bold
-                          ? "font-bold text-red-700"
-                          : "text-navy"
-                      }`}
-                    >
-                      {point.text}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+      <LpProblemSection
+        eyebrow="WHY POSTPARTUM WEIGHT IS DIFFERENT"
+        heading="The weight that won't come off"
+        cards={lpProblemCards}
+        transitionText="A biology-aware plan, built around the life you have now — that's what postpartum care should look like."
+        ctaLocation="problem-postpartum"
+      />
 
-            <div className="mt-6 rounded-xl bg-rose-50 p-4 text-center">
-              <p className="text-xs text-rose-700 font-medium">
-                Your provider will determine the right timing based on YOUR
-                postpartum journey.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── How It Works ─────────────────────────────────────── */}
+      {/* Why Postpartum Is Different */}
       <section className="py-14">
-        <div className="mx-auto max-w-2xl px-4">
-          <h2 className="text-2xl font-bold text-navy text-center mb-8">
-            How It Works
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            Why postpartum weight loss is different
           </h2>
-
-          <div className="space-y-4">
-            {howItWorksSteps.map((step) => (
-              <div
-                key={step.step}
-                className="flex items-start gap-4 rounded-xl bg-rose-50/30 p-5 border border-navy-100/40"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-100 text-sm font-bold text-rose-600">
-                  {step.step}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-navy">
-                    {step.title}
+          <p className="text-center text-sm text-lp-body mb-10">
+            Pregnancy rewired your biology. Your plan has to reflect that.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {problemCards.map((card) => (
+              <Card key={card.title}>
+                <CardContent className="p-5">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-xl mb-3"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <card.icon className="h-5 w-5" style={{ color: "var(--lp-icon)" }} />
+                  </div>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-lp-body leading-relaxed">
+                    {card.description}
                   </p>
-                  <p className="text-xs text-graphite-500 mt-1 leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Testimonials ─────────────────────────────────────── */}
-      <section className="bg-navy-50/30 py-14">
+      {/* How GLP-1 Solves Postpartum Weight */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
         <div className="mx-auto max-w-4xl px-4">
-          <h2 className="text-2xl font-bold text-navy text-center mb-2">
-            Mothers Who Started After Weaning
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            How GLP-1 addresses postpartum weight (post-wean)
           </h2>
-          <p className="text-center text-sm text-graphite-500 mb-8">
-            Real stories from moms who waited for the right time — and got real
-            results.
+          <p className="text-center text-sm text-lp-body mb-10">
+            Designed around real motherhood — not a &ldquo;bounce back&rdquo; timeline.
           </p>
-
-          <div className="grid gap-4 sm:grid-cols-3">
-            {testimonials.map((t) => (
-              <Card
-                key={t.name}
-                className="border border-navy-100/60 bg-white"
+          <div className="grid gap-5 sm:grid-cols-3">
+            {solutionCards.map((card) => (
+              <div
+                key={card.title}
+                className="rounded-xl border bg-white p-5"
+                style={{ borderColor: "var(--lp-card-border)" }}
               >
+                <div className="flex items-center gap-2 mb-3">
+                  <div
+                    className="flex h-6 w-6 items-center justify-center rounded-full"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <Check className="h-3.5 w-3.5" style={{ color: "var(--lp-icon)" }} />
+                  </div>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
+                </div>
+                <p className="text-xs text-lp-body leading-relaxed">
+                  {card.description}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-[10px] text-lp-body-muted max-w-xl mx-auto">
+            GLP-1 is generally not appropriate during pregnancy or breastfeeding. Individual results vary. Compounded medications are not FDA-approved.
+          </p>
+        </div>
+      </section>
+
+      <LpMidCta
+        headline="Weaned and ready? Let's start the conversation."
+        subtext="Free 2-minute assessment. Postpartum-aware providers. No commitment."
+        location="mid-postpartum"
+      />
+
+      <LpJourneyRoadmap
+        milestones={journeyMilestones}
+        heading="What to expect, month by month"
+        subheading="The realistic postpartum treatment arc your provider will build with you."
+      />
+
+      <LpPriceCompare
+        columns={priceColumns}
+        heading="Same active ingredient. Plans from $179/mo."
+        subheading="We think postpartum-aware GLP-1 care shouldn't depend on your insurer."
+      />
+
+      <LpProviderCredential
+        provider={provider}
+        heading="Every plan is overseen by a real clinician"
+      />
+
+      {/* Testimonials */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-8">
+            Mothers who waited — and got it right
+          </h2>
+          {/* AI-IMAGE PROMPT (optional — testimonial avatars)
+              Aspect ratio: 1:1
+              "Four photorealistic headshot portraits, diverse mothers ages
+               30-40, natural skin and hair, soft domestic window light,
+               genuine relaxed expressions, neutral warm backgrounds,
+               editorial photojournalism style, candid not posed,
+               Sony A7R 85mm f/1.8. No logos, no weight-loss marketing
+               aesthetic, no 'before/after' framing."
+          */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {testimonials.map((t) => (
+              <Card key={t.name}>
                 <CardContent className="p-5">
-                  <div className="flex gap-0.5 mb-3">
+                  <div className="flex gap-0.5 mb-2">
                     {[1, 2, 3, 4, 5].map((i) => (
                       <Star
                         key={i}
@@ -437,41 +531,66 @@ export default function PostpartumLandingPage() {
                       />
                     ))}
                   </div>
-                  <blockquote className="text-sm text-graphite-600 italic leading-relaxed">
+                  <p className="text-xs text-lp-body italic leading-relaxed">
                     &ldquo;{t.quote}&rdquo;
-                  </blockquote>
-                  <div className="mt-4 border-t border-navy-100/40 pt-3">
-                    <p className="text-xs font-semibold text-navy">
-                      {t.name}, {t.age}, {t.city}
-                    </p>
-                    <p className="text-xs text-rose-500 font-medium">
-                      {t.result}
-                    </p>
+                  </p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-lp-heading">
+                        {t.name}, {t.age}
+                      </p>
+                      <p className="text-[10px] text-lp-body-muted">
+                        {t.location}
+                      </p>
+                    </div>
+                    <Badge
+                      className="text-[10px]"
+                      style={{
+                        backgroundColor: "var(--lp-badge-bg)",
+                        color: "var(--lp-badge-text)",
+                      }}
+                    >
+                      -{t.lbs} lbs / {t.months}mo
+                    </Badge>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-          <p className="mt-4 text-center text-[10px] text-graphite-400">
+          <p className="mt-4 text-center text-[10px] text-lp-body-muted">
             Verified members. Individual results vary.
           </p>
         </div>
       </section>
 
-      {/* ── FAQ ───────────────────────────────────────────────── */}
       <LpFaq
-        faqs={[...faqs]}
-        heading="Postpartum GLP-1 Questions"
-        subheading="Safety, timing, and what to expect as a new parent."
+        faqs={faqs}
+        heading="Postpartum & GLP-1: your questions"
+        subheading="Everything you need to know about timing GLP-1 after pregnancy."
       />
 
-      {/* ── Final CTA ────────────────────────────────────────── */}
+      <LpInternalLinks heading="Keep exploring" links={internalLinks} />
+
       <LpCtaSection
-        headline="You took care of your baby. Now let us help take care of you."
-        bgClassName="bg-gradient-to-r from-rose-50 to-pink-50"
+        headline="You've done the hardest work. Now it's your turn."
+        bgClassName="bg-gradient-to-r from-sky-50 to-rose-50"
       />
 
       <LpFooter />
+
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Postpartum Weight Loss", href: "/lp/postpartum" },
+        ]}
+      />
+      <MedicalWebPageJsonLd
+        name="GLP-1 for Postpartum Weight Loss"
+        description="Postpartum-aware GLP-1 care for mothers who have weaned. Licensed US providers. From $179/mo. Not recommended during breastfeeding."
+        url="/lp/postpartum"
+        medicalAudience="Patient"
+      />
+      <FAQPageJsonLd faqs={faqs} />
       <LpConversionWidgets />
     </div>
   );

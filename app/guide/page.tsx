@@ -306,7 +306,7 @@ export default function GuidePage() {
           </h2>
           <p className="mt-4 text-graphite-500">
             Take a 2-minute assessment to see if you qualify for GLP-1 treatment.
-            Plans start at $279/month — up to 79% less than brand-name retail.
+            Plans start at $179/month — up to 79% less than brand-name retail.
           </p>
           <div className="mt-8">
             <Link href="/qualify">

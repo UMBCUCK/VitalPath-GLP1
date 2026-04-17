@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import { Star, Quote, ChevronLeft, ChevronRight, BadgeCheck, MapPin } from "lucide-react";
 import { testimonials } from "@/lib/content";
@@ -11,6 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { testimonialAvatars } from "@/lib/images";
+
+export interface TestimonialSectionProps {
+  /**
+   * Optional slot rendered between the rating summary block and the featured testimonial.
+   * Used by /home-v2 to inject a before/after photo carousel inline with the reviews.
+   */
+  afterRatingSummary?: ReactNode;
+}
 
 // Color palette for avatar backgrounds
 const avatarColors = [
@@ -61,7 +69,7 @@ function RatingBar({ stars, count, total }: { stars: number; count: number; tota
   );
 }
 
-export function TestimonialSection() {
+export function TestimonialSection({ afterRatingSummary }: TestimonialSectionProps = {}) {
   const [page, setPage] = useState(0);
   const perPage = 3;
   const totalPages = Math.ceil((testimonials.length - 1) / perPage);
@@ -128,6 +136,8 @@ export function TestimonialSection() {
             </div>
           </div>
         </AnimateOnView>
+
+        {afterRatingSummary}
 
         {/* Featured testimonial — the best one, larger */}
         <AnimateOnView className="mb-10">

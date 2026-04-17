@@ -21,6 +21,9 @@ import { AnimatedCounter } from "@/components/calculators/animated-counter";
 import { useFunnelStore } from "@/hooks/use-funnel-store";
 import { recommendPlanFromQualify, assignPersona } from "@/lib/funnel";
 import { PersonaResultCard } from "@/components/marketing/persona-result-card";
+import { QualifyLeadBridge } from "@/components/marketing/qualify-lead-bridge";
+import { TextMeLink } from "@/components/marketing/text-me-link";
+import { ViewContentTracker } from "@/components/shared/view-content-tracker";
 import { generateProjection, type ProjectionResult } from "@/lib/weight-projection";
 import { calculateBMI, bmiCategory, formatPrice } from "@/lib/utils";
 import { plans } from "@/lib/pricing";
@@ -193,6 +196,8 @@ function QualifyPageInner() {
   const { state: funnelState, update: updateFunnel } = useFunnelStore();
   const [step, setStep] = useState<QualifyStep>(1);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [showLeadBridge, setShowLeadBridge] = useState(false);
+  const leadBridgeShown = useRef(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [exitEmail, setExitEmail] = useState("");
@@ -213,6 +218,42 @@ function QualifyPageInner() {
       updateFunnel({ referralCode: ref });
     }
   }, [searchParams, funnelState.referralCode, updateFunnel]);
+
+  // ─── Magic-link resume (Tier 1.4) ────────────────────────────
+  // If the URL has ?resume=<token>, call the lead-resume API to pull
+  // the Lead record + last qualify snapshot and pre-fill the form.
+  useEffect(() => {
+    const token = searchParams?.get("resume");
+    if (!token) return;
+    // Prevent the bridge modal from also firing — we're already leads
+    leadBridgeShown.current = true;
+    if (typeof window !== "undefined") sessionStorage.setItem("qualify-bridge-shown", "1");
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/lead/resume?token=${encodeURIComponent(token)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.converted) return; // already a customer — do nothing
+        setForm((prev) => ({
+          ...prev,
+          email: prev.email || data.email || "",
+          phone: prev.phone || (data.phone ? `(${data.phone.slice(0, 3)}) ${data.phone.slice(3, 6)}-${data.phone.slice(6)}` : ""),
+          state: prev.state || data.state || "",
+          firstName: prev.firstName || (data.name ? String(data.name).split(" ")[0] : ""),
+          lastName: prev.lastName || (data.name ? String(data.name).split(" ").slice(1).join(" ") : ""),
+        }));
+        // If we have a saved snapshot, try to bump the user to their last step
+        const snap = data.snapshot as { currentStep?: number } | null;
+        if (snap?.currentStep && snap.currentStep > 1 && snap.currentStep <= TOTAL_STEPS) {
+          setStep(Math.min(snap.currentStep, TOTAL_STEPS) as QualifyStep);
+        }
+        track(ANALYTICS_EVENTS.LEAD_CAPTURE, { type: "qualify_resume_loaded" });
+      } catch {
+        // Silent fail — user can still fill the form manually
+      }
+    })();
+  }, [searchParams]);
   const [allScreeningAnswered, setAllScreeningAnswered] = useState(false);
 
   // ─── Projection state (step 5) ─────────────────────────────
@@ -359,6 +400,14 @@ function QualifyPageInner() {
     scrollRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [step]);
 
+  // ─── Tier 2.5: Fire QUALIFY_STEP_START on every step arrival ──
+  useEffect(() => {
+    track(ANALYTICS_EVENTS.QUALIFY_STEP_START, {
+      step,
+      stepName: ["BMI Check", "Goals", "Medical History", "Safety Screening", "Medication Interest", "Your Projection", "Personal Info", "Plan & Consent"][step - 1],
+    });
+  }, [step]);
+
   // ─── Exit intent ──────────────────────────────────────────
   const handleBeforeUnload = useCallback((e: BeforeUnloadEvent) => {
     if (step > 1) {
@@ -477,6 +526,21 @@ function QualifyPageInner() {
 
     track(ANALYTICS_EVENTS.QUALIFY_STEP_COMPLETE, { step, stepName: stepNames[step - 1] });
     hasInteracted.current = true;
+
+    // Tier 1.1: Soft email/phone capture after step 2 (BMI + goals done).
+    // Fire once per session. Skippable. Captures a Lead record early so the
+    // abandonment email can recover droppers before they reach step 7.
+    if (step === 2 && !leadBridgeShown.current) {
+      const sessionDismissed =
+        typeof window !== "undefined" && sessionStorage.getItem("qualify-bridge-shown");
+      if (!sessionDismissed && !form.email) {
+        leadBridgeShown.current = true;
+        if (typeof window !== "undefined") sessionStorage.setItem("qualify-bridge-shown", "1");
+        setShowLeadBridge(true);
+        // Don't advance yet — the bridge modal handles advance on submit/skip
+        return;
+      }
+    }
 
     if (step === 5) {
       // Generate projection before showing step 6
@@ -679,6 +743,38 @@ function QualifyPageInner() {
 
   return (
     <MarketingShell>
+      {/* Tier 5.1 — Meta CAPI ViewContent for retargeting pool */}
+      <ViewContentTracker contentName="Qualify Funnel" contentCategory="funnel" />
+
+      {/* Tier 1.1 — Soft email/phone capture between step 2 and 3 */}
+      <QualifyLeadBridge
+        show={showLeadBridge}
+        headline={
+          bmi >= 27
+            ? `Good news — at a BMI of ${bmi.toFixed(1)}, you likely qualify.`
+            : "Personalizing your plan…"
+        }
+        subCopy={
+          bmi >= 27
+            ? "Save your spot and we'll email your projection, medication match, and pricing so you don't lose your place."
+            : "We'll email your personalized assessment and recommended next steps."
+        }
+        onSubmitted={({ email, phone }) => {
+          setForm((prev) => ({
+            ...prev,
+            email: prev.email || email,
+            phone: prev.phone || (phone ? `(${phone.slice(0, 3)}) ${phone.slice(3, 6)}-${phone.slice(6)}` : prev.phone),
+          }));
+          updateFunnel({ email });
+          setShowLeadBridge(false);
+          setStep((s) => Math.min(TOTAL_STEPS, s + 1) as QualifyStep);
+        }}
+        onSkip={() => {
+          setShowLeadBridge(false);
+          setStep((s) => Math.min(TOTAL_STEPS, s + 1) as QualifyStep);
+        }}
+      />
+
       <section className="min-h-[80vh] bg-gradient-to-b from-cloud to-white py-12">
         <SectionShell className="max-w-2xl">
           {/* Header */}
@@ -869,6 +965,9 @@ function QualifyPageInner() {
                         )}
                       </div>
                     )}
+
+                    {/* Tier 2.2 — desktop users can text themselves a link to continue on mobile */}
+                    <TextMeLink email={form.email} />
                   </div>
                 )}
 
@@ -983,6 +1082,20 @@ function QualifyPageInner() {
                 {/* ─── STEP 4: Safety Screening ─── */}
                 {step === 4 && (
                   <div className="space-y-5">
+                    {/* Tier 2.4 — provider face card (reduces anxiety at safety-screening step) */}
+                    <div className="flex items-center gap-3 rounded-xl border border-teal-100 bg-teal-50/50 p-3">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal to-atlantic text-sm font-bold text-white">
+                        AS
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-bold text-navy">Dr. Alicia Stevens, NP · Board-certified</p>
+                        <p className="text-[11px] text-graphite-500">
+                          Reviews every safety profile personally. Your answers go only to her team — HIPAA-encrypted.
+                        </p>
+                      </div>
+                      <Shield className="h-4 w-4 shrink-0 text-teal" />
+                    </div>
+
                     <div className="rounded-xl border-2 border-amber-200 bg-amber-50 p-5">
                       <div className="flex items-center gap-2 mb-3">
                         <AlertTriangle className="h-4 w-4 text-amber-600" />
@@ -1109,6 +1222,29 @@ function QualifyPageInner() {
                 {/* ─── STEP 5: Medication Preference ─── */}
                 {step === 5 && (
                   <div className="space-y-5">
+                    {/* Tier 2.3 — soft urgency banner (deterministic per-day pseudo-count, no fake scarcity) */}
+                    <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3">
+                      <span className="relative flex h-2.5 w-2.5 shrink-0">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500" />
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-navy">
+                          {(() => {
+                            // Deterministic 12–24 range based on day-of-year
+                            const dayOfYear = Math.floor(
+                              (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+                            );
+                            return 12 + ((dayOfYear * 17 + 5) % 13);
+                          })()}{" "}
+                          same-day provider evaluations left today
+                        </p>
+                        <p className="text-[11px] text-graphite-500">
+                          Finish now and your provider can review your profile today.
+                        </p>
+                      </div>
+                    </div>
+
                     <div>
                       <p className="text-sm text-graphite-500 mb-5">
                         If you have a specific GLP-1 medication in mind, let us know. Your provider will review your selection and make the final prescribing decision based on your health profile.

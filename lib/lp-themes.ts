@@ -376,6 +376,10 @@ export function getDefaultThemeForSlug(slug: string): ThemeId {
     semaglutide: "clean-clinical",
     tirzepatide: "clean-clinical",
     "ozempic-alternative": "clean-clinical",
+    "wegovy-alternative": "clean-clinical",
+    "mounjaro-alternative": "clean-clinical",
+    "zepbound-alternative": "clean-clinical",
+    telehealth: "trust-medical",
     affordable: "earth-wellness",
     "no-surgery": "earth-wellness",
   };

@@ -247,7 +247,17 @@ export async function POST(req: NextRequest) {
       safeError("[Intake] Email send error", err);
     }
 
-    await trackServerEvent("SubmitIntake", { email: data.email }, { state: data.state });
+    // Tier 5.1 — advanced matching with phone + IP + UA for Meta CAPI
+    await trackServerEvent(
+      "SubmitIntake",
+      {
+        email: data.email,
+        phone: data.phone,
+        ip: req.headers.get("x-forwarded-for")?.split(",")[0] || undefined,
+        userAgent: req.headers.get("user-agent") || undefined,
+      },
+      { state: data.state },
+    );
 
     return NextResponse.json({ ok: true, intakeId: intake.id });
   } catch (error) {

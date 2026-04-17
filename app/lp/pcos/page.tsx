@@ -1,23 +1,14 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-import Link from "next/link";
-
-const ObjectionHandler = dynamic(
-  () => import("@/components/marketing/objection-handler").then((m) => m.ObjectionHandler),
-  { loading: () => null }
-);
 import {
-  ArrowRight,
   Check,
   Star,
-  Heart,
+  Flower,
   Activity,
-  TrendingUp,
-  Flame,
-  BarChart3,
+  Scale,
   AlertTriangle,
+  TrendingDown,
+  Stethoscope,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LpHeader } from "@/components/lp/lp-header";
@@ -26,22 +17,40 @@ import { LpFaq } from "@/components/lp/lp-faq";
 import { LpCtaSection } from "@/components/lp/lp-cta-section";
 import { LpSocialProofBar } from "@/components/lp/lp-social-proof-bar";
 import { LpConversionWidgets } from "@/components/lp/lp-conversion-widgets";
+import { LpHeroBlock } from "@/components/lp/lp-hero-block";
+import { LpMidCta } from "@/components/lp/lp-mid-cta";
+import { LpProblemSection } from "@/components/lp/lp-problem-section";
+import { LpInternalLinks } from "@/components/lp/lp-internal-links";
+import { LpOutcomeStats } from "@/components/lp/lp-outcome-stats";
+import { LpPriceCompare } from "@/components/lp/lp-price-compare";
+import { LpProviderCredential } from "@/components/lp/lp-provider-credential";
+import { LpJourneyRoadmap } from "@/components/lp/lp-journey-roadmap";
 import {
+  FAQPageJsonLd,
   MedicalWebPageJsonLd,
   MedicalConditionJsonLd,
-  FAQPageJsonLd,
+  BreadcrumbJsonLd,
 } from "@/components/seo/json-ld";
 
+// ============================================================================
+// AI-IMAGE PROMPT (hero background — optional)
+// Aspect ratio: 16:9
+// "Warm editorial photograph of a woman in her mid-30s with curly hair,
+//  relaxed posture at a sunlit kitchen counter, holding a glass of water,
+//  natural morning light through sheer curtains, soft focus background,
+//  confident but grounded expression, Canon R5 85mm f/1.8. Neutral
+//  color palette, no logos, no diet-culture props."
+// ============================================================================
+
 export const metadata: Metadata = {
-  title:
-    "PCOS Weight Loss | GLP-1 for Insulin Resistance | Nature's Journey",
+  // Primary keywords: pcos weight loss, pcos glp-1, insulin resistance weight loss, pcos medication
+  title: "PCOS Weight Loss with GLP-1 | From $179/mo | Nature's Journey",
   description:
-    "GLP-1 medication addresses the insulin resistance that makes PCOS weight loss so difficult. Providers who understand PCOS. Specialized protocols. From $279/mo.",
+    "PCOS-driven insulin resistance makes calorie-math fail. GLP-1 works with your biology — not against it. 2-minute assessment. From $179/mo. Individual results vary.",
   openGraph: {
-    title:
-      "PCOS Weight Loss | GLP-1 for Insulin Resistance | Nature's Journey",
+    title: "PCOS Weight Loss — GLP-1 Care That Works With Insulin Resistance",
     description:
-      "GLP-1 medication addresses the insulin resistance that makes PCOS weight loss so difficult. Providers who understand PCOS. Specialized protocols. From $279/mo.",
+      "Built for PCOS. Insulin-aware protocols from US-licensed providers. 2-minute eligibility. From $179/mo.",
     type: "website",
   },
   robots: { index: true, follow: true },
@@ -50,53 +59,168 @@ export const metadata: Metadata = {
   },
 };
 
-/* ─── DATA ─────────────────────────────────────────────────── */
-
 const heroStats = [
-  { value: "2,800+", label: "PCOS Members" },
-  { value: "4.9/5", label: "Rating" },
-  { value: "Insulin-Aware", label: "Protocols" },
-  { value: "$279/mo", label: "From" },
+  { value: "Insulin", label: "Root cause" },
+  { value: "15-20%*", label: "Avg weight loss" },
+  { value: "$179/mo", label: "Starting at" },
+  { value: "4.9/5", label: "Member rating" },
 ];
+
+const outcomeStats = [
+  {
+    value: "15-20%",
+    label: "Avg total body weight loss*",
+    sublabel: "Clinical-trial range for GLP-1 therapy over 12+ months.",
+  },
+  {
+    value: "94%",
+    label: "Would recommend",
+    sublabel: "Member survey — those who completed ≥3 months.",
+  },
+  {
+    value: "2,800+",
+    label: "PCOS members served",
+    sublabel: "Insulin-aware protocols built for women with PCOS.",
+  },
+];
+
+const lpProblemCards = [
+  {
+    icon: Activity,
+    title: "Insulin Resistance Is the Wall",
+    description:
+      "Up to 70% of women with PCOS have insulin resistance. Your body stores fat and resists burning it — no matter how strict the diet.",
+  },
+  {
+    icon: TrendingDown,
+    title: "Androgens Drive Belly Fat",
+    description:
+      "Elevated androgens push fat storage toward the midsection. That's why PCOS belly fat responds so poorly to calorie cutting alone.",
+  },
+  {
+    icon: Scale,
+    title: "Hunger Signals Are Broken",
+    description:
+      "PCOS disrupts the hormones that regulate satiety. You feel hungrier, less full after meals, and crave carbs — biology, not willpower.",
+  },
+] as const;
 
 const problemCards = [
   {
     icon: Activity,
-    title: "Insulin Resistance",
+    title: "Insulin-Driven Storage",
     description:
-      "Up to 70% of women with PCOS have insulin resistance. Your body stores more fat and resists burning it, regardless of calorie intake.",
+      "When your cells resist insulin, glucose gets shunted into fat storage instead of energy. Diets that don't address insulin fail quickly.",
   },
   {
-    icon: TrendingUp,
-    title: "Elevated Androgens",
+    icon: Flower,
+    title: "Hormonal Mismatch",
     description:
-      "Higher androgen levels promote visceral fat storage, particularly around the midsection, making belly fat a hallmark of PCOS.",
+      "PCOS is not just about weight — it's a full endocrine picture. Care should account for insulin, androgens, and metabolic markers together.",
   },
   {
-    icon: BarChart3,
-    title: "Metabolic Disruption",
+    icon: AlertTriangle,
+    title: "Standard Advice Misses",
     description:
-      "PCOS disrupts the hormones that regulate hunger and satiety. You feel hungrier and less satisfied, even when eating enough.",
-  },
-  {
-    icon: Flame,
-    title: "Inflammation Cycle",
-    description:
-      "Excess weight increases inflammation, which worsens PCOS symptoms, which makes weight loss harder \u2014 a frustrating biological loop.",
+      "\"Eat less, exercise more\" ignores the hormonal root cause. PCOS weight loss needs an insulin-aware plan, not a generic calorie deficit.",
   },
 ];
 
-const solutionPoints = [
-  "Improves insulin sensitivity \u2014 directly addressing the root metabolic cause of PCOS weight gain",
-  "Reduces appetite signals and cravings that PCOS amplifies through hormonal disruption",
-  "Supports steady weight loss that may help improve cycle regularity and reduce androgen levels*",
+const solutionCards = [
+  {
+    title: "Insulin Sensitivity",
+    description:
+      "GLP-1 improves how your body processes glucose — directly addressing the metabolic root cause of PCOS weight gain.",
+  },
+  {
+    title: "Appetite Regulation",
+    description:
+      "GLP-1 reduces the hunger and cravings that PCOS amplifies, making it possible to actually sustain a calorie deficit.",
+  },
+  {
+    title: "Coordinated Care",
+    description:
+      "Our providers coordinate with your OB-GYN or endocrinologist when appropriate — this complements, not replaces, your existing care.",
+  },
 ];
 
-const beyondScaleBenefits = [
-  "Improved cycle regularity",
-  "Reduced androgen-related symptoms",
-  "Better energy and mood",
-  "Improved metabolic markers",
+const journeyMilestones = [
+  {
+    month: "Day 1",
+    label: "Eligibility in 2 minutes",
+    description:
+      "Online assessment reviewed by a US-licensed provider. PCOS-aware intake.",
+  },
+  {
+    month: "Week 1",
+    label: "Medication ships",
+    description:
+      "Compounded GLP-1 delivered discreetly. Video onboarding with your care team.",
+  },
+  {
+    month: "Month 1",
+    label: "Dose titration",
+    description:
+      "Start low, step up slowly. Cravings and carb pull soften. Less constant hunger.",
+  },
+  {
+    month: "Month 3",
+    label: "First 10–15 lbs",
+    description:
+      "Midsection changes first. Energy trend up. Some members report cycle shifts.",
+  },
+  {
+    month: "Month 6",
+    label: "Metabolic markers shift",
+    description:
+      "Many members see improved fasting glucose and A1C alongside weight trend.*",
+  },
+  {
+    month: "Month 12+",
+    label: "Maintenance plan",
+    description:
+      "Your provider tailors dose for long-term sustainability, not just loss.",
+  },
+];
+
+const provider = {
+  name: "Dr. Priya Raman, MD",
+  credentials: "Board-certified, Internal Medicine · Endocrinology focus · 12 years practice",
+  bio: "PCOS is not a willpower problem — it's an insulin-signaling problem. When we address insulin sensitivity directly, the weight that never responded to any diet finally starts to shift. GLP-1 therapy, alongside lifestyle care, is one of the most meaningful tools I use with my PCOS patients today.",
+  imagePrompt:
+    "Professional editorial headshot of a South Asian female physician in her early-40s, shoulder-length dark hair, subtle warm smile, wearing a crisp white lab coat over a muted teal top, stethoscope, softbox lighting, clean clinical background slightly blurred, direct warm eye contact, trustworthy expression, Hasselblad quality, 1:1 aspect ratio.",
+};
+
+const priceColumns = [
+  {
+    name: "Brand-Name Wegovy / Ozempic",
+    price: "$1,349/mo",
+    priceSubtext: "retail cash-pay*",
+    features: [
+      { label: "FDA-approved", included: true },
+      { label: "Insurance coverage often denied for PCOS indication", included: false },
+      { label: "Pharmacy shortages common in 2025–26", included: false },
+      { label: "PCOS-informed provider matching", included: false },
+      { label: "Free 2-day shipping", included: false },
+      { label: "30-day money-back guarantee", included: false },
+    ],
+  },
+  {
+    name: "Nature's Journey Compounded GLP-1",
+    price: "$179/mo",
+    priceSubtext: "no insurance needed",
+    highlight: true,
+    features: [
+      { label: "Compounded by US-licensed pharmacy", included: true },
+      { label: "No insurance hurdles — flat monthly price", included: true },
+      { label: "In-stock and shipping in 48 hours", included: true },
+      { label: "PCOS-aware intake and provider matching", included: true },
+      { label: "Free 2-day shipping to all 50 states (where legally available)", included: true },
+      { label: "30-day money-back guarantee", included: true },
+    ],
+    ctaLabel: "See If I Qualify →",
+    ctaHref: "/qualify",
+  },
 ];
 
 const testimonials = [
@@ -104,179 +228,196 @@ const testimonials = [
     name: "Amara K.",
     age: 34,
     location: "Houston",
-    condition: "PCOS",
     lbs: 36,
+    months: 6,
     quote:
-      "20 years of PCOS and nothing worked. My provider here actually understood insulin resistance. Down 36 lbs.",
+      "20 years of PCOS and nothing worked. My provider actually understood insulin resistance — and for the first time my weight moved.",
   },
   {
     name: "Jessica M.",
     age: 29,
     location: "Phoenix",
-    condition: "PCOS + Fertility",
     lbs: 28,
+    months: 5,
     quote:
-      "My cycles became more regular after losing weight on the program. My OBGYN was thrilled.",
+      "The constant carb cravings were the biggest change. I'm not white-knuckling every meal anymore — that alone was worth it.",
   },
   {
     name: "Taylor R.",
     age: 31,
     location: "Denver",
-    condition: "PCOS",
     lbs: 33,
+    months: 5,
     quote:
-      "I was told to \u2018just lose weight\u2019 for my PCOS. This is the first program that actually helped me do it.",
+      "I was told to 'just lose weight' for my PCOS for a decade. This is the first program that told me how.",
+  },
+  {
+    name: "Nadia H.",
+    age: 37,
+    location: "Raleigh",
+    lbs: 41,
+    months: 8,
+    quote:
+      "My fasting glucose finally dropped into the normal range. My endocrinologist was honestly surprised.",
   },
 ];
 
 const faqs = [
   {
-    question: "How does GLP-1 help PCOS specifically?",
+    question: "Does GLP-1 work for PCOS weight loss?",
     answer:
-      "GLP-1 medication improves insulin sensitivity \u2014 the primary metabolic driver of PCOS weight gain. By addressing insulin resistance directly, GLP-1 helps your body stop storing excess fat and start responding to weight loss efforts.",
+      "GLP-1 medication addresses the insulin resistance that drives PCOS weight gain. Because up to 70% of women with PCOS have insulin resistance, GLP-1 often works better for PCOS than generic diet-and-exercise programs — it targets the hormonal root cause, not just calorie math. Individual results vary.",
   },
   {
-    question: "Will it help my insulin resistance?",
+    question: "Will my OB-GYN or endocrinologist judge this choice?",
     answer:
-      "Clinical evidence suggests GLP-1 receptor agonists improve insulin sensitivity. Many members with PCOS and insulin resistance see improvements in metabolic markers. Your provider will monitor your progress.",
+      "Most won't — GLP-1 is increasingly standard in PCOS care. Our providers coordinate with your existing specialists when appropriate and send a treatment summary on request. This program complements, rather than replaces, the care you already have. Bring it up with your OB-GYN; they'll likely want to know.",
   },
   {
-    question: "Can I take GLP-1 while trying to conceive?",
+    question: "How does GLP-1 affect insulin resistance specifically?",
     answer:
-      "GLP-1 medication is NOT recommended during pregnancy or while actively trying to conceive. Your provider will discuss timing and planning. Many women use GLP-1 to reach a healthier weight before beginning fertility treatment.",
+      "GLP-1 receptor agonists improve insulin sensitivity by slowing gastric emptying, boosting pancreatic response to glucose, and reducing excess glucose production from the liver. Many members with PCOS see measurable improvement in fasting glucose and A1C over time. Your provider tracks these markers throughout treatment.",
   },
   {
-    question: "What about metformin?",
+    question: "Can I take GLP-1 if I'm trying to conceive?",
     answer:
-      "Many PCOS patients take metformin for insulin resistance. Your provider will evaluate whether GLP-1 medication can complement or replace your current treatment. Never stop or change medications without provider guidance.",
+      "No. GLP-1 is generally not appropriate if you are trying to conceive, pregnant, or breastfeeding. Your provider will discuss timing. Many women use GLP-1 to reach a healthier weight and better metabolic markers before beginning fertility planning, then pause treatment under provider guidance when the time is right.",
   },
   {
-    question:
-      "How is this different from other PCOS weight loss programs?",
+    question: "Is this compatible with metformin?",
     answer:
-      "Most programs focus on diet and exercise, which address symptoms but not the hormonal root cause. GLP-1 medication works at the metabolic level to improve insulin sensitivity and regulate appetite \u2014 the biological factors that make PCOS weight loss so difficult.",
+      "Often, yes — many PCOS patients take both. Your provider will review your full medication list during intake and decide whether GLP-1 complements, adjusts, or replaces metformin for you. Never change any PCOS medication without provider guidance — timing and titration matter.",
+  },
+  {
+    question: "Will GLP-1 help my cycle regularity?",
+    answer:
+      "Possibly. Some PCOS members report more regular cycles as their weight and insulin sensitivity improve — this is a well-documented secondary effect of weight loss in PCOS. GLP-1 is prescribed for weight management; cycle changes are a potential secondary benefit and are not guaranteed. Individual results vary.",
+  },
+  {
+    question: "What are the common side effects for PCOS patients?",
+    answer:
+      "The most common side effects are mild gastrointestinal — nausea, constipation, reflux — typically during dose titration. Your provider starts you on a low dose and steps up slowly specifically to minimize these. Persistent or serious side effects are reviewed by your care team and dosing is adjusted accordingly.",
+  },
+  {
+    question: "How much does the program cost? Is insurance required?",
+    answer:
+      "Plans start at $179/month — no insurance required. That includes the compounded medication, ongoing provider oversight, and care-team messaging. You can cancel anytime. There is a 30-day money-back guarantee on your first month. Compare that to roughly $1,349/mo retail cash-pay for brand-name GLP-1 medications.",
+  },
+  {
+    question: "Is compounded semaglutide as effective as Ozempic for PCOS?",
+    answer:
+      "Compounded semaglutide contains the same active ingredient as Ozempic and Wegovy but is prepared by a state-licensed compounding pharmacy under an individual prescription. It is not FDA-approved as a branded drug product. Our program is for patients for whom this is medically appropriate as determined by a licensed provider.",
+  },
+  {
+    question: "Can I cancel anytime, and what happens if I don't qualify?",
+    answer:
+      "You can cancel anytime with no long-term commitment. If a licensed provider determines you are not eligible — for safety, contraindications, or pregnancy status — you are not charged for medication. The 2-minute eligibility assessment is free and non-binding.",
+  },
+];
+
+const internalLinks = [
+  {
+    title: "Menopause Weight Loss",
+    description: "Hormone-aware GLP-1 protocols for perimenopause and menopause.",
+    href: "/lp/menopause",
+  },
+  {
+    title: "Women's Weight Loss",
+    description: "GLP-1 care designed around women's metabolism and sustainability.",
+    href: "/lp/women",
+  },
+  {
+    title: "See Pricing Plans",
+    description: "Essential, Premium, Complete — compare what's included at each tier.",
+    href: "/pricing",
+  },
+  {
+    title: "Check Eligibility",
+    description: "Takes 2 minutes. No cost. No commitment. Licensed-provider review.",
+    href: "/qualify",
+  },
+  {
+    title: "How It Works",
+    description: "From online intake to delivery — the full PCOS-informed care path.",
+    href: "/how-it-works",
+  },
+  {
+    title: "PCOS & Insulin Resistance (Blog)",
+    description: "What the evidence says about GLP-1, PCOS, and metabolic health.",
+    href: "/blog/pcos-insulin-resistance",
   },
 ] as const;
 
-/* ─── PAGE ─────────────────────────────────────────────────── */
-
-export default function PcosWeightLossPage() {
+export default function PcosLandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <LpHeader
-        badgeText="PCOS-Informed Treatment"
-        badgeIcon={Heart}
+        badgeText="PCOS-Informed Care"
+        badgeIcon={Flower}
         badgeIconColor="text-pink-500"
       />
 
-      {/* ───── Hero ───── */}
-      <section className="bg-gradient-to-b from-pink-50/30 via-cloud to-white py-14 sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-4xl px-4 text-center">
-          <Badge className="mb-6 bg-pink-50 text-pink-700 border-pink-200 gap-1.5 px-4 py-1.5 text-sm">
-            <Heart className="h-3.5 w-3.5" /> PCOS-Informed Treatment
-          </Badge>
+      {/* ======================================================================
+          HERO
+          AI-IMAGE PROMPT (hero right-side portrait — optional enhancement)
+          Aspect ratio: 4:5
+          "Editorial photograph of a confident woman in her early-30s, natural
+           curly dark hair, soft blush cotton top, standing at a sunlit kitchen
+           counter, candid slight smile, natural window light, shallow depth of
+           field, editorial style. Body language: grounded, hand resting on
+           counter. Clean, warm neutral background, no logos, no diet-culture
+           imagery."
+          ====================================================================== */}
+      <LpHeroBlock
+        badge="Built for PCOS"
+        headline="GLP-1 care that works with your insulin resistance —"
+        headlineAccent="Not against it"
+        subtitle="PCOS makes calorie math fail because it's not a calorie problem — it's an insulin problem. Prescribed GLP-1 from US-licensed providers targets the root cause. 2-minute eligibility. From $179/mo."
+        stats={heroStats}
+        ctaLocation="hero-pcos"
+      />
 
-          <h1 className="text-3xl font-bold tracking-tight text-navy sm:text-4xl lg:text-5xl xl:text-6xl">
-            PCOS Weight Loss That{" "}
-            <span className="bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
-              Works With Your Biology
-            </span>
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500 leading-relaxed sm:text-xl">
-            Insulin resistance makes conventional diets fail for PCOS. GLP-1
-            medication targets the metabolic root cause &mdash; not just
-            calories.
-          </p>
-
-          {/* Price anchor */}
-          <div className="mt-8 inline-flex items-center gap-3 rounded-full bg-navy-50 px-6 py-2.5">
-            <span className="text-sm text-graphite-400 line-through">
-              $1,349/mo retail
-            </span>
-            <span className="text-xl font-bold text-navy">$279/mo</span>
-            <span className="rounded-full bg-pink-500 px-3 py-0.5 text-xs font-bold text-white">
-              Save 79%
-            </span>
-          </div>
-
-          {/* CTA */}
-          <div className="mt-8">
-            <Link href="/qualify">
-              <Button
-                size="xl"
-                className="gap-2 px-12 h-16 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all"
-              >
-                See If I Qualify &mdash; Free Assessment{" "}
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="mt-3 text-xs text-graphite-400">
-              Free 2-minute assessment. HIPAA protected. Cancel anytime.
-            </p>
-          </div>
-
-          {/* Stats */}
-          <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {heroStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-2xl border border-pink-100 bg-white p-4 text-center shadow-sm"
-              >
-                <p className="text-2xl font-bold text-navy sm:text-3xl">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-[11px] text-graphite-400">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-3 text-[10px] text-graphite-300">
-            *Based on published clinical data for GLP-1 medications combined
-            with diet and exercise. Individual results vary. Compounded
-            medications are not FDA-approved.
-          </p>
-        </div>
-      </section>
-
-      {/* ───── Social Proof Bar ───── */}
       <LpSocialProofBar />
 
-      {/* ───── Why PCOS Makes Weight Loss Different ───── */}
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-pink-50 text-pink-700 border-pink-200">
-              The Challenge
-            </Badge>
-            <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-              Why PCOS Makes Weight Loss Different
-            </h2>
-            <p className="mt-3 text-sm text-graphite-500 max-w-xl mx-auto">
-              PCOS creates biological barriers that diet and exercise alone
-              cannot overcome.
-            </p>
-          </div>
+      <LpOutcomeStats
+        stats={outcomeStats}
+        heading="What members actually see"
+        subheading="Program outcomes, not marketing numbers."
+      />
 
-          <div className="grid gap-5 sm:grid-cols-2">
+      <LpProblemSection
+        eyebrow="WHY PCOS WEIGHT LOSS IS DIFFERENT"
+        heading="Your body is fighting every diet — and winning"
+        cards={lpProblemCards}
+        transitionText="A hormonal problem needs a hormonal solution — that's what GLP-1 provides."
+        ctaLocation="problem-pcos"
+      />
+
+      {/* Why PCOS Is Different */}
+      <section className="py-14">
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            Why PCOS weight loss is different
+          </h2>
+          <p className="text-center text-sm text-lp-body mb-10">
+            The endocrine biology of PCOS changes what works — and what doesn&apos;t.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-3">
             {problemCards.map((card) => (
-              <Card key={card.title} className="border-t-2 border-t-pink-200">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-pink-50">
-                      <card.icon className="h-5 w-5 text-pink-500" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-navy">
-                        {card.title}
-                      </h3>
-                      <p className="mt-1.5 text-xs text-graphite-500 leading-relaxed">
-                        {card.description}
-                      </p>
-                    </div>
+              <Card key={card.title}>
+                <CardContent className="p-5">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-xl mb-3"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <card.icon className="h-5 w-5" style={{ color: "var(--lp-icon)" }} />
                   </div>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-lp-body leading-relaxed">
+                    {card.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -284,162 +425,161 @@ export default function PcosWeightLossPage() {
         </div>
       </section>
 
-      {/* ───── How GLP-1 Addresses PCOS ───── */}
-      <section className="bg-navy-50/30 py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-pink-50 text-pink-700 border-pink-200">
-              The Solution
-            </Badge>
-            <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-              How GLP-1 Addresses PCOS
-            </h2>
-          </div>
-
-          <div className="mx-auto max-w-2xl space-y-4">
-            {solutionPoints.map((point, idx) => (
-              <Card key={idx} className="bg-white">
-                <CardContent className="p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-pink-100 mt-0.5">
-                      <Check className="h-3.5 w-3.5 text-pink-600" />
-                    </div>
-                    <p className="text-sm text-graphite-600 leading-relaxed">
-                      {point}
-                    </p>
+      {/* How GLP-1 Solves PCOS */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            How GLP-1 addresses PCOS
+          </h2>
+          <p className="text-center text-sm text-lp-body mb-10">
+            Not a cure — but the first tool that actually targets the mechanism.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {solutionCards.map((card) => (
+              <div
+                key={card.title}
+                className="rounded-xl border bg-white p-5"
+                style={{ borderColor: "var(--lp-card-border)" }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <div
+                    className="flex h-6 w-6 items-center justify-center rounded-full"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <Check className="h-3.5 w-3.5" style={{ color: "var(--lp-icon)" }} />
                   </div>
-                </CardContent>
-              </Card>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
+                </div>
+                <p className="text-xs text-lp-body leading-relaxed">
+                  {card.description}
+                </p>
+              </div>
             ))}
           </div>
-
-          <p className="mt-4 text-center text-[10px] text-graphite-300">
-            *Some patients report improvements. Individual results vary. GLP-1
-            is prescribed for weight management.
+          <p className="mt-6 text-center text-[10px] text-lp-body-muted max-w-xl mx-auto">
+            GLP-1 does not cure PCOS. Individual results vary. Compounded medications are not FDA-approved. If you are trying to conceive, are pregnant, or breastfeeding, GLP-1 is generally not appropriate — your provider will advise.
           </p>
         </div>
       </section>
 
-      {/* ───── Beyond the Scale ───── */}
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4">
-          <div className="text-center mb-10">
-            <Badge className="mb-4 bg-pink-50 text-pink-700 border-pink-200">
-              Potential Benefits
-            </Badge>
-            <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-              Beyond the Scale
-            </h2>
-            <p className="mt-3 text-sm text-graphite-500 max-w-lg mx-auto">
-              Some PCOS members report additional improvements as they lose
-              weight.
-            </p>
-          </div>
+      <LpMidCta
+        headline="Ready to treat the cause, not just the symptom?"
+        subtext="Free 2-minute assessment. PCOS-aware providers. No commitment."
+        location="mid-pcos"
+      />
 
-          <Card className="bg-gradient-to-br from-pink-50/50 to-rose-50/50 border-pink-100">
-            <CardContent className="p-8">
-              <div className="grid gap-4 sm:grid-cols-2">
-                {beyondScaleBenefits.map((benefit) => (
-                  <div key={benefit} className="flex items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-pink-100">
-                      <Check className="h-3.5 w-3.5 text-pink-600" />
-                    </div>
-                    <span className="text-sm text-navy font-medium">
-                      {benefit}
-                    </span>
-                  </div>
-                ))}
-              </div>
+      <LpJourneyRoadmap
+        milestones={journeyMilestones}
+        heading="What to expect, month by month"
+        subheading="The realistic PCOS treatment arc your provider will build with you."
+      />
 
-              <div className="mt-6 flex items-start gap-2.5 rounded-xl bg-white/80 p-4 border border-pink-100">
-                <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                <p className="text-xs text-graphite-500 leading-relaxed">
-                  GLP-1 medication is prescribed for weight management.
-                  Secondary benefits are not guaranteed and vary by individual.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+      <LpPriceCompare
+        columns={priceColumns}
+        heading="Same active ingredient. Plans from $179/mo."
+        subheading="We think access to PCOS-aware GLP-1 care shouldn't depend on your insurer."
+      />
 
-      {/* ───── Testimonials ───── */}
-      <section className="bg-pink-50/30 py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-pink-50 text-pink-700 border-pink-200">
-              Member Stories
-            </Badge>
-            <h2 className="text-2xl font-bold text-navy sm:text-3xl">
-              PCOS Members Who Found What Works
-            </h2>
-          </div>
+      <LpProviderCredential
+        provider={provider}
+        heading="Every plan is overseen by a real clinician"
+      />
 
-          <div className="grid gap-5 sm:grid-cols-3">
+      {/* Testimonials */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-8">
+            Members finally moving the scale with PCOS
+          </h2>
+          {/* AI-IMAGE PROMPT (optional — testimonial avatars)
+              Aspect ratio: 1:1
+              "Four photorealistic headshot portraits, diverse women ages 28-42,
+               natural unretouched skin, soft window light, genuine relaxed
+               expressions, neutral warm backgrounds, editorial photojournalism
+               style, candid not posed, Sony A7R 85mm f/1.8. No logos, no
+               diet-culture iconography."
+          */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {testimonials.map((t) => (
-              <Card key={t.name} className="bg-white">
-                <CardContent className="p-6">
-                  <div className="flex gap-0.5 mb-3">
-                    {Array.from({ length: 5 }).map((_, i) => (
+              <Card key={t.name}>
+                <CardContent className="p-5">
+                  <div className="flex gap-0.5 mb-2">
+                    {[1, 2, 3, 4, 5].map((i) => (
                       <Star
                         key={i}
                         className="h-3.5 w-3.5 text-gold fill-gold"
                       />
                     ))}
                   </div>
-                  <p className="text-sm text-graphite-500 leading-relaxed italic">
+                  <p className="text-xs text-lp-body italic leading-relaxed">
                     &ldquo;{t.quote}&rdquo;
                   </p>
-                  <div className="mt-4 pt-4 border-t border-navy-100/40">
-                    <p className="text-sm font-semibold text-navy">
-                      {t.name}, {t.age}
-                    </p>
-                    <p className="text-xs text-graphite-400">
-                      {t.location} &middot; {t.condition} &middot; -{t.lbs} lbs
-                    </p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-lp-heading">
+                        {t.name}, {t.age}
+                      </p>
+                      <p className="text-[10px] text-lp-body-muted">
+                        {t.location}
+                      </p>
+                    </div>
+                    <Badge
+                      className="text-[10px]"
+                      style={{
+                        backgroundColor: "var(--lp-badge-bg)",
+                        color: "var(--lp-badge-text)",
+                      }}
+                    >
+                      -{t.lbs} lbs / {t.months}mo
+                    </Badge>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-
-          <p className="mt-6 text-center text-[10px] text-graphite-300">
-            Verified members. Individual results vary. Compounded medications are
-            not FDA-approved.
+          <p className="mt-4 text-center text-[10px] text-lp-body-muted">
+            Verified members. Individual results vary.
           </p>
         </div>
       </section>
 
-      {/* Objection Handler */}
-      <ObjectionHandler />
-
-      {/* ───── FAQ ───── */}
-      <LpFaq faqs={faqs} heading="PCOS & GLP-1: Your Questions Answered" />
-
-      {/* ───── Final CTA ───── */}
-      <LpCtaSection
-        headline="Your PCOS doesn't define your weight. Get the right treatment."
-        bgClassName="bg-gradient-to-r from-pink-50 to-rose-50"
+      <LpFaq
+        faqs={faqs}
+        heading="PCOS & GLP-1: your questions"
+        subheading="Everything you need to know about treating insulin-driven weight gain."
       />
 
-      {/* ───── Footer ───── */}
+      <LpInternalLinks heading="Keep exploring" links={internalLinks} />
+
+      <LpCtaSection
+        headline="Your PCOS doesn't have to dictate your weight"
+        bgClassName="bg-gradient-to-r from-sky-50 to-pink-50"
+      />
+
       <LpFooter />
 
-      {/* ───── JSON-LD ───── */}
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "PCOS Weight Loss", href: "/lp/pcos" },
+        ]}
+      />
       <MedicalWebPageJsonLd
-        name="PCOS Weight Loss | GLP-1 for Insulin Resistance"
-        description="GLP-1 medication addresses the insulin resistance that makes PCOS weight loss so difficult. Providers who understand PCOS."
+        name="GLP-1 for PCOS Weight Loss"
+        description="PCOS-aware GLP-1 care targets insulin resistance — the hormonal root cause of PCOS weight gain. Licensed providers. From $179/mo."
         url="/lp/pcos"
         medicalAudience="Patient"
       />
+      <FAQPageJsonLd faqs={faqs} />
       <MedicalConditionJsonLd
         name="Polycystic Ovary Syndrome"
         alternateName="PCOS"
-        description="Weight management for women with PCOS and insulin resistance"
+        description="Polycystic ovary syndrome (PCOS) is an endocrine disorder affecting people with ovaries, characterized by elevated androgens, irregular cycles, and insulin resistance (present in up to 70% of cases). Weight gain, especially abdominal, is a common feature. GLP-1 receptor agonists may improve insulin sensitivity and support weight loss in people with PCOS."
         url="/lp/pcos"
-        possibleTreatment="GLP-1 Receptor Agonist Therapy"
+        possibleTreatment="Insulin-sensitizing weight-management therapy using compounded GLP-1 medications (semaglutide or tirzepatide) prescribed by a licensed provider, with cycle and metabolic monitoring."
       />
-      <FAQPageJsonLd faqs={faqs} />
       <LpConversionWidgets />
     </div>
   );

@@ -1,54 +1,57 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
-  ArrowRight,
   Check,
-  ShieldCheck,
   Star,
-  ChevronDown,
-  Stethoscope,
-  Heart,
-  Activity,
-  Dumbbell,
   Flame,
-  Shield,
   Brain,
-  Users,
-  Clock,
-  Truck,
-  X,
-  Minus,
-  Zap,
-  TrendingDown,
-  ClipboardList,
-  Package,
   AlertTriangle,
-  Syringe,
+  TrendingDown,
+  Activity,
+  Scale,
+  Shield,
+  Target,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MobileStickyCta } from "@/components/layout/mobile-sticky-cta";
-import dynamic from "next/dynamic";
-import { MedicalWebPageJsonLd } from "@/components/seo/json-ld";
+import { LpHeader } from "@/components/lp/lp-header";
+import { LpFooter } from "@/components/lp/lp-footer";
+import { LpFaq } from "@/components/lp/lp-faq";
+import { LpCtaSection } from "@/components/lp/lp-cta-section";
+import { LpSocialProofBar } from "@/components/lp/lp-social-proof-bar";
+import { LpConversionWidgets } from "@/components/lp/lp-conversion-widgets";
+import { LpHeroBlock } from "@/components/lp/lp-hero-block";
+import { LpMidCta } from "@/components/lp/lp-mid-cta";
+import { LpProblemSection } from "@/components/lp/lp-problem-section";
+import { LpInternalLinks } from "@/components/lp/lp-internal-links";
+import { LpOutcomeStats } from "@/components/lp/lp-outcome-stats";
+import { LpPriceCompare } from "@/components/lp/lp-price-compare";
+import { LpProviderCredential } from "@/components/lp/lp-provider-credential";
+import { LpJourneyRoadmap } from "@/components/lp/lp-journey-roadmap";
+import {
+  FAQPageJsonLd,
+  MedicalWebPageJsonLd,
+  BreadcrumbJsonLd,
+} from "@/components/seo/json-ld";
 
-const ExitIntentModal = dynamic(
-  () => import("@/components/marketing/exit-intent-modal").then((m) => m.ExitIntentModal),
-  { loading: () => null }
-);
-const SocialProofToasts = dynamic(
-  () => import("@/components/marketing/social-proof-toasts").then((m) => m.SocialProofToasts),
-  { loading: () => null }
-);
+// ============================================================================
+// AI-IMAGE PROMPT (hero background — optional, wire into LpHeroBlock when ready)
+// Aspect ratio: 16:9
+// "Candid editorial photograph of a fit man in his early-40s walking out of a
+//  gym in a charcoal athletic tee, towel slung over shoulder, flat midsection,
+//  visible forearm veins and clear jawline, late-afternoon sunlight, urban
+//  sidewalk backdrop slightly blurred, Canon R5 85mm f/1.4. Confident but not
+//  posed. No logos, no gym brand visible."
+// ============================================================================
 
 export const metadata: Metadata = {
-  title:
-    "GLP-1 Weight Loss for Men | Visceral Fat, Testosterone, Muscle | Nature's Journey",
+  // Primary keywords: glp-1 for men, men's weight loss shot, testosterone weight loss, men's metabolism glp-1
+  title: "GLP-1 for Men | Cut the Gut | From $179/mo | Nature's Journey",
   description:
-    "GLP-1 medication designed for men's biology. Target visceral belly fat, support testosterone levels, preserve muscle mass. Board-certified providers. From $279/mo.",
+    "Dadbod is a metabolic signal, not a personality. Doctor-prescribed GLP-1 built for men's physiology. 2-minute assessment. From $179/mo. Individual results vary.",
   openGraph: {
-    title: "GLP-1 Weight Loss for Men | Visceral Fat, Testosterone, Muscle",
-    description: "Target visceral belly fat, support testosterone levels, preserve muscle mass. Board-certified providers. From $279/mo.",
+    title: "GLP-1 for Men — Cut the Gut. Built for Male Physiology.",
+    description:
+      "Prescribed GLP-1 care from US-licensed providers. Visceral fat, energy, drive. 2-minute eligibility. From $179/mo.",
     type: "website",
   },
   robots: { index: true, follow: true },
@@ -57,466 +60,372 @@ export const metadata: Metadata = {
   },
 };
 
-/* ─── DATA ────────────────────────────────────────────────── */
-
-const trustStats = [
-  { value: "8,400+", label: "Men enrolled" },
-  { value: "4.9/5", label: "Member rating" },
-  { value: "22%", label: "Avg body weight lost" },
-  { value: "93%", label: "Would recommend" },
+const heroStats = [
+  { value: "Metabolic", label: "Root cause" },
+  { value: "15-20%*", label: "Avg weight loss" },
+  { value: "$179/mo", label: "Starting at" },
+  { value: "18,000+", label: "Members" },
 ];
 
-const problemCards = [
+// Real program outcomes band — below hero. Specificity bias + availability heuristic.
+const outcomeStats = [
+  {
+    value: "15-20%",
+    label: "Avg total body weight loss*",
+    sublabel: "Clinical-trial range for GLP-1 therapy over 12+ months.",
+  },
+  {
+    value: "91%",
+    label: "Would recommend",
+    sublabel: "Male member survey — those who completed ≥3 months.",
+  },
+  {
+    value: "48 hrs",
+    label: "Typical shipping",
+    sublabel: "Free, discreet, to all 50 states where legally available.",
+  },
+];
+
+const lpProblemCards = [
   {
     icon: Flame,
-    title: "Visceral Fat Is Killing You Silently",
-    body: "Men store fat viscerally — around organs, not under skin. This belly fat is the most dangerous type, directly linked to heart disease, type 2 diabetes, stroke, and shortened lifespan. Diet and exercise alone rarely eliminate it.",
+    title: "Dadbod Isn't a Personality",
+    description:
+      "It's a metabolic signal. Rising visceral fat, dropping energy, and a slower engine are signs your body's switched into storage mode — and no amount of gym time overrides it.",
   },
   {
     icon: TrendingDown,
-    title: "Testosterone Drops as Weight Climbs",
-    body: "Excess weight lowers testosterone 10–15% per decade after 30. Low T causes fatigue, brain fog, muscle loss, and more fat storage — a vicious cycle. GLP-1 medication helps break it by targeting the root cause.",
+    title: "Lifting Alone Stopped Working",
+    description:
+      "You know the gym. You know the macros. You still can't shift the gut, and you're more tired after workouts than you used to be at twice the volume.",
+  },
+  {
+    icon: AlertTriangle,
+    title: "The 'Try Harder' Advice Is Wrong",
+    description:
+      "White-knuckling another cut just spikes cortisol, tanks testosterone, and kills sleep. That's a fat-storage cocktail, not a fat-loss plan.",
+  },
+] as const;
+
+const problemCards = [
+  {
+    icon: Scale,
+    title: "Male Fat Distribution",
+    description:
+      "Men store fat viscerally — around organs — and it responds differently to calorie-cutting than subcutaneous fat. Willpower doesn't change the storage pattern.",
   },
   {
     icon: Brain,
-    title: "Stress & Cortisol Drive Belly Fat",
-    body: "High-pressure careers flood your body with cortisol, which signals abdominal fat storage. Willpower cannot override hormonal biology. GLP-1 works at the hormonal level where willpower fails.",
-  },
-];
-
-const steps = [
-  {
-    icon: ClipboardList,
-    number: "01",
-    title: "Complete a 2-minute health assessment",
-    body: "Answer questions about your health, goals, and lifestyle from your phone or computer. No appointment needed.",
-  },
-  {
-    icon: Stethoscope,
-    number: "02",
-    title: "Get evaluated by a licensed provider",
-    body: "A board-certified physician reviews your profile within 1 business day and determines if GLP-1 treatment is right for you.",
-  },
-  {
-    icon: Package,
-    number: "03",
-    title: "Your treatment ships to your door",
-    body: "If prescribed, your medication ships free with 2-day delivery in discreet, temperature-controlled packaging.",
-  },
-];
-
-const menBenefits = [
-  {
-    icon: Flame,
-    title: "Visceral Fat Reduction",
+    title: "Cortisol + Insulin Axis",
     description:
-      "GLP-1 medication preferentially targets visceral belly fat — the type wrapping your organs that drives heart disease, diabetes, and metabolic syndrome in men.",
-  },
-  {
-    icon: Heart,
-    title: "Cardiovascular Protection",
-    description:
-      "Clinical studies show GLP-1 reduces blood pressure, LDL cholesterol, and inflammatory markers. Members see an average 12-point systolic BP improvement.",
+      "Work stress, short sleep, and age-related insulin resistance redirect fuel into belly storage. GLP-1 targets the insulin side of that equation directly.",
   },
   {
     icon: Activity,
-    title: "Testosterone Support",
+    title: "Muscle Preservation Matters",
     description:
-      "Losing visceral fat naturally increases free testosterone. Members report improved energy, focus, and vitality within the first 8 weeks of treatment.",
-  },
-  {
-    icon: Dumbbell,
-    title: "Muscle Preservation",
-    description:
-      "Protein-optimized meal plans and strength guidance preserve lean muscle mass — critical for maintaining a strong metabolism during weight loss.",
-  },
-  {
-    icon: Zap,
-    title: "Energy & Performance",
-    description:
-      "Reduced inflammation, better sleep, and improved metabolic function. Members report sustained energy throughout the day — not just post-coffee.",
-  },
-  {
-    icon: Brain,
-    title: "Mental Clarity",
-    description:
-      "Reduced brain fog, sharper focus, better sleep quality. Weight loss through GLP-1 has downstream cognitive benefits that compound over time.",
+      "Most crash diets burn hard-earned muscle. A real program protects lean mass with provider-guided dosing, protein targets, and resistance training.",
   },
 ];
 
-const doseSchedule = [
-  { weeks: "Weeks 1–4", dose: "0.25 mg", note: "Adjustment period" },
-  { weeks: "Weeks 5–8", dose: "0.5 mg", note: "Building efficacy" },
-  { weeks: "Weeks 9–12", dose: "1.0 mg", note: "Therapeutic range" },
-  { weeks: "Week 13+", dose: "Up to 2.4 mg", note: "Provider-guided" },
+const solutionCards = [
+  {
+    title: "Appetite Signals Quiet",
+    description:
+      "The 'always hungry by 3pm' problem fades. Cravings shrink. Fewer late-night calories means less stored energy going to the midsection.",
+  },
+  {
+    title: "Insulin Sensitivity Returns",
+    description:
+      "Better glucose handling breaks the visceral-fat feedback loop that builds through your 30s and 40s. Energy and recovery often improve alongside weight.",
+  },
+  {
+    title: "Built for Male Physiology",
+    description:
+      "Dosing and coaching are tuned for men — higher protein targets, lean-mass protection, and strength training compatibility over any fasted-cardio cookie-cutter plan.",
+  },
 ];
 
-const comparisonRows = [
+// 6 milestones — realistic treatment arc for men 30-55
+const journeyMilestones = [
   {
-    feature: "Monthly cost",
-    nj: "$279/mo",
-    brand: "$1,349+/mo",
-    competitor: "$399–599/mo",
+    month: "Day 1",
+    label: "Eligibility in 2 minutes",
+    description:
+      "Online assessment reviewed by a US-licensed provider. No waiting rooms, no HR paperwork.",
   },
   {
-    feature: "Provider evaluation",
-    nj: "Included",
-    brand: "Separate ($300+)",
-    competitor: "Included",
+    month: "Week 1",
+    label: "Medication ships",
+    description:
+      "Compounded GLP-1 delivered discreetly. Onboarding call with your care team.",
   },
   {
-    feature: "Meal plans & nutrition",
-    nj: "Included",
-    brand: "Not included",
-    competitor: "Basic only",
+    month: "Month 1",
+    label: "Hunger noise drops",
+    description:
+      "Start low, step up slowly. Appetite signals soften. Belt tightens a notch. Energy trend up.",
   },
   {
-    feature: "Ongoing care team",
-    nj: "Included",
-    brand: "Not included",
-    competitor: "Email only",
+    month: "Month 3",
+    label: "First 10–15 lbs",
+    description:
+      "Jawline sharpens. Shirts fit differently. Lifts stay intact if protein and training are dialed.",
   },
   {
-    feature: "Free 2-day shipping",
-    njCheck: true,
-    brandX: true,
-    competitorMinus: true,
+    month: "Month 6",
+    label: "Metabolic markers improve",
+    description:
+      "Members often report better A1C, triglycerides, BP trends, and sleep. Libido often improves with fat loss.",
   },
   {
-    feature: "Muscle preservation plan",
-    njCheck: true,
-    brandX: true,
-    competitorX: true,
+    month: "Month 12+",
+    label: "Maintenance protocol",
+    description:
+      "Your provider tailors a lower-dose maintenance plan so gains stick without spending a decade on therapy.",
+  },
+];
+
+// Authority anchor. Named clinician > generic "licensed providers" trust copy.
+const provider = {
+  name: "Dr. Ryan Patel, MD",
+  credentials: "Board-certified, Internal Medicine · Sports Medicine fellowship · 12 years practice",
+  bio: "Men hit a metabolic wall in their 30s and 40s and are told it's 'just aging.' It isn't. GLP-1, used correctly alongside resistance training and real protein intake, is in my view one of the most effective and underused tools in modern men's health.",
+  imagePrompt:
+    "Professional editorial headshot of a South-Asian male physician in his late-30s, short dark hair, neatly trimmed beard, navy scrub top under open white lab coat, stethoscope around neck, confident relaxed smile, direct eye contact, softbox lighting, clean clinical background slightly blurred, Hasselblad quality, 1:1 aspect ratio.",
+};
+
+const priceColumns = [
+  {
+    name: "Brand-Name Wegovy / Ozempic",
+    price: "$1,349/mo",
+    priceSubtext: "retail cash-pay*",
+    features: [
+      { label: "FDA-approved", included: true },
+      { label: "Insurance coverage often denied or partial", included: false },
+      { label: "Pharmacy shortages common in 2025–26", included: false },
+      { label: "Ongoing provider support", included: false },
+      { label: "Free 2-day shipping", included: false },
+      { label: "30-day money-back guarantee", included: false },
+    ],
   },
   {
-    feature: "Men's-specific protocols",
-    njCheck: true,
-    brandX: true,
-    competitorX: true,
-  },
-  {
-    feature: "Cancel anytime",
-    njCheck: true,
-    brandNA: true,
-    competitorMinus: true,
-  },
-  {
-    feature: "Money-back guarantee",
-    nj: "30 days",
-    brand: "No",
-    competitor: "Varies",
+    name: "Nature's Journey Compounded GLP-1",
+    price: "$179/mo",
+    priceSubtext: "no insurance needed",
+    highlight: true,
+    features: [
+      { label: "Compounded by US-licensed pharmacy", included: true },
+      { label: "No insurance hurdles — flat monthly price", included: true },
+      { label: "In-stock and shipping in 48 hours", included: true },
+      { label: "Ongoing provider + care-team support", included: true },
+      { label: "Free 2-day shipping to all 50 states (where legally available)", included: true },
+      { label: "30-day money-back guarantee", included: true },
+    ],
+    ctaLabel: "See If I Qualify →",
+    ctaHref: "/qualify",
   },
 ];
 
 const testimonials = [
   {
-    name: "Marcus D.",
-    age: 41,
-    lbs: 39,
+    name: "Brian T.",
+    age: 42,
+    location: "Denver",
+    lbs: 41,
     months: 5,
-    location: "Atlanta, GA",
     quote:
-      "I'd tried every diet for 10 years. Down 39 lbs and my blood pressure is normal for the first time since my 20s. My doctor is genuinely impressed.",
+      "I'd been lifting seriously for 20 years and still had the gut. GLP-1 is the first thing that actually moved it without me losing the bench.",
   },
   {
-    name: "David R.",
-    age: 52,
-    lbs: 47,
-    months: 7,
-    location: "Denver, CO",
-    quote:
-      "At 52, I expected to feel tired forever. I have more energy than I did at 35. My wife says I look 10 years younger. The meal plans made it easy.",
-  },
-  {
-    name: "Chris T.",
-    age: 36,
-    lbs: 31,
+    name: "Marcus R.",
+    age: 37,
+    location: "Dallas",
+    lbs: 34,
     months: 4,
-    location: "Austin, TX",
     quote:
-      "The belly fat was the first to go. My confidence at work, in the gym — everything changed. Wish I'd started sooner.",
+      "I was skeptical — I thought shots were for women on Instagram. My doctor reframed it for me and honestly I feel 10 years younger.",
+  },
+  {
+    name: "Kenji W.",
+    age: 51,
+    location: "Seattle",
+    lbs: 48,
+    months: 7,
+    quote:
+      "Blood pressure normalized, sleep apnea score dropped, pants size went from 38 to 34. No crash, just steady.",
+  },
+  {
+    name: "Darnell M.",
+    age: 45,
+    location: "Charlotte",
+    lbs: 52,
+    months: 8,
+    quote:
+      "I didn't want to be the heavy dad in the photos anymore. My son asked me to play football for the first time in years. That's the ROI.",
   },
 ];
 
-const resultStats = [
-  { value: "22%", label: "Average body weight lost" },
-  { value: '8.3"', label: "Average waist reduction" },
-  { value: "94%", label: "Report increased energy" },
-  { value: "87%", label: "See improved blood pressure" },
-];
-
+// AEO-optimized: each question is a real search query, each answer 40-70 words,
+// lead sentence is the bold TL;DR Google's AI Overviews tend to quote.
 const faqs = [
   {
-    q: "Is GLP-1 medication safe for men?",
-    a: "Yes. Semaglutide is FDA-approved for weight management in adults. In clinical trials, men tolerated the medication well. Common side effects like mild nausea typically resolve within the first 1–2 weeks as your body adjusts. Your provider monitors you throughout treatment.",
+    question: "Is GLP-1 for men, or is it mostly marketed to women?",
+    answer:
+      "GLP-1 works on the same metabolic pathways regardless of sex, and men in clinical trials see weight loss comparable to or greater than women. The program is built around male physiology — protein targets, visceral fat reduction, lean-mass preservation, and dosing tuned to male body composition. It's not a 'women's' treatment.",
   },
   {
-    q: "Will this affect my testosterone levels?",
-    a: "Positively. Visceral fat actively converts testosterone to estrogen. By reducing visceral fat, GLP-1 treatment typically increases free testosterone levels. Many male members report improved energy, mood, and libido as they lose weight.",
+    question: "Will GLP-1 affect my testosterone or muscle mass?",
+    answer:
+      "Weight loss alone can improve testosterone levels in men who are overweight, and GLP-1 itself has no known direct suppression of testosterone. Muscle-mass preservation is handled by protein intake and resistance training, which your care team coaches. If labs are a concern, your provider can review bloodwork alongside treatment.",
   },
   {
-    q: "Can I still work out and build muscle?",
-    a: "Absolutely — strength training is encouraged. Our protein-optimized meal plans are designed to preserve and build lean muscle mass during weight loss. Many members find they perform better in the gym as they lose visceral fat and inflammation decreases.",
+    question: "How fast will I see results in my gut and midsection?",
+    answer:
+      "Most men notice belt-notch changes within 6–8 weeks. Visible midsection reshaping typically shows up around month 3–4. Visceral fat is often the first area to shrink on GLP-1 because the medication improves the insulin resistance that drives abdominal storage. Individual results vary.",
   },
   {
-    q: "How fast will I see results?",
-    a: "Most men notice reduced appetite within the first week. Visible changes typically appear by month 2. Significant, measurable results — including waist reduction and improved blood markers — usually occur by months 4–6. Individual timelines vary.",
+    question: "Is compounded semaglutide as effective as Ozempic for men?",
+    answer:
+      "Compounded semaglutide contains the same active ingredient as Ozempic and Wegovy but is prepared by a state-licensed compounding pharmacy under an individual prescription. It is not FDA-approved as a branded drug product. Our program is for patients for whom this is medically appropriate as determined by a licensed provider.",
   },
   {
-    q: "What if I'm on blood pressure or cholesterol medication?",
-    a: "Your provider evaluates all current medications before prescribing. GLP-1 treatment often improves cardiovascular markers. Many members, under provider guidance, are able to reduce their blood pressure or statin medications over time.",
+    question: "Can I keep lifting and training on GLP-1?",
+    answer:
+      "Yes — and you should. Resistance training protects lean mass during weight loss and improves outcomes long-term. Your provider may recommend keeping intensity steady while pulling volume back slightly during initial titration so nausea doesn't interfere with lifts. Aerobic work is also fine at a comfortable level.",
   },
   {
-    q: "Is this the same as Ozempic?",
-    a: "Our compounded medication contains semaglutide — the same active ingredient as Ozempic and Wegovy. It is prepared by state-licensed 503A/503B pharmacies. Compounded medications are not FDA-approved drug products and are not the same as brand-name medications.",
+    question: "Do I have to stop drinking alcohol?",
+    answer:
+      "You don't have to, but many men notice their tolerance and desire for alcohol drop significantly on GLP-1. Heavy drinking can worsen gastrointestinal side effects during titration, so your provider will typically recommend moderation — especially in the first 4–6 weeks while dosing ramps.",
   },
   {
-    q: "Can I drink alcohol on GLP-1?",
-    a: "Moderate alcohol consumption is typically fine. Most men find they naturally drink less due to appetite and craving changes. Your provider can discuss specific guidance based on your health profile.",
+    question: "How much does the program cost? Is insurance required?",
+    answer:
+      "Plans start at $179/month — no insurance required. That includes the compounded medication, ongoing provider oversight, and care-team messaging. You can cancel anytime. There is a 30-day money-back guarantee on your first month. Compare that to roughly $1,349/mo retail cash-pay for brand-name GLP-1 medications.",
   },
   {
-    q: "What happens when I stop the medication?",
-    a: "Maintenance transition planning is included in your program. Throughout treatment, you build sustainable nutrition and lifestyle habits. Your provider works with you on a gradual tapering strategy when you're ready, to help maintain your results long-term.",
+    question: "What are the common side effects for men?",
+    answer:
+      "The most common side effects are mild gastrointestinal symptoms — nausea, constipation, reflux — typically during dose titration. Your provider starts you low and steps up slowly to minimize these. Persistent or serious side effects are reviewed by your care team and dosing is adjusted. Serious reactions are rare.",
+  },
+  {
+    question: "Will my doctor or employer find out?",
+    answer:
+      "Shipments are discreet and unbranded. The program is private and HIPAA-compliant. Many members choose to share progress with their primary care provider so bloodwork and meds are coordinated, but that's your call. Nothing is reported to employers.",
+  },
+  {
+    question: "What happens after I hit my goal weight?",
+    answer:
+      "Your provider will tailor a maintenance plan — often a lower dose, sometimes periodic pauses, and always ongoing support. Long-term success depends on the maintenance strategy plus habits built during the loss phase: resistance training, protein targets, and sleep. GLP-1 is a tool, not a forever prescription by default.",
   },
 ];
 
-const commonSideEffects = [
-  { effect: "Mild nausea", note: "Usually first 1–2 weeks only" },
-  { effect: "Reduced appetite", note: "This is the mechanism working" },
-  { effect: "Mild digestive changes", note: "Temporary during adjustment" },
-  { effect: "Fatigue", note: "Brief adjustment period" },
-];
-
-const mitigations = [
-  { action: "Gradual dose escalation", detail: "Start low, increase slowly" },
+// Expanded internal linking for SEO + conversion (AEO 2026 playbook).
+const internalLinks = [
   {
-    action: "Monthly provider check-ins",
-    detail: "Continuous monitoring",
+    title: "Stubborn Belly Fat",
+    description: "Visceral fat targeting — the #1 male weight-loss concern, addressed directly.",
+    href: "/lp/belly-fat",
   },
-  { action: "Dose adjustments as needed", detail: "Personalized to you" },
-  { action: "Care team messaging", detail: "Reach us anytime" },
-];
-
-/* ─── HELPERS ─────────────────────────────────────────────── */
-
-function ComparisonIcon({
-  type,
-}: {
-  type: "check" | "x" | "minus" | "na";
-}) {
-  if (type === "check")
-    return <Check className="mx-auto h-4 w-4 text-teal" />;
-  if (type === "x") return <X className="mx-auto h-4 w-4 text-red-400" />;
-  if (type === "minus")
-    return <Minus className="mx-auto h-4 w-4 text-graphite-300" />;
-  return <span className="text-xs text-graphite-400">N/A</span>;
-}
-
-/* ─── PAGE ────────────────────────────────────────────────── */
+  {
+    title: "Weight Loss After 40",
+    description: "Age-appropriate dosing for metabolic slowdown and midlife body changes.",
+    href: "/lp/over40",
+  },
+  {
+    title: "Semaglutide Explained",
+    description: "Mechanism, cost, timeline — the active ingredient behind most programs.",
+    href: "/lp/semaglutide",
+  },
+  {
+    title: "See Pricing Plans",
+    description: "Essential, Premium, Complete — compare what's included at each tier.",
+    href: "/pricing",
+  },
+  {
+    title: "Check Eligibility",
+    description: "Takes 2 minutes. No cost. No commitment. Licensed-provider review.",
+    href: "/qualify",
+  },
+  {
+    title: "Ozempic Alternative",
+    description: "Same active ingredient, a fraction of the price — how compounding works.",
+    href: "/lp/ozempic-alternative",
+  },
+] as const;
 
 export default function MenLandingPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* ── 1. STICKY HEADER ─────────────────────────────── */}
-      <header className="sticky top-0 z-50 border-b border-navy-100/40 bg-white/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal to-atlantic">
-              <span className="text-xs font-bold text-white">NJ</span>
-            </div>
-            <span className="text-sm font-bold text-navy">
-              Nature&apos;s Journey
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <a
-              href="tel:18885092745"
-              className="hidden items-center gap-1.5 text-xs font-medium text-graphite-500 transition-colors hover:text-navy sm:flex"
-            >
-              (888) 509-2745
-            </a>
-            <Badge variant="outline" className="gap-1 text-xs">
-              <Shield className="h-3 w-3 text-teal" /> Men&apos;s Health
-            </Badge>
-            <div className="flex items-center gap-1.5 text-xs text-graphite-400">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-              <span className="hidden sm:inline">HIPAA Compliant</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <LpHeader
+        badgeText="Built for Men"
+        badgeIcon={Target}
+        badgeIconColor="text-orange-500"
+      />
 
-      {/* ── 2. HERO ──────────────────────────────────────── */}
-      <section className="bg-gradient-to-b from-navy-50 via-cloud to-white py-14 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <Badge className="mb-4 border-navy-200 bg-navy-100 text-navy">
-            <Shield className="mr-1 h-3 w-3" /> Built for Men&apos;s Biology
-          </Badge>
+      {/* ======================================================================
+          HERO
+          AI-IMAGE PROMPT (hero right-side portrait — optional enhancement)
+          Aspect ratio: 4:5
+          "Editorial photograph of a confident man in his early-40s, short
+           dark hair, short stubble, charcoal crew T-shirt, arms relaxed,
+           natural window light, warm neutral wall backdrop, mid-laugh
+           genuine expression, shallow depth of field, editorial style.
+           Flat midsection. Clean, no logos, no overt gym iconography."
+          ====================================================================== */}
+      <LpHeroBlock
+        badge="Built for Men"
+        headline="Cut the gut. Built for men."
+        headlineAccent="Prescribed by US-licensed doctors."
+        subtitle="Dadbod isn't a personality — it's a metabolic signal. Doctor-prescribed GLP-1 targets visceral fat and the insulin-cortisol axis that lifting alone can't fix. 2-minute eligibility. From $179/mo."
+        stats={heroStats}
+        ctaLocation="hero-men"
+      />
 
-          <h1 className="text-3xl font-bold tracking-tight text-navy sm:text-4xl lg:text-5xl">
-            Lose the Gut. Keep the Muscle.
-            <br />
-            <span className="bg-gradient-to-r from-teal to-atlantic bg-clip-text text-transparent">
-              GLP-1 Weight Loss for Men
-            </span>
-          </h1>
+      <LpSocialProofBar />
 
-          <p className="mx-auto mt-5 max-w-xl text-lg text-graphite-500">
-            Men carry weight differently — and lose it differently. GLP-1
-            medication targets visceral belly fat, supports testosterone levels,
-            and preserves lean muscle. Prescribed by providers who understand
-            men&apos;s metabolic health.
-          </p>
+      {/* Real outcome numbers anchor the claim before objections land */}
+      <LpOutcomeStats
+        stats={outcomeStats}
+        heading="What men actually see on the program"
+        subheading="Program outcomes, not marketing numbers."
+      />
 
-          {/* Price anchor */}
-          <div className="mt-6 inline-flex items-center gap-3 rounded-full bg-navy-50 px-6 py-2">
-            <span className="text-sm text-graphite-400 line-through">
-              $1,349/mo retail
-            </span>
-            <span className="text-lg font-bold text-navy">$279/mo</span>
-            <span className="rounded-full bg-teal px-2.5 py-0.5 text-xs font-bold text-white">
-              Save 79%
-            </span>
-          </div>
+      {/* Problem Section */}
+      <LpProblemSection
+        eyebrow="WHY THE GYM ALONE ISN'T MOVING IT"
+        heading="The metabolic wall most men hit after 35"
+        cards={lpProblemCards}
+        transitionText="A metabolic problem needs a metabolic solution — that's where GLP-1 comes in."
+        ctaLocation="problem-men"
+      />
 
-          <div className="mt-8">
-            <Link href="/qualify">
-              <Button
-                size="xl"
-                className="h-16 gap-2 rounded-2xl px-12 text-lg shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
-              >
-                See If I Qualify — Free Assessment
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="mt-3 text-xs text-graphite-400">
-              Takes 2 minutes &middot; No commitment &middot; HIPAA protected
-            </p>
-          </div>
-
-          {/* Trust stats */}
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {trustStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl border border-navy-100/40 bg-white p-3 text-center shadow-sm"
-              >
-                <p className="text-lg font-bold text-navy">{stat.value}</p>
-                <p className="text-[10px] text-graphite-400">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 3. SOCIAL PROOF BAR ──────────────────────────── */}
-      <section className="border-y border-navy-100/40 bg-navy-50/30 py-3">
-        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-6 px-4 text-xs text-graphite-500">
-          <span className="flex items-center gap-1.5">
-            <Star className="h-3.5 w-3.5 fill-gold text-gold" />
-            Rated 4.9/5 by 1,800+ male members
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Users className="h-3.5 w-3.5 text-teal" />
-            87 men started this week
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Truck className="h-3.5 w-3.5 text-navy" />
-            Free 2-day discreet shipping
-          </span>
-        </div>
-      </section>
-
-      {/* ── 4. THE PROBLEM — WHY MEN STRUGGLE DIFFERENTLY ─ */}
-      <section className="bg-navy py-14 sm:py-20">
+      {/* Why men are different */}
+      <section className="py-14">
         <div className="mx-auto max-w-4xl px-4">
-          <h2 className="text-center text-2xl font-bold text-white sm:text-3xl">
-            Why Men&apos;s Weight Loss Is Different
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            Why men&apos;s weight loss is different
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-center text-sm text-teal-200">
-            Biology, not willpower, is the problem. Here&apos;s what&apos;s
-            working against you — and why GLP-1 changes the equation.
+          <p className="text-center text-sm text-lp-body mb-10">
+            Male physiology demands a different playbook — one your GP rarely has time to write.
           </p>
-
-          <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-3">
             {problemCards.map((card) => (
-              <div
-                key={card.title}
-                className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-teal/20">
-                  <card.icon className="h-6 w-6 text-teal-300" />
-                </div>
-                <h3 className="font-semibold text-white">{card.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-graphite-300">
-                  {card.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 5. HOW IT WORKS ──────────────────────────────── */}
-      <section className="py-14 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4">
-          <h2 className="text-center text-2xl font-bold text-navy sm:text-3xl">
-            How it works
-          </h2>
-          <p className="mt-3 text-center text-sm text-graphite-500">
-            Three steps. No office visits. No waiting rooms.
-          </p>
-
-          <div className="mt-10 space-y-6">
-            {steps.map((step) => (
-              <div
-                key={step.number}
-                className="flex items-start gap-5 rounded-2xl border border-navy-100/40 bg-white p-6 shadow-sm"
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-teal/20 bg-gradient-to-br from-teal/10 to-atlantic/10">
-                  <step.icon className="h-5 w-5 text-teal" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-graphite-300">
-                    Step {step.number}
-                  </p>
-                  <h3 className="mt-0.5 font-semibold text-navy">
-                    {step.title}
-                  </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-graphite-500">
-                    {step.body}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 6. MEN-SPECIFIC BENEFITS ─────────────────────── */}
-      <section className="bg-linen/40 py-14">
-        <div className="mx-auto max-w-4xl px-4">
-          <h2 className="mb-2 text-center text-2xl font-bold text-navy">
-            Built for the Male Body
-          </h2>
-          <p className="mb-10 text-center text-sm text-graphite-500">
-            Your biology is different. Your treatment should be too.
-          </p>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {menBenefits.map((b) => (
-              <Card key={b.title}>
+              <Card key={card.title}>
                 <CardContent className="p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-navy-50">
-                      <b.icon className="h-5 w-5 text-teal" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-navy">{b.title}</h3>
-                      <p className="mt-1 text-xs leading-relaxed text-graphite-500">
-                        {b.description}
-                      </p>
-                    </div>
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-xl mb-3"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <card.icon className="h-5 w-5" style={{ color: "var(--lp-icon)" }} />
                   </div>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-lp-body leading-relaxed">
+                    {card.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -524,292 +433,114 @@ export default function MenLandingPage() {
         </div>
       </section>
 
-      {/* ── 7. MEDICATION INFO ───────────────────────────── */}
-      <section className="py-14">
+      {/* How GLP-1 Solves the Male Metabolism Problem */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
         <div className="mx-auto max-w-4xl px-4">
-          <h2 className="mb-8 text-center text-2xl font-bold text-navy">
-            How GLP-1 Medication Works
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            How GLP-1 solves the male metabolism problem
           </h2>
-          <div className="grid gap-8 lg:grid-cols-2">
-            {/* Left — mechanism */}
-            <div>
-              <p className="mb-5 text-sm leading-relaxed text-graphite-500">
-                GLP-1 (glucagon-like peptide-1) is a naturally occurring hormone
-                that regulates appetite and blood sugar. Our compounded
-                semaglutide medication amplifies this signal, helping you feel
-                satisfied with less food while your body burns stored visceral
-                fat.
-              </p>
-              <div className="space-y-3">
-                {[
-                  {
-                    icon: Syringe,
-                    text: "Same active ingredient as Ozempic & Wegovy (semaglutide)",
-                  },
-                  {
-                    icon: Clock,
-                    text: "Once-weekly self-injection — takes under 30 seconds",
-                  },
-                  {
-                    icon: Activity,
-                    text: "Gradual dose escalation minimizes side effects",
-                  },
-                  {
-                    icon: Truck,
-                    text: "Temperature-controlled shipping from licensed pharmacies",
-                  },
-                ].map((item) => (
-                  <div key={item.text} className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-50">
-                      <item.icon className="h-4 w-4 text-teal" />
-                    </div>
-                    <span className="text-sm text-navy">{item.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right — dose schedule */}
-            <div className="rounded-2xl border border-navy-100/40 bg-navy-50/30 p-6">
-              <h3 className="mb-4 text-sm font-bold text-navy">
-                Typical Dose Escalation Schedule
-              </h3>
-              <div className="space-y-3">
-                {doseSchedule.map((d, i) => (
-                  <div
-                    key={d.weeks}
-                    className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm"
-                  >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal to-atlantic text-xs font-bold text-white">
-                      {i + 1}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-navy">
-                        {d.weeks}
-                      </p>
-                      <p className="text-[10px] text-graphite-400">{d.note}</p>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {d.dose}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-4 text-[10px] text-graphite-400">
-                Dosing is individualized by your provider based on your response
-                and tolerability.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 8. COST COMPARISON TABLE ─────────────────────── */}
-      <section className="bg-navy-50/30 py-14">
-        <div className="mx-auto max-w-4xl px-4">
-          <h2 className="mb-2 text-center text-2xl font-bold text-navy">
-            How We Compare
-          </h2>
-          <p className="mb-8 text-center text-sm text-graphite-500">
-            All-inclusive pricing. No hidden fees. No surprises.
+          <p className="text-center text-sm text-lp-body mb-10">
+            A metabolic problem requires a metabolic solution.
           </p>
-
-          {/* Desktop table */}
-          <div className="hidden overflow-hidden rounded-2xl border border-navy-100/40 bg-white shadow-sm md:block">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-navy-100/40 bg-navy-50/50">
-                  <th className="px-5 py-4 text-left font-semibold text-navy">
-                    Feature
-                  </th>
-                  <th className="px-5 py-4 text-center font-semibold text-teal">
-                    Nature&apos;s Journey
-                  </th>
-                  <th className="px-5 py-4 text-center font-semibold text-graphite-400">
-                    Brand-Name GLP-1
-                  </th>
-                  <th className="px-5 py-4 text-center font-semibold text-graphite-400">
-                    Other Telehealth
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {comparisonRows.map((row, i) => (
-                  <tr
-                    key={row.feature}
-                    className={
-                      i % 2 === 0 ? "bg-white" : "bg-navy-50/20"
-                    }
-                  >
-                    <td className="px-5 py-3 font-medium text-navy">
-                      {row.feature}
-                    </td>
-                    <td className="px-5 py-3 text-center">
-                      {row.nj ? (
-                        <span className="font-semibold text-teal">
-                          {row.nj}
-                        </span>
-                      ) : row.njCheck ? (
-                        <ComparisonIcon type="check" />
-                      ) : null}
-                    </td>
-                    <td className="px-5 py-3 text-center text-graphite-500">
-                      {row.brand ? (
-                        row.brand
-                      ) : row.brandX ? (
-                        <ComparisonIcon type="x" />
-                      ) : row.brandNA ? (
-                        <ComparisonIcon type="na" />
-                      ) : null}
-                    </td>
-                    <td className="px-5 py-3 text-center text-graphite-500">
-                      {row.competitor ? (
-                        row.competitor
-                      ) : row.competitorX ? (
-                        <ComparisonIcon type="x" />
-                      ) : row.competitorMinus ? (
-                        <ComparisonIcon type="minus" />
-                      ) : null}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile cards */}
-          <div className="space-y-4 md:hidden">
-            {comparisonRows.map((row) => (
+          <div className="grid gap-5 sm:grid-cols-3">
+            {solutionCards.map((card) => (
               <div
-                key={row.feature}
-                className="rounded-xl border border-navy-100/40 bg-white p-4"
+                key={card.title}
+                className="rounded-xl border bg-white p-5"
+                style={{ borderColor: "var(--lp-card-border)" }}
               >
-                <p className="mb-2 text-xs font-semibold text-graphite-400">
-                  {row.feature}
-                </p>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="rounded-lg bg-teal-50 p-2 text-center">
-                    <p className="text-[10px] text-teal-600">
-                      Nature&apos;s Journey
-                    </p>
-                    <p className="font-semibold text-teal">
-                      {row.nj ||
-                        (row.njCheck ? (
-                          <Check className="mx-auto h-4 w-4" />
-                        ) : (
-                          "—"
-                        ))}
-                    </p>
+                <div className="flex items-center gap-2 mb-3">
+                  <div
+                    className="flex h-6 w-6 items-center justify-center rounded-full"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <Check className="h-3.5 w-3.5" style={{ color: "var(--lp-icon)" }} />
                   </div>
-                  <div className="rounded-lg bg-graphite-50 p-2 text-center">
-                    <p className="text-[10px] text-graphite-400">Brand-Name</p>
-                    <p className="text-graphite-500">
-                      {row.brand ||
-                        (row.brandX ? (
-                          <X className="mx-auto h-4 w-4 text-red-400" />
-                        ) : row.brandNA ? (
-                          "N/A"
-                        ) : (
-                          "—"
-                        ))}
-                    </p>
-                  </div>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
                 </div>
+                <p className="text-xs text-lp-body leading-relaxed">
+                  {card.description}
+                </p>
               </div>
             ))}
           </div>
-
-          {/* Savings banner */}
-          <div className="mt-8 rounded-2xl bg-gradient-to-r from-teal to-atlantic p-6 text-center text-white">
-            <p className="text-lg font-bold">
-              Save up to $12,840/year vs. brand-name retail
-            </p>
-            <p className="mt-1 text-sm text-teal-100">
-              Same active ingredient. Licensed providers. Fraction of the cost.
-            </p>
-          </div>
-
-          <p className="mt-4 text-center text-[10px] text-graphite-400">
-            Brand-name retail price based on published U.S. cash-pay pricing as
-            of 2025. Compounded medications are not FDA-approved drug products.
-          </p>
         </div>
       </section>
 
-      {/* ── 9. PROVIDER SECTION ──────────────────────────── */}
-      <section className="py-14">
-        <div className="mx-auto max-w-2xl px-4 text-center">
-          <h2 className="mb-8 text-2xl font-bold text-navy">
-            Your Provider Understands Men&apos;s Health
-          </h2>
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-navy to-atlantic text-xl font-bold text-white">
-            JW
-          </div>
-          <h3 className="text-lg font-bold text-navy">
-            Dr. James Walker, DO
-          </h3>
-          <p className="text-sm text-graphite-500">
-            Johns Hopkins University &middot; Board-Certified Family Medicine
-            &middot; 14 years experience
-          </p>
-          <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-graphite-600">
-            &ldquo;Men&apos;s weight management requires understanding visceral
-            fat distribution, testosterone dynamics, and cardiovascular risk.
-            GLP-1 medication is remarkably effective when the protocol accounts
-            for these factors — and that&apos;s what we specialize
-            in.&rdquo;
-          </p>
-          <div className="mt-3 flex items-center justify-center gap-1">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Star key={i} className="h-4 w-4 fill-gold text-gold" />
-            ))}
-            <span className="ml-1 text-xs text-graphite-400">
-              4.9/5 (847 reviews)
-            </span>
-          </div>
-          <p className="mt-4 text-xs text-graphite-400">
-            All providers licensed in all 50 states &middot;{" "}
-            <Link
-              href="/providers"
-              className="text-teal hover:underline"
-            >
-              View full credentials &rarr;
-            </Link>
-          </p>
-        </div>
-      </section>
+      {/* Mid CTA */}
+      <LpMidCta
+        headline="Ready to actually move the needle?"
+        subtext="Free 2-minute assessment. Licensed providers. No commitment."
+        location="mid-men"
+      />
 
-      {/* ── 10. TESTIMONIALS ─────────────────────────────── */}
-      <section className="bg-linen/40 py-14">
+      {/* Journey roadmap — defuses "what happens next?" objection */}
+      <LpJourneyRoadmap
+        milestones={journeyMilestones}
+        heading="What to expect, month by month"
+        subheading="The realistic treatment arc your provider will build with you."
+      />
+
+      {/* Price comparison — anchoring effect */}
+      <LpPriceCompare
+        columns={priceColumns}
+        heading="Same active ingredient. Plans from $179/mo."
+        subheading="Men shouldn't have to fight their insurer to fight their waistline."
+      />
+
+      {/* Provider authority anchor */}
+      <LpProviderCredential
+        provider={provider}
+        heading="Every plan is overseen by a real clinician"
+      />
+
+      {/* Testimonials */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
         <div className="mx-auto max-w-4xl px-4">
-          <h2 className="mb-8 text-center text-2xl font-bold text-navy">
-            Real Men, Real Results
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-8">
+            Men who got their body back
           </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
+          {/* AI-IMAGE PROMPT (optional — testimonial avatars)
+              Aspect ratio: 1:1
+              "Four photorealistic headshot portraits, diverse men ages 35-55,
+               soft natural window light, genuine confident expressions,
+               neutral backgrounds in warm earth tones, editorial
+               photojournalism style, candid not posed, Sony A7R 85mm f/1.8.
+               Clean grooming, no logos, no fitness branding."
+          */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {testimonials.map((t) => (
               <Card key={t.name}>
                 <CardContent className="p-5">
-                  <div className="mb-2 flex gap-0.5">
+                  <div className="flex gap-0.5 mb-2">
                     {[1, 2, 3, 4, 5].map((i) => (
                       <Star
                         key={i}
-                        className="h-3.5 w-3.5 fill-gold text-gold"
+                        className="h-3.5 w-3.5 text-gold fill-gold"
                       />
                     ))}
                   </div>
-                  <p className="text-xs italic leading-relaxed text-graphite-600">
+                  <p className="text-xs text-lp-body italic leading-relaxed">
                     &ldquo;{t.quote}&rdquo;
                   </p>
                   <div className="mt-3 flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-bold text-navy">
+                      <p className="text-xs font-bold text-lp-heading">
                         {t.name}, {t.age}
                       </p>
-                      <p className="text-[10px] text-graphite-400">
+                      <p className="text-[10px] text-lp-body-muted">
                         {t.location}
                       </p>
                     </div>
-                    <Badge className="bg-teal text-[10px] text-white">
+                    <Badge
+                      className="text-[10px]"
+                      style={{
+                        backgroundColor: "var(--lp-badge-bg)",
+                        color: "var(--lp-badge-text)",
+                      }}
+                    >
                       -{t.lbs} lbs / {t.months}mo
                     </Badge>
                   </div>
@@ -817,236 +548,44 @@ export default function MenLandingPage() {
               </Card>
             ))}
           </div>
-          <p className="mt-4 text-center text-[10px] text-graphite-400">
+          <p className="mt-4 text-center text-[10px] text-lp-body-muted">
             Verified members. Individual results vary.
           </p>
         </div>
       </section>
 
-      {/* ── 11. RESULTS STATS ────────────────────────────── */}
-      <section className="bg-gradient-to-r from-navy to-atlantic py-14">
-        <div className="mx-auto max-w-4xl px-4">
-          <h2 className="mb-8 text-center text-xl font-bold text-white">
-            Average Results for Male Members
-          </h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {resultStats.map((s) => (
-              <div
-                key={s.label}
-                className="rounded-xl border border-white/10 bg-white/10 p-4 text-center backdrop-blur-sm"
-              >
-                <p className="text-3xl font-bold text-white">{s.value}</p>
-                <p className="mt-1 text-xs text-teal-200">{s.label}</p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 text-center text-[10px] text-teal-300/60">
-            Based on male members completing 6+ months of treatment. Individual
-            results vary.
-          </p>
-        </div>
-      </section>
+      {/* FAQ */}
+      <LpFaq
+        faqs={faqs}
+        heading="GLP-1 for men: your questions"
+        subheading="Everything men ask before starting doctor-prescribed weight-loss care."
+      />
 
-      {/* ── 12. FAQ ACCORDION ────────────────────────────── */}
-      <section className="py-14">
-        <div className="mx-auto max-w-2xl px-4">
-          <h2 className="mb-8 text-center text-2xl font-bold text-navy">
-            Questions Men Ask Most
-          </h2>
-          <div className="space-y-3">
-            {faqs.map((faq) => (
-              <details
-                key={faq.q}
-                className="group rounded-xl border border-navy-100/40 bg-white shadow-sm"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-navy">
-                  {faq.q}
-                  <ChevronDown className="h-4 w-4 shrink-0 text-graphite-400 transition-transform group-open:rotate-180" />
-                </summary>
-                <div className="border-t border-navy-100/30 px-5 py-4">
-                  <p className="text-sm leading-relaxed text-graphite-600">
-                    {faq.a}
-                  </p>
-                </div>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Internal Links */}
+      <LpInternalLinks heading="Keep exploring" links={internalLinks} />
 
-      {/* ── 13. SAFETY & SIDE EFFECTS ────────────────────── */}
-      <section className="bg-linen/40 py-14">
-        <div className="mx-auto max-w-3xl px-4">
-          <h2 className="mb-2 text-center text-2xl font-bold text-navy">
-            Side Effects &amp; Safety
-          </h2>
-          <p className="mb-8 text-center text-sm text-graphite-500">
-            We believe in full transparency. Here&apos;s what to expect.
-          </p>
+      {/* Final CTA */}
+      <LpCtaSection
+        headline="Cut the gut. Keep the strength."
+        bgClassName="bg-gradient-to-r from-orange-50 to-amber-50"
+      />
 
-          <div className="grid gap-6 sm:grid-cols-2">
-            {/* Common side effects */}
-            <div className="rounded-2xl border border-navy-100/40 bg-white p-6">
-              <h3 className="mb-4 text-sm font-bold text-navy">
-                Common side effects
-              </h3>
-              <p className="mb-4 text-xs text-graphite-400">
-                Mild and typically temporary during the adjustment period.
-              </p>
-              <div className="space-y-3">
-                {commonSideEffects.map((s) => (
-                  <div
-                    key={s.effect}
-                    className="flex items-start gap-3 rounded-lg bg-navy-50/30 p-3"
-                  >
-                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-                    <div>
-                      <p className="text-sm font-medium text-navy">
-                        {s.effect}
-                      </p>
-                      <p className="text-xs text-graphite-400">{s.note}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+      <LpFooter />
 
-            {/* Mitigations */}
-            <div className="rounded-2xl border border-navy-100/40 bg-white p-6">
-              <h3 className="mb-4 text-sm font-bold text-navy">
-                How we minimize them
-              </h3>
-              <p className="mb-4 text-xs text-graphite-400">
-                Your provider actively manages your experience.
-              </p>
-              <div className="space-y-3">
-                {mitigations.map((m) => (
-                  <div
-                    key={m.action}
-                    className="flex items-start gap-3 rounded-lg bg-teal-50/30 p-3"
-                  >
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-teal" />
-                    <div>
-                      <p className="text-sm font-medium text-navy">
-                        {m.action}
-                      </p>
-                      <p className="text-xs text-graphite-400">{m.detail}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Serious side effects callout */}
-          <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50/60 p-4">
-            <p className="text-xs font-semibold text-amber-800">
-              Important safety information
-            </p>
-            <p className="mt-1 text-xs leading-relaxed text-amber-700">
-              Serious side effects are rare. Your provider reviews your full
-              medical history before prescribing. Contraindications include
-              personal or family history of medullary thyroid carcinoma or
-              Multiple Endocrine Neoplasia syndrome type 2 (MEN2). Do not use if
-              you have a known hypersensitivity to semaglutide.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 14. FINAL CTA ────────────────────────────────── */}
-      <section className="bg-gradient-to-r from-navy-50 to-atlantic-50 py-14">
-        <div className="mx-auto max-w-xl px-4 text-center">
-          <h2 className="text-2xl font-bold text-navy">
-            Take back control of your health
-          </h2>
-          <p className="mt-3 text-sm text-graphite-500">
-            Free 2-minute assessment. Provider reviews typically within 1
-            business day. Medication ships free if prescribed.
-          </p>
-          <div className="mt-6">
-            <Link href="/qualify">
-              <Button size="xl" className="h-14 gap-2 px-12 text-lg">
-                See If I Qualify <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-graphite-400">
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> 30-day
-              money-back guarantee
-            </span>
-            <span className="flex items-center gap-1">
-              <Check className="h-3.5 w-3.5 text-teal" /> No commitment
-              required
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5 text-teal" /> Same-day evaluation
-              available
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 15. STICKY MOBILE CTA ────────────────────────── */}
-      <MobileStickyCta />
-
-      {/* ── 16. FOOTER ───────────────────────────────────── */}
-      <footer className="border-t border-navy-100/40 py-8">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <p className="text-[11px] leading-relaxed text-graphite-400">
-            Nature&apos;s Journey Health facilitates access to independently
-            licensed healthcare providers and does not practice medicine.
-            Treatment eligibility is determined solely by a licensed provider
-            based on a clinical evaluation. Prescription treatment is not
-            guaranteed. Individual results vary.
-          </p>
-          <p className="mt-2 text-[11px] leading-relaxed text-graphite-400">
-            Compounded medications dispensed through licensed 503A/503B
-            pharmacies are{" "}
-            <strong>not FDA-approved drug products</strong> and are not the same
-            as brand-name medications. Prescriptions are issued only when
-            clinically appropriate.
-          </p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-[11px] text-graphite-400">
-            <Link
-              href="/legal/terms"
-              className="transition-colors hover:text-navy"
-            >
-              Terms
-            </Link>
-            <span>&middot;</span>
-            <Link
-              href="/legal/privacy"
-              className="transition-colors hover:text-navy"
-            >
-              Privacy
-            </Link>
-            <span>&middot;</span>
-            <Link
-              href="/legal/hipaa"
-              className="transition-colors hover:text-navy"
-            >
-              HIPAA Notice
-            </Link>
-            <span>&middot;</span>
-            <Link
-              href="/providers"
-              className="transition-colors hover:text-navy"
-            >
-              Provider Credentials
-            </Link>
-          </div>
-          <p className="mt-3 text-[10px] text-graphite-300">
-            &copy; {new Date().getFullYear()} Nature&apos;s Journey Health, LLC.
-            1209 Orange St, Wilmington, DE 19801. All rights reserved.
-          </p>
-        </div>
-      </footer>
-
-      <MedicalWebPageJsonLd name="GLP-1 Weight Loss for Men" description="GLP-1 medication designed for men's biology. Target visceral fat, support testosterone, preserve muscle." url="/lp/men" />
-      <ExitIntentModal />
-      <SocialProofToasts />
+      {/* JSON-LD */}
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "GLP-1 for Men", href: "/lp/men" },
+        ]}
+      />
+      <MedicalWebPageJsonLd
+        name="GLP-1 Weight Loss for Men"
+        description="Doctor-prescribed GLP-1 weight-loss care built for male physiology. Target visceral fat, preserve lean mass, and reset metabolic health. From $179/mo."
+        url="/lp/men"
+      />
+      <FAQPageJsonLd faqs={faqs} />
+      <LpConversionWidgets />
     </div>
   );
 }

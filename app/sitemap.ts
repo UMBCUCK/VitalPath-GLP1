@@ -37,6 +37,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/medications`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${baseUrl}/medications/semaglutide`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${baseUrl}/medications/tirzepatide`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${baseUrl}/peptides`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${baseUrl}/peptides/nad-plus`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/peptides/sermorelin`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/peptides/ipamorelin-cjc`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/peptides/bpc-157`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/peptides/glow-stack`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/peptides/thymosin-beta-4`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${baseUrl}/glossary`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${baseUrl}/blog`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
     { url: `${baseUrl}/blog/category/medication`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
@@ -87,6 +94,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/lp/no-surgery`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${baseUrl}/lp/affordable`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${baseUrl}/lp/postpartum`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/wegovy-alternative`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/mounjaro-alternative`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/zepbound-alternative`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/lp/telehealth`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
   ];
 
   // Dynamic pages from DB — wrapped in try/catch for build-time when DB isn't available

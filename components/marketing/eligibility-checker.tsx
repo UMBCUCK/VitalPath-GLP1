@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { AnimateOnView } from "@/components/shared/animate-on-view";
+import { CalculatorLeadCapture } from "@/components/calculators/calculator-lead-capture";
 import { cn } from "@/lib/utils";
 
 type Result = "likely" | "possible" | "unlikely" | null;
@@ -126,7 +127,7 @@ export function EligibilityChecker() {
                     const projLoss = Math.round(weight * 0.15);
                     const projWeight = weight - projLoss;
                     const months = Math.max(3, Math.round(projLoss / 6));
-                    const savings = (1349 - 279) * months;
+                    const savings = (1349 - 179) * months;
                     return (
                       <div className="mt-3">
                         <Badge variant="success" className="text-sm gap-1.5">
@@ -195,6 +196,22 @@ export function EligibilityChecker() {
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
+
+                {/* Tier 5.5 — Email capture right under the homepage BMI result.
+                    Most homepage visitors compute BMI but don't click the CTA;
+                    this card converts the bounce into a lead. */}
+                {(result === "likely" || result === "possible") && (
+                  <CalculatorLeadCapture
+                    source="homepage_eligibility_checker"
+                    headline={
+                      result === "likely"
+                        ? `Your BMI of ${bmiRounded} qualifies — get your personalized plan emailed.`
+                        : `Your BMI of ${bmiRounded} may qualify — we'll email your eligibility details.`
+                    }
+                    subCopy="Free personalized plan with projected weight loss, recommended medication, pricing, and timeline. No spam, no commitment."
+                    metadata={{ bmi: Number(bmiRounded), result }}
+                  />
+                )}
 
                 <button
                   onClick={() => setChecked(false)}

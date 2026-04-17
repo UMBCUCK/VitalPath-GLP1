@@ -42,7 +42,7 @@ const values = [
   {
     icon: Users,
     title: "Accessibility",
-    description: "Weight management shouldn't cost $1,349/month. We partner with licensed compounding pharmacies to make effective treatment accessible starting at $279/month.",
+    description: "Weight management shouldn't cost $1,349/month. We partner with licensed compounding pharmacies to make effective treatment accessible starting at $179/month.",
   },
 ];
 
@@ -144,7 +144,7 @@ export default function AboutPage() {
             <p>
               <strong>Nature's Journey exists to solve all three problems.</strong> We combine licensed
               provider care, affordable compounded medication, and comprehensive lifestyle support
-              into one program — starting at $279/month. That&apos;s 79% less than brand-name retail
+              into one program — starting at $179/month. That&apos;s 79% less than brand-name retail
               for a more complete solution.
             </p>
           </div>

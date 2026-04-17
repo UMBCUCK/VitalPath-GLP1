@@ -28,8 +28,8 @@ export const plans: PricingPlan[] = [
     id: "essential",
     name: "Essential",
     slug: "essential",
-    priceMonthly: 27900, // $279 (charm pricing — left-digit bias)
-    priceAnnual: 267840, // $2,678.40 ($223.20/mo — 20% off)
+    priceMonthly: 17900, // $179 (charm pricing — left-digit bias)
+    priceAnnual: 171840, // $1,718.40 ($143.20/mo — 20% off)
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_ESSENTIAL_PRICE_ID || "price_essential_monthly",
     description: "Provider-guided treatment with medication, if prescribed, plus clinical support.",
     features: [

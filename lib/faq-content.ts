@@ -170,7 +170,7 @@ export const faqTopics: FAQTopic[] = [
       {
         question: "What does tirzepatide cost per month?",
         answer:
-          "Brand Zepbound has a list price of approximately $1,060/month, though manufacturer savings programs can bring this down significantly for eligible patients — Eli Lilly's Zepbound Savings Card can reduce cost to as low as $550/month for commercially insured patients. Without insurance or savings programs, brand tirzepatide is cost-prohibitive for most patients. Compounded tirzepatide through telehealth programs typically ranges from $279–$399/month for the medication, though some all-inclusive programs bundle provider fees, medication, shipping, and coaching support into a single monthly fee.",
+          "Brand Zepbound has a list price of approximately $1,060/month, though manufacturer savings programs can bring this down significantly for eligible patients — Eli Lilly's Zepbound Savings Card can reduce cost to as low as $550/month for commercially insured patients. Without insurance or savings programs, brand tirzepatide is cost-prohibitive for most patients. Compounded tirzepatide through telehealth programs typically ranges from $179–$399/month for the medication, though some all-inclusive programs bundle provider fees, medication, shipping, and coaching support into a single monthly fee.",
       },
       {
         question: "Are the results from tirzepatide permanent?",
@@ -237,12 +237,12 @@ export const faqTopics: FAQTopic[] = [
       {
         question: "How much does compounded semaglutide cost?",
         answer:
-          "Compounded semaglutide pricing varies by dose, program, and pharmacy, but generally ranges from $150–$400/month. At starting doses (0.25 mg, 0.5 mg), costs tend to be on the lower end. At full maintenance dose (2.4 mg equivalent), costs are higher. Some all-inclusive telehealth programs include the medication, provider consultation, shipping, and support for a flat monthly fee in the $279–$399/month range. It is important to compare what is included — a lower medication price that requires separate provider visit fees may end up costing more than an all-inclusive program. Always verify the pharmacy's credentials and quality assurance practices.",
+          "Compounded semaglutide pricing varies by dose, program, and pharmacy, but generally ranges from $150–$400/month. At starting doses (0.25 mg, 0.5 mg), costs tend to be on the lower end. At full maintenance dose (2.4 mg equivalent), costs are higher. Some all-inclusive telehealth programs include the medication, provider consultation, shipping, and support for a flat monthly fee in the $179–$399/month range. It is important to compare what is included — a lower medication price that requires separate provider visit fees may end up costing more than an all-inclusive program. Always verify the pharmacy's credentials and quality assurance practices.",
       },
       {
         question: "What does an all-inclusive telehealth GLP-1 program cost?",
         answer:
-          "All-inclusive telehealth GLP-1 programs typically bundle medical evaluation, ongoing provider access, medication, shipping, and support features into a single monthly fee. Pricing generally ranges from $249–$599/month depending on the medication, dose level, and what support features are included. Nature's Journey's programs start at $279/month and include medical evaluation, compounded medication, unlimited provider messaging, nutrition guidance, progress tracking tools, and a referral program. When comparing programs, evaluate: medication quality and sourcing, provider availability, included support, and whether pricing is truly all-inclusive or requires additional fees for certain services.",
+          "All-inclusive telehealth GLP-1 programs typically bundle medical evaluation, ongoing provider access, medication, shipping, and support features into a single monthly fee. Pricing generally ranges from $249–$599/month depending on the medication, dose level, and what support features are included. Nature's Journey's programs start at $179/month and include medical evaluation, compounded medication, unlimited provider messaging, nutrition guidance, progress tracking tools, and a referral program. When comparing programs, evaluate: medication quality and sourcing, provider availability, included support, and whether pricing is truly all-inclusive or requires additional fees for certain services.",
       },
       {
         question: "Will Medicare or Medicaid cover GLP-1 for weight loss?",

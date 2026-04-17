@@ -11,6 +11,7 @@ import { calculateHydration } from "@/lib/utils";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { WaterFill } from "@/components/calculators/water-fill";
 import { AnimatedCounter } from "@/components/calculators/animated-counter";
+import { CalculatorLeadCapture } from "@/components/calculators/calculator-lead-capture";
 
 export default function HydrationCalculatorPage() {
   const [weight, setWeight] = useState("");
@@ -192,6 +193,16 @@ export default function HydrationCalculatorPage() {
                       </Button>
                     </Link>
                   </div>
+
+                  <CalculatorLeadCapture
+                    source="calculator_hydration"
+                    headline={`Your target is ${result} oz/day — crucial on GLP-1 medications.`}
+                    subCopy="Adequate hydration reduces common GLP-1 side effects (nausea, constipation). We'll email a simple tracking plan + your free GLP-1 eligibility check."
+                    metadata={{
+                      hydration_oz: result,
+                      activity,
+                    }}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>

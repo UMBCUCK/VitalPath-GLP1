@@ -97,13 +97,33 @@ export async function POST(req: NextRequest) {
 
     const session = await stripe.checkout.sessions.create(checkoutOptions);
 
-    await trackServerEvent("InitiateCheckout", { email }, {
-      plan_slug: planSlug,
-      plan_name: plan.name,
-      interval,
-      value: plan.priceMonthly / 100,
-      currency: "USD",
-    });
+    // Tier 5.1 — Advanced matching: include phone, IP, UA for higher match rate.
+    // Look up phone from user table or Lead table (email is the shared key).
+    let userPhone: string | undefined;
+    if (email) {
+      const [user, lead] = await Promise.all([
+        db.user.findUnique({ where: { email }, select: { phone: true } }),
+        db.lead.findUnique({ where: { email }, select: { phone: true } }),
+      ]);
+      userPhone = user?.phone || lead?.phone || undefined;
+    }
+
+    await trackServerEvent(
+      "InitiateCheckout",
+      {
+        email,
+        phone: userPhone,
+        ip: req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || undefined,
+        userAgent: req.headers.get("user-agent") || undefined,
+      },
+      {
+        plan_slug: planSlug,
+        plan_name: plan.name,
+        interval,
+        value: plan.priceMonthly / 100,
+        currency: "USD",
+      },
+    );
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

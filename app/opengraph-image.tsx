@@ -84,7 +84,7 @@ export default async function OGImage() {
           }}
         >
           <span style={{ fontSize: "22px", fontWeight: 700, color: "#DDE9E3" }}>
-            From $279/mo
+            From $179/mo
           </span>
           <span style={{ fontSize: "14px", color: "#97A5B0" }}>
             79% less than brand-name retail

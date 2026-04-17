@@ -22,7 +22,7 @@ const brandPrices = [
 ];
 
 const compoundedPrices = [
-  { name: "Nature's Journey Essential", monthly: 279, annual: 279 * 12 * 0.8, features: ["Provider evaluation", "Medication", "Free shipping", "Care team messaging"] },
+  { name: "Nature's Journey Essential", monthly: 179, annual: 179 * 12 * 0.8, features: ["Provider evaluation", "Medication", "Free shipping", "Care team messaging"] },
   { name: "Nature's Journey Premium", monthly: 379, annual: 379 * 12 * 0.8, features: ["Everything in Essential", "Meal plans & recipes", "Coaching check-ins", "Progress tracking"] },
   { name: "Nature's Journey Complete", monthly: 599, annual: 599 * 12 * 0.8, features: ["Everything in Premium", "Lab work coordination", "Supplements included", "Maintenance planning"] },
 ];
@@ -38,10 +38,10 @@ export default function CostCalculatorPage() {
   const [duration, setDuration] = useState(6); // months
   const [hasInsurance, setHasInsurance] = useState(false);
 
-  const vitalPathCost = 279 * duration;
+  const vitalPathCost = 179 * duration;
   const avgBrandCost = 1100 * duration;
   const savings = avgBrandCost - vitalPathCost;
-  const dailyCost = (279 / 30).toFixed(2);
+  const dailyCost = (179 / 30).toFixed(2);
 
   return (
     <MarketingShell>
@@ -59,7 +59,7 @@ export default function CostCalculatorPage() {
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500">
             Brand-name GLP-1 medication costs $935–$1,349/month. Compounded versions from licensed pharmacies
-            start at $279/month. Use this calculator to see your total cost and savings.
+            start at $179/month. Use this calculator to see your total cost and savings.
           </p>
         </SectionShell>
       </section>
@@ -144,7 +144,7 @@ export default function CostCalculatorPage() {
                 <div className="rounded-xl border-2 border-teal bg-teal-50/50 p-5">
                   <p className="text-xs font-semibold text-teal uppercase tracking-wider mb-2">Nature&apos;s Journey</p>
                   <p className="text-3xl font-bold text-teal">${vitalPathCost.toLocaleString()}</p>
-                  <p className="text-xs text-graphite-500 mt-1">{duration} months × $279/mo (Essential plan)</p>
+                  <p className="text-xs text-graphite-500 mt-1">{duration} months × $179/mo (Essential plan)</p>
                   <p className="text-xs text-teal font-medium mt-2">That&apos;s ${dailyCost}/day — less than a coffee</p>
                 </div>
               </div>
@@ -200,8 +200,8 @@ export default function CostCalculatorPage() {
                 <tr className="bg-teal-50/50 font-semibold">
                   <td className="px-5 py-3 text-teal">Nature&apos;s Journey (compounded)</td>
                   <td className="px-5 py-3 text-center text-xs text-teal">All-inclusive</td>
-                  <td className="px-5 py-3 text-right text-teal">$279</td>
-                  <td className="px-5 py-3 text-right text-teal">${(279 * 12 * 0.8).toLocaleString()}</td>
+                  <td className="px-5 py-3 text-right text-teal">$179</td>
+                  <td className="px-5 py-3 text-right text-teal">${(179 * 12 * 0.8).toLocaleString()}</td>
                 </tr>
               </tbody>
             </table>

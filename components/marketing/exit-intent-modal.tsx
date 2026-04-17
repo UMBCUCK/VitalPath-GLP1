@@ -2,16 +2,148 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { X, Gift, ArrowRight, Check, Clock, ShieldCheck, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
+// Tier 5.6 — Page-aware exit-intent variants.
+// Each variant is keyed off the URL pathname so the pitch matches the
+// user's intent at the moment they tried to leave. Falls back to the
+// generic $50-off + guide when no variant matches.
+interface ExitVariant {
+  badge: string;
+  heading: string;
+  subheading: React.ReactNode;
+  bullets: string[];
+  cta: string;
+  skipLabel: string;
+  priceAnchor?: React.ReactNode;
+}
+
+const GENERIC_VARIANT: ExitVariant = {
+  badge: "GLP-1 medication from",
+  heading: "Wait — don't leave empty-handed",
+  subheading: (
+    <>
+      Get our free <span className="font-semibold text-navy">GLP-1 Starter Guide</span>{" "}
+      + a <span className="font-semibold text-teal">$50 discount code</span> for your first month.
+    </>
+  ),
+  bullets: [
+    "How GLP-1 medications work (plain English)",
+    "Week-by-week timeline of what to expect",
+    "Foods that maximize results on GLP-1",
+    "Side effect management tips from providers",
+  ],
+  cta: "Get My Free Guide + $50 Code",
+  skipLabel: "Skip the guide — take the free assessment →",
+};
+
+function getVariantForPath(path: string | null): ExitVariant {
+  if (!path) return GENERIC_VARIANT;
+  if (path.startsWith("/calculators")) {
+    return {
+      badge: "Personalized plan — free",
+      heading: "Before you go — email your results",
+      subheading: (
+        <>
+          We&apos;ll send your calculator result plus a <span className="font-semibold text-navy">personalized GLP-1 plan</span>{" "}
+          with recommended medication and pricing.
+        </>
+      ),
+      bullets: [
+        "Your personalized weight-loss projection",
+        "Recommended GLP-1 medication + dose schedule",
+        "6-month timeline with monthly milestones",
+        "Full pricing breakdown with included extras",
+      ],
+      cta: "Email My Plan",
+      skipLabel: "No thanks — take the 2-min assessment →",
+    };
+  }
+  if (path.startsWith("/pricing") || path.startsWith("/checkout")) {
+    return {
+      badge: "Price-match offer",
+      heading: "Before you go — unlock $50 off your first month",
+      subheading: (
+        <>
+          Enter your email to save your cart and get an exclusive{" "}
+          <span className="font-semibold text-teal">$50 off</span> code that expires in 24h.
+        </>
+      ),
+      bullets: [
+        "$50 off your first month",
+        "Free 2-day shipping (always)",
+        "30-day money-back guarantee",
+        "Cancel anytime — no contracts",
+      ],
+      cta: "Unlock My $50-Off Code",
+      skipLabel: "Just take me to pricing →",
+    };
+  }
+  if (path.startsWith("/qualify")) {
+    return {
+      badge: "Save your progress",
+      heading: "Don't lose your answers",
+      subheading: (
+        <>
+          We&apos;ll <span className="font-semibold text-navy">email you a link</span> to resume exactly
+          where you left off — no re-typing. Plus a <span className="font-semibold text-teal">$50 welcome credit</span>.
+        </>
+      ),
+      bullets: [
+        "Pick up where you left off — 1 click",
+        "Link is unique to you and valid 14 days",
+        "Welcome credit auto-applies at checkout",
+        "A provider reviews within 1 business day",
+      ],
+      cta: "Save & Email Me My Link",
+      skipLabel: "Just continue the assessment →",
+    };
+  }
+  if (path.startsWith("/peptides")) {
+    return {
+      badge: "Peptide therapy guide — free",
+      heading: "Before you go — get the peptide guide",
+      subheading: (
+        <>
+          Download a plain-English guide to peptides:{" "}
+          <span className="font-semibold text-navy">NAD+, Sermorelin, BPC-157, Ipamorelin</span>, and
+          more. Dosing, cycling, and what to expect.
+        </>
+      ),
+      bullets: [
+        "Overview of the 6 most-used peptides",
+        "Typical dosing protocols + stacking",
+        "Who qualifies + contraindications",
+        "Pricing, pharmacy, and how it ships",
+      ],
+      cta: "Send Me the Peptide Guide",
+      skipLabel: "No thanks — browse peptides →",
+    };
+  }
+  return GENERIC_VARIANT;
+}
+
 export function ExitIntentModal() {
+  const pathname = usePathname();
+  const variant = getVariantForPath(pathname);
+
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [smsConsent, setSmsConsent] = useState(true);
   const [submitted, setSubmitted] = useState(false);
   const hasTriggered = useRef(false);
+
+  function formatPhone(value: string): string {
+    const digits = value.replace(/\D/g, "").slice(0, 10);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
 
   useEffect(() => {
     // Don't show if already dismissed this session
@@ -65,14 +197,27 @@ export function ExitIntentModal() {
     e.preventDefault();
     if (!email) return;
 
-    track(ANALYTICS_EVENTS.EMAIL_SUBSCRIBE, { source: "exit_intent", email_provided: true });
+    // Only send phone if user provided one AND consented to SMS
+    const phoneDigits = phone.replace(/\D/g, "");
+    const validPhone = phoneDigits.length === 10 && smsConsent ? phoneDigits : undefined;
+
+    track(ANALYTICS_EVENTS.EMAIL_SUBSCRIBE, {
+      source: "exit_intent",
+      email_provided: true,
+      phone_provided: !!validPhone,
+    });
 
     // Save lead to database
     try {
       await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "exit_intent", tags: ["glp1-guide"] }),
+        body: JSON.stringify({
+          email,
+          phone: validPhone,
+          source: "exit_intent",
+          tags: ["glp1-guide"],
+        }),
       });
     } catch {
       // Non-blocking — still show success even if API fails
@@ -107,11 +252,11 @@ export function ExitIntentModal() {
 
         {!submitted ? (
           <>
-            {/* Price anchor banner */}
+            {/* Price anchor banner — Tier 5.6 variant-driven label */}
             <div className="mb-4 -mx-8 -mt-8 sm:-mx-10 sm:-mt-10 rounded-t-3xl bg-gradient-to-r from-navy to-atlantic px-6 py-4 text-center text-white">
-              <p className="text-xs opacity-80">GLP-1 medication from</p>
+              <p className="text-xs opacity-80">{variant.badge}</p>
               <p className="text-xl font-bold">
-                $279/mo <span className="text-sm font-normal line-through opacity-50">$1,349</span>
+                $179/mo <span className="text-sm font-normal line-through opacity-50">$1,349</span>
               </p>
               <p className="text-xs font-semibold text-gold">Save 79% vs. brand-name retail</p>
             </div>
@@ -121,22 +266,12 @@ export function ExitIntentModal() {
               <Gift className="h-7 w-7 text-gold" />
             </div>
 
-            <h2 className="mt-5 text-2xl font-bold text-navy">
-              Wait — don&apos;t leave empty-handed
-            </h2>
-            <p className="mt-2 text-base text-graphite-500">
-              Get our free <span className="font-semibold text-navy">GLP-1 Starter Guide</span>{" "}
-              + a <span className="font-semibold text-teal">$50 discount code</span> for your first month.
-            </p>
+            <h2 className="mt-5 text-2xl font-bold text-navy">{variant.heading}</h2>
+            <p className="mt-2 text-base text-graphite-500">{variant.subheading}</p>
 
-            {/* What's inside */}
+            {/* What's inside — variant-driven bullets */}
             <div className="mt-5 space-y-2">
-              {[
-                "How GLP-1 medications work (plain English)",
-                "Week-by-week timeline of what to expect",
-                "Foods that maximize results on GLP-1",
-                "Side effect management tips from providers",
-              ].map((item) => (
+              {variant.bullets.map((item) => (
                 <div key={item} className="flex items-center gap-2 text-sm text-graphite-600">
                   <Check className="h-4 w-4 shrink-0 text-teal" />
                   {item}
@@ -144,22 +279,42 @@ export function ExitIntentModal() {
               ))}
             </div>
 
-            {/* Email form */}
-            <form onSubmit={handleSubmit} className="mt-6">
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="flex-1 rounded-xl border border-navy-100 bg-white px-4 py-3 text-base text-navy placeholder:text-graphite-300 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all min-h-[48px]"
-                />
-                <Button variant="emerald" type="submit" className="shrink-0 gap-1.5 min-h-[48px] rounded-full">
-                  Get Free Guide
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
+            {/* Email + phone form */}
+            <form onSubmit={handleSubmit} className="mt-6 space-y-3">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="w-full rounded-xl border border-navy-100 bg-white px-4 py-3 text-base text-navy placeholder:text-graphite-300 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all min-h-[48px]"
+              />
+              <input
+                type="tel"
+                placeholder="Phone (optional — for texts only)"
+                value={phone}
+                onChange={(e) => setPhone(formatPhone(e.target.value))}
+                autoComplete="tel"
+                className="w-full rounded-xl border border-navy-100 bg-white px-4 py-3 text-base text-navy placeholder:text-graphite-300 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all min-h-[48px]"
+              />
+              {phone && (
+                <label className="flex items-start gap-2 text-[11px] leading-relaxed text-graphite-500 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={smsConsent}
+                    onChange={(e) => setSmsConsent(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-navy-200 text-teal focus:ring-teal"
+                  />
+                  <span>
+                    Yes, text me my GLP-1 guide and occasional program updates. Reply STOP to opt out. Msg &amp; data rates may apply.
+                  </span>
+                </label>
+              )}
+              <Button variant="emerald" type="submit" className="w-full gap-1.5 min-h-[48px] rounded-full">
+                {variant.cta}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
             </form>
 
             {/* Trust signals */}
@@ -175,14 +330,14 @@ export function ExitIntentModal() {
               </span>
             </div>
 
-            {/* Skip link */}
+            {/* Skip link — variant-driven label */}
             <div className="mt-4 text-center">
               <Link
                 href="/qualify"
                 className="text-sm font-semibold text-teal hover:underline"
                 onClick={handleDismiss}
               >
-                Skip the guide — take the free assessment &rarr;
+                {variant.skipLabel}
               </Link>
             </div>
           </>

@@ -15,9 +15,10 @@ export interface Experiment {
 export const EXPERIMENTS: Record<string, Experiment> = {
   hero_headline: {
     key: "hero_headline",
-    variants: ["control", "variant_a", "variant_b"],
+    variants: ["control", "variant_a", "variant_b", "belly_fat_seasonal"],
     defaultVariant: "control",
-    description: "Test hero headline copy for conversion",
+    description:
+      "Test hero headline copy for conversion. 'belly_fat_seasonal' is the /home-v2 variant — seasonally rolling 'by [Month]' headline + 5-bullet benefit stack (previewable at /home-v2).",
   },
   pricing_layout: {
     key: "pricing_layout",
@@ -89,6 +90,13 @@ export const HERO_HEADLINES: Record<string, { headline: string; subheadline: str
   variant_b: {
     headline: "Your weight management program, built around your life",
     subheadline: "Licensed providers, personalized treatment, and practical daily tools — all in one platform designed for lasting results.",
+  },
+  // /home-v2 preview — seasonal deadline headline with 5-bullet benefit stack.
+  // When this variant wins, promote its HeroSectionV2 treatment to the main home page.
+  // Route preview: /home-v2 (noindex). Rolling month computed server-side (rolls on the 20th).
+  belly_fat_seasonal: {
+    headline: "Lose that stubborn belly fat by [Month]. Medicine that works up to 3x better than diet and exercise alone.",
+    subheadline: "✓ 2-minute approval ✓ Real doctor-prescribed medicine — no hassle ✓ No insurance needed ✓ Fast shipping in 24–48 hours ✓ Many members see changes within weeks.",
   },
 };
 

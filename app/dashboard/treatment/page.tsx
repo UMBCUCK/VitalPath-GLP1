@@ -6,17 +6,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DoseAdjustmentForm } from "@/components/dashboard/dose-adjustment-form";
-import { Pill, Calendar, Package, Stethoscope, Clock, TrendingUp, MessageCircle } from "lucide-react";
+import { Pill, Calendar, Package, Stethoscope, Clock, TrendingUp, MessageCircle, Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default async function TreatmentPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const treatment = await db.treatmentPlan.findFirst({
-    where: { userId: session.userId },
-    orderBy: { createdAt: "desc" },
-  });
+  const [treatment, peptideProducts] = await Promise.all([
+    db.treatmentPlan.findFirst({
+      where: { userId: session.userId },
+      orderBy: { createdAt: "desc" },
+    }),
+    // Tier 3.4 — top 3 HEALTHY_AGING products for the marketplace strip
+    db.product.findMany({
+      where: { category: "HEALTHY_AGING", isActive: true, isMarketplace: true },
+      orderBy: [{ isFeatured: "desc" }, { marketplaceOrder: "asc" }],
+      take: 3,
+      select: { id: true, slug: true, name: true, marketplaceDesc: true, priceMonthly: true, badge: true },
+    }),
+  ]);
 
   if (!treatment) {
     return (
@@ -285,6 +294,63 @@ export default async function TreatmentPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Tier 3.4 — "Recommended for you" peptides marketplace strip.
+          Only show if the member is actively on treatment (≥30 days) and we have peptide products seeded. */}
+      {daysSincePrescribed >= 30 && peptideProducts.length > 0 && (
+        <Card className="border-navy-100/60 bg-gradient-to-br from-white to-sage/10">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-gold" />
+                Recommended for you
+              </span>
+              <Link
+                href="/dashboard/shop"
+                className="text-xs font-semibold text-teal hover:underline"
+              >
+                View all &rarr;
+              </Link>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4 text-xs text-graphite-500">
+              Provider-supervised add-ons popular with members at your stage of treatment.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {peptideProducts.map((p) => (
+                <Link
+                  key={p.id}
+                  href={`/dashboard/shop?product=${p.slug}`}
+                  className="group relative rounded-xl border border-navy-100/60 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:border-teal"
+                >
+                  {p.badge && (
+                    <Badge variant="gold" className="absolute -top-2 right-2 text-[9px] uppercase">
+                      {p.badge}
+                    </Badge>
+                  )}
+                  <p className="text-sm font-bold text-navy">{p.name}</p>
+                  {p.marketplaceDesc && (
+                    <p className="mt-1 text-[11px] leading-relaxed text-graphite-500 line-clamp-2">
+                      {p.marketplaceDesc}
+                    </p>
+                  )}
+                  <div className="mt-3 flex items-center justify-between border-t border-navy-100/40 pt-2.5">
+                    <span className="text-sm font-bold text-navy">
+                      ${(p.priceMonthly / 100).toFixed(0)}
+                      <span className="text-xs font-normal text-graphite-400">/mo</span>
+                    </span>
+                    <ArrowRight className="h-3.5 w-3.5 text-graphite-400 group-hover:text-teal transition-colors" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <p className="mt-4 text-[10px] text-graphite-400">
+              Eligibility and dosing determined by your provider. Compounded medications are not FDA-approved.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Emergency Information */}
       <Card className="border-2 border-red-300 bg-red-50/30">

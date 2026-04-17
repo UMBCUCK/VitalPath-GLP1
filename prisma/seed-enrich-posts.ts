@@ -156,7 +156,7 @@ async function main() {
 <ul>
 <li><strong>Brand-name Wegovy:</strong> $1,349+/month</li>
 <li><strong>Brand-name Ozempic:</strong> $935+/month</li>
-<li><strong>Compounded semaglutide (via Nature's Journey):</strong> Starting at $279/month (includes provider care, medication, and support)</li>
+<li><strong>Compounded semaglutide (via Nature's Journey):</strong> Starting at $179/month (includes provider care, medication, and support)</li>
 </ul>
 <p>That's up to <strong>78% less</strong> than brand-name retail pricing. <a href="/blog/glp1-weight-loss-cost-without-insurance">See our complete cost breakdown</a>.</p>
 

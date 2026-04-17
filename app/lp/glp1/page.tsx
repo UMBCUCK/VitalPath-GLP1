@@ -1,17 +1,60 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight, Check, ShieldCheck, Star, Clock, Users, Truck } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  Check,
+  Star,
+  Sparkles,
+  Brain,
+  Activity,
+  TrendingDown,
+  Shield,
+  Stethoscope,
+  Target,
+  Scale,
+  Pill,
+  Users,
+} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { LpHeader } from "@/components/lp/lp-header";
+import { LpFooter } from "@/components/lp/lp-footer";
 import { LpFaq } from "@/components/lp/lp-faq";
+import { LpCtaSection } from "@/components/lp/lp-cta-section";
+import { LpSocialProofBar } from "@/components/lp/lp-social-proof-bar";
 import { LpConversionWidgets } from "@/components/lp/lp-conversion-widgets";
-import { MedicalWebPageJsonLd, FAQPageJsonLd, ProductJsonLd } from "@/components/seo/json-ld";
+import { LpHeroBlock } from "@/components/lp/lp-hero-block";
+import { LpMidCta } from "@/components/lp/lp-mid-cta";
+import { LpProblemSection } from "@/components/lp/lp-problem-section";
+import { LpInternalLinks } from "@/components/lp/lp-internal-links";
+import { LpOutcomeStats } from "@/components/lp/lp-outcome-stats";
+import { LpPriceCompare } from "@/components/lp/lp-price-compare";
+import { LpProviderCredential } from "@/components/lp/lp-provider-credential";
+import { LpJourneyRoadmap } from "@/components/lp/lp-journey-roadmap";
+import {
+  FAQPageJsonLd,
+  MedicalWebPageJsonLd,
+  BreadcrumbJsonLd,
+  HowToJsonLd,
+} from "@/components/seo/json-ld";
+
+// ============================================================================
+// AI-IMAGE PROMPT (hero background — optional enhancement)
+// Aspect ratio: 16:9
+// "Editorial candid photograph of a diverse group of real people in their
+//  30s-50s walking together through a sunny park in activewear, genuine
+//  smiles, natural morning light, warm inviting palette of soft blues and
+//  creams, shallow depth of field, Canon R5 85mm f/1.4, no logos, no
+//  fitness branding, no visible medication."
+// ============================================================================
 
 export const metadata: Metadata = {
-  title: "Provider-Guided GLP-1 Weight Management from $279/mo | Nature's Journey",
-  description: "Compounded GLP-1 medication prescribed online by licensed providers. Provider evaluation included. Free 2-day shipping. 30-day satisfaction guarantee. Individual results vary.",
+  // Keywords: glp-1 online, glp-1 weight loss program, glp-1 telehealth, glp-1 program
+  title: "GLP-1 Weight-Loss Program Online from $179/mo | Nature's Journey",
+  description:
+    "Complete GLP-1 program: medication, licensed providers, meal plans, coaching. 2-minute assessment. From $179/mo. Individual results vary.",
   openGraph: {
-    title: "Provider-Guided GLP-1 Weight Management from $279/mo",
-    description: "Compounded GLP-1 medication prescribed online by licensed providers. 79% less than retail. Free 2-day shipping.",
+    title: "Your Complete GLP-1 Weight-Loss Program — Medication + Care + Coaching",
+    description:
+      "Provider-guided GLP-1 weight loss from US-licensed providers. 2-minute eligibility. From $179/mo. Individual results vary.",
     type: "website",
   },
   robots: { index: true, follow: true },
@@ -20,200 +63,534 @@ export const metadata: Metadata = {
   },
 };
 
-const trustStats = [
-  { value: "18,000+", label: "Members served" },
-  { value: "4.9/5", label: "Average rating" },
-  { value: "79%", label: "Less than retail" },
-  { value: "1 biz day", label: "Typical provider review" },
+const heroStats = [
+  { value: "15-20%*", label: "Avg weight loss" },
+  { value: "All-in", label: "Med + care + coaching" },
+  { value: "$179/mo", label: "Starting at" },
+  { value: "18,000+", label: "Members" },
 ];
 
-const benefits = [
-  "Board-certified providers typically evaluate your profile within 1 business day",
-  "Medication ships free with 2-day delivery if prescribed",
-  "All-inclusive pricing — no hidden consult or pharmacy fees",
-  "Structured meal plans, progress tracking, and care team messaging included",
-  "Cancel, pause, or change plan anytime — no contracts",
-  "30-day money-back guarantee if you're not satisfied",
+const outcomeStats = [
+  {
+    value: "15-20%",
+    label: "Avg total body weight loss*",
+    sublabel: "Clinical-trial range for GLP-1 therapy over 12+ months.",
+  },
+  {
+    value: "94%",
+    label: "Would recommend",
+    sublabel: "Member survey — those who completed ≥3 months.",
+  },
+  {
+    value: "48 hrs",
+    label: "Typical shipping",
+    sublabel: "Free, discreet, to all 50 states where legally available.",
+  },
 ];
 
-export default function GLP1LandingPage() {
+const lpProblemCards = [
+  {
+    icon: Brain,
+    title: "Your Biology Isn't the Problem — Just Willpower Isn't the Answer",
+    description:
+      "Diets fail 95% of the time within 5 years. Your brain raises hunger signals and lowers metabolism to defend your weight. That's biology, not weakness.",
+  },
+  {
+    icon: Scale,
+    title: "The GLP-1 Landscape Is Overwhelming",
+    description:
+      "Ozempic. Wegovy. Mounjaro. Zepbound. Semaglutide. Tirzepatide. Compounded vs. brand. Most people don't know where to start — or who's trustworthy.",
+  },
+  {
+    icon: TrendingDown,
+    title: "You Don't Know Who to Trust",
+    description:
+      "Between shady online pharmacies and $1,349/mo brand retail, figuring out a legitimate, affordable path is harder than the weight loss itself.",
+  },
+] as const;
+
+const differentCards = [
+  {
+    icon: Sparkles,
+    title: "One Program, Everything Included",
+    description:
+      "Medication, licensed provider oversight, structured meal plans, progress tracking, and care-team messaging — all in one flat monthly price. No bolt-ons, no surprise charges.",
+  },
+  {
+    icon: Shield,
+    title: "Licensed, Legitimate, Supervised",
+    description:
+      "US-licensed providers issue every prescription. US state-licensed compounding pharmacies fill them. LegitScript-certified process — designed for patients who want a real program, not a shortcut.",
+  },
+  {
+    icon: Stethoscope,
+    title: "Real Human Care",
+    description:
+      "Your provider reviews your profile personally. Your care team answers messages in hours, not days. This isn't a vending machine — it's a supervised treatment program.",
+  },
+];
+
+const solutionCards = [
+  {
+    title: "GLP-1 Medication That Works With Your Biology",
+    description:
+      "GLP-1 receptor agonists reduce appetite signals in the brain, slow digestion, and support metabolic health. Food noise quiets. Portions feel naturally smaller. No willpower white-knuckling required.",
+  },
+  {
+    title: "Matched to the Right Molecule for You",
+    description:
+      "Your provider helps you choose: compounded semaglutide for most new patients, or compounded tirzepatide for those who need a dual-action approach. You're not stuck with a one-size-fits-all choice.",
+  },
+  {
+    title: "Real Support Around the Medication",
+    description:
+      "Meal plans, progress tracking, coaching, and messaging with a real care team. The medication does the heavy lifting — the program keeps you on track for the long run.",
+  },
+];
+
+// 6 milestones — general month-by-month expectations
+const journeyMilestones = [
+  {
+    month: "Day 1",
+    label: "Eligibility in 2 minutes",
+    description:
+      "Online assessment reviewed by a US-licensed provider — typically within 24 hours.",
+  },
+  {
+    month: "Week 1",
+    label: "Medication ships",
+    description:
+      "Your first dose arrives free in 48 hours. Video onboarding with your care team.",
+  },
+  {
+    month: "Month 1",
+    label: "Food noise fades",
+    description:
+      "Appetite signals soften. Portions feel naturally smaller. Most members lose first pounds.",
+  },
+  {
+    month: "Month 3",
+    label: "First 10-20 lbs",
+    description:
+      "Pants fit differently. Energy and sleep typically improve. Provider adjusts dose.",
+  },
+  {
+    month: "Month 6",
+    label: "Meaningful change, lab improvements",
+    description:
+      "Many members report better bloodwork (A1C, triglycerides, BP) alongside weight loss.",
+  },
+  {
+    month: "Month 12+",
+    label: "Maintenance plan",
+    description:
+      "Your provider builds a long-term dose and lifestyle plan for sustainability.",
+  },
+];
+
+const provider = {
+  name: "Dr. Emily Carter, MD",
+  credentials: "Board-certified, Internal Medicine · Obesity Medicine fellow · 12 years practice",
+  bio: "Most of my patients didn't fail at weight loss — they never got a real plan in the first place. A modern GLP-1 program is more than a prescription. It's medication matched to you, a real clinician who knows your chart, and support that doesn't disappear after you pay. That's what we built here.",
+  imagePrompt:
+    "Professional editorial headshot of a Caucasian female physician in her late-30s, shoulder-length brown hair with natural highlights, wearing a crisp white lab coat over a soft cream blouse, stethoscope around neck, warm genuine smile, softbox lighting, clean bright clinical background slightly blurred, direct trustworthy eye contact, Hasselblad quality, 1:1 aspect ratio.",
+};
+
+const priceColumns = [
+  {
+    name: "Brand-Name Wegovy / Ozempic",
+    price: "$1,349/mo",
+    priceSubtext: "retail cash-pay*",
+    features: [
+      { label: "FDA-approved", included: true },
+      { label: "Insurance coverage often denied or partial", included: false },
+      { label: "Ongoing shortages through 2025-2026", included: false },
+      { label: "Ongoing provider support built-in", included: false },
+      { label: "Structured meal plans included", included: false },
+      { label: "30-day money-back guarantee", included: false },
+    ],
+  },
+  {
+    name: "Nature's Journey Complete GLP-1 Program",
+    price: "$179/mo",
+    priceSubtext: "no insurance needed",
+    highlight: true,
+    features: [
+      { label: "Compounded GLP-1 medication (if prescribed)", included: true },
+      { label: "US-licensed provider oversight throughout", included: true },
+      { label: "Personalized meal plans + grocery lists", included: true },
+      { label: "Progress tracking + care-team messaging", included: true },
+      { label: "Free 2-day shipping to all 50 states (where legally available)", included: true },
+      { label: "30-day money-back guarantee", included: true },
+    ],
+    ctaLabel: "See If I Qualify →",
+    ctaHref: "/qualify",
+  },
+];
+
+const testimonials = [
+  {
+    name: "Marcus D.",
+    age: 44,
+    location: "Atlanta",
+    lbs: 39,
+    months: 5,
+    quote:
+      "My provider adjusts my plan every month. The meal plans made the biggest difference — I actually know what to eat now.",
+  },
+  {
+    name: "Jennifer L.",
+    age: 38,
+    location: "Austin",
+    lbs: 28,
+    months: 4,
+    quote:
+      "I was skeptical about telehealth, but my provider is more attentive than any doctor I've seen in person.",
+  },
+  {
+    name: "Robert K.",
+    age: 52,
+    location: "Denver",
+    lbs: 47,
+    months: 6,
+    quote:
+      "The all-inclusive pricing sealed it for me. No hidden fees, no insurance battles. Just a real program.",
+  },
+  {
+    name: "Amina S.",
+    age: 41,
+    location: "Phoenix",
+    lbs: 33,
+    months: 5,
+    quote:
+      "I didn't know where to start. The program guided me through which medication was right and handled everything else.",
+  },
+];
+
+// 10 FAQs — broad general-audience angle
+const faqs = [
+  {
+    question: "How do I know if GLP-1 is right for me?",
+    answer:
+      "Most adults with a BMI over 27 (with related health conditions) or over 30 may be candidates — but your provider makes the final call based on your complete health profile, medications, and history. The 2-minute assessment is free and the provider review tells you whether it's appropriate for you.",
+  },
+  {
+    question: "How does GLP-1 medication work?",
+    answer:
+      "GLP-1 receptor agonists mimic a natural hormone that regulates appetite and blood sugar. They help you feel satisfied with less food, quiet constant food cravings, and support sustained weight management when paired with diet, lifestyle, and provider oversight.",
+  },
+  {
+    question: "What's the difference between semaglutide and tirzepatide?",
+    answer:
+      "Semaglutide activates one receptor (GLP-1). Tirzepatide activates two (GLP-1 and GIP). Semaglutide is the most-studied GLP-1 and is usually the starting point. Tirzepatide is typically considered for patients who need stronger metabolic leverage or who plateau on semaglutide. Your provider recommends the right one.",
+  },
+  {
+    question: "What does the $179/mo include?",
+    answer:
+      "Everything: compounded GLP-1 medication (if prescribed), US-licensed provider evaluation and ongoing monitoring, personalized meal plans, progress tracking, care-team messaging, and free 2-day shipping. No hidden fees. Tirzepatide plans start at $379/mo.",
+  },
+  {
+    question: "Is it safe?",
+    answer:
+      "GLP-1 medications have been studied in tens of thousands of patients across clinical trials. Common side effects are mild and temporary — mild nausea, decreased appetite, digestive changes during initial titration. Your provider monitors your response and adjusts dosing. Not everyone is a candidate, which is why real medical review matters.",
+  },
+  {
+    question: "Is compounded medication legitimate?",
+    answer:
+      "Yes, when prescribed and dispensed correctly. US state-licensed 503A/503B compounding pharmacies are permitted to prepare compounded medications under individual prescriptions issued by licensed providers. Compounded medications are not FDA-approved brand-name drugs. Our program operates within that regulatory framework.",
+  },
+  {
+    question: "How quickly will I see results?",
+    answer:
+      "Most members notice reduced appetite and 'food noise' within 1-2 weeks. Visible weight loss typically begins within 4-6 weeks. Meaningful progress usually shows by month 3 and full therapeutic effect builds as your provider titrates the dose upward. Individual results vary.",
+  },
+  {
+    question: "Do I need insurance?",
+    answer:
+      "No. Our pricing is all-inclusive and flat monthly. No insurance. No prior authorizations. No pharmacy runs. That's part of why members find the program easier to stick with than navigating brand-name coverage.",
+  },
+  {
+    question: "What if I don't qualify?",
+    answer:
+      "Not everyone is a candidate for GLP-1 medication. If our providers determine it's not right for you based on safety or contraindications, you won't be charged for medication. The initial assessment is free and non-binding.",
+  },
+  {
+    question: "Can I cancel anytime?",
+    answer:
+      "Yes. You can cancel, pause, or change plans anytime — no long-term contracts. There is a 30-day money-back guarantee on your first month of medication.",
+  },
+];
+
+const internalLinks = [
+  {
+    title: "Semaglutide Weight Loss",
+    description: "Our most popular GLP-1 — same active ingredient as Ozempic and Wegovy.",
+    href: "/lp/semaglutide",
+  },
+  {
+    title: "Tirzepatide (Dual-Action)",
+    description: "Dual GLP-1/GIP option — for patients seeking stronger metabolic leverage.",
+    href: "/lp/tirzepatide",
+  },
+  {
+    title: "Ozempic Alternative",
+    description: "Compounded semaglutide at ~80% off retail — same active ingredient.",
+    href: "/lp/ozempic-alternative",
+  },
+  {
+    title: "Affordable Weight Loss Plans",
+    description: "Compare our plan tiers and find the right option for your budget.",
+    href: "/lp/affordable",
+  },
+  {
+    title: "Check Eligibility",
+    description: "2-minute assessment. Free. Provider review within 1 business day.",
+    href: "/qualify",
+  },
+  {
+    title: "See Pricing Plans",
+    description: "Essential, Premium, Complete — compare what's included at each tier.",
+    href: "/pricing",
+  },
+] as const;
+
+export default function Glp1LandingPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Minimal header — no navigation to reduce distraction */}
-      <header className="border-b border-navy-100/40 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal to-atlantic">
-              <span className="text-xs font-bold text-white">NJ</span>
-            </div>
-            <span className="text-sm font-bold text-navy">Nature&apos;s Journey</span>
-          </div>
-          <div className="flex items-center gap-4 text-xs text-graphite-400">
-            <a href="tel:18885092745" className="flex items-center gap-1.5 hover:text-navy transition-colors">
-              <span className="font-medium">(888) 509-2745</span>
-            </a>
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-              <span>HIPAA Compliant</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <LpHeader
+        badgeText="Complete GLP-1 Program"
+        badgeIcon={Sparkles}
+        badgeIconColor="text-cyan-600"
+      />
 
-      {/* Hero — conversion focused, single CTA */}
-      <section className="bg-gradient-to-b from-cloud to-white py-12 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-4 py-1.5">
-            <Clock className="h-3.5 w-3.5 text-teal" />
-            <span className="text-xs font-semibold text-teal">Same-day provider evaluations available</span>
-          </div>
+      {/* ======================================================================
+          HERO
+          AI-IMAGE PROMPT (hero right-side portrait — optional enhancement)
+          Aspect ratio: 4:5
+          "Editorial photograph of a warm approachable woman in her early-40s,
+           shoulder-length medium-brown hair, simple cream sweater, standing
+           in a bright kitchen holding a cup of tea, natural window light,
+           genuine relaxed smile, clean warm-neutral palette, shallow depth
+           of field, Leica Q2. No logos, no branded medication, no fitness
+           iconography."
+          ====================================================================== */}
+      <LpHeroBlock
+        badge="Accepting new patients — same-day evaluation"
+        headline="Your complete GLP-1 weight-loss program —"
+        headlineAccent="Medication, care, coaching. From $179/mo."
+        subtitle="Not just medication — a supervised program. US-licensed providers, personalized meal plans, care-team messaging, and compounded GLP-1 delivered to your door. 2-minute eligibility. Individual results vary."
+        stats={heroStats}
+        ctaLocation="glp1-hero"
+      />
 
-          <h1 className="text-3xl font-bold tracking-tight text-navy sm:text-4xl lg:text-5xl">
-            GLP-1 Weight Loss Medication
-            <br />
-            <span className="bg-gradient-to-r from-teal to-atlantic bg-clip-text text-transparent">
-              From $279/month
-            </span>
-          </h1>
+      <LpSocialProofBar />
 
-          <p className="mx-auto mt-5 max-w-xl text-lg text-graphite-500">
-            Same active ingredient as Ozempic &amp; Wegovy — prescribed online by licensed
-            providers. Free 2-day shipping. Cancel anytime.
+      {/* Real program-outcome numbers band */}
+      <LpOutcomeStats
+        stats={outcomeStats}
+        heading="What members actually see"
+        subheading="Program outcomes, not marketing numbers."
+      />
+
+      {/* Problem Section */}
+      <LpProblemSection
+        eyebrow="WHERE DO I EVEN START"
+        heading="GLP-1 works. Finding a real program shouldn't be this hard."
+        cards={lpProblemCards}
+        transitionText="We built one program that handles medication, care, and support — in one place, at one price."
+        ctaLocation="problem-glp1"
+      />
+
+      {/* Why Our Program Is Different */}
+      <section className="py-14">
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            Why our GLP-1 program is different
+          </h2>
+          <p className="text-center text-sm text-lp-body mb-10">
+            Complete, licensed, supervised. Not a vending machine — a real program.
           </p>
-
-          {/* Price anchor */}
-          <div className="mt-6 inline-flex items-center gap-3 rounded-full bg-navy-50 px-6 py-2">
-            <span className="text-sm text-graphite-400 line-through">$1,349/mo retail</span>
-            <span className="text-lg font-bold text-navy">$279/mo</span>
-            <span className="rounded-full bg-teal px-2.5 py-0.5 text-xs font-bold text-white">Save 79%</span>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {differentCards.map((card) => (
+              <Card key={card.title}>
+                <CardContent className="p-5">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-xl mb-3"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <card.icon className="h-5 w-5" style={{ color: "var(--lp-icon)" }} />
+                  </div>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-lp-body leading-relaxed">
+                    {card.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+        </div>
+      </section>
 
-          <div className="mt-8">
-            <Link href="/qualify">
-              <Button size="xl" className="gap-2 px-12 h-16 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]">
-                See If I Qualify — Free Assessment
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="mt-3 text-xs text-graphite-400">Takes 2 minutes. No commitment. HIPAA protected.</p>
-          </div>
-
-          {/* Trust stats */}
-          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {trustStats.map((stat) => (
-              <div key={stat.label} className="rounded-xl border border-navy-100/40 bg-white p-3 text-center shadow-sm">
-                <p className="text-lg font-bold text-navy">{stat.value}</p>
-                <p className="text-[10px] text-graphite-400">{stat.label}</p>
+      {/* How GLP-1 Solves It */}
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-2">
+            How a complete GLP-1 program solves it
+          </h2>
+          <p className="text-center text-sm text-lp-body mb-10">
+            Medication is the tool. Program is what makes it work.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {solutionCards.map((card) => (
+              <div
+                key={card.title}
+                className="rounded-xl border bg-white p-5"
+                style={{ borderColor: "var(--lp-card-border)" }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <div
+                    className="flex h-6 w-6 items-center justify-center rounded-full"
+                    style={{ backgroundColor: "var(--lp-icon-bg)" }}
+                  >
+                    <Check className="h-3.5 w-3.5" style={{ color: "var(--lp-icon)" }} />
+                  </div>
+                  <h3 className="text-sm font-bold text-lp-heading">
+                    {card.title}
+                  </h3>
+                </div>
+                <p className="text-xs text-lp-body leading-relaxed">
+                  {card.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Social proof bar */}
-      <section className="border-y border-navy-100/40 bg-navy-50/30 py-3">
-        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-6 px-4 text-xs text-graphite-500">
-          <span className="flex items-center gap-1"><Star className="h-3 w-3 text-gold fill-gold" /> Rated 4.9/5 by 2,400+ members</span>
-          <span className="flex items-center gap-1"><Users className="h-3 w-3 text-teal" /> 142 started this week</span>
-          <span className="flex items-center gap-1"><Truck className="h-3 w-3 text-navy" /> Free 2-day shipping</span>
-        </div>
-      </section>
+      {/* Mid CTA */}
+      <LpMidCta
+        headline="Ready to start a real GLP-1 program?"
+        subtext="Free 2-minute assessment. Licensed providers. No commitment."
+        location="mid-glp1"
+      />
 
-      {/* Benefits */}
-      <section className="py-12 sm:py-16">
-        <div className="mx-auto max-w-2xl px-4">
-          <h2 className="text-2xl font-bold text-navy text-center mb-8">Everything included in your membership</h2>
-          <div className="space-y-3">
-            {benefits.map((b) => (
-              <div key={b} className="flex items-start gap-3 rounded-xl bg-teal-50/30 p-4">
-                <Check className="h-5 w-5 text-teal shrink-0 mt-0.5" />
-                <span className="text-sm text-navy">{b}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Journey roadmap */}
+      <LpJourneyRoadmap
+        milestones={journeyMilestones}
+        heading="What to expect, month by month"
+        subheading="Most members follow a similar arc — your provider adapts the pace to you."
+      />
+
+      {/* Price comparison */}
+      <LpPriceCompare
+        columns={priceColumns}
+        heading="Same active ingredient. A complete program. Lower price."
+        subheading="Access to a real GLP-1 program shouldn't depend on your insurance."
+      />
+
+      {/* Provider authority anchor */}
+      <LpProviderCredential
+        provider={provider}
+        heading="Every plan is overseen by a real clinician"
+      />
 
       {/* Testimonials */}
-      <section className="bg-navy-50/30 py-12">
+      <section className="py-14" style={{ backgroundColor: "var(--lp-section-alt)" }}>
         <div className="mx-auto max-w-4xl px-4">
-          <h2 className="text-2xl font-bold text-navy text-center mb-8">What Our Members Say</h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { name: "Marcus D.", age: 44, location: "Atlanta, GA", lbs: 39, months: 5, quote: "My provider adjusts my plan every month. The meal plans made the biggest difference — I actually know what to eat now." },
-              { name: "Jennifer L.", age: 38, location: "Austin, TX", lbs: 28, months: 4, quote: "I was skeptical about telehealth, but my provider is more attentive than any doctor I've seen in person." },
-              { name: "Robert K.", age: 52, location: "Denver, CO", lbs: 47, months: 6, quote: "The all-inclusive pricing sealed it for me. No hidden fees, no insurance battles. Just results." },
-            ].map((t) => (
-              <div key={t.name} className="rounded-xl border border-navy-100/40 bg-white p-5 shadow-sm">
-                <div className="flex gap-0.5 mb-2">
-                  {[1,2,3,4,5].map((i) => <Star key={i} className="h-3.5 w-3.5 text-gold fill-gold" />)}
-                </div>
-                <p className="text-xs text-graphite-600 italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
-                <div className="mt-3 flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold text-navy">{t.name}, {t.age}</p>
-                    <p className="text-[10px] text-graphite-400">{t.location}</p>
+          <h2 className="text-2xl font-bold text-lp-heading text-center mb-8">
+            What our members say
+          </h2>
+          {/* AI-IMAGE PROMPT (optional — testimonial avatars)
+              Aspect ratio: 1:1
+              "Four photorealistic headshot portraits, diverse men and women ages
+               35-55, soft natural window light, genuine expressions, neutral
+               backgrounds in warm cream and soft-blue tones, editorial
+               photojournalism style, candid not posed, Sony A7R 85mm f/1.8.
+               No logos, no medical branding, no fitness gear."
+          */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {testimonials.map((t) => (
+              <Card key={t.name}>
+                <CardContent className="p-5">
+                  <div className="flex gap-0.5 mb-2">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <Star
+                        key={i}
+                        className="h-3.5 w-3.5 text-gold fill-gold"
+                      />
+                    ))}
                   </div>
-                  <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold text-teal">-{t.lbs} lbs</span>
-                </div>
-              </div>
+                  <p className="text-xs text-lp-body italic leading-relaxed">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-lp-heading">
+                        {t.name}, {t.age}
+                      </p>
+                      <p className="text-[10px] text-lp-body-muted">
+                        {t.location}
+                      </p>
+                    </div>
+                    <Badge
+                      className="text-[10px]"
+                      style={{
+                        backgroundColor: "var(--lp-badge-bg)",
+                        color: "var(--lp-badge-text)",
+                      }}
+                    >
+                      -{t.lbs} lbs / {t.months}mo
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
-          <p className="mt-4 text-center text-[10px] text-graphite-400">Verified members. Individual results vary.</p>
+          <p className="mt-4 text-center text-[10px] text-lp-body-muted">
+            Verified members. Individual results vary. Compounded medications are not FDA-approved.
+          </p>
         </div>
       </section>
 
       {/* FAQ */}
       <LpFaq
-        faqs={[
-          { question: "How does GLP-1 medication work?", answer: "GLP-1 receptor agonists mimic a natural hormone that regulates appetite and blood sugar. They help you feel satisfied with less food, reduce cravings, and support sustained weight management when combined with lifestyle changes." },
-          { question: "What does the $279/mo include?", answer: "Everything. Provider evaluation and ongoing monitoring, GLP-1 medication (if prescribed), personalized meal plans, progress tracking, care team messaging, and free 2-day shipping. No hidden fees." },
-          { question: "How quickly will I see results?", answer: "Most members notice reduced appetite within 1-2 weeks. Visible weight loss typically begins within 4-6 weeks. Average weight loss in clinical studies is 15-20% of body weight over the treatment period." },
-          { question: "Is it safe?", answer: "GLP-1 medications have been extensively studied. Common side effects are mild and temporary: nausea, decreased appetite, and digestive changes during the initial titration period. Your provider monitors your progress throughout." },
-          { question: "What if I don't qualify?", answer: "Not everyone is a candidate for GLP-1 medication. If our providers determine it's not right for you, you won't be charged. The initial assessment is completely free." },
-        ]}
+        faqs={faqs}
+        heading="GLP-1 program: your questions"
+        subheading="Everything you need to know about our complete GLP-1 weight-loss program."
       />
 
+      {/* Internal Links */}
+      <LpInternalLinks heading="Keep exploring" links={internalLinks} />
+
       {/* Final CTA */}
-      <section className="py-12 sm:py-16">
-        <div className="mx-auto max-w-xl px-4 text-center">
-          <h2 className="text-2xl font-bold text-navy">
-            Start losing weight with medical support
-          </h2>
-          <p className="mt-3 text-sm text-graphite-500">
-            Free 2-minute assessment. Provider typically reviews within 1 business day.
-            Medication ships free if prescribed.
-          </p>
-          <div className="mt-6">
-            <Link href="/qualify">
-              <Button size="xl" className="gap-2 px-12 h-14 text-lg">
-                See If I Qualify <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-graphite-400">
-            <span className="flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> 30-day money-back guarantee</span>
-            <span className="flex items-center gap-1"><Check className="h-3.5 w-3.5 text-teal" /> No commitment required</span>
-            <span className="flex items-center gap-1"><Check className="h-3.5 w-3.5 text-teal" /> HIPAA protected</span>
-          </div>
-        </div>
-      </section>
+      <LpCtaSection headline="Start your complete GLP-1 program today" />
 
-      {/* Minimal footer */}
-      <footer className="border-t border-navy-100/40 py-6 text-center text-[10px] text-graphite-400">
-        <p>Nature&apos;s Journey Health &middot; Compounded medications from licensed 503A/503B pharmacies &middot; Not FDA-approved</p>
-        <p className="mt-1">Eligibility determined by licensed providers. Individual results vary.</p>
-      </footer>
+      <LpFooter />
 
-      <MedicalWebPageJsonLd name="GLP-1 Weight Management Program" description="Provider-guided GLP-1 weight loss medication prescribed online. All-inclusive from $279/mo." url="/lp/glp1" />
-      <FAQPageJsonLd faqs={[
-        { question: "How does GLP-1 medication work?", answer: "GLP-1 receptor agonists mimic a natural hormone that regulates appetite and blood sugar." },
-        { question: "What does the $279/mo include?", answer: "Provider evaluation, medication if prescribed, meal plans, progress tracking, and free shipping." },
-        { question: "How quickly will I see results?", answer: "Most members notice reduced appetite within 1-2 weeks. Visible weight loss typically begins within 4-6 weeks." },
-        { question: "Is it safe?", answer: "GLP-1 medications have been extensively studied. Common side effects are mild and temporary." },
-        { question: "What if I don't qualify?", answer: "If our providers determine it's not right for you, you won't be charged. The assessment is free." },
-      ]} />
-      <ProductJsonLd name="GLP-1 Weight Management Program" description="All-inclusive GLP-1 weight loss program with provider, medication, and support" price={279} url="/lp/glp1" />
+      {/* JSON-LD */}
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "GLP-1 Program", href: "/lp/glp1" },
+        ]}
+      />
+      <HowToJsonLd
+        name="How to Start a GLP-1 Weight-Loss Program Online"
+        description="Three simple steps to start a complete GLP-1 program through Nature's Journey."
+        steps={[
+          { title: "Complete a Free Assessment", description: "Answer a 2-minute health questionnaire. No payment required." },
+          { title: "Provider Evaluation", description: "A licensed provider reviews your profile within 1 business day." },
+          { title: "Medication Delivered", description: "If prescribed, your GLP-1 ships to your door with free 2-day delivery." },
+        ]}
+      />
+      <MedicalWebPageJsonLd
+        name="Complete GLP-1 Weight-Loss Program Online"
+        description="Provider-guided GLP-1 weight loss with medication, meal plans, and coaching. From $179/mo. Individual results vary."
+        url="/lp/glp1"
+      />
+      <FAQPageJsonLd faqs={faqs} />
       <LpConversionWidgets />
     </div>
   );

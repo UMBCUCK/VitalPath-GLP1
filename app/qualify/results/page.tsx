@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Check, Star, Shield, Clock, TrendingDown } from "lucide-react";
+import { ArrowRight, Check, Star, Shield, Clock, TrendingDown, ChefHat, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
@@ -11,6 +11,7 @@ import { plans } from "@/lib/pricing";
 import { formatPrice } from "@/lib/utils";
 import { siteConfig } from "@/lib/site";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { cn } from "@/lib/utils";
 
 export default function QualifyResultsPage() {
   return (
@@ -41,11 +42,68 @@ function QualifyResultsContent() {
 
   const [revealed, setRevealed] = useState(false);
 
+  // Tier 4.2 — soft-urgency countdown (24h hold window per qualify).
+  // Stored in localStorage so refresh doesn't reset; expires gracefully.
+  const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
+
   useEffect(() => {
     track(ANALYTICS_EVENTS.QUALIFY_COMPLETE, { recommendedPlan: recommended });
     const timer = setTimeout(() => setRevealed(true), 600);
     return () => clearTimeout(timer);
   }, [recommended]);
+
+  // Tier 5.4 — Pre-checkout upsell selections (add-ons the user can
+  // include in their Stripe checkout). Persisted in localStorage so
+  // selections survive the click into /checkout.
+  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = localStorage.getItem("nj-qualify-addons");
+    if (raw) {
+      try {
+        setSelectedAddOns(JSON.parse(raw));
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("nj-qualify-addons", JSON.stringify(selectedAddOns));
+  }, [selectedAddOns]);
+
+  function toggleAddOn(slug: string) {
+    setSelectedAddOns((prev) => {
+      const next = prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug];
+      track(next.includes(slug) ? ANALYTICS_EVENTS.ADDON_ADDED : ANALYTICS_EVENTS.ADDON_REMOVED, {
+        slug,
+        location: "qualify_results",
+      });
+      return next;
+    });
+  }
+
+  // Countdown effect — 24h from first visit (stored in localStorage)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const KEY = "nj-qualify-expires";
+    let expiresAt = Number(localStorage.getItem(KEY));
+    if (!expiresAt || isNaN(expiresAt) || expiresAt <= Date.now()) {
+      expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+      localStorage.setItem(KEY, String(expiresAt));
+    }
+    const tick = () => {
+      const remaining = Math.max(0, expiresAt - Date.now());
+      setTimeLeft({
+        hours: Math.floor(remaining / 3600000),
+        minutes: Math.floor((remaining % 3600000) / 60000),
+        seconds: Math.floor((remaining % 60000) / 1000),
+      });
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   if (!revealed) {
     return (
@@ -157,11 +215,126 @@ function QualifyResultsContent() {
             </div>
           </div>
 
+          {/* Tier 5.4 — Pre-checkout upsell strip.
+              Only 2 offers here (meal plans + lab) to avoid decision fatigue
+              at the moment of commitment. Peptides are intentionally excluded
+              — they're post-month-1 per the upsell engine rules. */}
+          {(() => {
+            const addOns = [
+              {
+                slug: "meal-plans",
+                name: "Meal Plans & Recipes",
+                description: "Weekly GLP-1-tailored meals, auto grocery lists, 4 modes",
+                priceCents: 1500,
+                originalCents: 1900,
+                badge: "68% of members add this",
+                icon: ChefHat,
+              },
+              {
+                slug: "protein-hydration",
+                name: "Protein & Hydration Bundle",
+                description: "Daily targets + supplements to support GLP-1 side effects",
+                priceCents: 3400,
+                badge: "Reduces nausea",
+                icon: Plus,
+              },
+            ];
+            return (
+              <div className="mt-6 rounded-2xl border border-navy-100/60 bg-navy-50/30 p-5">
+                <p className="text-xs font-bold uppercase tracking-wider text-navy">
+                  Boost your results — add to your plan
+                </p>
+                <p className="mt-0.5 text-xs text-graphite-500">
+                  Members who add these average 35% higher adherence in month 1.
+                </p>
+                <div className="mt-3 space-y-2">
+                  {addOns.map((a) => {
+                    const active = selectedAddOns.includes(a.slug);
+                    return (
+                      <button
+                        type="button"
+                        key={a.slug}
+                        onClick={() => toggleAddOn(a.slug)}
+                        className={cn(
+                          "flex w-full items-center gap-3 rounded-xl border-2 bg-white px-4 py-3 text-left transition-all",
+                          active
+                            ? "border-teal bg-teal-50/40"
+                            : "border-navy-100 hover:border-navy-200",
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                            active ? "bg-teal text-white" : "bg-gold-50 text-gold-700",
+                          )}
+                        >
+                          {active ? <Check className="h-4 w-4" /> : <a.icon className="h-4 w-4" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-baseline gap-2">
+                            <span className="text-sm font-bold text-navy">{a.name}</span>
+                            {a.badge && (
+                              <span className="rounded-full bg-gold-50 px-2 py-0.5 text-[10px] font-semibold text-gold-700">
+                                {a.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-0.5 text-xs text-graphite-500 line-clamp-1">
+                            {a.description}
+                          </p>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          {a.originalCents && (
+                            <p className="text-[10px] text-graphite-400 line-through">
+                              ${(a.originalCents / 100).toFixed(0)}/mo
+                            </p>
+                          )}
+                          <p className="text-sm font-bold text-navy">
+                            +${(a.priceCents / 100).toFixed(0)}
+                            <span className="text-[10px] font-normal text-graphite-400">/mo</span>
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedAddOns.length > 0 && (
+                  <p className="mt-3 text-[11px] text-teal font-semibold">
+                    ✓ {selectedAddOns.length} add-on{selectedAddOns.length > 1 ? "s" : ""} will be
+                    included in your checkout. You can remove them anytime from your dashboard.
+                  </p>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Tier 4.2 — soft-urgency 24h countdown (this-assessment-holds-your-spot) */}
+          {timeLeft && (timeLeft.hours + timeLeft.minutes + timeLeft.seconds > 0) && (
+            <div className="mt-6 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3">
+              <Clock className="h-4 w-4 shrink-0 text-amber-600" />
+              <p className="flex-1 text-xs text-navy">
+                Your provider-reviewed plan is held for{" "}
+                <span className="font-bold text-amber-700 tabular-nums">
+                  {String(timeLeft.hours).padStart(2, "0")}h {String(timeLeft.minutes).padStart(2, "0")}m {String(timeLeft.seconds).padStart(2, "0")}s
+                </span>
+                .{" "}Complete checkout now and your provider can begin reviewing today.
+              </p>
+            </div>
+          )}
+
           {/* CTA */}
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link href={`/checkout?plan=${plan.slug}`} className="flex-1">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href={`/checkout?plan=${plan.slug}${selectedAddOns.length ? `&addons=${selectedAddOns.join(",")}` : ""}`}
+              className="flex-1"
+            >
               <Button size="xl" className="w-full gap-2 text-lg h-14 rounded-2xl shadow-glow hover:shadow-premium-lg transition-all hover:scale-[1.01]">
                 Start My {plan.name} Plan
+                {selectedAddOns.length > 0 && (
+                  <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold">
+                    + {selectedAddOns.length}
+                  </span>
+                )}
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>

@@ -61,7 +61,7 @@ export function ComparisonSection() {
                   </th>
                   <th className="bg-teal-50/50 p-4 text-center">
                     <div className="text-sm font-bold text-teal">Nature's Journey</div>
-                    <div className="text-xs text-graphite-400">From $279/mo</div>
+                    <div className="text-xs text-graphite-400">From $179/mo</div>
                   </th>
                   <th className="p-4 text-center">
                     <div className="text-sm font-semibold text-graphite-500">Brand-Name GLP-1</div>
@@ -115,7 +115,7 @@ export function ComparisonSection() {
               Save up to $12,840/year
             </p>
             <p className="mt-2 text-sm text-teal-100">
-              compared to brand-name GLP-1 retail pricing ($1,349/mo &times; 12 = $16,188 vs Nature's Journey at $279/mo &times; 12 = $3,348)
+              compared to brand-name GLP-1 retail pricing ($1,349/mo &times; 12 = $16,188 vs Nature's Journey at $179/mo &times; 12 = $3,348)
             </p>
             <Link href="/qualify" className="mt-4 inline-block">
               <Button variant="gold" className="gap-2">

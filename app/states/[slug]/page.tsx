@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: richContent?.metaTitle ?? `GLP-1 Weight Loss in ${state.name} — Online Treatment Available`,
     description:
       richContent?.metaDescription ??
-      `Get GLP-1 weight loss medication in ${state.name} through telehealth. Licensed providers, compounded semaglutide from $279/mo, free 2-day shipping to ${state.code}. No clinic visits needed.`,
+      `Get GLP-1 weight loss medication in ${state.name} through telehealth. Licensed providers, compounded semaglutide from $179/mo, free 2-day shipping to ${state.code}. No clinic visits needed.`,
     openGraph: {
       title: richContent?.metaTitle ?? `GLP-1 Weight Loss Treatment in ${state.name} | Nature's Journey`,
       description:
@@ -66,7 +66,7 @@ export default async function StatePage({ params }: PageProps) {
     },
     {
       question: `How much does GLP-1 treatment cost in ${state.name}?`,
-      answer: `Nature's Journey plans in ${state.name} start at $279/month — including provider evaluation, medication, and support. Brand-name alternatives (Wegovy, Zepbound) cost $1,000–$1,349/month without insurance. Compounded GLP-1 through telehealth programs typically saves 70–80% compared to retail.`,
+      answer: `Nature's Journey plans in ${state.name} start at $179/month — including provider evaluation, medication, and support. Brand-name alternatives (Wegovy, Zepbound) cost $1,000–$1,349/month without insurance. Compounded GLP-1 through telehealth programs typically saves 70–80% compared to retail.`,
     },
     {
       question: `What GLP-1 medications are available in ${state.name}?`,
@@ -198,7 +198,7 @@ export default async function StatePage({ params }: PageProps) {
 
           <div className="mt-10 mx-auto max-w-3xl grid gap-4 sm:grid-cols-3">
             {[
-              { name: "Essential", price: "$279", features: ["Provider evaluation", "GLP-1 medication", "Free 2-day shipping", "Monthly check-ins"] },
+              { name: "Essential", price: "$179", features: ["Provider evaluation", "GLP-1 medication", "Free 2-day shipping", "Monthly check-ins"] },
               { name: "Premium", price: "$379", highlight: true, features: ["Everything in Essential", "Weekly meal plans", "Bi-weekly coaching", "Progress tracking"] },
               { name: "Complete", price: "$599", features: ["Everything in Premium", "Weekly coaching", "Supplement bundles", "Lab coordination"] },
             ].map((plan) => (
@@ -336,7 +336,7 @@ export default async function StatePage({ params }: PageProps) {
               <p>
                 Our program includes a licensed provider evaluation, compounded GLP-1 medication
                 (semaglutide) if prescribed, free 2-day shipping anywhere in {state.name}, and ongoing
-                clinical support. Plans start at $279/month — up to 79% less than brand-name
+                clinical support. Plans start at $179/month — up to 79% less than brand-name
                 GLP-1 medications like Ozempic ($935+/mo) or Wegovy ($1,349+/mo).
               </p>
               <p>

@@ -349,7 +349,7 @@ function EmbedCalculatorInner() {
               >
                 <p className="text-lg font-bold">Ready to start your weight loss journey?</p>
                 <p className="text-sm text-white/70 mt-1 mb-4">
-                  GLP-1 medication from $279/mo &middot; Licensed providers &middot; Delivered to your door
+                  GLP-1 medication from $179/mo &middot; Licensed providers &middot; Delivered to your door
                 </p>
                 <a href={ctaUrl} target="_blank" rel="noopener noreferrer">
                   <Button size="lg" className="bg-white text-navy hover:bg-white/90 gap-2 text-base px-8">

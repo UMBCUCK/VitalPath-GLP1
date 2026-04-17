@@ -208,12 +208,18 @@ export async function POST(req: NextRequest) {
           safeError("[Webhook] Lifecycle welcome email failed", lifecycleErr);
         }
 
-        // Meta CAPI: Purchase event for ROAS optimization
+        // Meta CAPI: Purchase event for ROAS optimization.
+        // Tier 5.1 — add phone (from user) for advanced matching.
         try {
           const userAgent = req.headers.get("user-agent") || undefined;
           const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || undefined;
+          const userForMatch = await db.user.findUnique({
+            where: { email },
+            select: { phone: true },
+          });
           await trackServerEvent("Purchase", {
             email,
+            phone: userForMatch?.phone || undefined,
             userAgent,
             ip,
           }, {

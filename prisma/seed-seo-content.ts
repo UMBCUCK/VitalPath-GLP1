@@ -47,7 +47,7 @@ async function main() {
 
 <h2>Cost Comparison</h2>
 <p>Brand-name versions of both medications can cost $1,000-$1,500+ per month without insurance. Compounded versions, prescribed by licensed providers and prepared by state-licensed pharmacies, offer a significantly more affordable option.</p>
-<p>At Nature's Journey, plans including compounded medication start at <strong>$279/month</strong> — up to 79% less than brand-name pricing.</p>
+<p>At Nature's Journey, plans including compounded medication start at <strong>$179/month</strong> — up to 79% less than brand-name pricing.</p>
 
 <h2>How Providers Choose Between Them</h2>
 <p>Your provider evaluates several factors when recommending a medication:</p>
@@ -69,7 +69,7 @@ async function main() {
       title: "How Much Does GLP-1 Weight Loss Medication Cost Without Insurance?",
       slug: "glp1-weight-loss-cost-without-insurance",
       seoTitle: "GLP-1 Medication Cost Without Insurance: Complete 2026 Price Guide",
-      seoDescription: "What does GLP-1 weight loss medication cost without insurance? Compare Ozempic, Wegovy, Mounjaro, and compounded options. Plans from $279/mo vs $1,349+ retail.",
+      seoDescription: "What does GLP-1 weight loss medication cost without insurance? Compare Ozempic, Wegovy, Mounjaro, and compounded options. Plans from $179/mo vs $1,349+ retail.",
       excerpt: "Brand-name GLP-1 medications can cost over $1,300/month. Here's a transparent breakdown of every option — and how compounded alternatives make treatment accessible.",
       category: "education",
       tags: JSON.stringify(["cost", "pricing", "insurance", "ozempic", "wegovy", "affordable"]),
@@ -94,7 +94,7 @@ async function main() {
 <p>Compounded medications are prepared by state-licensed 503A and 503B pharmacies using the same active ingredients. While not FDA-approved, they are legal, regulated, and prescribed by licensed medical providers after clinical evaluation.</p>
 <p><strong>Compounded semaglutide programs typically cost $200-$500/month</strong> — a fraction of brand-name pricing.</p>
 
-<h2>What's Included in Nature's Journey's $279/Month Plan?</h2>
+<h2>What's Included in Nature's Journey's $179/Month Plan?</h2>
 <p>Unlike standalone pharmacy pricing, Nature's Journey's Essential plan includes:</p>
 <ul>
 <li>Licensed provider evaluation and ongoing care</li>
@@ -259,7 +259,7 @@ async function main() {
 <tr><td>Invasiveness</td><td>Weekly injection</td><td>Major surgery</td></tr>
 <tr><td>Recovery time</td><td>None</td><td>2-6 weeks</td></tr>
 <tr><td>Reversibility</td><td>Fully reversible (stop medication)</td><td>Mostly irreversible</td></tr>
-<tr><td>Typical cost</td><td>$279-$599/month</td><td>$15,000-$35,000 (one-time)</td></tr>
+<tr><td>Typical cost</td><td>$179-$599/month</td><td>$15,000-$35,000 (one-time)</td></tr>
 <tr><td>Hospital stay</td><td>None</td><td>1-3 days</td></tr>
 <tr><td>Anesthesia</td><td>None</td><td>General anesthesia</td></tr>
 </tbody>
@@ -812,7 +812,7 @@ async function main() {
       heroDescription: "Two powerful approaches to significant weight loss — with very different trade-offs.",
       features: JSON.stringify([
         { feature: "Average weight loss", us: "15-22%", them: "25-35%" },
-        { feature: "Monthly cost", us: "$279-$599", them: "$15,000-$35,000 (one-time)" },
+        { feature: "Monthly cost", us: "$179-$599", them: "$15,000-$35,000 (one-time)" },
         { feature: "Recovery time", us: "None", them: "2-6 weeks" },
         { feature: "Invasiveness", us: "Weekly injection", them: "Major surgery" },
         { feature: "Reversible", us: true, them: false },
@@ -848,7 +848,7 @@ async function main() {
         { feature: "Progress tracking", us: true, them: true },
         { feature: "Community support", us: "Care team messaging", them: "Group meetings" },
         { feature: "Average weight loss", us: "15-22%", them: "3-5%" },
-        { feature: "Monthly cost", us: "From $279", them: "From $23" },
+        { feature: "Monthly cost", us: "From $179", them: "From $23" },
         { feature: "Addresses hunger biology", us: true, them: false },
       ]),
       keyDifferences: JSON.stringify([
@@ -877,7 +877,7 @@ async function main() {
         { feature: "Progress photo vault", us: true, them: false },
         { feature: "Hydration/protein tracking", us: true, them: false },
         { feature: "Grocery list generator", us: true, them: false },
-        { feature: "Starting price", us: "$279/mo", them: "$145/mo" },
+        { feature: "Starting price", us: "$179/mo", them: "$145/mo" },
       ]),
       keyDifferences: JSON.stringify([
         "Nature's Journey includes comprehensive nutrition and lifestyle support",

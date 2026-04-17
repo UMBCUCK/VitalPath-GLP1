@@ -78,7 +78,7 @@ export function CtaSection() {
         <div className="mt-10 mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
           <p className="text-sm text-white/70">Plans starting at</p>
           <p className="text-3xl font-bold text-white">
-            $279<span className="text-lg font-normal text-white/50">/month</span>
+            $179<span className="text-lg font-normal text-white/50">/month</span>
           </p>
           <p className="mt-1 text-sm text-white/40 line-through">$1,349/mo brand-name retail</p>
           <p className="mt-2 text-xs text-teal-300 font-semibold">Save up to 79%</p>

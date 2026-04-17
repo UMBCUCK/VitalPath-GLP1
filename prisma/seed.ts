@@ -291,6 +291,18 @@ async function main() {
     { name: "Meal Plans & Recipes", slug: "meal-plans", type: "CONTENT" as const, category: "MEAL_PLANS" as const, priceMonthly: 1900, isAddon: true, sortOrder: 13 },
     { name: "Premium Coaching", slug: "coaching-upgrade", type: "COACHING" as const, category: "COACHING" as const, priceMonthly: 4900, isAddon: true, sortOrder: 14 },
     { name: "Lab Membership", slug: "lab-membership", type: "LAB" as const, category: "LABS" as const, priceMonthly: 2900, isAddon: true, sortOrder: 15 },
+
+    // ─── HEALTHY_AGING — peptide & anti-aging marketplace (Tier 3.1) ─────────
+    // Secondary revenue stream for active members. All require provider
+    // evaluation + compounding pharmacy fulfillment through the existing
+    // OpenLoop telehealth + 503A/503B pharmacy adapters (no new vendor).
+    // Marketed ONLY to approved, subscribed members (see /dashboard/shop gate).
+    { name: "NAD+ Injection", slug: "nad-plus", type: "ADDON" as const, category: "HEALTHY_AGING" as const, priceMonthly: 14900, isAddon: true, isMarketplace: true, marketplaceOrder: 1, marketplaceDesc: "Cellular energy and metabolic support. Weekly subcutaneous injection.", sortOrder: 20, features: ["Supports cellular energy production", "May improve mental clarity and focus", "Weekly self-administered injection", "Provider-supervised dosing protocol"], badge: "Popular" },
+    { name: "Sermorelin (GHRH)", slug: "sermorelin", type: "ADDON" as const, category: "HEALTHY_AGING" as const, priceMonthly: 19900, isAddon: true, isMarketplace: true, marketplaceOrder: 2, marketplaceDesc: "Growth hormone releasing hormone. Nightly injection to support sleep quality and recovery.", sortOrder: 21, features: ["Supports natural growth hormone release", "Nightly subcutaneous injection", "May improve sleep quality", "Supports lean muscle and recovery"] },
+    { name: "Ipamorelin / CJC-1295", slug: "ipamorelin-cjc", type: "ADDON" as const, category: "HEALTHY_AGING" as const, priceMonthly: 22900, isAddon: true, isMarketplace: true, marketplaceOrder: 3, marketplaceDesc: "Dual-peptide stack for body composition and anti-aging support.", sortOrder: 22, features: ["Synergistic peptide combination", "Supports body composition goals", "Daily injection protocol", "Customizable dosing schedule"], badge: "Best Value" },
+    { name: "BPC-157", slug: "bpc-157", type: "ADDON" as const, category: "HEALTHY_AGING" as const, priceMonthly: 12900, isAddon: true, isMarketplace: true, marketplaceOrder: 4, marketplaceDesc: "Body protective compound. Often added to a GLP-1 stack for gut support and recovery.", sortOrder: 23, features: ["Supports gut health and digestive comfort", "May support joint and soft tissue recovery", "Daily subcutaneous injection", "Often paired with GLP-1 therapy"] },
+    { name: "Glow Stack (Glutathione + Biotin)", slug: "glow-stack", type: "ADDON" as const, category: "HEALTHY_AGING" as const, priceMonthly: 8900, isAddon: true, isMarketplace: true, marketplaceOrder: 5, marketplaceDesc: "Antioxidant + biotin combo for skin, hair, and nail support.", sortOrder: 24, features: ["Glutathione for antioxidant support", "Biotin for hair, skin, and nail health", "Weekly injection or oral lozenge options", "Complements GLP-1 weight loss protocol"] },
+    { name: "Thymosin Beta-4", slug: "thymosin-beta-4", type: "ADDON" as const, category: "HEALTHY_AGING" as const, priceMonthly: 17900, isAddon: true, isMarketplace: true, marketplaceOrder: 6, marketplaceDesc: "Recovery and immune support peptide. For active members and those optimizing longevity.", sortOrder: 25, features: ["Supports recovery and repair", "May support immune function", "Weekly subcutaneous injection", "Popular with athletic patients"] },
   ];
 
   for (const p of products) {
@@ -2252,7 +2264,7 @@ async function main() {
   <li><strong>Wegovy (semaglutide 2.4mg, brand):</strong> $1,349/month list price</li>
   <li><strong>Ozempic (semaglutide, diabetes-labeled, brand):</strong> $935/month list price</li>
   <li><strong>Compounded semaglutide from 503B facility:</strong> $150–450/month depending on dose and program</li>
-  <li><strong>Nature's Journey all-inclusive:</strong> $279–$599/month including provider evaluation, medication, and shipping</li>
+  <li><strong>Nature's Journey all-inclusive:</strong> $179–$599/month including provider evaluation, medication, and shipping</li>
 </ul>
 <p>The gap between brand list price and compounded is enormous — and understanding every pathway that could reduce your cost is worth the time to read this fully.</p>
 
@@ -2294,7 +2306,7 @@ async function main() {
 <p>The $79/month "semaglutide" offers you\'ll see advertised deserve serious scrutiny. At that price point, corners are being cut somewhere in the supply chain or clinical oversight.</p>
 
 <h2>The Bottom Line on Access</h2>
-<p>For most people without insurance coverage, compounded medication through a licensed telehealth program is the most accessible and cost-effective pathway. The $279–$599/month range for a program like Nature's Journey that includes clinical evaluation, medication, and ongoing support represents a fraction of brand list price while maintaining clinical safety standards. The key is choosing a program that takes the clinical side seriously, not just the shipping logistics.</p>`,
+<p>For most people without insurance coverage, compounded medication through a licensed telehealth program is the most accessible and cost-effective pathway. The $179–$599/month range for a program like Nature's Journey that includes clinical evaluation, medication, and ongoing support represents a fraction of brand list price while maintaining clinical safety standards. The key is choosing a program that takes the clinical side seriously, not just the shipping logistics.</p>`,
     },
     {
       title: "Will I Gain All the Weight Back When I Stop GLP-1 Medication?",
@@ -2536,7 +2548,7 @@ async function main() {
 <ul>
   <li>Wegovy list price: approximately $1,349/month</li>
   <li>With Novo Nordisk savings card (commercially insured only): potentially $0–$200/month</li>
-  <li>Compounded semaglutide through telehealth program: $279–$599/month all-inclusive</li>
+  <li>Compounded semaglutide through telehealth program: $179–$599/month all-inclusive</li>
 </ul>
 <p>Compounded versions are not FDA-approved products but are manufactured under FDA oversight at registered facilities. They\'ve provided access to millions of patients who would otherwise be priced out of treatment entirely.</p>
 
@@ -4497,7 +4509,7 @@ The goal of GLP-1 treatment is not just weight loss — it\'s improved health, m
         { feature: "Same active molecule", us: true, them: true },
         { feature: "Licensed provider required", us: true, them: true },
         { feature: "503B outsourcing facility sourcing", us: true, them: "N/A (manufacturer)" },
-        { feature: "Typical monthly cost", us: "$279–$599", them: "$935–$1,349" },
+        { feature: "Typical monthly cost", us: "$179–$599", them: "$935–$1,349" },
         { feature: "Insurance coverage for weight loss", us: "No", them: "Rare (<25% of plans)" },
         { feature: "Available during brand shortage", us: "Yes (while on FDA shortage list)", them: "Limited" },
         { feature: "Certificate of analysis available", us: true, them: "N/A" },
@@ -4583,7 +4595,7 @@ The goal of GLP-1 treatment is not just weight loss — it\'s improved health, m
       keyDifferences: JSON.stringify([
         "Noom's core program is behavioral: it uses a psychology-informed curriculum and a food color-coding system to change eating patterns. This works well for some people, particularly those without significant physiological drivers of weight gain. For patients with insulin resistance, PCOS, or BMI above 35, the behavioral approach alone often isn't sufficient.",
         "Noom added medication access through 'Noom Med' — but medication is an overlay on a behavioral platform, not the foundation. Nature's Journey is built around medical treatment from the ground up, with clinical protocols, contraindication screening, and provider oversight that matches the medication's clinical profile.",
-        "Nature's Journey uses compounded GLP-1 medications that cost $279–$599/month all-inclusive. Noom Med's medication pricing adds on top of the behavioral program subscription, and the total cost can be comparable to or exceed Nature's Journey depending on the plan.",
+        "Nature's Journey uses compounded GLP-1 medications that cost $179–$599/month all-inclusive. Noom Med's medication pricing adds on top of the behavioral program subscription, and the total cost can be comparable to or exceed Nature's Journey depending on the plan.",
         "The honest answer: if you want behavioral tools and don't need or want medication, Noom is a reasonable choice. If medication-based treatment is the goal, Nature's Journey's clinical infrastructure is better suited to that purpose.",
       ]),
       isPublished: true,
@@ -4718,12 +4730,12 @@ The goal of GLP-1 treatment is not just weight loss — it\'s improved health, m
         { feature: "DEA scheduling", us: "Not scheduled", them: "Schedule IV controlled substance" },
         { feature: "Typical duration of use", us: "Long-term / indefinite", them: "Up to 3 months (tolerance)" },
         { feature: "Cardiovascular safety", us: "Demonstrated benefit (SELECT)", them: "Raises heart rate / BP — use caution" },
-        { feature: "Monthly cost", us: "$279+/mo (compounded)", them: "~$30–$60/mo (generic)" },
+        { feature: "Monthly cost", us: "$179+/mo (compounded)", them: "~$30–$60/mo (generic)" },
         { feature: "Mental health effects", us: "Neutral to positive", them: "Can cause anxiety, insomnia, irritability" },
         { feature: "Insurance coverage", us: "Rarely covered (weight)", them: "Rarely covered (weight)" },
       ]),
       keyDifferences: JSON.stringify([
-        "Phentermine's most significant advantage is cost — generic phentermine is $30–60/month at most pharmacies, compared to $279+ for compounded semaglutide. For patients who cannot afford GLP-1 therapy and have no contraindications, phentermine remains a legitimate short-term option despite its age.",
+        "Phentermine's most significant advantage is cost — generic phentermine is $30–60/month at most pharmacies, compared to $179+ for compounded semaglutide. For patients who cannot afford GLP-1 therapy and have no contraindications, phentermine remains a legitimate short-term option despite its age.",
         "Semaglutide's efficacy is dramatically better. The STEP-1 trial average of ~15% body weight loss at 68 weeks compares to 3–5% typically seen with phentermine at 6 months. Additionally, phentermine's effects plateau quickly as tolerance develops, while semaglutide continues working as long as it is used.",
         "Phentermine is a Schedule IV controlled substance with a stimulant mechanism — it raises heart rate and blood pressure, causes insomnia and anxiety in many patients, and has significant potential for dependence and misuse. It is generally contraindicated in patients with cardiovascular disease, hypertension, or a history of stimulant abuse. Semaglutide has demonstrated cardiovascular benefit in the SELECT trial.",
         "Phentermine may be a reasonable short-term bridge option for patients waiting on GLP-1 access or who cannot afford ongoing GLP-1 therapy, used under appropriate medical supervision for no more than 3 months. It is not a substitute for the efficacy, safety profile, or long-term outcomes of GLP-1 therapy.",
@@ -4742,7 +4754,7 @@ The goal of GLP-1 treatment is not just weight loss — it\'s improved health, m
         { feature: "Time to see results", us: "Months", them: "Weeks" },
         { feature: "Requires anesthesia", us: "No", them: "Yes" },
         { feature: "Nutritional deficiency risk", us: "Low", them: "High — lifelong supplementation required" },
-        { feature: "Cost", us: "$279–$599/mo ongoing", them: "$15,000–$25,000 upfront" },
+        { feature: "Cost", us: "$179–$599/mo ongoing", them: "$15,000–$25,000 upfront" },
         { feature: "Insurance coverage", us: "Rarely covered (weight)", them: "More commonly covered with BMI criteria" },
         { feature: "Maintenance requirements", us: "Ongoing medication", them: "Lifelong dietary restrictions" },
       ]),

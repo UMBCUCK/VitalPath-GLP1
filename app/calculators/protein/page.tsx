@@ -10,6 +10,7 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { calculateProtein } from "@/lib/utils";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { AnimatedCounter } from "@/components/calculators/animated-counter";
+import { CalculatorLeadCapture } from "@/components/calculators/calculator-lead-capture";
 
 const foodEquivalents = [
   { icon: "🍗", name: "Chicken breast", grams: 31, unit: "4oz serving" },
@@ -239,6 +240,18 @@ export default function ProteinCalculatorPage() {
                       </Button>
                     </Link>
                   </div>
+
+                  <CalculatorLeadCapture
+                    source="calculator_protein"
+                    headline={`Hit your ${result.min}–${result.max}g protein target on GLP-1 — we'll email a meal-by-meal plan.`}
+                    subCopy="Preserving lean muscle while losing fat is the #1 reason GLP-1 patients add structured meal support. Get a free sample plan built around your target."
+                    metadata={{
+                      protein_min: result.min,
+                      protein_max: result.max,
+                      activity,
+                      goal,
+                    }}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>

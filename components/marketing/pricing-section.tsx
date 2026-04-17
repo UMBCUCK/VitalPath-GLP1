@@ -31,7 +31,7 @@ export function PricingSection({ plans = defaultPlans }: { plans?: PricingPlan[]
       <SectionShell>
         <SectionHeading
           eyebrow="Plans & Pricing"
-          title="Complete GLP-1 care. Starting at $279/mo."
+          title="Complete GLP-1 care. Starting at $179/mo."
           description="Every plan includes provider evaluation, personalized treatment plan, and medication if prescribed. Up to 79% less than brand-name retail."
         />
 
@@ -77,7 +77,7 @@ export function PricingSection({ plans = defaultPlans }: { plans?: PricingPlan[]
               {" "}&rarr;{" "}
               Nature&apos;s Journey from{" "}
               <span className="font-bold text-teal">
-                {annual ? "$223/mo" : "$279/mo"}
+                {annual ? "$223/mo" : "$179/mo"}
               </span>
             </span>
           </div>

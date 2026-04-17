@@ -59,7 +59,7 @@ const brandCosts = [
 
 const compoundedCosts = [
   { tier: "Basic (semaglutide)", range: "$150–$250/mo", notes: "Titration dosing, no nutrition support" },
-  { tier: "Nature's Journey Essential", range: "$279/mo", notes: "Provider eval, medication if prescribed, care team messaging, monthly check-ins" },
+  { tier: "Nature's Journey Essential", range: "$179/mo", notes: "Provider eval, medication if prescribed, care team messaging, monthly check-ins" },
   { tier: "Nature's Journey Premium", range: "$379/mo", notes: "Everything in Essential + meal plans, recipes, coaching, progress tracking" },
   { tier: "Nature's Journey Complete", range: "$599/mo", notes: "Everything in Premium + supplements, weekly coaching, lab coordination" },
   { tier: "Compounded tirzepatide (range)", range: "$300–$500/mo", notes: "Higher cost than semaglutide due to compound complexity; still 50–70% below brand" },
@@ -120,7 +120,7 @@ export default function GLP1CostPage() {
                 See Pricing <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
-            <p className="text-sm text-graphite-400">From $279/mo · Free assessment · Cancel anytime</p>
+            <p className="text-sm text-graphite-400">From $179/mo · Free assessment · Cancel anytime</p>
           </div>
         </SectionShell>
       </section>
@@ -140,7 +140,7 @@ export default function GLP1CostPage() {
               </div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-teal">$279</div>
+              <div className="text-3xl font-bold text-teal">$179</div>
               <div className="mt-1 text-sm text-white/70">Nature's Journey Essential/mo</div>
             </div>
           </div>
@@ -307,7 +307,7 @@ export default function GLP1CostPage() {
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-3 text-sm">
               {[
-                { label: "Essential", price: "$279/mo" },
+                { label: "Essential", price: "$179/mo" },
                 { label: "Premium", price: "$379/mo" },
                 { label: "Complete", price: "$599/mo" },
               ].map((p) => (

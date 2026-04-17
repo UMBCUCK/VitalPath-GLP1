@@ -16,3 +16,7 @@ prisma/dev.db-journal
 public/uploads/
 exports/
 tsconfig.tsbuildinfo
+
+# Local tool artifacts (keep out of the repo)
+.claude/settings.local.json
+.playwright-mcp/

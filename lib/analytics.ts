@@ -85,12 +85,24 @@ export const ANALYTICS_EVENTS = {
 
   // Unified Qualify flow
   QUALIFY_START: "qualify_start",
+  QUALIFY_STEP_START: "qualify_step_start",
   QUALIFY_STEP_COMPLETE: "qualify_step_complete",
+  QUALIFY_FIELD_BLUR: "qualify_field_blur",
   QUALIFY_BMI_CALCULATED: "qualify_bmi_calculated",
   QUALIFY_PROJECTION_VIEWED: "qualify_projection_viewed",
   QUALIFY_CONTRAINDICATION_FLAG: "qualify_contraindication_flag",
+  QUALIFY_LEAD_BRIDGE_SHOW: "qualify_lead_bridge_show",
+  QUALIFY_LEAD_BRIDGE_SUBMIT: "qualify_lead_bridge_submit",
+  QUALIFY_LEAD_BRIDGE_SKIP: "qualify_lead_bridge_skip",
+  QUALIFY_RESUME_LOADED: "qualify_resume_loaded",
+  QUALIFY_TEXT_LINK_SEND: "qualify_text_link_send",
   QUALIFY_COMPLETE: "qualify_complete",
   QUALIFY_ABANDON: "qualify_abandon",
+
+  // Peptide upsell tracking (Tier 3)
+  PEPTIDE_LP_VIEW: "peptide_lp_view",
+  PEPTIDE_UPSELL_VIEW: "peptide_upsell_view",
+  PEPTIDE_UPSELL_CLICK: "peptide_upsell_click",
 
   // LP Theme tracking
   LP_THEME_VIEW: "lp_theme_view",
@@ -149,6 +161,20 @@ export async function trackServerEvent(
   if (!pixelId || !token) return;
 
   try {
+    // Tier 4.1 — Meta CAPI advanced matching requires SHA-256 hashed email/phone.
+    // Phone must be normalized: digits-only, E.164-style (country code first).
+    // We strip non-digits and, if the number looks like a 10-digit US number, prepend "1".
+    const normalizePhone = (raw: string): string => {
+      const digits = raw.replace(/\D/g, "");
+      if (digits.length === 10) return `1${digits}`;
+      return digits;
+    };
+
+    const [emailHash, phoneHash] = await Promise.all([
+      userData.email ? hashForMeta(userData.email.toLowerCase().trim()) : Promise.resolve(undefined),
+      userData.phone ? hashForMeta(normalizePhone(userData.phone)) : Promise.resolve(undefined),
+    ]);
+
     await fetch(`https://graph.facebook.com/v18.0/${pixelId}/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -158,8 +184,8 @@ export async function trackServerEvent(
             event_name: eventName,
             event_time: Math.floor(Date.now() / 1000),
             user_data: {
-              em: userData.email ? hashForMeta(userData.email) : undefined,
-              ph: userData.phone ? hashForMeta(userData.phone) : undefined,
+              em: emailHash,
+              ph: phoneHash,
               client_ip_address: userData.ip,
               client_user_agent: userData.userAgent,
             },
@@ -177,7 +203,7 @@ export async function trackServerEvent(
 
 async function hashForMeta(value: string): Promise<string> {
   const encoder = new TextEncoder();
-  const data = encoder.encode(value.toLowerCase().trim());
+  const data = encoder.encode(value);
   const hash = await crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(hash))
     .map((b) => b.toString(16).padStart(2, "0"))

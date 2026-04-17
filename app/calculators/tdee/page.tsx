@@ -11,6 +11,7 @@ import { calculateTDEE, calculateMacros } from "@/lib/utils";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { AnimatedCounter } from "@/components/calculators/animated-counter";
 import { DonutChart } from "@/components/calculators/donut-chart";
+import { CalculatorLeadCapture } from "@/components/calculators/calculator-lead-capture";
 
 const activityOptions = [
   { value: "sedentary", label: "Sedentary", description: "Little or no exercise, desk job" },
@@ -280,6 +281,19 @@ export default function TDEECalculatorPage() {
                       </Button>
                     </Link>
                   </div>
+
+                  {/* Lead capture — shown to anyone who hit the calculator */}
+                  <CalculatorLeadCapture
+                    source="calculator_tdee"
+                    headline={`Your TDEE is ${result.toLocaleString()} calories — here's how to build a plan around it.`}
+                    subCopy={`We'll email your personalized GLP-1 plan with macro targets at ${calorieTargets.lose.toLocaleString()} cals/day for steady weight loss, plus recommended medication and timeline.`}
+                    metadata={{
+                      tdee: result,
+                      cut_target: calorieTargets.lose,
+                      activity,
+                      sex,
+                    }}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>

@@ -447,7 +447,7 @@ export default function SettingsPage() {
                   <ArrowDown className="mt-0.5 h-5 w-5 text-navy" />
                   <div>
                     <p className="text-sm font-bold text-navy">Downgrade to Essential</p>
-                    <p className="text-xs text-graphite-400">Keep your treatment at a lower price point. $279/mo instead of $379/mo.</p>
+                    <p className="text-xs text-graphite-400">Keep your treatment at a lower price point. $179/mo instead of $379/mo.</p>
                   </div>
                 </button>
 

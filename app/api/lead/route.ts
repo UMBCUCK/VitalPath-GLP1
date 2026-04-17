@@ -43,11 +43,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Track server-side for Meta CAPI
-    await trackServerEvent("Lead", { email }, {
-      lead_source: source,
-      lead_name: name,
-    });
+    // Track server-side for Meta CAPI — Tier 4.1 now passes phone too
+    // for improved advanced-matching rate (~+15-25% match uplift).
+    await trackServerEvent(
+      "Lead",
+      {
+        email,
+        phone: phone || undefined,
+        ip: req.headers.get("x-forwarded-for") ?? undefined,
+        userAgent: req.headers.get("user-agent") ?? undefined,
+      },
+      {
+        lead_source: source,
+        lead_name: name,
+      },
+    );
 
     return NextResponse.json({ ok: true });
   } catch (error) {

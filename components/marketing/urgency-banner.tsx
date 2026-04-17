@@ -10,7 +10,7 @@ export function UrgencyBanner() {
       <div className="mx-auto flex max-w-7xl items-center justify-center gap-x-5 gap-y-1 flex-wrap px-4 py-2">
         <div className="flex items-center gap-1.5 text-xs sm:text-sm">
           <Star className="h-3.5 w-3.5 fill-gold text-gold shrink-0" />
-          <span className="font-bold">GLP-1 from $279/mo</span>
+          <span className="font-bold">GLP-1 from $179/mo</span>
           <span className="text-white/60 hidden sm:inline">— save 79% vs. brand-name</span>
         </div>
 

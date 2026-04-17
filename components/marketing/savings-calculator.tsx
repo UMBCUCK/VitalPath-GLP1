@@ -28,8 +28,8 @@ export function SavingsCalculator() {
   goalDate.setMonth(goalDate.getMonth() + monthsToGoal);
   const goalDateStr = goalDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
-  // Cost comparison
-  const vitalPathCost = 279 * monthsToGoal;
+  // Cost comparison — matches the $179 Essential-tier anchor used across marketing
+  const vitalPathCost = 179 * monthsToGoal;
   const brandedCost = 1349 * monthsToGoal;
   const savings = brandedCost - vitalPathCost;
 
@@ -171,7 +171,7 @@ export function SavingsCalculator() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold text-teal">Nature's Journey</p>
-                        <p className="text-xs text-teal-600">{monthsToGoal} months &times; $279/mo</p>
+                        <p className="text-xs text-teal-600">{monthsToGoal} months &times; $179/mo</p>
                       </div>
                       <p className="text-xl font-bold text-teal">
                         ${vitalPathCost.toLocaleString()}

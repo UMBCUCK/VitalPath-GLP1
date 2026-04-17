@@ -27,7 +27,7 @@ export function MobileStickyCta() {
     >
       <div className="flex items-center gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-navy">From $279/mo</p>
+          <p className="text-sm font-bold text-navy">From $179/mo</p>
           <p className="text-xs text-graphite-400">
             <span className="line-through">$1,349</span> retail &middot; Save 79%
           </p>

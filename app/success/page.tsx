@@ -4,10 +4,12 @@ import { UpsellModal } from "@/components/checkout/upsell-modal";
 import { ReferralPrompt } from "@/components/checkout/referral-prompt";
 import { ProviderPreview } from "@/components/checkout/provider-preview";
 import { OnboardingSteps } from "@/components/checkout/onboarding-steps";
+import { PushOptInPrompt } from "@/components/dashboard/push-opt-in-prompt";
+import { useSearchParams } from "next/navigation";
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { CheckCircle, ArrowRight, Calendar, MessageCircle, BookOpen, ShieldCheck, TrendingUp, Utensils, Mail, Package, ClipboardList, Stethoscope, HeartHandshake } from "lucide-react";
+import { CheckCircle, ArrowRight, Calendar, MessageCircle, BookOpen, ShieldCheck, TrendingUp, Utensils, Mail, Package, ClipboardList, Stethoscope, HeartHandshake, Zap, Sparkles as SparklesIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SectionShell } from "@/components/shared/section-shell";
@@ -102,11 +104,81 @@ function FirstWeekTimeline() {
 
 export default function SuccessPage() {
   const [showUpsell, setShowUpsell] = useState(false);
+  const searchParams = useSearchParams();
 
-  // Track success page view — critical for conversion attribution
+  // Track success page view — critical for conversion attribution.
+  // Tier 5.8 — enrich with plan slug + selected add-ons + purchase value
+  // so GA4/PostHog revenue dashboards populate. Meta CAPI Purchase fires
+  // authoritatively from /api/stripe/webhook (amount_total from Stripe).
   useEffect(() => {
-    track(ANALYTICS_EVENTS.CHECKOUT_COMPLETE, { source: "success_page" });
-  }, []);
+    if (typeof window === "undefined") return;
+
+    // Pull everything we know locally without a server round-trip
+    let planSlug: string | undefined;
+    let addOns: string[] = [];
+    let estimatedValue: number | undefined;
+    try {
+      const funnelRaw = localStorage.getItem("nj-funnel");
+      if (funnelRaw) {
+        const funnel = JSON.parse(funnelRaw) as {
+          recommendedPlan?: string;
+          email?: string;
+        };
+        planSlug = funnel.recommendedPlan;
+      }
+      const addOnsRaw = localStorage.getItem("nj-qualify-addons");
+      if (addOnsRaw) addOns = JSON.parse(addOnsRaw);
+
+      // Rough value estimate from plan slug
+      const planValues: Record<string, number> = {
+        essential: 297,
+        premium: 397,
+        complete: 529,
+      };
+      estimatedValue = planSlug ? planValues[planSlug] : undefined;
+    } catch {
+      // Non-blocking — telemetry is best-effort
+    }
+
+    track(ANALYTICS_EVENTS.CHECKOUT_COMPLETE, {
+      source: "success_page",
+      session_id: searchParams?.get("session_id") || undefined,
+      plan_slug: planSlug,
+      addon_count: addOns.length,
+      addons: addOns.join(",") || undefined,
+      value: estimatedValue,
+      currency: "USD",
+    });
+
+    // GA4 ecommerce purchase event (separate from PostHog) — powers GA4 revenue reporting
+    if (typeof window !== "undefined" && "gtag" in window && estimatedValue) {
+      try {
+        (
+          window as unknown as {
+            gtag: (cmd: string, event: string, params: Record<string, unknown>) => void;
+          }
+        ).gtag("event", "purchase", {
+          transaction_id: searchParams?.get("session_id") || `success-${Date.now()}`,
+          value: estimatedValue,
+          currency: "USD",
+          items: [
+            { item_id: planSlug, item_name: planSlug, price: estimatedValue, quantity: 1 },
+            ...addOns.map((slug) => ({ item_id: slug, item_name: slug, quantity: 1 })),
+          ],
+        });
+      } catch {
+        // ignore
+      }
+    }
+
+    // Clean up transient funnel state once we've converted
+    try {
+      localStorage.removeItem("nj-qualify-addons");
+      localStorage.removeItem("nj-qualify-expires");
+    } catch {
+      // ignore
+    }
+  }, [searchParams]);
 
   // Delay upsell 3.5s so the user absorbs the success moment first
   useEffect(() => {
@@ -225,6 +297,45 @@ export default function SuccessPage() {
           </CardContent>
         </Card>
 
+        {/* Tier 3.6 — Peptides / Anti-aging teaser (unlocks at day 30) */}
+        <Card className="mt-10 bg-gradient-to-br from-navy to-atlantic text-white border-0 overflow-hidden relative">
+          <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-gold/20 blur-3xl" />
+          <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-teal/20 blur-2xl" />
+          <CardContent className="p-6 relative z-10">
+            <div className="flex items-center gap-2 mb-3">
+              <SparklesIcon className="h-4 w-4 text-gold" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gold">
+                Unlocks at day 30
+              </span>
+            </div>
+            <h3 className="text-lg font-bold">
+              After your first month — anti-aging &amp; recovery peptides from $89/mo
+            </h3>
+            <p className="mt-2 text-sm text-white/80 leading-relaxed">
+              Once you're stabilized on your GLP-1 protocol, members can add provider-supervised
+              peptides like BPC-157 (recovery), NAD+ (energy), Glow Stack (skin/hair), and
+              Sermorelin (sleep) — all prescribed, compounded, and shipped from the same
+              licensed pharmacy.
+            </p>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              {[
+                { icon: Zap, label: "NAD+", price: "$149" },
+                { icon: HeartHandshake, label: "BPC-157", price: "$129" },
+                { icon: SparklesIcon, label: "Glow Stack", price: "$89" },
+              ].map((p) => (
+                <div key={p.label} className="rounded-lg bg-white/10 backdrop-blur px-2 py-2 text-center">
+                  <p.icon className="mx-auto h-3.5 w-3.5 text-gold mb-1" />
+                  <p className="text-[10px] font-semibold">{p.label}</p>
+                  <p className="text-[9px] text-white/70">{p.price}/mo</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-[10px] text-white/60">
+              Eligibility and dosing determined by your provider. Available after 30 days on GLP-1 protocol.
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Referral prompt — viral growth lever */}
         <div className="mt-10">
           <ReferralPrompt />
@@ -241,6 +352,8 @@ export default function SuccessPage() {
       </SectionShell>
     </section>
     <UpsellModal show={showUpsell} onClose={() => setShowUpsell(false)} />
+    {/* Tier 4.4 — Push-notification opt-in (auto-shows 10s after load) */}
+    <PushOptInPrompt />
   </MarketingShell>
   );
 }

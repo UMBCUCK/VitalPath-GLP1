@@ -100,6 +100,65 @@ const UPSELL_RULES: Array<{
       priority: 5,
     },
   },
+
+  // ─── Tier 3.2: HEALTHY_AGING / Peptides rules ──────────────────────────
+  // These fire post-activation once the patient is stabilized on GLP-1
+  // and engaged with tracking (so we're offering to warm, retained users).
+  {
+    id: "peptide_bpc157_recovery_day30",
+    condition: (s) =>
+      !s.addOnSlugs.some((x) => PEPTIDE_SLUGS.includes(x)) &&
+      s.daysSinceJoin >= 30 &&
+      s.progressCount >= 5,
+    suggestion: {
+      productSlug: "bpc-157",
+      productName: "BPC-157 Recovery",
+      headline: "Add recovery support to your stack",
+      description:
+        "Month 1 is when many GLP-1 patients add BPC-157 for digestive comfort and soft-tissue recovery. Provider-supervised, shipped from the same pharmacy.",
+      discountPct: 15,
+      priority: 4,
+    },
+  },
+  {
+    id: "peptide_glow_stack_day45",
+    condition: (s) =>
+      !s.addOnSlugs.some((x) => PEPTIDE_SLUGS.includes(x)) &&
+      s.daysSinceJoin >= 45 &&
+      s.daysSinceJoin <= 120,
+    suggestion: {
+      productSlug: "glow-stack",
+      productName: "Glow Stack",
+      headline: "Skin, hair & nail support on rapid weight loss",
+      description:
+        "Glutathione + biotin is the #1 add-on for members 6–12 weeks into treatment — helps skin quality keep pace with weight changes.",
+      priority: 3,
+    },
+  },
+  {
+    id: "peptide_nad_energy_day90",
+    condition: (s) =>
+      !s.addOnSlugs.includes("nad-plus") &&
+      s.daysSinceJoin >= 90,
+    suggestion: {
+      productSlug: "nad-plus",
+      productName: "NAD+ Injection",
+      headline: "Feel the energy plateau lift",
+      description:
+        "Around month 3, many members notice an energy dip as their body adapts. NAD+ injections support cellular energy production and mental clarity.",
+      priority: 4,
+    },
+  },
+];
+
+/** Slugs that count as "peptides" for the non-stacking rule above. */
+const PEPTIDE_SLUGS = [
+  "nad-plus",
+  "sermorelin",
+  "ipamorelin-cjc",
+  "bpc-157",
+  "glow-stack",
+  "thymosin-beta-4",
 ];
 
 // ─── Engine ─────────────────────────────────────────────────

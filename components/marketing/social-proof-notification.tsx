@@ -10,7 +10,7 @@ const notifications = [
   { icon: TrendingUp, text: "Members average 15% body weight loss over 12 months", time: "Member data · Individual results vary", color: "text-emerald-600" },
   { icon: UserCheck, text: "Most patients complete their assessment in under 10 min", time: "Program data", color: "text-teal" },
   { icon: Star, text: "4.9/5 average rating", time: "2,400+ post-program survey responses", color: "text-gold" },
-  { icon: ShoppingBag, text: "GLP-1 program starting at $279/mo", time: "Current pricing", color: "text-navy" },
+  { icon: ShoppingBag, text: "GLP-1 program starting at $179/mo", time: "Current pricing", color: "text-navy" },
   { icon: TrendingUp, text: "30-day satisfaction guarantee on all plans", time: "See terms for details", color: "text-emerald-600" },
 ];
 

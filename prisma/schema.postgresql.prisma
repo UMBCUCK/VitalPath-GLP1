@@ -1057,6 +1057,7 @@ model BlogPost {
   tags        Json?    // array of tags
   isPublished Boolean  @default(false)
   publishedAt DateTime?
+  readTime    Int?
   seoTitle    String?
   seoDescription String?
 

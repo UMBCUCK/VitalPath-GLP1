@@ -33,6 +33,9 @@ export const siteConfig = {
   },
   navigation: {
     main: [
+      // TEMP: A/B preview entries — remove before launch once v1 vs v2 winner is chosen
+      { label: "Home V1", href: "/" },
+      { label: "Home V2", href: "/home-v2" },
       { label: "How It Works", href: "/how-it-works" },
       { label: "Medications", href: "/medications" },
       { label: "Pricing", href: "/pricing" },

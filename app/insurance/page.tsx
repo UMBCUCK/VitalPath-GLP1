@@ -30,7 +30,7 @@ const reimbursementSteps = [
 const hsaFsaInfo = [
   "GLP-1 weight loss medication prescribed by a licensed provider is typically HSA/FSA eligible",
   "Nature's Journey provides itemized receipts suitable for HSA/FSA submission",
-  "Your monthly membership fee ($279-$599) can be paid directly from your HSA/FSA card",
+  "Your monthly membership fee ($179-$599) can be paid directly from your HSA/FSA card",
   "Pre-tax savings of 25-35% depending on your tax bracket",
   "No prior authorization or insurance approval needed for HSA/FSA",
 ];
@@ -88,7 +88,7 @@ export default function InsurancePage() {
               </div>
               <div>
                 <p className="text-xs text-teal mb-1">Nature&apos;s Journey</p>
-                <p className="text-lg font-bold text-teal">$279/mo all-in</p>
+                <p className="text-lg font-bold text-teal">$179/mo all-in</p>
                 <p className="text-[10px] text-teal-600">Start within 24-48 hours</p>
               </div>
             </div>
@@ -143,7 +143,7 @@ export default function InsurancePage() {
               </div>
               <div className="mt-6 rounded-xl bg-emerald-50 p-4 text-center">
                 <p className="text-sm text-navy">
-                  <strong>Example savings:</strong> $279/mo paid from HSA/FSA saves you
+                  <strong>Example savings:</strong> $179/mo paid from HSA/FSA saves you
                   <strong className="text-emerald-600"> $83-$98/mo in taxes</strong> (25-35% bracket)
                 </p>
               </div>

@@ -75,7 +75,7 @@ export function SolutionSection() {
               {/* Floating price comparison */}
               <div className="absolute -bottom-6 -right-4 rounded-2xl border border-teal-100 bg-white p-4 shadow-premium-lg sm:-right-8">
                 <p className="text-xs font-semibold text-graphite-400">Your price</p>
-                <p className="text-2xl font-bold text-teal">$279<span className="text-sm font-normal text-graphite-400">/mo</span></p>
+                <p className="text-2xl font-bold text-teal">$179<span className="text-sm font-normal text-graphite-400">/mo</span></p>
                 <p className="mt-1 text-xs text-graphite-300 line-through">$1,349/mo retail</p>
                 <div className="mt-2 rounded-full bg-teal-50 px-3 py-1">
                   <p className="text-xs font-bold text-teal">Save 79%</p>

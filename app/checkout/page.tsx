@@ -47,7 +47,9 @@ export default function CheckoutPage() {
   const [showUpsell, setShowUpsell] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  // Fetch live plans + add-ons from DB on mount
+  // Fetch live plans + add-ons from DB on mount.
+  // Tier 5.4 — after loading, honor ?addons=slug1,slug2 from URL so the
+  // pre-checkout strip on /qualify/results pre-selects addons here.
   useEffect(() => {
     fetch("/api/products/plans")
       .then((r) => r.json())
@@ -59,6 +61,16 @@ export default function CheckoutPage() {
           if (match) setSelectedPlan(match);
         }
         if (data.addOns?.length) setAddOns(data.addOns);
+
+        // Pre-select add-ons from URL ?addons=meal-plans,protein-hydration
+        const addOnsParam = searchParams?.get("addons");
+        if (addOnsParam && data.addOns?.length) {
+          const slugs = addOnsParam.split(",").map((s) => s.trim()).filter(Boolean);
+          const preIds = data.addOns
+            .filter((a) => slugs.includes(a.slug))
+            .map((a) => a.id);
+          if (preIds.length) setSelectedAddOns((prev) => Array.from(new Set([...prev, ...preIds])));
+        }
       })
       .catch(() => { /* silently keep defaults */ });
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -40,7 +40,7 @@ export function StickyDesktopCta() {
           <div className="h-4 w-px bg-navy-100" />
           <span className="text-xs text-graphite-500">
             GLP-1 weight loss from{" "}
-            <span className="font-bold text-navy">$279/mo</span>
+            <span className="font-bold text-navy">$179/mo</span>
             <span className="ml-1 text-graphite-400 line-through">$1,349</span>
           </span>
         </div>

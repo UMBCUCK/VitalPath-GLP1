@@ -175,7 +175,7 @@ export function MedicationShowcase() {
           <Link href="/qualify">
             <Button size="lg" className="gap-2">
               <DollarSign className="h-4 w-4" />
-              See If You Qualify — From $279/mo
+              See If You Qualify — From $179/mo
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>

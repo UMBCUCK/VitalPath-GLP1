@@ -12,6 +12,7 @@ import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { AnimatedGauge, type GaugeZone } from "@/components/calculators/animated-gauge";
 import { AnimatedCounter } from "@/components/calculators/animated-counter";
+import { CalculatorLeadCapture } from "@/components/calculators/calculator-lead-capture";
 
 const bmiZones: GaugeZone[] = [
   { from: 0, to: 18.5, color: "#60A5FA", label: "Underweight" },
@@ -233,6 +234,20 @@ export default function BMICalculatorPage() {
                       provider considers multiple factors when evaluating treatment options.
                     </p>
                   </div>
+
+                  {/* Personalized plan lead capture — shown only when user may benefit from GLP-1 */}
+                  {result.bmi >= 27 && (
+                    <CalculatorLeadCapture
+                      source="calculator_bmi"
+                      headline={`Based on your BMI of ${result.bmi}, a personalized GLP-1 plan could help you reach your healthy weight.`}
+                      subCopy={`We'll email your ${result.toLose > 0 ? `${result.toLose}-lb plan` : "personalized plan"} with recommended medication, projected timeline, and pricing — free, no obligation.`}
+                      metadata={{
+                        bmi: result.bmi,
+                        category: result.category,
+                        to_lose: result.toLose,
+                      }}
+                    />
+                  )}
 
                   <div className="mt-6 text-center">
                     <Link href="/qualify">

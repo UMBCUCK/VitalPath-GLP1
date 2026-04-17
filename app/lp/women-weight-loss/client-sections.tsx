@@ -181,7 +181,7 @@ export function WomenPricingSection() {
             <span className="font-bold text-graphite-400 line-through">$1,349+/mo*</span>
             {" "}&rarr;{" "}
             Nature&apos;s Journey from{" "}
-            <span className="font-bold text-pink-600">{annual ? "$223/mo" : "$279/mo"}</span>
+            <span className="font-bold text-pink-600">{annual ? "$223/mo" : "$179/mo"}</span>
           </span>
         </div>
       </div>
