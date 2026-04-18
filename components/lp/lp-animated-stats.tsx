@@ -8,12 +8,36 @@ interface Stat {
   suffix?: string;
 }
 
+/**
+ * Returns true only if the stat value is a "clean" single number that can
+ * safely count-up (e.g. "$179/mo", "18,000+", "94%", "4.9"). Returns false for
+ * strings like "Hormonal", "Insulin", or ranges like "15-20%*" — those would
+ * otherwise flash NaN or concatenate digits (1520) mid-animation.
+ */
+function isAnimatable(target: string): boolean {
+  // Ranges like "15-20%" or "15–20%" → concatenate digits → bad animation.
+  if (/\d\s*[-–]\s*\d/.test(target)) return false;
+  // Strip everything that's legitimately part of a numeric stat; if letters
+  // remain, the target is a word like "Hormonal" or "Insulin" → show static.
+  const leftover = target
+    .replace(/[$+,%*†\s]/g, "")
+    .replace(/\/mo(nth)?/gi, "")
+    .replace(/[0-9.]/g, "");
+  if (leftover !== "") return false;
+  const num = parseFloat(target.replace(/[^0-9.]/g, ""));
+  return Number.isFinite(num);
+}
+
 function AnimatedStatValue({ target, suffix = "" }: { target: string; suffix: string }) {
+  const animatable = isAnimatable(target);
+  // Non-animatable targets render the full label from first paint, so users
+  // never see transient gibberish like "NaN" or "1503%".
   const [display, setDisplay] = useState(target + suffix);
   const ref = useRef<HTMLSpanElement>(null);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
+    if (!animatable) return;
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(
@@ -58,7 +82,7 @@ function AnimatedStatValue({ target, suffix = "" }: { target: string; suffix: st
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [target, suffix]);
+  }, [target, suffix, animatable]);
 
   return <span ref={ref}>{display}</span>;
 }

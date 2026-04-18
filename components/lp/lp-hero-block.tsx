@@ -69,7 +69,9 @@ export function LpHeroBlock({
           {subtitle}
         </p>
 
-        {/* Price anchor */}
+        {/* Price anchor — text colors reference --lp-price-text so they
+            always contrast against --lp-price-bg (fixes the old black-on-black
+            bug when --lp-heading happened to match --lp-price-bg). */}
         <div
           className="mt-6 inline-flex items-center gap-3 rounded-xl border px-5 py-2.5 opacity-0 animate-fade-in-up"
           style={{
@@ -79,8 +81,24 @@ export function LpHeroBlock({
             animationFillMode: "forwards",
           }}
         >
-          <span className="text-sm text-lp-body-muted line-through">{retailPrice} retail</span>
-          <span className="text-2xl font-bold text-lp-heading">{memberPrice}<span className="text-sm font-normal text-lp-body">/mo</span></span>
+          <span
+            className="text-sm line-through"
+            style={{ color: "var(--lp-price-text)", opacity: 0.55 }}
+          >
+            {retailPrice} retail
+          </span>
+          <span
+            className="text-2xl font-bold"
+            style={{ color: "var(--lp-price-text)" }}
+          >
+            {memberPrice}
+            <span
+              className="text-sm font-normal"
+              style={{ color: "var(--lp-price-text)", opacity: 0.7 }}
+            >
+              /mo
+            </span>
+          </span>
           <span
             className="rounded-full px-2 py-0.5 text-xs font-bold"
             style={{ backgroundColor: "var(--lp-btn-bg)", color: "var(--lp-btn-text)" }}
