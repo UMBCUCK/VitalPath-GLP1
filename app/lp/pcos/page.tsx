@@ -370,9 +370,9 @@ export default function PcosLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Built for PCOS"
-        headline="GLP-1 care that works with your insulin resistance —"
-        headlineAccent="Not against it"
-        subtitle="PCOS makes calorie math fail because it's not a calorie problem — it's an insulin problem. Prescribed GLP-1 from US-licensed providers targets the root cause. 2-minute eligibility. From $179/mo."
+        headline="Lose that stubborn PCOS weight by May."
+        headlineAccent="Same active ingredient as Ozempic."
+        subtitle="PCOS-aware GLP-1 that targets insulin resistance — may help you lose up to 6 lbs in your first month.* From $179/mo. 2-minute assessment. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-pcos"
       />

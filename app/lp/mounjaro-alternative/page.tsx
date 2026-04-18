@@ -241,9 +241,9 @@ export default function MounjaroAlternativePage() {
       {/* 1. HERO */}
       <LpHeroBlock
         badge="Accepting new patients — same-day evaluation"
-        headline="Looking for a Mounjaro Alternative? Same Active Ingredient,"
-        headlineAccent="72% Less."
-        subtitle="Compounded tirzepatide — the same dual-action GLP-1/GIP — prescribed online. From $379/mo."
+        headline="The Mounjaro alternative, available by May."
+        headlineAccent="Same active ingredient (tirzepatide). Less cost."
+        subtitle="Compounded tirzepatide — dual GLP-1/GIP, prescribed online by US-licensed providers. May help you lose up to 10 lbs in your first month.* From $379/mo. Individual results vary."
         stats={heroStats}
         ctaLocation="mounjaro-alternative-hero"
       />

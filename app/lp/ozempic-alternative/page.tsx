@@ -386,9 +386,9 @@ export default function OzempicAlternativeLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Accepting new patients — same-day evaluation"
-        headline="Same molecule. ~80% less cost."
-        headlineAccent="Compounded semaglutide from $179/mo."
-        subtitle="Compounded semaglutide contains the same active ingredient prepared by a US-licensed compounding pharmacy. Prescribed by US-licensed providers. In stock, free 2-day shipping. Individual results vary."
+        headline="The Ozempic alternative, available by May."
+        headlineAccent="Same active ingredient (semaglutide). Less cost."
+        subtitle="Compounded semaglutide — same active molecule as Ozempic, prepared by a US-licensed compounding pharmacy. May help you lose up to 8 lbs in your first month.* From $179/mo. Individual results vary."
         stats={heroStats}
         ctaLocation="ozempic-alt-hero"
       />

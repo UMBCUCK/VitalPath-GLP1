@@ -373,9 +373,9 @@ export default function Over50LandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Safety-First for Your 50s"
-        headline="What your doctor won't tell you about"
-        headlineAccent="weight loss after 50"
-        subtitle="Same effort, half the results? Doctor-prescribed GLP-1 from US-licensed providers, coordinated with your PCP and tuned for your current medications. 2-minute eligibility. From $179/mo."
+        headline="Lose that stubborn weight by May — safely, after 50."
+        headlineAccent="Same active ingredient as Ozempic."
+        subtitle="Slow-titration GLP-1 with PCP coordination — may help you lose up to 6 lbs in your first month.* Muscle and bone-preserving protocol. From $179/mo. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-over50"
       />

@@ -240,9 +240,9 @@ export default function WegovyAlternativePage() {
       {/* 1. HERO */}
       <LpHeroBlock
         badge="Accepting new patients — same-day evaluation"
-        headline="A Clinically Comparable Alternative to Wegovy —"
-        headlineAccent="79% Less"
-        subtitle="Same active ingredient (semaglutide) prescribed by licensed providers. From $179/mo with free 2-day shipping."
+        headline="The Wegovy alternative, available by May."
+        headlineAccent="Same active ingredient (semaglutide). Less cost."
+        subtitle="Compounded semaglutide prescribed by US-licensed providers — may help you lose up to 8 lbs in your first month.* From $179/mo. Free 2-day shipping. Individual results vary."
         stats={heroStats}
         ctaLocation="wegovy-alternative-hero"
       />

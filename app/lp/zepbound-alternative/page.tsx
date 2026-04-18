@@ -241,9 +241,9 @@ export default function ZepboundAlternativePage() {
       {/* 1. HERO */}
       <LpHeroBlock
         badge="Accepting new patients — same-day evaluation"
-        headline="Zepbound-Level Results Without the"
-        headlineAccent="Zepbound Price Tag"
-        subtitle="Compounded tirzepatide delivers the same dual-action mechanism. From $379/mo."
+        headline="The Zepbound alternative, available by May."
+        headlineAccent="Same active ingredient (tirzepatide). Less cost."
+        subtitle="Compounded tirzepatide — same dual GLP-1/GIP as Zepbound. May help you lose up to 10 lbs in your first month.* From $379/mo. Individual results vary."
         stats={heroStats}
         ctaLocation="zepbound-alternative-hero"
       />

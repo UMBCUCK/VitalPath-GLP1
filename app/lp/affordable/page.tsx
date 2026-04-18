@@ -378,9 +378,9 @@ export default function AffordableLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Affordable GLP-1"
-        headline="Prescription GLP-1 for $179/mo —"
-        headlineAccent="no insurance needed"
-        subtitle="Retail GLP-1s run $1,349/mo. Ours is $179/mo flat — medication, provider oversight, and support included. US-licensed pharmacy. 2-minute eligibility check."
+        headline="Start prescribed GLP-1 by May — from $179/mo."
+        headlineAccent="Same active ingredient as Ozempic. No insurance needed."
+        subtitle="Flat monthly price includes medication, provider, and support — may help you lose up to 8 lbs in your first month.* US-licensed pharmacy. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-affordable"
       />

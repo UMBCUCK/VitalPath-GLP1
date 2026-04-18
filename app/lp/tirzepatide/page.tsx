@@ -375,9 +375,9 @@ export default function TirzepatideLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Accepting new patients — same-day evaluation"
-        headline="Compounded tirzepatide —"
-        headlineAccent="The dual-action shot, prescribed online"
-        subtitle="Tirzepatide is the only medication that activates both GLP-1 and GIP receptors. Prescribed by US-licensed providers, dispensed by a US-licensed compounding pharmacy. 2-minute eligibility. Individual results vary."
+        headline="Start compounded tirzepatide by May."
+        headlineAccent="Same molecule as Mounjaro and Zepbound."
+        subtitle="Dual GLP-1 + GIP action — may help you lose up to 10 lbs in your first month.* Prescribed by US-licensed providers. Individual results vary."
         stats={heroStats}
         retailPrice="$1,349/mo"
         memberPrice="$379"

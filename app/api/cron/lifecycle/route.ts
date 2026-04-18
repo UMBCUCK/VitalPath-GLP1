@@ -30,6 +30,7 @@ import { JWT_SECRET } from "@/lib/constants";
 import {
   qualifyResumeEmail,
   welcomeSequence,
+  checkoutAbandonment,
   sendLifecycleEmail,
   sendPeptideIntro,
 } from "@/lib/services/lifecycle-emails";
@@ -67,6 +68,8 @@ async function runLifecycle(req: NextRequest) {
     peptide_intro: 0,
     welcome_day3: 0,
     welcome_day7: 0,
+    checkout_abandon_1h: 0,
+    checkout_abandon_24h: 0,
   };
   const errors: string[] = [];
 
@@ -169,6 +172,79 @@ async function runLifecycle(req: NextRequest) {
   } catch (err) {
     errors.push("peptide_intro:batch");
     safeError("[Cron peptide_intro batch]", err);
+  }
+
+  // ─── Trigger 2b: Checkout abandonment (1h and 24h) ───────────
+  // Signal: user completed intake, no active subscription yet, intake age
+  // falls inside one of the abandonment windows. This recovers the most
+  // valuable drop-offs (warm users who already signed off on intake).
+  for (const { hours, tag, key, template } of [
+    { hours: 1, tag: "checkout_abandon_1h", key: "checkout_abandon_1h" as const, template: checkoutAbandonment.hour1 },
+    { hours: 24, tag: "checkout_abandon_24h", key: "checkout_abandon_24h" as const, template: checkoutAbandonment.hour24 },
+  ]) {
+    try {
+      // Window: [now - (hours+1)h, now - hours h]. Width = 1 hour.
+      // Cron runs hourly, so each user passes through exactly one window.
+      const windowStart = new Date(now - (hours + 1) * 60 * 60 * 1000);
+      const windowEnd = new Date(now - hours * 60 * 60 * 1000);
+      const candidates = await db.intakeSubmission.findMany({
+        where: {
+          createdAt: { gte: windowStart, lt: windowEnd },
+          user: {
+            subscriptions: { none: { status: "ACTIVE" } },
+          },
+        },
+        select: {
+          id: true,
+          userId: true,
+          user: { select: { email: true, firstName: true } },
+        },
+        take: 200,
+      });
+
+      for (const c of candidates) {
+        if (!c.user?.email) continue;
+        const already = await db.notification.findFirst({
+          where: {
+            userId: c.userId,
+            type: "SYSTEM",
+            metadata: { path: ["tag"], equals: tag } as unknown as object,
+          },
+        });
+        if (already) continue;
+
+        try {
+          await sendLifecycleEmail(
+            c.user.email,
+            template(c.user.firstName ?? undefined),
+            [tag],
+          );
+          await db.notification.create({
+            data: {
+              userId: c.userId,
+              type: "SYSTEM",
+              title:
+                hours === 1
+                  ? "Your plan is ready — complete your membership"
+                  : "Questions? We're here to help",
+              body:
+                hours === 1
+                  ? "Your selected plan is saved. Complete checkout and your provider evaluation can begin today."
+                  : "Browse FAQs, or reply to our email and we'll get back within 24 hours.",
+              link: "/pricing",
+              metadata: { tag },
+            },
+          });
+          sent[key]++;
+        } catch (err) {
+          errors.push(`${tag}:${c.userId}`);
+          safeError(`[Cron ${tag}]`, err);
+        }
+      }
+    } catch (err) {
+      errors.push(`${tag}:batch`);
+      safeError(`[Cron ${tag} batch]`, err);
+    }
   }
 
   // ─── Trigger 3: Welcome day 3 and day 7 ──────────────────────

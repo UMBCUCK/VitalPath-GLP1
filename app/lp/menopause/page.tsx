@@ -370,9 +370,9 @@ export default function MenopauseLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Menopause-Aware GLP-1 Care"
-        headline="Menopause doesn't have to mean 20 extra pounds —"
-        headlineAccent="GLP-1 care, from licensed providers"
-        subtitle="Estrogen decline shifts fat storage, slows metabolism, and makes old diets useless. Prescribed GLP-1 from US-licensed providers addresses the hormonal cause. 2-minute eligibility. From $179/mo."
+        headline="Lose that stubborn menopause weight by May."
+        headlineAccent="Same active ingredient as Ozempic."
+        subtitle="Hormone-aware GLP-1 care — may help you lose up to 7 lbs in your first month.* Works with estrogen shifts, not against them. From $179/mo. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-menopause"
       />

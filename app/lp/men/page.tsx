@@ -376,9 +376,9 @@ export default function MenLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Built for Men"
-        headline="Cut the gut. Built for men."
-        headlineAccent="Prescribed by US-licensed doctors."
-        subtitle="Dadbod isn't a personality — it's a metabolic signal. Doctor-prescribed GLP-1 targets visceral fat and the insulin-cortisol axis that lifting alone can't fix. 2-minute eligibility. From $179/mo."
+        headline="Cut the gut by May."
+        headlineAccent="Same active ingredient as Ozempic and Wegovy."
+        subtitle="Doctor-prescribed GLP-1 built for men — may help you lose up to 10 lbs in your first month.* Testosterone-aware protocol. From $179/mo. 2-minute assessment. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-men"
       />

@@ -372,9 +372,9 @@ export default function WomenWeightLossLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="For Every Life Stage"
-        headline="Weight-loss care for every phase —"
-        headlineAccent="cycle, postpartum, perimenopause, menopause"
-        subtitle="Diets were designed by men who've never lived in your body. Doctor-prescribed GLP-1 from US-licensed providers, tuned for female physiology across every phase of life. 2-minute eligibility. From $179/mo."
+        headline="Lose that stubborn weight by May — at any phase."
+        headlineAccent="Same active ingredient as Ozempic."
+        subtitle="GLP-1 care tuned for your cycle, postpartum, peri, or menopause — may help you lose up to 7 lbs in your first month.* From $179/mo. 2-minute assessment. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-women-weight-loss"
       />

@@ -296,9 +296,9 @@ export default function TelehealthPage() {
       {/* 1. HERO */}
       <LpHeroBlock
         badge="Now accepting new patients \u2014 telehealth evaluation available"
-        headline="See a Weight Loss Doctor Online \u2014"
-        headlineAccent="Get Medication Delivered"
-        subtitle="Board-certified providers evaluate your health profile within 1 business day. GLP-1 medication ships free if prescribed. No office visits. No insurance required."
+        headline="Start GLP-1 telehealth care by May."
+        headlineAccent="Same active ingredient as Ozempic."
+        subtitle="100% online. Board-certified providers evaluate you in 1 business day — may help you lose up to 8 lbs in your first month.* From $179/mo. Ships free. Individual results vary."
         stats={heroStats}
         ctaLocation="telehealth-hero"
       />

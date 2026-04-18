@@ -374,9 +374,9 @@ export default function BellyFatLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Target Visceral Fat"
-        headline="Finally lose that stubborn belly fat —"
-        headlineAccent="Medicine that treats the hormonal cause"
-        subtitle="Visceral fat is driven by cortisol and insulin, not willpower. Prescribed GLP-1 from US-licensed providers addresses the root cause. 2-minute eligibility. From $179/mo."
+        headline="Lose that stubborn belly fat by May."
+        headlineAccent="Same active ingredient as Ozempic and Wegovy."
+        subtitle="Doctor-prescribed GLP-1 may help you lose up to 8 lbs in your first month.* Targets visceral fat at the hormonal cause. From $179/mo. 2-minute assessment. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-belly-fat"
       />

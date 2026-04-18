@@ -376,9 +376,9 @@ export default function Glp1LandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Accepting new patients — same-day evaluation"
-        headline="Your complete GLP-1 weight-loss program —"
-        headlineAccent="Medication, care, coaching. From $179/mo."
-        subtitle="Not just medication — a supervised program. US-licensed providers, personalized meal plans, care-team messaging, and compounded GLP-1 delivered to your door. 2-minute eligibility. Individual results vary."
+        headline="Start your GLP-1 journey by May."
+        headlineAccent="Same class of medicine as Ozempic and Mounjaro."
+        subtitle="Complete program — prescription, medication, and provider support in one. May help you lose up to 8 lbs in your first month.* From $179/mo. Individual results vary."
         stats={heroStats}
         ctaLocation="glp1-hero"
       />

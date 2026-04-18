@@ -369,9 +369,9 @@ export default function PostpartumLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Care Built Post-Pregnancy"
-        headline="You gave your body to your baby."
-        headlineAccent="Let's get you back — thoughtfully"
-        subtitle="Postpartum weight isn't a willpower problem. Hormones, sleep, and time all changed. GLP-1 care, after you've weaned, from US-licensed providers who take postpartum seriously. From $179/mo."
+        headline="Lose that stubborn baby weight by May."
+        headlineAccent="Same active ingredient as Ozempic."
+        subtitle="GLP-1 care for moms cleared by their OB and not currently breastfeeding — may help you lose up to 8 lbs in your first month.* From $179/mo. 2-minute assessment. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-postpartum"
       />

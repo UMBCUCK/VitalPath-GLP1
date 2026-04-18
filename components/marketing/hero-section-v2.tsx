@@ -1,14 +1,6 @@
 import { Check } from "lucide-react";
 import { HeroSection } from "./hero-section";
-
-function getDeadlineMonth(): string {
-  const now = new Date();
-  const dayOfMonth = now.getDate();
-  // Before the 20th: target = this month + 1. On/after the 20th: target = this month + 2.
-  const monthsAhead = dayOfMonth >= 20 ? 2 : 1;
-  const target = new Date(now.getFullYear(), now.getMonth() + monthsAhead, 1);
-  return new Intl.DateTimeFormat("en-US", { month: "long" }).format(target);
-}
+import { getDeadlineMonth } from "@/lib/seasonal-month";
 
 const BULLETS = [
   "2-minute approval",

@@ -373,9 +373,9 @@ export default function Over40LandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Built for Your 40s"
-        headline="The weight-loss playbook that actually works"
-        headlineAccent="in your 40s"
-        subtitle="Your body changed the rules at 40 — slower metabolism, shifting hormones, quiet muscle loss. Doctor-prescribed GLP-1 from US-licensed providers addresses the real mechanism. 2-minute eligibility. From $179/mo."
+        headline="Lose that midlife weight by May."
+        headlineAccent="Same active ingredient as Ozempic and Wegovy."
+        subtitle="Metabolism-aware GLP-1 for your 40s — may help you lose up to 8 lbs in your first month.* Targets the real mechanism behind midlife weight gain. From $179/mo. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-over40"
       />

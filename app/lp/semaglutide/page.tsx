@@ -386,9 +386,9 @@ export default function SemaglutideLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Accepting new patients — same-day evaluation"
-        headline="Compounded semaglutide, prescribed online —"
-        headlineAccent="From $179/mo"
-        subtitle="The same active ingredient studied in brand-name GLP-1 trials. Prescribed by US-licensed providers, dispensed by a US-licensed compounding pharmacy. 2-minute eligibility. Individual results vary."
+        headline="Start compounded semaglutide by May."
+        headlineAccent="Same molecule as Ozempic and Wegovy."
+        subtitle="Prescribed by US-licensed providers, dispensed by a US-licensed compounding pharmacy — may help you lose up to 8 lbs in your first month.* From $179/mo. Individual results vary."
         stats={heroStats}
         ctaLocation="semaglutide-hero"
       />

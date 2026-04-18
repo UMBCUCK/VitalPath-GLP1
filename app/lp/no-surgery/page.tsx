@@ -380,9 +380,9 @@ export default function NoSurgeryLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Non-Surgical Option"
-        headline="Skip the scalpel —"
-        headlineAccent="prescribed GLP-1 care from home"
-        subtitle="A clinically supervised, non-invasive alternative to bariatric surgery for many patients. US-licensed providers. No hospital stay. 2-minute eligibility. From $179/mo."
+        headline="Lose that weight by May — no scalpel needed."
+        headlineAccent="Same active ingredient as Ozempic and Wegovy."
+        subtitle="At-home weekly injection, no hospital, no recovery — may help you lose up to 8 lbs in your first month.* From $179/mo. 2-minute assessment. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-no-surgery"
       />

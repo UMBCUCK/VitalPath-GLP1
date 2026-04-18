@@ -369,9 +369,9 @@ export default function WomenLandingPage() {
           ====================================================================== */}
       <LpHeroBlock
         badge="Designed By Women, For Women"
-        headline="Weight-loss care, designed by women,"
-        headlineAccent="Prescribed for women"
-        subtitle="Most programs were built around male metabolism. Your hormones, cycles, and life phases work differently — your care should too. Prescribed GLP-1 from US-licensed providers. 2-minute eligibility. From $179/mo."
+        headline="Lose that stubborn weight by May."
+        headlineAccent="Same active ingredient as Ozempic and Wegovy."
+        subtitle="Female-designed GLP-1 care that works with your biology — may help you lose up to 7 lbs in your first month.* From $179/mo. 2-minute assessment. Individual results vary."
         stats={heroStats}
         ctaLocation="hero-women"
       />
