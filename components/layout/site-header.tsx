@@ -51,7 +51,17 @@ const LP_GROUPS = [
       { label: "After Breakup", slug: "after-breakup" },
       { label: "After Divorce", slug: "after-divorce" },
       { label: "Before Wedding", slug: "before-wedding" },
+      { label: "Empty Nester", slug: "empty-nester" },
+      { label: "Reunion", slug: "reunion" },
+    ],
+  },
+  {
+    category: "Clinical",
+    pages: [
       { label: "Pre-Diabetes", slug: "pre-diabetes" },
+      { label: "Sleep Apnea", slug: "sleep-apnea" },
+      { label: "Blood Pressure", slug: "blood-pressure" },
+      { label: "Fatty Liver", slug: "fatty-liver" },
     ],
   },
   {
@@ -131,8 +141,8 @@ export function SiteHeader() {
             </button>
 
             {lpDesktopOpen && (
-              <div className="absolute left-1/2 top-full mt-2 w-[820px] -translate-x-1/2 rounded-2xl border border-navy-100/60 bg-white p-5 shadow-2xl">
-                <div className="grid grid-cols-2 gap-x-6 gap-y-5 lg:grid-cols-5">
+              <div className="absolute left-1/2 top-full mt-2 w-[min(980px,calc(100vw-2rem))] -translate-x-1/2 rounded-2xl border border-navy-100/60 bg-white p-5 shadow-2xl">
+                <div className="grid grid-cols-2 gap-x-5 gap-y-5 md:grid-cols-3 lg:grid-cols-6">
                   {LP_GROUPS.map((group) => (
                     <div key={group.category}>
                       <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-graphite-400">

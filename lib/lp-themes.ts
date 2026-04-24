@@ -519,7 +519,14 @@ export function getDefaultThemeForSlug(slug: string): ThemeId {
     "after-breakup": "cerulean-feminine",   // Empowerment energy — modern + action
     "after-divorce": "warm-feminine",       // Nurturing reinvention — life transition
     "before-wedding": "warm-feminine",      // Warmth for the big day
-    "pre-diabetes": "trust-medical",        // Pure clinical authority
+    "empty-nester": "warm-feminine",        // "Your time now" — nurturing agency for 45-60
+    reunion: "bold-vitality",                // "Show up unrecognizable" — confidence + action
+
+    // Clinical urgency (Tier 3 LPs — doctor-recommended intent, strong outcome data)
+    "pre-diabetes": "trust-medical",         // A1C audience, reversible-window framing
+    "sleep-apnea": "trust-medical",          // OSA + CPAP users, SURMOUNT-OSA-informed
+    "blood-pressure": "trust-medical",       // Hypertension, BP-reduction-via-weight-loss
+    "fatty-liver": "trust-medical",          // MASH/NAFLD, semaglutide FDA Fast Track
 
     // General + clinical
     telehealth: "trust-medical",
