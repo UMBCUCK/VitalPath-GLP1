@@ -515,6 +515,12 @@ export function getDefaultThemeForSlug(slug: string): ThemeId {
     affordable: "earth-wellness",
     "no-surgery": "earth-wellness",
 
+    // Life-event triggered (Tier 2 LPs — high emotional motivation, underserved markets)
+    "after-breakup": "cerulean-feminine",   // Empowerment energy — modern + action
+    "after-divorce": "warm-feminine",       // Nurturing reinvention — life transition
+    "before-wedding": "warm-feminine",      // Warmth for the big day
+    "pre-diabetes": "trust-medical",        // Pure clinical authority
+
     // General + clinical
     telehealth: "trust-medical",
     over40: "trust-medical",

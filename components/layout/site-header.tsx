@@ -46,6 +46,15 @@ const LP_GROUPS = [
     ],
   },
   {
+    category: "Life Events",
+    pages: [
+      { label: "After Breakup", slug: "after-breakup" },
+      { label: "After Divorce", slug: "after-divorce" },
+      { label: "Before Wedding", slug: "before-wedding" },
+      { label: "Pre-Diabetes", slug: "pre-diabetes" },
+    ],
+  },
+  {
     category: "Other Angles",
     pages: [
       { label: "Affordable", slug: "affordable" },
@@ -122,11 +131,11 @@ export function SiteHeader() {
             </button>
 
             {lpDesktopOpen && (
-              <div className="absolute left-1/2 top-full mt-2 w-[680px] -translate-x-1/2 rounded-2xl border border-navy-100/60 bg-white p-5 shadow-2xl">
-                <div className="grid grid-cols-2 gap-x-6 gap-y-5 lg:grid-cols-4">
+              <div className="absolute left-1/2 top-full mt-2 w-[820px] -translate-x-1/2 rounded-2xl border border-navy-100/60 bg-white p-5 shadow-2xl">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-5 lg:grid-cols-5">
                   {LP_GROUPS.map((group) => (
                     <div key={group.category}>
-                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-graphite-400">
+                      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-graphite-400">
                         {group.category}
                       </p>
                       <ul className="space-y-1">
@@ -135,7 +144,7 @@ export function SiteHeader() {
                             <Link
                               href={`/lp/${p.slug}`}
                               onClick={() => setLpDesktopOpen(false)}
-                              className="block rounded-md px-2 py-1.5 text-xs text-graphite-600 transition-colors hover:bg-teal-50 hover:text-navy"
+                              className="block rounded-md px-2 py-1.5 text-sm text-graphite-600 transition-colors hover:bg-teal-50 hover:text-navy"
                             >
                               {p.label}
                             </Link>
@@ -166,21 +175,22 @@ export function SiteHeader() {
           </Link>
         </div>
 
-        {/* Mobile menu button */}
+        {/* Mobile menu button — 44px touch target */}
         <button
-          className="flex items-center justify-center rounded-lg p-2 text-graphite-600 md:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-graphite-600 hover:bg-navy-50 active:bg-navy-100 transition-colors md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
-      {/* Mobile nav */}
+      {/* Mobile nav — iOS momentum scroll, no parent overflow-hidden fight */}
       <div
         className={cn(
-          "overflow-hidden border-t border-navy-100/40 bg-white transition-all duration-300 md:hidden",
-          mobileOpen ? "max-h-[80vh] overflow-y-auto opacity-100" : "max-h-0 opacity-0"
+          "border-t border-navy-100/40 bg-white transition-all duration-300 md:hidden [-webkit-overflow-scrolling:touch]",
+          mobileOpen ? "max-h-[calc(100vh-4rem)] overflow-y-auto opacity-100" : "max-h-0 overflow-hidden opacity-0"
         )}
       >
         <nav className="flex flex-col gap-1 px-4 py-4">
@@ -214,7 +224,7 @@ export function SiteHeader() {
             <div className="pl-3">
               {LP_GROUPS.map((group) => (
                 <div key={group.category} className="mb-2">
-                  <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-graphite-400">
+                  <p className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-graphite-400">
                     {group.category}
                   </p>
                   {group.pages.map((p) => (
@@ -225,7 +235,7 @@ export function SiteHeader() {
                         setLpMobileOpen(false);
                         setMobileOpen(false);
                       }}
-                      className="block rounded-md px-3 py-2 text-xs text-graphite-600 transition-colors hover:bg-teal-50"
+                      className="block rounded-md px-3 py-2.5 text-sm text-graphite-600 transition-colors hover:bg-teal-50"
                     >
                       {p.label}
                     </Link>
