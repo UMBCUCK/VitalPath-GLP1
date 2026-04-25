@@ -130,9 +130,39 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Kill the iOS gray-flash on every tap. We control feedback via active: classes. */
+    -webkit-tap-highlight-color: transparent;
+    /* Prevent decorative fixed/absolute elements (blurred orbs, social-proof
+       toasts positioned off-canvas during transitions, etc.) from creating
+       page-level horizontal scroll on mobile. `clip` preserves position:sticky
+       on descendants (overflow-hidden would break it). */
+    overflow-x: clip;
   }
   body {
     @apply bg-background text-foreground font-sans;
+    overflow-x: clip;
+    /* Stop pull-to-refresh and rubber-band scroll from showing through into
+       the parent UA chrome on mobile drawers/modals. */
+    overscroll-behavior-y: none;
+  }
+  /* Eliminates the 300ms double-tap-zoom delay and makes taps feel instant on
+     every interactive control. Using `manipulation` (not `none`) preserves
+     pinch-zoom for users who need it for accessibility. */
+  button, a, [role="button"], [role="tab"], [role="link"], [role="menuitem"], summary, label, input[type="checkbox"], input[type="radio"], select {
+    touch-action: manipulation;
+  }
+  /* Sticky / fixed UI chrome shouldn't be selectable — accidental long-press
+     selecting the "From $179/mo" text feels broken. */
+  header.sticky, [role="navigation"][aria-label*="mobile"], div.fixed.bottom-0 {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  /* Default focus ring is brand-color and visible, but never on mouse clicks. */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 }
 
@@ -343,19 +373,61 @@
   }
 }
 
-/* Reduced motion support */
+/* Reduced motion support — comprehensive */
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Decorative pulse/ping/spin become static */
   .animate-fade-in-up,
   .animate-fade-in-left,
   .animate-pulse,
   .animate-spin,
-  .animate-ping {
+  .animate-ping,
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-count-up,
+  .animate-shake {
     animation: none !important;
   }
-
-  * {
-    transition-duration: 0.01ms !important;
+  /* Force the final state for fade-in-up so content is visible without animation */
+  .animate-fade-in-up,
+  .animate-fade-in-left,
+  .animate-fade-in,
+  .animate-slide-up {
+    opacity: 1 !important;
+    transform: none !important;
   }
+}
+
+/* Apple-standard ease-out for transitions — feels more native than CSS default. */
+.transition-native {
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Drawer / sheet slide easing — Apple spring-out. */
+.ease-spring {
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Scrollable containers should use iOS momentum + contain bounce */
+.scroll-container,
+[data-scroll-container] {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Visual press feedback for cards (use with active:scale-[0.99] in markup if needed) */
+.tap-card {
+  transition: transform 120ms cubic-bezier(0.32, 0.72, 0, 1), box-shadow 200ms ease;
+}
+.tap-card:active {
+  transform: scale(0.98);
 }
 
 /* content-visibility: auto defers rendering of off-screen sections until needed.
@@ -493,8 +565,10 @@ html.theme-cerulean .bg-sage       { background-color: #CCF4FF !important; }
 html.theme-cerulean .bg-cloud      { background-color: #f6fafc !important; }
 
 /* ── GRAPHITE text — match Nature's Journey gray tones ── */
-html.theme-cerulean .text-graphite-200 { color: #b8cdd8 !important; }
-html.theme-cerulean .text-graphite-300 { color: #7a96a6 !important; }
+html.theme-cerulean .text-graphite-200 { color: #a4bcc8 !important; }
+/* WCAG AA: bumped from #7a96a6 (3.7:1 against white) to #5a7a88 (~4.6:1) so
+   body-text usage of text-graphite-300 (490+ sites) passes 4.5:1. */
+html.theme-cerulean .text-graphite-300 { color: #5a7a88 !important; }
 html.theme-cerulean .text-graphite-400 { color: #4a6a75 !important; }
 html.theme-cerulean .text-graphite-500 { color: #3a5a68 !important; }
 html.theme-cerulean .text-graphite-600 { color: #2a4a58 !important; }

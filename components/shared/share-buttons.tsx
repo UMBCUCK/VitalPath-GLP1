@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Link2, Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link2, Check, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ShareButtonsProps {
@@ -11,10 +11,15 @@ interface ShareButtonsProps {
 
 export function ShareButtons({ title, slug }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
+  const [canShare, setCanShare] = useState(false);
 
   const url = typeof window !== "undefined"
     ? window.location.href
     : `https://naturesjourneyhealth.com/blog/${slug}`;
+
+  useEffect(() => {
+    setCanShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
+  }, []);
 
   function copyLink() {
     navigator.clipboard.writeText(url);
@@ -26,9 +31,29 @@ export function ShareButtons({ title, slug }: ShareButtonsProps) {
     window.open(shareUrl, "_blank", "width=600,height=400");
   }
 
+  async function nativeShare() {
+    try {
+      await navigator.share({ title, url });
+    } catch {
+      copyLink();
+    }
+  }
+
   return (
     <div className="flex items-center gap-1.5">
       <span className="text-xs text-graphite-300 mr-1">Share</span>
+      {canShare && (
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8 sm:hidden"
+          onClick={nativeShare}
+          title="Share"
+          aria-label="Share via device"
+        >
+          <Share2 className="h-3.5 w-3.5" aria-hidden="true" />
+        </Button>
+      )}
       <Button
         variant="outline"
         size="icon"

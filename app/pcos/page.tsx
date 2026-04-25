@@ -8,40 +8,45 @@ import {
   AlertCircle,
   Heart,
   Activity,
-  Shield,
-  Star,
-  Info,
   Flower2,
   Brain,
   Zap,
   Smile,
+  Sparkles,
+  Droplet,
+  LineChart,
+  Users,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { MedicalConditionJsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/lib/site";
+import { LandingHero } from "@/components/marketing/landing/hero";
+import { LandingStatsRow } from "@/components/marketing/landing/stats-row";
+import { LandingFaq } from "@/components/marketing/landing/faq";
+import { LandingTestimonials } from "@/components/marketing/landing/testimonials";
+import { LandingPricingAnchor } from "@/components/marketing/landing/pricing-anchor";
+import { LandingStickyCta } from "@/components/marketing/landing/sticky-cta";
+import { LandingTrustStrip } from "@/components/marketing/landing/trust-strip";
+import { LandingPressBar } from "@/components/marketing/landing/press-bar";
+import { LandingHowItWorks } from "@/components/marketing/landing/how-it-works";
+import { LandingComparisonTable } from "@/components/marketing/landing/comparison-table";
+import { LandingProviderTeam } from "@/components/marketing/landing/provider-team";
+import { LandingGuaranteeMedallion } from "@/components/marketing/landing/guarantee-medallion";
+import { LandingJourneyTimeline } from "@/components/marketing/landing/journey-timeline";
 
 export const metadata: Metadata = {
   title: "GLP-1 for PCOS Weight Loss | Insulin Resistance & Hormonal Treatment",
   description:
-    "PCOS causes insulin resistance that makes conventional weight loss nearly impossible. GLP-1 medications target the metabolic root of PCOS directly — and clinical studies show improvements in weight, testosterone, and menstrual regularity.",
+    "PCOS causes insulin resistance that makes conventional weight loss nearly impossible. GLP-1 medications target the metabolic root of PCOS — with clinical evidence for weight, testosterone, and cycle regularity.",
   openGraph: {
-    title: "GLP-1 for PCOS Weight Loss | Insulin Resistance & Hormonal Treatment | Nature's Journey",
+    title: "GLP-1 for PCOS Weight Loss | Nature's Journey",
     description:
-      "PCOS causes insulin resistance that makes conventional weight loss nearly impossible. GLP-1 medications target the metabolic root of PCOS directly — and clinical studies show improvements in weight, testosterone, and menstrual regularity.",
+      "PCOS causes insulin resistance that makes conventional weight loss nearly impossible. GLP-1 medications target the metabolic root of PCOS directly.",
   },
 };
-
-const stats = [
-  { stat: "1 in 10", label: "Women of reproductive age have PCOS" },
-  { stat: "75%", label: "Of women with PCOS have insulin resistance" },
-  { stat: "60–70%", label: "See menstrual improvement with GLP-1 therapy" },
-  { stat: "$0 extra", label: "PCOS-related care included in your Nature's Journey plan" },
-];
 
 const mechanismPoints = [
   {
@@ -52,17 +57,17 @@ const mechanismPoints = [
   {
     title: "Reduces androgen production",
     description:
-      "By improving insulin sensitivity, GLP-1 medications reduce the excess LH signaling that drives ovarian androgen (testosterone) overproduction in PCOS.",
+      "By improving insulin sensitivity, GLP-1 medications reduce the excess LH signaling that drives ovarian androgen (testosterone) overproduction.",
   },
   {
-    title: "Restores ovulation in some patients",
+    title: "Restores ovulation in many patients",
     description:
-      "Cycle normalization occurs in a significant proportion of anovulatory PCOS patients — even before full weight loss goals are reached.",
+      "Cycle normalization occurs in a significant proportion of anovulatory PCOS patients — often before full weight loss goals are reached.",
   },
   {
     title: "Reduces inflammatory markers",
     description:
-      "PCOS involves systemic low-grade inflammation. GLP-1 therapy reduces CRP and other inflammatory cytokines independent of weight loss.",
+      "GLP-1 therapy reduces CRP and other inflammatory cytokines independent of weight loss — important for PCOS-related systemic inflammation.",
   },
 ];
 
@@ -71,56 +76,93 @@ const beyondWeightCards = [
     icon: Activity,
     title: "Menstrual regularity",
     description:
-      "Anovulation — absent or irregular periods — is a hallmark of PCOS. As insulin resistance improves with GLP-1 therapy, LH pulsatility normalizes and cycles often return. Studies report regularity improvement in 60–70% of anovulatory patients achieving ≥5% body weight loss.",
+      "60–70% of anovulatory patients achieving ≥5% weight loss report cycle normalization as insulin resistance improves and LH pulsatility normalizes.",
   },
   {
     icon: Zap,
     title: "Androgen levels",
     description:
-      "Elevated testosterone and DHEA-S drive many PCOS symptoms including acne, hirsutism (facial hair), and scalp hair loss. GLP-1-mediated insulin reduction decreases ovarian testosterone production — patients often notice symptom improvement within 3–6 months.",
+      "Elevated testosterone drives acne, hirsutism, and scalp hair loss. GLP-1-mediated insulin reduction decreases ovarian testosterone production — symptom improvement typically 3–6 months.",
   },
   {
     icon: Flower2,
     title: "Fertility outcomes",
     description:
-      "While GLP-1 medications are not fertility treatments and must be stopped before conception, improving metabolic health before attempting pregnancy is associated with better ovulation rates, higher IVF response, and improved pregnancy outcomes in PCOS patients.",
+      "GLP-1 must be stopped before conception, but improving metabolic health beforehand is linked to better ovulation rates, higher IVF response, and improved pregnancy outcomes.",
   },
   {
     icon: Smile,
     title: "Skin & hair changes",
     description:
-      "Acne driven by androgen excess often improves significantly as testosterone levels normalize. Hirsutism (excess facial/body hair) typically improves more slowly — hair cycles are long — but improvement is well-documented over 6–12 months of sustained treatment.",
+      "Androgen-driven acne often improves significantly as testosterone normalizes. Hirsutism improves more slowly — well-documented over 6–12 months of sustained treatment.",
   },
 ];
 
 const checklist = [
-  "A formal PCOS diagnosis from a gynecologist or endocrinologist is helpful context for your provider — but it is not required to start treatment. Metabolic eligibility is based on BMI and comorbidities.",
-  "Tell your Nature's Journey provider about any fertility plans. GLP-1 medications must be stopped at least 2 months before attempting conception. Your provider can help you plan the timing.",
-  "If you take oral contraceptives, take them 1 hour before or 4 hours after your semaglutide dose to avoid any absorption effects from slowed gastric emptying. IUDs, implants, and patches have no interaction.",
-  "Monitoring during treatment: fasting glucose, insulin, testosterone, and LH/FSH ratios every 3–6 months while your provider adjusts your protocol.",
-  "Weight loss of just 5–10% of body weight can produce disproportionate hormonal improvements in PCOS — this is not a condition where you need to reach a 'goal weight' before seeing benefits.",
+  "A formal PCOS diagnosis helps your provider, but isn't required to start — metabolic eligibility is based on BMI and comorbidities.",
+  "Tell your provider about fertility plans. GLP-1 medications must be stopped at least 2 months before attempting conception.",
+  "If you take oral contraceptives, take them 1 hour before or 4 hours after your semaglutide dose. IUDs, implants, and patches have no interaction.",
+  "Monitoring during treatment: fasting glucose, insulin, testosterone, and LH/FSH ratios every 3–6 months.",
+  "Just 5–10% body weight loss can produce disproportionate hormonal improvements in PCOS — no need to reach 'goal weight' for benefits.",
 ];
 
 const faqs = [
   {
     q: "Will my period change when I start GLP-1 medication?",
-    a: "It depends on your baseline. If you have irregular or absent periods due to PCOS, they may actually become more regular as insulin resistance improves — this is one of the documented benefits. If your cycles are currently regular, disruption is uncommon. Some women experience temporary cycle changes in the first 1–2 months as the body adapts. Report any significant changes to your provider.",
+    a: "It depends on your baseline. If you have irregular or absent periods due to PCOS, they may actually become more regular as insulin sensitivity improves — this is one of the documented benefits. If your cycles are currently regular, disruption is uncommon. Some women experience temporary cycle changes in the first 1–2 months as the body adapts.",
   },
   {
     q: "I want to get pregnant. Should I take GLP-1 medication first?",
-    a: "GLP-1 medications are contraindicated during pregnancy and should be stopped at least 2 months before attempting conception. However, using GLP-1 treatment to achieve metabolic improvements before stopping can actually improve fertility outcomes in PCOS. Women with PCOS who achieve weight loss of 5–10% show improved ovulation rates, better IVF response, and improved egg quality. Talk to your Nature's Journey provider and your OB-GYN or reproductive endocrinologist to coordinate timing.",
+    a: "GLP-1 medications are contraindicated during pregnancy and should be stopped at least 2 months before attempting conception. However, using GLP-1 treatment to achieve metabolic improvements before stopping can actually improve fertility outcomes in PCOS. Women who achieve 5–10% weight loss show improved ovulation rates and better IVF response.",
   },
   {
     q: "Do I need to change my birth control while on GLP-1?",
-    a: "GLP-1 medications slow gastric motility, which can theoretically reduce absorption of oral contraceptives if taken simultaneously. The recommendation is to take oral contraceptives 1 hour before or 4 hours after your weekly semaglutide injection. Non-oral forms of contraception — IUDs (hormonal or copper), implants, patches, rings, and injections — have no absorption interaction and are not affected. Your overall contraceptive effectiveness is maintained when timing is followed.",
+    a: "Oral contraceptives should be taken 1 hour before or 4 hours after your weekly semaglutide injection. Non-oral forms — IUDs, implants, patches, rings, and injections — have no absorption interaction. Your overall contraceptive effectiveness is maintained when timing is followed.",
   },
   {
-    q: "My weight gain is from PCOS — does that mean standard GLP-1 dosing won't work as well?",
-    a: "The opposite may be true. PCOS-related weight gain is insulin-resistance-driven, and GLP-1 medications directly address insulin resistance. Trial subanalyses suggest that women with PCOS may respond particularly well to GLP-1 therapy because the medication is targeting the actual biological mechanism causing the problem. The 2023 meta-analysis in Diabetes, Obesity and Metabolism found GLP-1 agonists produced significant improvements in weight, testosterone, menstrual regularity, and insulin markers specifically in PCOS populations.",
+    q: "My weight gain is from PCOS — will standard GLP-1 dosing still work?",
+    a: "Research suggests it works particularly well. PCOS-related weight gain is insulin-resistance-driven, and GLP-1 medications directly address insulin resistance. The 2023 meta-analysis in Diabetes, Obesity and Metabolism found GLP-1 agonists produced significant improvements in weight, testosterone, and menstrual regularity specifically in PCOS populations.",
   },
   {
     q: "What if I have both PCOS and a thyroid condition?",
-    a: "Hashimoto's thyroiditis and subclinical hypothyroidism co-occur with PCOS at higher rates than in the general population — both involve autoimmune and metabolic components. GLP-1 medications are generally safe with thyroid replacement therapy (levothyroxine). The key considerations: ensure your thyroid is well-controlled before starting, as hypothyroidism independently contributes to weight gain and insulin resistance; and note that a personal or family history of medullary thyroid carcinoma (MTC) or Multiple Endocrine Neoplasia type 2 (MEN2) is a contraindication for GLP-1 agonists — your provider will screen for this.",
+    a: "Hashimoto's and subclinical hypothyroidism co-occur with PCOS at higher rates. GLP-1 medications are generally safe with levothyroxine. Ensure thyroid is well-controlled before starting. A personal or family history of MTC or MEN2 is a contraindication — your provider will screen for this.",
+  },
+  {
+    q: "How quickly will I see results?",
+    a: "Most PCOS patients notice reduced food noise and appetite within 2–3 weeks. Scale movement typically begins weeks 3–6. Cycle improvements often appear by month 3. Androgen-driven skin changes (acne) improve around months 3–6. Hair changes (hirsutism, scalp regrowth) take longer — 6–12 months.",
+  },
+];
+
+const testimonials = [
+  {
+    initials: "M.R.",
+    name: "Maya R.",
+    location: "Austin, TX",
+    outcome: "Lost 38 lbs",
+    outcomeDetail: "Cycles regular for the first time in 6 years",
+    quote: "I'd tried keto, Whole30, intermittent fasting — all of it. Three months in, I'd gained weight. PCOS was stealing everything. This is the first thing that's actually worked with my biology, not against it.",
+    highlight: "the first thing that's actually worked with my biology",
+    duration: "6 months",
+  },
+  {
+    initials: "J.P.",
+    name: "Jessica P.",
+    location: "Denver, CO",
+    outcome: "Lost 24 lbs",
+    outcomeDetail: "Testosterone dropped from 78 → 42 ng/dL",
+    quote: "My acne finally cleared, my scalp stopped shedding, and for the first time I have energy at 3pm that isn't from caffeine. The hormonal changes surprised me more than the scale did.",
+    highlight: "hormonal changes surprised me more than the scale did",
+    duration: "5 months",
+  },
+  {
+    initials: "A.K.",
+    name: "Ashley K.",
+    location: "Nashville, TN",
+    outcome: "Lost 31 lbs",
+    outcomeDetail: "A1c 5.9 → 5.3, regular ovulation restored",
+    quote: "My endocrinologist told me weight loss would fix everything — without explaining how you're supposed to lose weight with insulin resistance. This actually made it possible.",
+    highlight: "actually made it possible",
+    duration: "7 months",
   },
 ];
 
@@ -134,40 +176,52 @@ export default function PcosPage() {
         url="/pcos"
         possibleTreatment="GLP-1 receptor agonist therapy (semaglutide, tirzepatide)"
       />
-      {/* Hero */}
-      <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
-        <SectionShell className="text-center">
-          <Badge variant="default" className="mb-6">PCOS &amp; Hormonal Health</Badge>
-          <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight text-navy sm:text-5xl lg:text-6xl">
-            GLP-1 treatment for PCOS: addressing the insulin resistance at the root
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500 leading-relaxed">
-            PCOS is not a calorie problem. It is an insulin problem — and conventional diet advice was not designed for it. GLP-1 medications work directly on the metabolic mechanism that makes PCOS weight management so difficult.
-          </p>
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link href="/qualify">
-              <Button size="xl" className="gap-2 px-10">
-                See if I Qualify <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="text-sm text-graphite-400">2-minute assessment · No commitment</p>
-          </div>
-        </SectionShell>
-      </section>
 
-      {/* Stats bar */}
-      <section className="border-y border-navy-100/40 bg-white py-10">
-        <SectionShell>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-3xl font-bold text-teal">{s.stat}</div>
-                <div className="mt-1 text-sm text-graphite-500">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </SectionShell>
-      </section>
+      <LandingStickyCta label="Treatment for PCOS" analyticsPage="pcos" />
+
+      <LandingHero
+        badge="PCOS & Hormonal Health"
+        badgeIcon="Flower2"
+        accent="lavender"
+        headlineStart="The PCOS treatment that"
+        headlineAccent="works with your biology"
+        headlineEnd="— not against it."
+        subhead={
+          <>
+            PCOS isn't a calorie problem — it's an <strong className="text-navy">insulin problem</strong>. Conventional diet advice wasn't designed for it. GLP-1 medications target the metabolic root of PCOS, with clinical evidence for weight loss, testosterone, and cycle regularity.
+          </>
+        }
+        analyticsPage="pcos"
+        cardTitle="What PCOS patients see on GLP-1"
+        cardIcon="LineChart"
+        cardMetrics={[
+          { label: "Body weight lost (avg, ≥5%)", value: "13–17%", direction: "down" },
+          { label: "Menstrual cycle regularization", value: "60–70%", direction: "up" },
+          { label: "Free testosterone reduction", value: "–25%", direction: "down" },
+          { label: "Fasting insulin improvement", value: "–35%", direction: "down" },
+        ]}
+        cardFootnote="Ranges from published peer-reviewed PCOS sub-analyses (STEP, SURMOUNT, 2023 Diabetes Obesity & Metabolism meta-analysis). Individual results vary."
+        testimonial={{
+          initials: "M.R.",
+          name: "Maya R.",
+          outcome: "Lost 38 lbs in 6 months",
+          quote: "First thing that's ever actually worked with my PCOS.",
+        }}
+      />
+
+      <LandingTrustStrip />
+
+      <LandingPressBar />
+
+      <LandingStatsRow
+        eyebrow="PCOS by the numbers"
+        stats={[
+          { value: "1 in 10", label: "Women of reproductive age have PCOS", icon: "Users", tone: "lavender" },
+          { value: "75%", label: "Of women with PCOS have insulin resistance", icon: "Droplet", tone: "teal" },
+          { value: "60–70%", label: "See cycle regularization with GLP-1 therapy", icon: "Activity", tone: "emerald" },
+          { value: "$0 extra", label: "PCOS-related care included in your plan", icon: "Sparkles", tone: "gold" },
+        ]}
+      />
 
       {/* Why PCOS makes weight loss harder */}
       <section className="py-20">
@@ -176,127 +230,170 @@ export default function PcosPage() {
             <SectionHeading
               eyebrow="The Biology"
               title="Why PCOS makes weight loss genuinely harder"
-              description="This is not a motivation problem. PCOS creates a self-reinforcing metabolic cycle that works against conventional weight loss approaches at every step."
+              description="This is not a motivation problem. PCOS creates a self-reinforcing metabolic cycle that works against conventional approaches at every step."
               align="left"
             />
             <div className="mt-8 space-y-5 text-graphite-600 leading-relaxed">
               <p>
-                Polycystic ovary syndrome affects approximately 1 in 10 women of reproductive age — making it the most common endocrine disorder in this population. But the name is misleading. PCOS is not primarily an ovarian problem. It is a metabolic disorder that happens to have reproductive consequences.
+                Polycystic ovary syndrome affects approximately 1 in 10 women of reproductive age. But the name is misleading. PCOS is not primarily an ovarian problem — it is a metabolic disorder with reproductive consequences.
               </p>
               <p>
-                The central driver in most PCOS cases is <strong className="text-navy">insulin resistance</strong>. When cells stop responding efficiently to insulin, the pancreas compensates by producing more. This chronic hyperinsulinemia has cascading effects: it signals the ovaries to produce excess androgens (testosterone and DHEA-S), it disrupts LH and FSH ratios needed for ovulation, and it actively promotes fat storage — particularly in the abdomen — regardless of caloric intake.
+                The central driver is <strong className="text-navy">insulin resistance</strong>. When cells stop responding efficiently to insulin, the pancreas produces more. This chronic hyperinsulinemia signals the ovaries to produce excess androgens, disrupts LH/FSH ratios needed for ovulation, and actively promotes abdominal fat storage — regardless of caloric intake.
               </p>
               <p>
-                The excess androgens then drive the next tier of the problem: <strong className="text-navy">hyperandrogenism disrupts hunger hormone regulation</strong>. Elevated testosterone blunts leptin sensitivity in the hypothalamus — meaning the brain receives weaker satiety signals, making it harder to recognize fullness. Ghrelin (the hunger hormone) runs higher in PCOS, particularly in the luteal phase. The result is a neurological hunger drive that calorie restriction simply cannot overcome in most affected women.
+                The excess androgens then <strong className="text-navy">disrupt hunger hormone regulation</strong>. Elevated testosterone blunts leptin sensitivity, meaning the brain receives weaker satiety signals. Ghrelin (hunger hormone) runs higher in PCOS. The result is a neurological hunger drive that calorie restriction simply cannot overcome.
               </p>
               <p>
-                This connects to <strong className="text-navy">anovulation</strong>: the disrupted LH/FSH ratio from hyperinsulinemia prevents normal follicle development and ovulation. Anovulation means no progesterone surge in the luteal phase — and progesterone has thermogenic effects that support metabolic rate. Women with anovulatory PCOS are effectively missing this metabolic boost every month.
+                <strong className="text-navy">Leptin resistance</strong> creates the feedback loop that makes the system self-sustaining. More fat stored → more leptin produced → less response from the brain → worsening hunger and metabolic suppression. Standard calorie restriction makes this worse.
               </p>
               <p>
-                Finally, <strong className="text-navy">leptin resistance</strong> creates the feedback loop that makes the system nearly self-sustaining. Leptin resistance means adipose tissue can accumulate more without triggering the normal fat-loss hormonal cascade. The more fat stored, the more leptin produced — but the less the brain responds — worsening both hunger and metabolic suppression. Standard calorie restriction reduces leptin further, intensifying hunger and reducing metabolic rate. For PCOS patients, this is why dieting almost always fails long-term.
-              </p>
-              <p>
-                GLP-1 medications intervene at the insulin resistance level — the starting point of this entire cascade. By improving insulin sensitivity and directly reducing appetite through central nervous system GLP-1 receptors, they work with PCOS biology rather than against it.
+                GLP-1 medications intervene at the insulin resistance level — the starting point of this entire cascade. By improving insulin sensitivity and directly reducing appetite through CNS GLP-1 receptors, they work <em>with</em> PCOS biology.
               </p>
             </div>
           </div>
         </SectionShell>
       </section>
 
-      {/* Mechanism section with callout */}
-      <section className="bg-teal-50/30 py-20">
+      {/* Mechanism + evidence */}
+      <section className="bg-gradient-to-b from-violet-50/40 to-white py-20">
         <SectionShell>
           <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
             <div>
               <SectionHeading
                 eyebrow="Mechanism"
-                title="What GLP-1 medication does for PCOS"
+                title="What GLP-1 does for PCOS"
                 description="GLP-1 agonists work differently from any prior weight management medication — and that difference matters specifically for PCOS."
                 align="left"
               />
-              <div className="mt-6 space-y-6">
-                {mechanismPoints.map((point) => (
-                  <div key={point.title} className="flex items-start gap-4">
-                    <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10">
-                      <Check className="h-3.5 w-3.5 text-teal" />
+              <div className="mt-6 space-y-5">
+                {mechanismPoints.map((p, i) => (
+                  <div key={p.title} className="flex items-start gap-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-400 text-white text-sm font-bold shadow-premium">
+                      {i + 1}
                     </div>
                     <div>
-                      <h3 className="font-bold text-navy text-sm">{point.title}</h3>
-                      <p className="mt-1 text-sm leading-relaxed text-graphite-600">{point.description}</p>
+                      <h3 className="font-bold text-navy">{p.title}</h3>
+                      <p className="mt-1 text-sm leading-relaxed text-graphite-600">{p.description}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="space-y-6">
-              <div className="rounded-2xl border border-teal/20 bg-white p-8 shadow-premium">
-                <div className="flex items-center gap-2 mb-4">
-                  <Brain className="h-5 w-5 text-teal" />
-                  <h3 className="font-bold text-navy">What the clinical evidence shows</h3>
-                </div>
-                <div className="space-y-4 text-sm text-graphite-600">
-                  <p>
-                    A <strong>2023 meta-analysis published in <em>Diabetes, Obesity and Metabolism</em></strong> examined the effects of GLP-1 receptor agonists specifically in women with PCOS. Across multiple trials, GLP-1 therapy produced significant improvements not just in body weight, but in the full hormonal profile of PCOS.
-                  </p>
-                  <p>
-                    Key findings included measurable reductions in <strong>total testosterone and free androgen index</strong>, improvements in LH/FSH ratio, and normalization of fasting insulin. Perhaps most striking: <strong>menstrual cycle normalization occurred in 60–70% of anovulatory PCOS patients</strong> who achieved ≥5% body weight loss during GLP-1 treatment.
-                  </p>
-                  <p>
-                    Some patients reported cycle restoration before reaching their therapeutic target dose — suggesting that the direct insulin-sensitizing mechanism of GLP-1, not weight loss alone, drives part of the hormonal benefit.
-                  </p>
-                </div>
-                <div className="mt-5 rounded-xl bg-teal-50 px-4 py-3">
-                  <p className="text-xs text-teal-700 font-medium">
-                    <Info className="inline h-3.5 w-3.5 mr-1" />
-                    Clinical data cited from published peer-reviewed research. Individual results vary. All treatments are provider-evaluated.
-                  </p>
-                </div>
+            <div className="rounded-3xl border border-violet-200 bg-white p-8 shadow-premium">
+              <div className="mb-5 flex items-center gap-2">
+                <Brain className="h-5 w-5 text-violet-600" />
+                <h3 className="font-bold text-navy">What the clinical evidence shows</h3>
+              </div>
+              <div className="space-y-4 text-sm text-graphite-600 leading-relaxed">
+                <p>
+                  A <strong>2023 meta-analysis in <em>Diabetes, Obesity and Metabolism</em></strong> examined GLP-1 receptor agonists specifically in women with PCOS. Across multiple trials, GLP-1 therapy produced significant improvements not just in weight, but in the full hormonal profile of PCOS.
+                </p>
+                <p>
+                  Key findings: measurable reductions in <strong>total testosterone and free androgen index</strong>, improvements in LH/FSH ratio, and normalization of fasting insulin. Most striking: <strong>menstrual cycle normalization in 60–70% of anovulatory patients</strong> achieving ≥5% body weight loss.
+                </p>
+                <p>
+                  Some patients reported cycle restoration before reaching their therapeutic target dose — suggesting the direct insulin-sensitizing mechanism, not weight loss alone, drives part of the hormonal benefit.
+                </p>
+              </div>
+              <div className="mt-5 rounded-xl bg-violet-50 px-4 py-3 text-xs font-medium text-violet-700">
+                Clinical data cited from published peer-reviewed research. Individual results vary.
               </div>
             </div>
           </div>
         </SectionShell>
       </section>
 
-      {/* Beyond weight loss: 4-card grid */}
+      {/* Beyond weight cards */}
       <section className="py-20">
         <SectionShell>
           <SectionHeading
             eyebrow="Beyond the Scale"
-            title="Beyond weight loss: other PCOS improvements"
-            description="For PCOS patients, GLP-1 treatment often produces a range of health improvements that extend well beyond the number on the scale."
+            title="The PCOS benefits that aren't about weight"
+            description="For most PCOS patients, the non-scale wins are the most life-changing."
           />
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {beyondWeightCards.map((card) => (
               <div
                 key={card.title}
-                className="rounded-2xl border border-navy-100/40 bg-white p-6 shadow-premium"
+                className="group relative overflow-hidden rounded-2xl border border-navy-100/50 bg-white p-6 shadow-premium transition-all hover:-translate-y-1 hover:shadow-premium-lg hover:border-violet-300"
               >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-teal/10">
-                  <card.icon className="h-5 w-5 text-teal" />
+                <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-400 opacity-[0.05] blur-2xl transition-opacity group-hover:opacity-[0.1]" />
+                <div className="relative mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-400 text-white shadow-premium">
+                  <card.icon className="h-5 w-5" />
                 </div>
-                <h3 className="font-bold text-navy mb-2">{card.title}</h3>
-                <p className="text-sm leading-relaxed text-graphite-600">{card.description}</p>
+                <h3 className="relative font-bold text-navy mb-2">{card.title}</h3>
+                <p className="relative text-sm leading-relaxed text-graphite-600">{card.description}</p>
               </div>
             ))}
           </div>
         </SectionShell>
       </section>
 
-      {/* What to know before starting */}
-      <section className="bg-gradient-to-b from-sage/10 to-white py-20">
+      <LandingJourneyTimeline
+        eyebrow="The PCOS journey"
+        title="Your hormonal restoration — month by month"
+        description="Based on PCOS sub-analyses of GLP-1 trials and consistent patient reports."
+        accent="lavender"
+        milestones={[
+          { when: "Day 1", label: "Provider approves treatment", metric: "Meds shipping" },
+          { when: "Week 2", label: "Food noise quiets", metric: "Leptin sensitivity ↑" },
+          { when: "Month 1", label: "First scale movement", metric: "3–6 lbs" },
+          { when: "Month 3", label: "Cycle + androgen shifts", metric: "Testosterone ↓" },
+          { when: "Month 6", label: "Skin + hair improvements", metric: "~10% weight loss" },
+          { when: "Month 12", label: "Cycles regular · new baseline", metric: "13–17% loss" },
+        ]}
+      />
+
+      <LandingComparisonTable />
+
+      <LandingTestimonials
+        eyebrow="PCOS patient stories"
+        title="What PCOS patients are saying"
+        description="Hormonal weight loss that finally works — in their words."
+        items={testimonials}
+        accent="lavender"
+      />
+
+      <LandingGuaranteeMedallion accent="lavender" />
+
+      <LandingProviderTeam accent="lavender" />
+
+      <LandingHowItWorks
+        accent="lavender"
+        segmentLabel="Your first dose ships within 48 hours of provider approval."
+      />
+
+      <LandingPricingAnchor
+        eyebrow="Transparent PCOS pricing"
+        headline="PCOS-aware treatment. One monthly price. No surprises."
+        subhead="Everything you need for metabolic + hormonal care — provider visits, hormone monitoring, medication, coaching, and shipping."
+        includes={[
+          "Board-certified provider with hormonal health experience",
+          "Compounded semaglutide or tirzepatide — dose adjusted monthly",
+          "Hormone monitoring: testosterone, LH/FSH, fasting insulin",
+          "Unlimited provider messaging — response within hours",
+          "PCOS-specific meal plans & coaching",
+          "Free 2-day shipping · Cancel anytime",
+        ]}
+        primaryCtaLabel="See If I Qualify — 2 min"
+        accent="lavender"
+      />
+
+      {/* Before you start checklist */}
+      <section className="bg-gradient-to-b from-white to-violet-50/30 py-20">
         <SectionShell>
           <div className="mx-auto max-w-3xl">
             <SectionHeading
               eyebrow="Before You Start"
-              title="What you need to know before starting"
+              title="What you need to know"
               description="GLP-1 treatment for PCOS works well, but there are important considerations specific to hormonal health and reproductive planning."
               align="left"
             />
             <ul className="mt-8 space-y-4">
               {checklist.map((item, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10">
-                    <Check className="h-3.5 w-3.5 text-teal" />
+                <li key={i} className="flex items-start gap-3 rounded-xl border border-violet-100 bg-white p-4 shadow-sm">
+                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-400 text-white">
+                    <Check className="h-3.5 w-3.5" />
                   </div>
                   <span className="text-sm leading-relaxed text-graphite-600">{item}</span>
                 </li>
@@ -310,7 +407,7 @@ export default function PcosPage() {
                   <h3 className="font-bold text-navy text-sm">Important contraindications</h3>
                   <ul className="mt-2 space-y-1.5 text-xs text-graphite-600 leading-relaxed">
                     <li>• GLP-1 medications are <strong>contraindicated during pregnancy</strong>. Stop at least 2 months before trying to conceive and use reliable contraception during treatment.</li>
-                    <li>• A personal or family history of medullary thyroid carcinoma (MTC) or Multiple Endocrine Neoplasia syndrome type 2 (MEN2) is a contraindication. Your provider will screen for this.</li>
+                    <li>• Personal or family history of medullary thyroid carcinoma (MTC) or MEN2 is a contraindication. Your provider will screen for this.</li>
                     <li>• If you have pancreatitis history, discuss with your provider before starting.</li>
                   </ul>
                 </div>
@@ -320,77 +417,43 @@ export default function PcosPage() {
         </SectionShell>
       </section>
 
-      {/* FAQ */}
-      <section className="py-20">
-        <SectionShell>
-          <SectionHeading
-            eyebrow="Common Questions"
-            title="PCOS-specific questions, answered honestly"
-            description="The questions women with PCOS actually ask — about cycles, fertility, birth control, and what makes their situation different."
-          />
-          <div className="mx-auto mt-12 max-w-3xl divide-y divide-navy-100/40">
-            {faqs.map((item) => (
-              <div key={item.q} className="py-6">
-                <h3 className="font-bold text-navy">{item.q}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-graphite-600">{item.a}</p>
-              </div>
-            ))}
-          </div>
-        </SectionShell>
-      </section>
+      <LandingFaq
+        eyebrow="PCOS-specific questions"
+        title="PCOS-specific questions, answered honestly"
+        description="The questions women with PCOS actually ask — cycles, fertility, birth control, and what makes their situation different."
+        items={faqs}
+      />
 
-      {/* Trust signals */}
-      <section className="py-12 border-t border-navy-100/40">
-        <SectionShell>
-          <div className="grid gap-6 sm:grid-cols-3 text-center">
-            <div className="flex flex-col items-center gap-2">
-              <Shield className="h-8 w-8 text-teal" />
-              <h3 className="font-bold text-navy text-sm">HIPAA-compliant care</h3>
-              <p className="text-xs text-graphite-500">Your health data is encrypted and protected</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Star className="h-8 w-8 text-gold" />
-              <h3 className="font-bold text-navy text-sm">Licensed providers</h3>
-              <p className="text-xs text-graphite-500">Board-certified physicians evaluate every patient</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Heart className="h-8 w-8 text-teal" />
-              <h3 className="font-bold text-navy text-sm">Hormonal health experience</h3>
-              <p className="text-xs text-graphite-500">Providers experienced with PCOS and metabolic disorders</p>
-            </div>
-          </div>
-        </SectionShell>
-      </section>
-
-      <CtaSection />
-
-      <section className="py-14 bg-navy-50/40 border-t border-navy-100/40">
+      {/* Further reading */}
+      <section className="py-14 bg-cloud/50 border-t border-navy-100/40">
         <SectionShell>
           <h2 className="text-xl font-bold text-navy mb-6 text-center">Further reading</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { href: "/blog/glp1-pcos-weight-loss-guide", tag: "PCOS", title: "GLP-1 for PCOS: Complete Weight Loss Guide" },
-              { href: "/blog/semaglutide-birth-control-interaction", tag: "Safety", title: "Semaglutide and Birth Control: What You Need to Know" },
+              { href: "/blog/semaglutide-birth-control-interaction", tag: "Safety", title: "Semaglutide and Birth Control Interactions" },
               { href: "/blog/metformin-and-semaglutide-can-you-take-together", tag: "Medications", title: "Can You Take Metformin and Semaglutide Together?" },
               { href: "/blog/is-semaglutide-safe-long-term", tag: "Safety", title: "Is Semaglutide Safe for Long-Term Use?" },
-              { href: "/blog/glp1-mental-health-food-noise", tag: "Lifestyle", title: "How GLP-1 Medications Reduce Food Noise" },
-              { href: "/blog/what-to-eat-on-semaglutide", tag: "Nutrition", title: "Best Foods to Eat on GLP-1 for Hormonal Health" },
+              { href: "/blog/glp1-mental-health-food-noise", tag: "Lifestyle", title: "How GLP-1 Reduces Food Noise" },
+              { href: "/blog/what-to-eat-on-semaglutide", tag: "Nutrition", title: "Best Foods for Hormonal Health on GLP-1" },
               { href: "/prediabetes", tag: "Condition", title: "GLP-1 for Prediabetes & Insulin Resistance" },
               { href: "/eligibility", tag: "Eligibility", title: "Check Your Eligibility for GLP-1 Treatment" },
             ].map(({ href, tag, title }) => (
-              <Link key={href} href={href} className="group flex flex-col gap-2 rounded-xl border border-navy-100/60 bg-white p-4 shadow-sm hover:shadow-md hover:border-teal/40 transition-all">
-                <span className="text-xs font-semibold uppercase tracking-wide text-teal">{tag}</span>
-                <span className="text-sm font-medium text-navy leading-snug group-hover:text-teal transition-colors">{title}</span>
-                <ArrowRight className="h-3.5 w-3.5 text-graphite-300 group-hover:text-teal mt-auto transition-colors" />
+              <Link key={href} href={href} className="group flex flex-col gap-2 rounded-xl border border-navy-100/60 bg-white p-4 shadow-sm hover:shadow-premium hover:border-violet-300/60 transition-all">
+                <span className="text-xs font-semibold uppercase tracking-wide text-violet-600">{tag}</span>
+                <span className="text-sm font-medium text-navy leading-snug group-hover:text-violet-700 transition-colors">{title}</span>
+                <ArrowRight className="h-3.5 w-3.5 text-graphite-300 group-hover:text-violet-600 mt-auto transition-colors" />
               </Link>
             ))}
           </div>
         </SectionShell>
       </section>
 
+      <CtaSection />
+
       <section className="py-8 border-t border-navy-100/40">
         <SectionShell>
-          <p className="mx-auto max-w-3xl text-center text-xs text-graphite-300 leading-relaxed">
+          <p className="mx-auto max-w-3xl text-center text-xs text-graphite-400 leading-relaxed">
             {siteConfig.compliance.shortDisclaimer} Clinical data cited from published peer-reviewed research. Individual results vary. Treatment eligibility determined by a licensed medical provider. GLP-1 medications are contraindicated during pregnancy.
           </p>
         </SectionShell>

@@ -12,6 +12,8 @@ import { siteConfig } from "@/lib/site";
 import { NotificationBell } from "@/app/dashboard/notification-bell";
 import { StreakBadges } from "@/components/dashboard/streak-badges";
 import { UserAvatarDropdown } from "@/components/shared/user-avatar-dropdown";
+import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
+import { DashboardMobileNav } from "@/components/dashboard/dashboard-mobile-nav";
 
 const dashboardNav = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
@@ -67,7 +69,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const displayName = user?.firstName || user?.email?.split("@")[0] || "Member";
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-dvh bg-background overscroll-y-none">
+      {/* Skip-to-content for keyboard / SR users */}
+      <a href="#dashboard-main" className="skip-to-content">Skip to content</a>
+
       {/* Sidebar */}
       <aside className="hidden w-64 shrink-0 border-r border-border bg-card lg:block">
         <div className="flex h-16 items-center gap-2.5 border-b border-border px-6">
@@ -98,18 +103,32 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 overflow-auto">
-        <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
-          <div>
-            <div className="flex items-center gap-3">
-              <div>
-                <p className="text-sm text-muted-foreground">Welcome back</p>
-                <p className="text-base font-bold text-card-foreground">{displayName}</p>
+      <div className="flex-1 overflow-auto min-w-0">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-2 border-b border-border bg-card/95 backdrop-blur-xl px-3 sm:px-6">
+          {/* Mobile: brand logo + drawer. Desktop: welcome + streaks. */}
+          <div className="flex items-center gap-2 min-w-0 lg:hidden">
+            <DashboardMobileNav
+              displayName={displayName}
+              unreadMessages={unreadMessages}
+              initials={initials}
+              email={user?.email ?? null}
+            />
+            <Link href="/dashboard" className="flex items-center gap-2 min-w-0">
+              <LeafIcon className="h-7 w-7 shrink-0" />
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-card-foreground leading-tight">Hi, {displayName}</p>
+                <p className="text-[10px] text-muted-foreground leading-tight">Member Dashboard</p>
               </div>
-              <StreakBadges trackingStreak={trackingStreak} checkInStreak={Math.min(checkInStreak, 10)} />
-            </div>
+            </Link>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3 min-w-0">
+            <div className="min-w-0">
+              <p className="text-sm text-muted-foreground">Welcome back</p>
+              <p className="truncate text-base font-bold text-card-foreground">{displayName}</p>
+            </div>
+            <StreakBadges trackingStreak={trackingStreak} checkInStreak={Math.min(checkInStreak, 10)} />
+          </div>
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <NotificationBell initialCount={unreadNotifications} />
             <Link href="/dashboard/messages" className="relative rounded-lg p-2 text-muted-foreground hover:bg-muted transition-colors" aria-label={`Messages${unreadMessages > 0 ? `, ${unreadMessages} unread` : ""}`}>
               <MessageCircle className="h-5 w-5" />
@@ -126,8 +145,43 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </header>
 
-        <div className="p-6">{children}</div>
+        {/* Main content: extra bottom padding on mobile to clear the bottom tab bar */}
+        <main id="dashboard-main" tabIndex={-1} className="p-4 pb-24 sm:p-6 lg:pb-6 focus:outline-none">{children}</main>
       </div>
+
+      {/* Mobile bottom tab bar — thumb-reachable primary nav */}
+      <nav
+        aria-label="Primary mobile navigation"
+        className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-border bg-card/95 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]"
+      >
+        <div className="grid grid-cols-5">
+          {[
+            { label: "Home", href: "/dashboard", icon: LayoutDashboard },
+            { label: "Progress", href: "/dashboard/progress", icon: TrendingUp },
+            { label: "Treatment", href: "/dashboard/treatment", icon: Pill },
+            { label: "Meals", href: "/dashboard/meals", icon: Utensils },
+            { label: "Messages", href: "/dashboard/messages", icon: MessageCircle, badge: unreadMessages },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="relative flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-muted-foreground hover:text-primary active:bg-primary/5 transition-colors"
+            >
+              <item.icon className="h-5 w-5" aria-hidden="true" />
+              <span>{item.label}</span>
+              {item.badge && item.badge > 0 ? (
+                <span className="absolute right-4 top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground">
+                  {item.badge > 9 ? "9+" : item.badge}
+                </span>
+              ) : null}
+            </Link>
+          ))}
+        </div>
+      </nav>
+
+      {/* Tier 7.8 — surface PWA install prompt only inside the dashboard,
+          where engagement is highest and installing pays off for the user. */}
+      <PWAInstallPrompt />
     </div>
   );
 }

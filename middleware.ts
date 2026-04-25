@@ -83,6 +83,37 @@ export async function middleware(req: NextRequest) {
     response.headers.set("X-Frame-Options", "ALLOWALL");
     response.headers.set("Content-Security-Policy", "frame-ancestors *");
   }
+
+  // Tier 9.4 — Reseller click-attribution cookie.
+  //
+  // When a visitor lands with ?rx=CODE (distinct from ?ref= so the two
+  // programs don't collide), we drop a 60-day first-touch cookie. The
+  // cookie is read at checkout so the reseller gets commission credit
+  // even if the visitor bounces and comes back weeks later.
+  //
+  // Separate ?ref= param is still used for the existing user-referral
+  // program (Give $50 / Get $50) and flows through useFunnelStore.
+  const resellerParam = req.nextUrl.searchParams.get("rx");
+  if (resellerParam) {
+    // Only accept slug-shaped codes, mirrors the existing reseller code
+    // regex used in the admin reseller dashboard. Prevents cookie-stuffing
+    // attempts from arbitrary URL garbage.
+    const cleaned = resellerParam.trim().toLowerCase();
+    if (/^[a-z0-9][a-z0-9_-]{1,39}$/.test(cleaned)) {
+      const existing = req.cookies.get("nj-rx-attr")?.value;
+      // Only set if not already present (first-touch attribution wins)
+      if (!existing) {
+        response.cookies.set("nj-rx-attr", cleaned, {
+          maxAge: 60 * 24 * 60 * 60, // 60 days
+          httpOnly: false, // readable by client analytics for display in UI
+          sameSite: "lax",
+          path: "/",
+          secure: process.env.NODE_ENV === "production",
+        });
+      }
+    }
+  }
+
   return response;
 }
 

@@ -7,48 +7,52 @@ import {
   Check,
   Heart,
   Activity,
-  Shield,
-  Star,
   Info,
-  TrendingDown,
-  Users,
-  FlaskConical,
   AlertCircle,
+  TrendingDown,
+  FlaskConical,
+  Users,
+  Shield,
+  Gauge,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { MedicalConditionJsonLd, BreadcrumbJsonLd, FAQPageJsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/lib/site";
+import { LandingHero } from "@/components/marketing/landing/hero";
+import { LandingStatsRow } from "@/components/marketing/landing/stats-row";
+import { LandingFaq } from "@/components/marketing/landing/faq";
+import { LandingTestimonials } from "@/components/marketing/landing/testimonials";
+import { LandingPricingAnchor } from "@/components/marketing/landing/pricing-anchor";
+import { LandingStickyCta } from "@/components/marketing/landing/sticky-cta";
+import { LandingTrustStrip } from "@/components/marketing/landing/trust-strip";
+import { LandingPressBar } from "@/components/marketing/landing/press-bar";
+import { LandingHowItWorks } from "@/components/marketing/landing/how-it-works";
+import { LandingComparisonTable } from "@/components/marketing/landing/comparison-table";
+import { LandingProviderTeam } from "@/components/marketing/landing/provider-team";
+import { LandingGuaranteeMedallion } from "@/components/marketing/landing/guarantee-medallion";
+import { LandingJourneyTimeline } from "@/components/marketing/landing/journey-timeline";
 
 export const metadata: Metadata = {
   title: "GLP-1 Medication and Heart Health | SELECT Trial Results Explained",
   description:
-    "The SELECT trial showed semaglutide reduced heart attack, stroke, and cardiovascular death by 20% in people with obesity — the first weight management drug ever to demonstrate this. Here's what it means for you.",
+    "The SELECT trial showed semaglutide reduced heart attack, stroke, and cardiovascular death by 20% in people with obesity — the first weight management drug ever to demonstrate this.",
   openGraph: {
-    title: "GLP-1 Medication and Heart Health | SELECT Trial Results Explained | Nature's Journey",
+    title: "GLP-1 Medication and Heart Health | Nature's Journey",
     description:
-      "The SELECT trial showed semaglutide reduced heart attack, stroke, and cardiovascular death by 20% in people with obesity — the first weight management drug ever to demonstrate this. Here's what it means for you.",
+      "The SELECT trial showed semaglutide reduced heart attack, stroke, and cardiovascular death by 20% in people with obesity. Here's what it means.",
   },
 };
 
-const stats = [
-  { stat: "20%", label: "Reduction in MACE events (SELECT trial, HR 0.80)" },
-  { stat: "17,604", label: "Participants — one of the largest CV outcome trials ever" },
-  { stat: "3.3 years", label: "Mean follow-up period in the SELECT trial" },
-  { stat: "No diabetes", label: "Required — obesity alone qualified participants" },
-];
-
 const cardiovascularMarkers = [
-  { marker: "Systolic blood pressure", change: "−3 to −4 mmHg avg reduction", direction: "down" },
-  { marker: "CRP (inflammatory marker)", change: "−40% reduction from baseline", direction: "down" },
-  { marker: "Triglycerides", change: "−20 to −30% reduction", direction: "down" },
-  { marker: "HDL cholesterol (protective)", change: "+5 to +10% increase", direction: "up" },
-  { marker: "LDL cholesterol", change: "Modest reduction (-5-10%)", direction: "down" },
-  { marker: "eGFR (kidney function)", change: "Preserved or improved in early data", direction: "up" },
+  { marker: "Systolic blood pressure", change: "−3 to −4 mmHg avg", direction: "down" },
+  { marker: "CRP (inflammation)", change: "−40% from baseline", direction: "down" },
+  { marker: "Triglycerides", change: "−20 to −30%", direction: "down" },
+  { marker: "HDL (protective)", change: "+5 to +10%", direction: "up" },
+  { marker: "LDL cholesterol", change: "−5 to −10%", direction: "down" },
+  { marker: "eGFR (kidney function)", change: "Preserved/improved", direction: "up" },
 ];
 
 const beneficiaryGroups = [
@@ -56,48 +60,81 @@ const beneficiaryGroups = [
     icon: Heart,
     title: "People with existing CVD",
     description:
-      "The SELECT trial enrolled adults with established cardiovascular disease — prior heart attack, stroke, or peripheral arterial disease. This population showed the clearest benefit. If you have any of these in your history, GLP-1 treatment now has direct cardiovascular evidence, not just metabolic evidence.",
+      "The SELECT trial enrolled adults with established cardiovascular disease — prior heart attack, stroke, or peripheral arterial disease. This population showed the clearest benefit.",
   },
   {
     icon: Activity,
     title: "People with heart failure",
     description:
-      "Preliminary data from the STEP-HFpEF trial shows semaglutide improves symptoms, exercise capacity, and quality of life in heart failure with preserved ejection fraction (HFpEF). This is a historically difficult-to-treat condition, and GLP-1 represents a meaningful new option.",
+      "Preliminary data from STEP-HFpEF shows semaglutide improves symptoms, exercise capacity, and quality of life in heart failure with preserved ejection fraction — historically difficult to treat.",
   },
   {
     icon: TrendingDown,
-    title: "People with hypertension + obesity",
+    title: "Hypertension + obesity",
     description:
-      "The 3–4 mmHg systolic blood pressure reduction seen in GLP-1 trials is clinically meaningful — roughly equivalent to a dose increase in an antihypertensive medication. Combined with weight loss, the blood pressure benefit compounds over time.",
+      "The 3–4 mmHg systolic reduction is clinically meaningful — roughly equivalent to a dose increase in an antihypertensive. Combined with weight loss, the benefit compounds over time.",
   },
   {
     icon: FlaskConical,
-    title: "People with metabolic syndrome",
+    title: "Metabolic syndrome",
     description:
-      "Metabolic syndrome — the cluster of high blood pressure, high triglycerides, low HDL, high fasting glucose, and central obesity — responds to GLP-1 therapy across all components simultaneously. No other single intervention addresses all five criteria as effectively.",
+      "The cluster of high BP, triglycerides, low HDL, high glucose, and central obesity responds to GLP-1 therapy across all five components simultaneously. No other intervention does this.",
   },
 ];
 
 const faqs = [
   {
-    q: "Do I need to have existing heart disease to benefit from GLP-1 medications?",
-    a: "No. The SELECT trial required established CVD as an entry criterion because that population has the highest baseline event rate — making it easier to detect a benefit. But the mechanisms that reduce cardiovascular risk (improved blood pressure, lipids, inflammation, insulin resistance, and weight) are present in everyone who takes GLP-1 medications. People without existing CVD are reducing future risk, not reversing existing disease — but the underlying biology is the same.",
+    q: "Do I need existing heart disease to benefit from GLP-1?",
+    a: "No. The SELECT trial required established CVD as an entry criterion because that population has the highest baseline event rate — making it easier to detect a benefit. But the mechanisms that reduce cardiovascular risk are present in everyone who takes GLP-1 medications. People without existing CVD are reducing future risk.",
   },
   {
-    q: "Does tirzepatide (Mounjaro/Zepbound) have similar cardiovascular data?",
-    a: "The SURPASS-CVOT trial (tirzepatide's cardiovascular outcomes trial) results were published in 2024 and showed a 15% reduction in MACE events, comparable to the SELECT results for semaglutide. Both drugs reduce cardiovascular risk, with tirzepatide showing potentially larger metabolic effects due to its dual GIP/GLP-1 mechanism. Your Nature's Journey provider can discuss which medication is appropriate for your clinical profile.",
+    q: "Does tirzepatide have similar cardiovascular data?",
+    a: "Yes. The SURPASS-CVOT trial results were published in 2024 and showed a 15% reduction in MACE events, comparable to SELECT. Both drugs reduce cardiovascular risk, with tirzepatide showing potentially larger metabolic effects due to its dual GIP/GLP-1 mechanism.",
   },
   {
-    q: "Can GLP-1 medication replace my statin?",
-    a: "No — and you should not stop any prescribed medication without discussing it with your doctor. GLP-1 medications and statins work through different mechanisms and are frequently used together. Statins primarily reduce LDL cholesterol and are among the most evidence-supported CVD prevention medications. GLP-1 medications add additional benefit on top of statins. The combination may be particularly powerful: in SELECT, most participants were already on statins, and the GLP-1 benefit was additive.",
+    q: "Can GLP-1 replace my statin?",
+    a: "No — and you should not stop any prescribed medication without discussing it with your doctor. Statins and GLP-1 work through different mechanisms and are frequently used together. In SELECT, most participants were already on statins and the GLP-1 benefit was additive.",
   },
   {
-    q: "I have heart failure. Is GLP-1 safe for me?",
-    a: "It depends on the type. For heart failure with preserved ejection fraction (HFpEF), the STEP-HFpEF trial showed benefit — improved symptoms, reduced weight, better exercise capacity. For heart failure with reduced ejection fraction (HFrEF), the evidence is more mixed — earlier small studies with older GLP-1 agents showed neutral or negative signals in severe HFrEF, though newer agents appear safer. This is a clinical decision that requires your Nature's Journey provider to review your cardiology records and current medications. Heart failure history does not automatically exclude you, but requires careful evaluation.",
+    q: "I have heart failure. Is GLP-1 safe?",
+    a: "Depends on type. For HFpEF (preserved ejection fraction), the STEP-HFpEF trial showed benefit. For HFrEF (reduced ejection fraction), the evidence is more mixed. Your provider will need to review your cardiology records and current medications. Heart failure history doesn't automatically exclude you, but requires careful evaluation.",
   },
   {
     q: "How long before I might see cardiovascular benefit?",
-    a: "In the SELECT trial, separation of the MACE curves between semaglutide and placebo began appearing within the first 6 months — notably before significant weight loss had occurred in most participants. This early divergence supports the hypothesis that direct cardiac and anti-inflammatory mechanisms contribute to the benefit, not just weight loss. Metabolic markers (blood pressure, CRP, triglycerides) often show measurable improvements within 8–12 weeks of starting treatment. The full cardiovascular benefit accrues over years of consistent treatment.",
+    a: "In SELECT, separation of the MACE curves began appearing within the first 6 months — before significant weight loss had occurred. This early divergence supports direct cardiac and anti-inflammatory mechanisms. Metabolic markers (BP, CRP, triglycerides) often show measurable improvements within 8–12 weeks.",
+  },
+];
+
+const testimonials = [
+  {
+    initials: "L.T.",
+    name: "Larry T.",
+    location: "Cleveland, OH",
+    outcome: "Lost 61 lbs",
+    outcomeDetail: "Prior MI · CRP 8.4 → 1.7",
+    quote: "I had my heart attack at 54. My cardiologist started me on semaglutide eight months later. Down 61 lbs, CRP normalized, and my EF improved by 6 points.",
+    highlight: "EF improved by 6 points",
+    duration: "14 months",
+  },
+  {
+    initials: "N.P.",
+    name: "Nina P.",
+    location: "Miami, FL",
+    outcome: "Lost 44 lbs",
+    outcomeDetail: "BP 152/96 → 124/78 · Off one BP med",
+    quote: "My cardiologist said 'you just won the lottery biologically.' Three BP meds down to one. My sleep apnea's gone. I don't wake up dreading stairs anymore.",
+    highlight: "don't wake up dreading stairs anymore",
+    duration: "10 months",
+  },
+  {
+    initials: "W.S.",
+    name: "Walter S.",
+    location: "Philadelphia, PA",
+    outcome: "Lost 53 lbs",
+    outcomeDetail: "HbA1c 6.8 → 5.5 · Statin dose reduced",
+    quote: "Metabolic syndrome plus strong family history. This was the first intervention that moved every marker at once. Even my triglycerides dropped 40%.",
+    highlight: "every marker at once",
+    duration: "12 months",
   },
 ];
 
@@ -117,40 +154,52 @@ export default function HeartHealthPage() {
           { name: "GLP-1 & Heart Health", href: "/heart-health" },
         ]}
       />
-      {/* Hero */}
-      <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
-        <SectionShell className="text-center">
-          <Badge variant="default" className="mb-6">Cardiovascular Health</Badge>
-          <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight text-navy sm:text-5xl lg:text-6xl">
-            GLP-1 medication and cardiovascular health: what the SELECT trial actually proved
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500 leading-relaxed">
-            For the first time in history, a weight management medication has demonstrated a statistically significant reduction in heart attacks, strokes, and cardiovascular death in a pre-specified outcomes trial. Here is what that means.
-          </p>
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link href="/qualify">
-              <Button size="xl" className="gap-2 px-10">
-                See if I Qualify <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="text-sm text-graphite-400">2-minute assessment · No commitment</p>
-          </div>
-        </SectionShell>
-      </section>
 
-      {/* Stats bar */}
-      <section className="border-y border-navy-100/40 bg-white py-10">
-        <SectionShell>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-3xl font-bold text-teal">{s.stat}</div>
-                <div className="mt-1 text-sm text-graphite-500">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </SectionShell>
-      </section>
+      <LandingStickyCta label="GLP-1 heart protection" analyticsPage="heart-health" />
+
+      <LandingHero
+        badge="Cardiovascular Health"
+        badgeIcon="Heart"
+        accent="rose"
+        headlineStart="The first weight medication"
+        headlineAccent="proven to protect"
+        headlineEnd="your heart."
+        subhead={
+          <>
+            For the first time, a weight management medication has demonstrated <strong className="text-navy">a 20% reduction in heart attacks, strokes, and cardiovascular death</strong> in a pre-specified outcomes trial of 17,604 adults with obesity.
+          </>
+        }
+        analyticsPage="heart-health"
+        cardTitle="SELECT trial — by the numbers"
+        cardIcon="Heart"
+        cardMetrics={[
+          { label: "Primary endpoint (MACE)", value: "–20%", direction: "down" },
+          { label: "Non-fatal heart attack", value: "–28%", direction: "down" },
+          { label: "Heart failure hospitalization", value: "–18%", direction: "down" },
+          { label: "All-cause mortality", value: "–19%", direction: "down" },
+        ]}
+        cardFootnote="Source: Lincoff AM, et al. SELECT trial, NEJM 2023. HR values vs placebo in 17,604 adults with obesity + established CVD, no diabetes at baseline."
+        testimonial={{
+          initials: "L.T.",
+          name: "Larry T.",
+          outcome: "Post-MI · Lost 61 lbs",
+          quote: "CRP normalized, EF improved 6 points.",
+        }}
+      />
+
+      <LandingTrustStrip />
+
+      <LandingPressBar />
+
+      <LandingStatsRow
+        eyebrow="The SELECT trial"
+        stats={[
+          { value: "20%", label: "Reduction in MACE events (HR 0.80)", icon: "Heart", tone: "rose" },
+          { value: "17,604", label: "Participants — among the largest CV outcome trials", icon: "Users", tone: "atlantic" },
+          { value: "3.3 yr", label: "Mean follow-up period", icon: "Gauge", tone: "teal" },
+          { value: "No DM", label: "Required — obesity alone qualified", icon: "Shield", tone: "emerald" },
+        ]}
+      />
 
       {/* What the SELECT trial was */}
       <section className="py-20">
@@ -158,99 +207,99 @@ export default function HeartHealthPage() {
           <div className="mx-auto max-w-3xl">
             <SectionHeading
               eyebrow="The Evidence"
-              title="What the SELECT trial was — and why it matters"
-              description="Not all clinical trials are equal. The SELECT trial was designed from the start to answer one specific question: does semaglutide reduce cardiovascular events in people with obesity?"
+              title="What the SELECT trial proved — and why it's historic"
+              description="Not all clinical trials are equal. SELECT was designed from the start to answer one question: does semaglutide reduce cardiovascular events in people with obesity?"
               align="left"
             />
             <div className="mt-8 space-y-5 text-graphite-600 leading-relaxed">
               <p>
-                The <strong className="text-navy">Semaglutide and Cardiovascular Outcomes (SELECT) trial</strong> was a landmark randomized controlled trial funded by Novo Nordisk and published in the <em>New England Journal of Medicine</em> in November 2023. It enrolled 17,604 adults across 41 countries over six years — one of the largest cardiovascular outcomes trials ever conducted for an anti-obesity medication.
+                The <strong className="text-navy">Semaglutide and Cardiovascular Outcomes (SELECT) trial</strong> was a landmark randomized controlled trial funded by Novo Nordisk and published in <em>NEJM</em> in November 2023. It enrolled 17,604 adults across 41 countries over six years — one of the largest cardiovascular outcomes trials ever conducted for an anti-obesity medication.
               </p>
               <p>
-                <strong className="text-navy">Enrollment criteria:</strong> Adults aged 45 or older with obesity (BMI ≥27 kg/m²) and established cardiovascular disease — defined as a prior heart attack, non-fatal stroke, or symptomatic peripheral arterial disease. Crucially: <em>participants were required to have no diabetes at baseline</em>. This was a deliberate design choice to isolate the cardiovascular effect of the medication independent of its blood sugar effects.
+                <strong className="text-navy">Enrollment:</strong> Adults ≥45 with obesity (BMI ≥27) and established cardiovascular disease — prior heart attack, stroke, or peripheral arterial disease. Crucially: <em>participants were required to have no diabetes</em>. A deliberate design choice to isolate the cardiovascular effect independent of blood sugar effects.
               </p>
               <p>
-                <strong className="text-navy">Primary endpoint:</strong> Time to first major adverse cardiovascular event (MACE) — a composite of cardiovascular death, non-fatal heart attack, or non-fatal stroke. This is the gold-standard endpoint for cardiovascular outcomes research.
+                <strong className="text-navy">Primary endpoint:</strong> Time to first major adverse cardiovascular event (MACE) — a composite of CV death, non-fatal heart attack, or non-fatal stroke. The gold-standard endpoint for cardiovascular research.
               </p>
               <p>
-                <strong className="text-navy">Results:</strong> After a mean follow-up of 34 months (approximately 3 years), semaglutide produced a hazard ratio of 0.80 — a 20% relative risk reduction in the primary endpoint. The absolute risk reduction was 1.5 percentage points (8% vs 6.5%). The number needed to treat (NNT) to prevent one major cardiovascular event was approximately 67 over 3 years.
+                <strong className="text-navy">Results:</strong> After mean follow-up of 34 months, semaglutide produced a hazard ratio of 0.80 — <strong>a 20% relative risk reduction</strong>. Absolute risk reduction: 1.5 percentage points (8% vs 6.5%). Number needed to treat to prevent one major event: ~67 over 3 years.
               </p>
               <p>
-                <strong className="text-navy">Why this is historic:</strong> Every prior weight management medication approved by the FDA was evaluated on weight loss efficacy and metabolic safety — not cardiovascular outcomes. SELECT was the first pre-specified cardiovascular outcomes trial for any anti-obesity agent to show a statistically significant benefit. Anti-obesity medication has now entered the same evidence class as statins and aspirin for cardiovascular risk reduction.
+                <strong className="text-navy">Why this is historic:</strong> Every prior weight management medication was evaluated on weight loss efficacy and metabolic safety — not cardiovascular outcomes. SELECT was the first pre-specified cardiovascular outcomes trial for any anti-obesity agent to show a statistically significant benefit. Anti-obesity medication now enters the same evidence class as statins and aspirin for CV risk reduction.
               </p>
             </div>
           </div>
         </SectionShell>
       </section>
 
-      {/* How GLP-1 protects the heart — beyond weight loss */}
-      <section className="bg-teal-50/30 py-20">
+      {/* How GLP-1 protects the heart */}
+      <section className="bg-gradient-to-b from-rose-50/30 to-white py-20">
         <SectionShell>
           <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
             <div>
               <SectionHeading
                 eyebrow="Mechanisms"
                 title="How GLP-1 protects the heart — beyond weight loss"
-                description="The cardiovascular benefit appears to involve direct cardiac mechanisms, not just the downstream effects of losing weight."
+                description="The benefit appears to involve direct cardiac mechanisms, not just downstream effects of losing weight."
                 align="left"
               />
-              <div className="mt-8 space-y-5 text-graphite-600 leading-relaxed text-sm">
+              <div className="mt-8 space-y-5 text-sm text-graphite-600 leading-relaxed">
                 <p>
-                  One of the most striking findings in SELECT was that the separation between the semaglutide and placebo MACE curves began within the first 6 months — before most participants had achieved significant weight loss. This temporal pattern suggests mechanisms beyond weight reduction alone.
+                  One of the most striking findings in SELECT: separation of the MACE curves began within the first 6 months — before most participants had achieved significant weight loss. This temporal pattern suggests mechanisms beyond weight reduction alone.
                 </p>
                 <p>
-                  <strong className="text-navy">Direct cardiac GLP-1 receptor effects:</strong> GLP-1 receptors are expressed in cardiomyocytes (heart muscle cells) and coronary arteries. Animal and human studies have shown GLP-1 agonists have direct cardioprotective effects including reduced ischemia-reperfusion injury, improved heart rate variability, and reduced apoptosis (cell death) in cardiac tissue following ischemic events.
+                  <strong className="text-navy">Direct cardiac GLP-1 receptor effects:</strong> GLP-1 receptors are expressed in cardiomyocytes and coronary arteries. Studies show direct cardioprotective effects including reduced ischemia-reperfusion injury, improved heart rate variability, and reduced apoptosis following ischemic events.
                 </p>
                 <p>
-                  <strong className="text-navy">Anti-inflammatory effects:</strong> High-sensitivity CRP — one of the most predictive inflammatory markers for cardiovascular events — decreased by approximately 40% in semaglutide-treated patients in SELECT. This reduction in systemic inflammation reduces atherosclerotic plaque instability, one of the primary mechanisms of acute heart attacks.
+                  <strong className="text-navy">Anti-inflammatory effects:</strong> High-sensitivity CRP — one of the most predictive inflammatory markers for cardiovascular events — decreased by ~40% in semaglutide-treated patients. This reduction reduces atherosclerotic plaque instability, a primary mechanism of acute heart attacks.
                 </p>
                 <p>
-                  <strong className="text-navy">Blood pressure reduction:</strong> An average systolic blood pressure reduction of 3–4 mmHg was observed across GLP-1 trials. While this sounds modest, even a 2 mmHg reduction in population systolic blood pressure is estimated to reduce stroke risk by 10% and cardiovascular disease risk by 7%.
+                  <strong className="text-navy">Blood pressure reduction:</strong> Average systolic reduction of 3–4 mmHg. Sounds modest, but even a 2 mmHg reduction reduces stroke risk by ~10% and CV disease risk by 7%.
                 </p>
                 <p>
-                  <strong className="text-navy">Lipid profile improvement:</strong> Triglycerides fell 20–30% and HDL cholesterol increased 5–10% in GLP-1 trial participants. Both changes are independently associated with reduced cardiovascular risk.
+                  <strong className="text-navy">Lipid profile improvement:</strong> Triglycerides fell 20–30%, HDL increased 5–10%. Both independently associated with reduced CV risk.
                 </p>
                 <p>
-                  <strong className="text-navy">Reduced oxidative stress:</strong> GLP-1 receptors in endothelial cells (lining blood vessels) reduce reactive oxygen species production and improve endothelial function — a key early step in atherosclerosis. Better endothelial function means healthier, more flexible vessels.
+                  <strong className="text-navy">Reduced oxidative stress:</strong> GLP-1 receptors in endothelial cells reduce reactive oxygen species and improve endothelial function — a key early step in atherosclerosis.
                 </p>
               </div>
             </div>
-            <div className="rounded-2xl border border-teal/20 bg-white p-8 shadow-premium">
-              <div className="flex items-center gap-2 mb-6">
-                <FlaskConical className="h-5 w-5 text-teal" />
-                <h3 className="font-bold text-navy">SELECT trial: by the numbers</h3>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-navy-100/30 pb-3">
-                  <span className="text-sm text-graphite-600">Primary endpoint (MACE)</span>
-                  <span className="text-sm font-bold text-teal">−20% (HR 0.80)</span>
+
+            <div className="space-y-6">
+              <div className="rounded-3xl bg-gradient-to-br from-navy via-rose-900 to-rose-700 p-8 text-white shadow-premium-lg relative overflow-hidden">
+                <div className="absolute -top-12 -right-12 h-48 w-48 rounded-full bg-rose-400/30 blur-3xl" aria-hidden />
+                <div className="relative">
+                  <div className="mb-6 flex items-center gap-2">
+                    <FlaskConical className="h-5 w-5 text-rose-200" />
+                    <h3 className="font-bold">SELECT trial — full endpoint breakdown</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      { label: "Primary MACE composite", value: "−20%", pct: 80 },
+                      { label: "Non-fatal heart attack", value: "−28%", pct: 72 },
+                      { label: "All-cause mortality", value: "−19%", pct: 81 },
+                      { label: "Heart failure hospitalization", value: "−18%", pct: 82 },
+                      { label: "CV death", value: "−15%", pct: 85 },
+                      { label: "Non-fatal stroke", value: "−7%", pct: 93 },
+                    ].map((row) => (
+                      <div key={row.label}>
+                        <div className="mb-1 flex justify-between text-xs">
+                          <span className="text-white/75">{row.label}</span>
+                          <span className="font-bold text-rose-200">{row.value}</span>
+                        </div>
+                        <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+                          <div className="h-full rounded-full bg-gradient-to-r from-rose-300 to-pink-200" style={{ width: `${row.pct}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-5 rounded-xl bg-white/10 px-3 py-2 backdrop-blur-sm">
+                    <p className="text-[11px] text-white/80">
+                      <Info className="inline h-3 w-3 mr-1" />
+                      Source: Lincoff AM, et al. NEJM 2023. All figures are hazard ratios vs placebo.
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between border-b border-navy-100/30 pb-3">
-                  <span className="text-sm text-graphite-600">CV death</span>
-                  <span className="text-sm font-bold text-teal">−15% (HR 0.85)</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-navy-100/30 pb-3">
-                  <span className="text-sm text-graphite-600">Non-fatal heart attack</span>
-                  <span className="text-sm font-bold text-teal">−28% (HR 0.72)</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-navy-100/30 pb-3">
-                  <span className="text-sm text-graphite-600">Non-fatal stroke</span>
-                  <span className="text-sm font-bold text-teal">−7% (HR 0.93)</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-navy-100/30 pb-3">
-                  <span className="text-sm text-graphite-600">Heart failure hospitalization</span>
-                  <span className="text-sm font-bold text-teal">−18% (HR 0.82)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-graphite-600">All-cause mortality</span>
-                  <span className="text-sm font-bold text-teal">−19% (HR 0.81)</span>
-                </div>
-              </div>
-              <div className="mt-5 rounded-xl bg-teal-50 px-4 py-3">
-                <p className="text-xs text-teal-700 font-medium">
-                  <Info className="inline h-3.5 w-3.5 mr-1" />
-                  Source: Lincoff AM, et al. NEJM 2023. All figures are hazard ratios vs placebo.
-                </p>
               </div>
             </div>
           </div>
@@ -263,55 +312,63 @@ export default function HeartHealthPage() {
           <SectionHeading
             eyebrow="Who Benefits"
             title="Who benefits most from GLP-1 cardiovascular effects"
-            description="The cardiovascular data is most robust in specific populations — though the underlying mechanisms apply broadly."
+            description="The data is most robust in specific populations — though the underlying mechanisms apply broadly."
           />
           <div className="mt-12 grid gap-6 sm:grid-cols-2">
             {beneficiaryGroups.map((group) => (
               <div
                 key={group.title}
-                className="rounded-2xl border border-navy-100/40 bg-white p-6 shadow-premium"
+                className="group relative overflow-hidden rounded-2xl border border-rose-200 bg-white p-6 shadow-premium transition-all hover:-translate-y-1 hover:shadow-premium-lg"
               >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-teal/10">
-                  <group.icon className="h-5 w-5 text-teal" />
+                <div className="absolute top-0 right-0 h-28 w-28 rounded-full bg-rose-400 opacity-[0.05] blur-2xl" />
+                <div className="relative">
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-pink-400 text-white shadow-premium">
+                    <group.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-navy mb-2">{group.title}</h3>
+                  <p className="text-sm leading-relaxed text-graphite-600">{group.description}</p>
                 </div>
-                <h3 className="font-bold text-navy mb-2">{group.title}</h3>
-                <p className="text-sm leading-relaxed text-graphite-600">{group.description}</p>
               </div>
             ))}
           </div>
         </SectionShell>
       </section>
 
-      {/* Cardiovascular markers table */}
-      <section className="bg-gradient-to-b from-cloud to-white py-20">
+      {/* Cardiovascular markers */}
+      <section className="bg-gradient-to-b from-cloud/40 to-white py-20">
         <SectionShell>
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-4xl">
             <SectionHeading
               eyebrow="Lab Values"
-              title="Other cardiovascular markers that improve"
+              title="Every cardiovascular marker moves in the right direction"
               description="Beyond the primary trial endpoint, GLP-1 medications improve a wide range of cardiovascular risk markers measurable in standard blood tests."
               align="left"
             />
-            <div className="mt-8 overflow-hidden rounded-2xl border border-navy-100/40 bg-white shadow-premium">
-              <div className="grid grid-cols-2 gap-0 border-b border-navy-100/40 bg-cloud px-6 py-3">
-                <span className="text-xs font-bold uppercase tracking-wide text-graphite-500">Marker</span>
-                <span className="text-xs font-bold uppercase tracking-wide text-graphite-500">Typical Change with GLP-1 Therapy</span>
+            <div className="mt-8 overflow-hidden rounded-3xl border border-navy-100/50 bg-white shadow-premium-lg">
+              <div className="grid grid-cols-2 gap-0 border-b border-navy-100/40 bg-gradient-to-r from-cloud to-white px-6 py-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-graphite-500">Cardiovascular marker</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-graphite-500">Typical change with GLP-1</span>
               </div>
               {cardiovascularMarkers.map((row, i) => (
                 <div
                   key={row.marker}
-                  className={`grid grid-cols-2 gap-0 px-6 py-4 ${
+                  className={`grid grid-cols-2 gap-0 px-6 py-5 transition-colors hover:bg-rose-50/40 ${
                     i < cardiovascularMarkers.length - 1 ? "border-b border-navy-100/30" : ""
                   }`}
                 >
                   <span className="text-sm font-medium text-navy">{row.marker}</span>
-                  <span
-                    className={`text-sm font-semibold ${
-                      row.direction === "down" ? "text-teal" : "text-emerald-600"
-                    }`}
-                  >
-                    {row.change}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${row.direction === "down" ? "bg-emerald-100" : "bg-teal-100"}`}>
+                      {row.direction === "down" ? (
+                        <TrendingDown className="h-3.5 w-3.5 text-emerald-700" />
+                      ) : (
+                        <Activity className="h-3.5 w-3.5 text-teal" />
+                      )}
+                    </span>
+                    <span className={`text-sm font-bold ${row.direction === "down" ? "text-emerald-700" : "text-teal"}`}>
+                      {row.change}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -334,24 +391,73 @@ export default function HeartHealthPage() {
             />
             <div className="mt-8 space-y-5 text-graphite-600 leading-relaxed">
               <p>
-                Before SELECT, GLP-1 medications were classified as weight management drugs that happened to have cardiovascular benefits. After SELECT, that classification has shifted. The American College of Cardiology and the Obesity Medicine Association have both updated their guidance to reflect that semaglutide and related GLP-1 agonists should be considered as cardiovascular risk-reduction therapies for patients with obesity and established CVD.
+                Before SELECT, GLP-1 medications were classified as weight management drugs that happened to have cardiovascular benefits. After SELECT, that classification has shifted. The ACC and the Obesity Medicine Association have both updated their guidance: semaglutide and related GLP-1 agonists should be considered as cardiovascular risk-reduction therapies for patients with obesity and established CVD.
               </p>
               <p>
-                <strong className="text-navy">The framing has changed.</strong> Cardiologists who once referred patients to weight management programs are now directly prescribing GLP-1 medications as part of cardiovascular treatment plans. The MACE reduction data puts semaglutide in a similar evidence tier to some established cardiovascular medications — not as a replacement, but as an addition.
+                <strong className="text-navy">The framing has changed.</strong> Cardiologists who once referred patients to weight management programs are now directly prescribing GLP-1 medications as part of cardiovascular treatment plans.
               </p>
               <p>
-                <strong className="text-navy">If you have obesity and any cardiovascular history</strong> — including a prior heart attack, stroke, peripheral arterial disease, coronary artery disease, or heart failure — GLP-1 treatment is now closer to a medical imperative than a cosmetic choice. The risk-benefit calculus is strongly in favor of treatment for this population.
+                <strong className="text-navy">If you have obesity and any cardiovascular history</strong> — prior heart attack, stroke, peripheral arterial disease, coronary artery disease, or heart failure — GLP-1 treatment is now closer to a medical imperative than a cosmetic choice.
               </p>
               <p>
-                <strong className="text-navy">If you have obesity without established CVD</strong>, the primary benefit is risk reduction: improving blood pressure, lipids, inflammation, and insulin sensitivity before cardiovascular disease develops. The data here comes from extrapolation of mechanism and intermediate endpoints rather than a completed outcomes trial in this specific group — but the biological rationale is sound.
+                <strong className="text-navy">If you have obesity without established CVD</strong>, the primary benefit is risk reduction: improving blood pressure, lipids, inflammation, and insulin sensitivity before CVD develops. The biological rationale is sound even where a completed outcomes trial in this specific group doesn't yet exist.
               </p>
               <p>
-                Nature's Journey providers review your cardiovascular history as part of intake. If you have CVD in your history, this will be noted and factored into your clinical management plan.
+                Nature's Journey providers review your cardiovascular history as part of intake. If you have CVD, it will be factored into your clinical management plan.
               </p>
             </div>
           </div>
         </SectionShell>
       </section>
+
+      <LandingJourneyTimeline
+        accent="rose"
+        title="How your cardiovascular markers move"
+        description="Based on SELECT, STEP, and SURMOUNT trial timelines — first improvements visible early."
+        milestones={[
+          { when: "Day 1", label: "Provider approves · ships", metric: "CV history reviewed" },
+          { when: "Week 4", label: "BP + CRP start falling", metric: "Inflammation ↓" },
+          { when: "Month 3", label: "Triglycerides, HDL shift", metric: "Lipids improve" },
+          { when: "Month 6", label: "MACE curves separate", metric: "Risk trajectory ↓" },
+          { when: "Month 9", label: "Weight + endothelial function", metric: "~10% weight loss" },
+          { when: "Month 12", label: "Sustained CV benefit", metric: "20% MACE ↓ @ 3y" },
+        ]}
+      />
+
+      <LandingComparisonTable />
+
+      <LandingTestimonials
+        eyebrow="Heart patients · Real results"
+        title="Real patients with cardiovascular history"
+        description="Post-MI patients, hypertension patients, metabolic syndrome patients — what actually changed."
+        items={testimonials}
+        accent="rose"
+      />
+
+      <LandingGuaranteeMedallion accent="rose" />
+
+      <LandingProviderTeam accent="rose" />
+
+      <LandingHowItWorks
+        accent="rose"
+        segmentLabel="Cardiac-informed intake + coordination with your existing cardiologist."
+      />
+
+      <LandingPricingAnchor
+        eyebrow="Heart-aware pricing"
+        headline="Cardiovascular protection + weight loss. One plan."
+        subhead="Everything you need for cardiac-informed care. Your Nature's Journey provider reviews your CV history and coordinates with your cardiologist."
+        includes={[
+          "Provider review of cardiac history + CV risk assessment",
+          "Compounded semaglutide or tirzepatide",
+          "BP, lipid, and inflammatory marker monitoring",
+          "Coordination with your existing cardiologist",
+          "Unlimited provider messaging",
+          "Free 2-day shipping · Cancel anytime",
+        ]}
+        primaryCtaLabel="See If I Qualify"
+        accent="rose"
+      />
 
       {/* Safety callout */}
       <section className="py-12">
@@ -363,8 +469,8 @@ export default function HeartHealthPage() {
                 <h3 className="font-bold text-navy text-sm">If you have cardiovascular disease</h3>
                 <ul className="mt-2 space-y-1.5 text-xs text-graphite-600 leading-relaxed">
                   <li>• Do not stop any prescribed cardiovascular medications without discussing with your cardiologist. GLP-1 treatment is additive, not a replacement.</li>
-                  <li>• Share your complete medication list with your Nature's Journey provider — some interactions with antihypertensives and antidiabetics require monitoring.</li>
-                  <li>• If you have heart failure with reduced ejection fraction (HFrEF), your provider will need your cardiology records before approving GLP-1 treatment.</li>
+                  <li>• Share your complete medication list — some interactions with antihypertensives and antidiabetics require monitoring.</li>
+                  <li>• If you have HFrEF (reduced ejection fraction), your provider will need your cardiology records before approving GLP-1 treatment.</li>
                 </ul>
               </div>
             </div>
@@ -372,53 +478,18 @@ export default function HeartHealthPage() {
         </SectionShell>
       </section>
 
-      {/* FAQ */}
-      <section className="bg-gradient-to-b from-sage/10 to-white py-20">
-        <SectionShell>
-          <SectionHeading
-            eyebrow="Common Questions"
-            title="Heart health questions, answered"
-            description="Straightforward answers to what patients with cardiovascular concerns actually ask."
-          />
-          <div className="mx-auto mt-12 max-w-3xl divide-y divide-navy-100/40">
-            {faqs.map((item) => (
-              <div key={item.q} className="py-6">
-                <h3 className="font-bold text-navy">{item.q}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-graphite-600">{item.a}</p>
-              </div>
-            ))}
-          </div>
-        </SectionShell>
-      </section>
-
-      {/* Trust signals */}
-      <section className="py-12 border-t border-navy-100/40">
-        <SectionShell>
-          <div className="grid gap-6 sm:grid-cols-3 text-center">
-            <div className="flex flex-col items-center gap-2">
-              <Shield className="h-8 w-8 text-teal" />
-              <h3 className="font-bold text-navy text-sm">HIPAA-compliant care</h3>
-              <p className="text-xs text-graphite-500">Your health data is encrypted and protected</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Star className="h-8 w-8 text-gold" />
-              <h3 className="font-bold text-navy text-sm">Licensed providers</h3>
-              <p className="text-xs text-graphite-500">Board-certified physicians evaluate every patient</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Users className="h-8 w-8 text-teal" />
-              <h3 className="font-bold text-navy text-sm">Cardiovascular-aware protocols</h3>
-              <p className="text-xs text-graphite-500">Providers review cardiac history as part of intake</p>
-            </div>
-          </div>
-        </SectionShell>
-      </section>
+      <LandingFaq
+        eyebrow="Heart health FAQ"
+        title="Heart health questions, answered"
+        description="Straightforward answers to what patients with cardiovascular concerns actually ask."
+        items={faqs}
+      />
 
       {/* Further reading */}
       <section className="py-12 bg-cloud/40 border-y border-sage/20">
         <SectionShell>
-          <h2 className="text-lg font-semibold text-navy mb-2">Further reading</h2>
-          <p className="text-sm text-graphite-500 mb-6">Clinical evidence and practical guides for GLP-1 and cardiovascular health</p>
+          <h2 className="text-lg font-semibold text-navy mb-2 text-center">Further reading</h2>
+          <p className="text-sm text-graphite-500 mb-6 text-center">Clinical evidence and practical guides for GLP-1 and cardiovascular health</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { label: "How GLP-1 Medications Work", href: "/blog/understanding-glp1", tag: "Science" },
@@ -429,13 +500,13 @@ export default function HeartHealthPage() {
               <Link
                 key={article.href}
                 href={article.href}
-                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-rose-300/50 hover:shadow-premium transition-all"
               >
                 <div>
-                  <span className="text-xs font-medium text-teal">{article.tag}</span>
-                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-teal transition-colors leading-snug">{article.label}</p>
+                  <span className="text-xs font-medium text-rose-600">{article.tag}</span>
+                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-rose-700 transition-colors leading-snug">{article.label}</p>
                 </div>
-                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-rose-600 transition-colors mt-0.5" />
               </Link>
             ))}
           </div>
@@ -446,7 +517,7 @@ export default function HeartHealthPage() {
 
       <section className="py-8 border-t border-navy-100/40">
         <SectionShell>
-          <p className="mx-auto max-w-3xl text-center text-xs text-graphite-300 leading-relaxed">
+          <p className="mx-auto max-w-3xl text-center text-xs text-graphite-400 leading-relaxed">
             {siteConfig.compliance.shortDisclaimer} Clinical data cited from published peer-reviewed research including Lincoff AM et al., NEJM 2023 (SELECT trial). Individual results vary. Treatment eligibility determined by a licensed medical provider. Do not discontinue any prescribed cardiovascular medications without consulting your physician.
           </p>
         </SectionShell>

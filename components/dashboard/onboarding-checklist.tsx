@@ -102,13 +102,32 @@ export function OnboardingChecklist({
     );
   }
 
+  // Tier 10.5 — dynamic motivation sub-text tied to progress %.
+  // Small psychological nudge that reframes the bar from "5 chores to do"
+  // into "you're already Y% of the way there."
+  const motivation =
+    progress >= 80
+      ? "Almost there — 1 step from fully activated"
+      : progress >= 60
+        ? "You're on a roll — more than halfway"
+        : progress >= 40
+          ? "Momentum is building — keep stacking"
+          : progress >= 20
+            ? "Great start — next step unlocks tracking"
+            : "First step is the biggest — let's go";
+
   return (
     <Card className="border-teal/20 bg-gradient-to-r from-teal-50/30 to-sage/20">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Getting Started</CardTitle>
+          <div>
+            <CardTitle className="text-base">Getting Started</CardTitle>
+            <p className="mt-0.5 text-[11px] text-graphite-500">{motivation}</p>
+          </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-teal">{completedCount}/{items.length} complete</span>
+            <span className="text-xs font-semibold text-teal">
+              {Math.round(progress)}% &middot; {completedCount}/{items.length}
+            </span>
             <Button variant="ghost" size="sm" onClick={handleDismiss} className="h-6 w-6 p-0 text-graphite-300 hover:text-graphite-500" title="Dismiss">
               <X className="h-3.5 w-3.5" />
             </Button>
@@ -121,13 +140,15 @@ export function OnboardingChecklist({
           <Link
             key={item.id}
             href={item.completed ? "#" : item.href}
+            aria-disabled={item.completed}
+            tabIndex={item.completed ? -1 : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors",
-              item.completed ? "opacity-60" : "hover:bg-white/60"
+              "flex items-center gap-3 rounded-xl px-3 py-3 transition-colors active:bg-white/80",
+              item.completed ? "opacity-60 pointer-events-none" : "hover:bg-white/60"
             )}
           >
             <div className={cn(
-              "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
               item.completed ? "bg-teal" : "bg-white border border-navy-200"
             )}>
               {item.completed ? (
@@ -138,9 +159,9 @@ export function OnboardingChecklist({
             </div>
             <div className="flex-1 min-w-0">
               <p className={cn("text-sm font-medium", item.completed ? "text-graphite-400 line-through" : "text-navy")}>{item.label}</p>
-              <p className="text-[10px] text-graphite-400">{item.description}</p>
+              <p className="text-xs text-graphite-500">{item.description}</p>
             </div>
-            {!item.completed && <ArrowRight className="h-3.5 w-3.5 text-graphite-300" />}
+            {!item.completed && <ArrowRight className="h-4 w-4 text-graphite-300" aria-hidden="true" />}
           </Link>
         ))}
 

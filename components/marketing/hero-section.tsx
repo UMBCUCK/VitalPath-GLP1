@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { siteConfig } from "@/lib/site";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { heroImage } from "@/lib/images";
+import { getVariant, trackExperiment, HERO_CTA_COPY } from "@/lib/experiments";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 export interface HeroSectionProps {
@@ -49,47 +50,49 @@ function AnimatedCounter({ target, suffix = "" }: { target: string; suffix?: str
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    // Honor reduced-motion: skip animation, show final value immediately
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setDisplay(target + suffix);
+      hasAnimated.current = true;
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true;
-          // Extract number from target
-          const num = parseFloat(target.replace(/[^0-9.]/g, ""));
-          const hasPlus = target.includes("+");
-          const hasComma = target.includes(",");
-          const isPercent = target.includes("%");
-          const duration = 1500;
-          const steps = 40;
-          const stepDuration = duration / steps;
-          let step = 0;
+        if (!entry.isIntersecting || hasAnimated.current) return;
+        hasAnimated.current = true;
 
-          const interval = setInterval(() => {
-            step++;
-            const progress = step / steps;
-            // Ease out cubic
-            const eased = 1 - Math.pow(1 - progress, 3);
-            let current = Math.round(num * eased * 10) / 10;
+        const num = parseFloat(target.replace(/[^0-9.]/g, ""));
+        const hasPlus = target.includes("+");
+        const hasComma = target.includes(",");
+        const isPercent = target.includes("%");
+        const duration = 1500;
+        const startedAt = performance.now();
+        let raf = 0;
 
-            if (num >= 100) current = Math.round(current);
-
-            let formatted = hasComma
-              ? current.toLocaleString()
-              : num < 10
-                ? current.toFixed(1)
-                : String(Math.round(current));
-
-            if (isPercent) formatted += "%";
-            if (hasPlus) formatted += "+";
-            formatted += suffix;
-
-            setDisplay(formatted);
-
-            if (step >= steps) {
-              clearInterval(interval);
-              setDisplay(target + suffix);
-            }
-          }, stepDuration);
-        }
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - startedAt) / duration);
+          // Ease out cubic
+          const eased = 1 - Math.pow(1 - t, 3);
+          const v = num * eased;
+          let formatted = hasComma
+            ? Math.round(v).toLocaleString()
+            : num < 10
+              ? v.toFixed(1)
+              : String(Math.round(v));
+          if (isPercent) formatted += "%";
+          if (hasPlus) formatted += "+";
+          formatted += suffix;
+          setDisplay(formatted);
+          if (t < 1) {
+            raf = requestAnimationFrame(tick);
+          } else {
+            setDisplay(target + suffix);
+          }
+        };
+        raf = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(raf);
       },
       { rootMargin: "0px" }
     );
@@ -130,14 +133,37 @@ export function HeroSection({
   footnote = DEFAULT_FOOTNOTE,
   analyticsLocation = "hero",
 }: HeroSectionProps = {}) {
+  // Tier 6.6 — Hero CTA A/B test. Each visitor gets a stable assignment via
+  // their PostHog distinct_id (falls back to a session-scoped random id).
+  // Copy only the button label — keeps the visual identical so we isolate
+  // the copy effect. Exposure fires once per session.
+  const [ctaCopy, setCtaCopy] = useState<string>(HERO_CTA_COPY.control);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SESSION_KEY = "nj-exp-hero-cta";
+    let anonymousId = sessionStorage.getItem(SESSION_KEY);
+    if (!anonymousId) {
+      anonymousId = `anon_${Math.random().toString(36).slice(2, 10)}`;
+      sessionStorage.setItem(SESSION_KEY, anonymousId);
+    }
+    const variant = getVariant("hero_cta_copy", anonymousId);
+    const copy = HERO_CTA_COPY[variant] ?? HERO_CTA_COPY.control;
+    setCtaCopy(copy);
+    // One exposure fires per session (sessionStorage dedupes)
+    if (!sessionStorage.getItem(`${SESSION_KEY}-exposed`)) {
+      trackExperiment("hero_cta_copy", variant);
+      sessionStorage.setItem(`${SESSION_KEY}-exposed`, "1");
+    }
+  }, []);
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-white via-sage-50/30 to-white">
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-subtle-grid opacity-30" />
+      {/* Background pattern — desktop only (mobile paint cost not worth subtle visual) */}
+      <div className="absolute inset-0 bg-subtle-grid opacity-30 hidden sm:block" aria-hidden="true" />
 
-      {/* Floating accent orbs — subtle */}
-      <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-teal/3 blur-3xl" />
-      <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-atlantic/3 blur-3xl" />
+      {/* Floating accent orbs — desktop only, GPU-promoted to avoid scroll jank */}
+      <div className="hidden sm:block absolute -top-24 -right-24 h-96 w-96 rounded-full bg-teal/3 blur-2xl gpu-layer" aria-hidden="true" />
+      <div className="hidden sm:block absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-atlantic/3 blur-2xl gpu-layer" aria-hidden="true" />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pt-16 lg:px-8 lg:pt-20">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
@@ -168,11 +194,11 @@ export function HeroSection({
 
             {/* Price anchor — separated for visual impact */}
             <div
-              className="animate-fade-in-up mt-4 inline-flex items-center gap-3 rounded-xl bg-navy-50/60 px-4 py-2.5 lg:mx-0 mx-auto"
+              className="animate-fade-in-up mt-4 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 rounded-xl bg-navy-50/60 px-4 py-2.5 lg:mx-0 mx-auto lg:justify-start"
               style={{ animationDelay: "0.25s" }}
             >
               <span className="text-2xl font-bold text-navy">$179<span className="text-sm font-normal text-graphite-400">/mo</span></span>
-              <span className="h-6 w-px bg-navy-200" />
+              <span className="hidden sm:inline-block h-6 w-px bg-navy-200" />
               <span className="text-sm text-graphite-400 line-through">$1,349/mo retail</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald">PLANS FROM $179</span>
             </div>
@@ -182,14 +208,23 @@ export function HeroSection({
               className="animate-fade-in-up mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start"
               style={{ animationDelay: "0.3s" }}
             >
-              <Link href="/qualify" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_qualify", location: analyticsLocation })}>
+              <Link
+                href="/qualify"
+                onClick={() =>
+                  track(ANALYTICS_EVENTS.CTA_CLICK, {
+                    cta: "hero_qualify",
+                    location: analyticsLocation,
+                    variant_copy: ctaCopy,
+                  })
+                }
+              >
                 <Button variant="emerald" size="xl" className="gap-2 w-full sm:w-auto text-lg px-12 h-16 rounded-full transition-all duration-300 hover:scale-[1.02] hover:brightness-110">
-                  See If I Qualify
+                  {ctaCopy}
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/pricing" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_pricing", location: analyticsLocation })}>
-                <Button variant="outline" size="xl" className="w-full sm:w-auto rounded-full border-navy-200 text-navy hover:bg-navy-50">
+              <Link href="/pricing" onClick={() => track(ANALYTICS_EVENTS.CTA_CLICK, { cta: "hero_pricing", location: analyticsLocation })} className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full border-navy-200 text-navy hover:bg-navy-50 sm:h-14 sm:px-10 sm:text-lg">
                   View Plans & Pricing
                 </Button>
               </Link>
@@ -243,12 +278,17 @@ export function HeroSection({
               </div>
             </div>
 
-            <p
-              className="animate-fade-in-up mt-3 text-[10px] text-graphite-300"
+            <details
+              className="animate-fade-in-up mt-3 text-xs text-graphite-400 lg:max-w-xl"
               style={{ animationDelay: "0.55s" }}
             >
-              {footnote}
-            </p>
+              <summary className="cursor-pointer text-[11px] text-graphite-400 hover:text-graphite-600 lg:text-left text-center">
+                Study details & disclaimers
+              </summary>
+              <p className="mt-2 text-[11px] leading-relaxed text-graphite-400 lg:text-left text-center">
+                {footnote}
+              </p>
+            </details>
           </div>
 
           {/* Right: Hero image + floating social proof card */}
@@ -259,8 +299,11 @@ export function HeroSection({
               width={heroImage.width}
               height={heroImage.height}
               priority
-              unoptimized
-              sizes="(max-width: 1024px) 0px, 50vw"
+              fetchPriority="high"
+              quality={82}
+              sizes="(max-width: 1024px) 0px, (max-width: 1280px) 45vw, 600px"
+              placeholder="blur"
+              blurDataURL={heroImage.blurDataURL}
               className="rounded-3xl object-contain drop-shadow-2xl"
             />
 

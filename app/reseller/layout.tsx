@@ -32,7 +32,7 @@ export default async function ResellerLayout({
   }
 
   return (
-    <div className="min-h-screen bg-linen/30">
+    <div className="min-h-dvh bg-linen/30">
       {/* Header */}
       <header className="border-b border-navy-100/40 bg-white">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">

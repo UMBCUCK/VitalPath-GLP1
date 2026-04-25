@@ -105,8 +105,8 @@ export default async function HomePage() {
       {/* COMPLIANCE: FDA disclosure — required above primary content */}
       <div className="border-b border-navy-100/40 bg-linen/60 py-3">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 text-center">
-          <p className="text-[11px] leading-relaxed text-graphite-400">
-            <strong className="text-graphite-500">Important:</strong> Compounded semaglutide and tirzepatide are <strong>not FDA-approved drug products</strong>. They are prepared by state-licensed compounding pharmacies under individual prescriptions. Medication is only available to eligible patients as determined by a licensed provider. Individual results vary.
+          <p className="text-xs leading-relaxed text-graphite-500">
+            <strong className="text-graphite-600">Important:</strong> Compounded semaglutide and tirzepatide are <strong>not FDA-approved drug products</strong>. They are prepared by state-licensed compounding pharmacies under individual prescriptions. Medication is only available to eligible patients as determined by a licensed provider. Individual results vary.
           </p>
         </div>
       </div>

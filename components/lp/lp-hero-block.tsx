@@ -41,8 +41,9 @@ export function LpHeroBlock({
   return (
     <LpHeroSection className={className}>
       <div className="mx-auto max-w-4xl px-4 text-center">
-        {/* Badge */}
-        <div className="mb-6 flex justify-center opacity-0 animate-fade-in-up" style={{ animationDelay: "0.05s", animationFillMode: "forwards" }}>
+        {/* Badge — no fade-in: it sits above the LCP H1 and any opacity
+            transition delays paint of the headline below it. */}
+        <div className="mb-6 flex justify-center">
           <LpThemedBadge>
             <span className="relative mr-1.5 flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -52,33 +53,32 @@ export function LpHeroBlock({
           </LpThemedBadge>
         </div>
 
-        {/* Headline */}
-        <h1
-          className="text-3xl font-bold tracking-tight text-lp-heading sm:text-4xl lg:text-5xl opacity-0 animate-fade-in-up"
-          style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}
-        >
+        {/* Headline — LCP candidate. NO opacity-0/fade animation here:
+            the H1 is the largest text and acts as the LCP element. Hiding it
+            behind opacity-0 + animation-delay forces LCP to wait for the
+            animation to run, which costs ~100-300ms of LCP. We render it
+            visible from first paint. */}
+        <h1 className="text-3xl font-bold tracking-tight text-lp-heading sm:text-4xl lg:text-5xl">
           {headline}{" "}
           {headlineAccent && <LpGradientText>{headlineAccent}</LpGradientText>}
         </h1>
 
-        {/* Subtitle */}
-        <p
-          className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-lp-body sm:text-lg opacity-0 animate-fade-in-up"
-          style={{ animationDelay: "0.15s", animationFillMode: "forwards" }}
-        >
+        {/* Subtitle — also above-the-fold, no fade delay. */}
+        <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-lp-body sm:text-lg">
           {subtitle}
         </p>
 
         {/* Price anchor — text colors reference --lp-price-text so they
             always contrast against --lp-price-bg (fixes the old black-on-black
-            bug when --lp-heading happened to match --lp-price-bg). */}
+            bug when --lp-heading happened to match --lp-price-bg).
+            CLS fix: removed opacity-0/fade delay — the pill always renders at
+            its final visual position so it doesn't cause a layout shift when
+            the animation flips opacity. */}
         <div
-          className="mt-6 inline-flex items-center gap-3 rounded-xl border px-5 py-2.5 opacity-0 animate-fade-in-up"
+          className="mt-6 inline-flex items-center gap-3 rounded-xl border px-5 py-2.5"
           style={{
             backgroundColor: "var(--lp-price-bg)",
             borderColor: "var(--lp-stat-border)",
-            animationDelay: "0.2s",
-            animationFillMode: "forwards",
           }}
         >
           <span
@@ -107,8 +107,10 @@ export function LpHeroBlock({
           </span>
         </div>
 
-        {/* CTA */}
-        <div className="mt-8 opacity-0 animate-fade-in-up" style={{ animationDelay: "0.25s", animationFillMode: "forwards" }}>
+        {/* CTA — no fade-in. Above the fold; opacity animations on
+            interactive elements also hurt INP since the first click can land
+            during the fade and feel laggy. */}
+        <div className="mt-8">
           <LpTrackedCta location={ctaLocation} label={ctaLabel} />
         </div>
 

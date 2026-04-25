@@ -64,12 +64,49 @@ export async function POST(req: NextRequest) {
 
         if (!email) break;
 
+        // Tier 7.1 — Stripe Checkout now collects a phone number during
+        // checkout (phone_number_collection.enabled). If we got one, persist
+        // it to the user so SMS lifecycle emails and Meta CAPI advanced
+        // matching have a fresh, verified number.
+        const phoneFromCheckout =
+          session.customer_details?.phone ||
+          (session as unknown as { customer_phone?: string }).customer_phone ||
+          null;
+
         // Find or create user
         let user = await db.user.findUnique({ where: { email } });
         if (!user) {
           user = await db.user.create({
-            data: { email, role: "PATIENT" },
+            data: {
+              email,
+              role: "PATIENT",
+              phone: phoneFromCheckout ?? undefined,
+            },
           });
+        } else if (phoneFromCheckout && !user.phone) {
+          // Only overwrite if we don't already have a phone — don't clobber
+          // a number the user set manually in profile settings.
+          await db.user.update({
+            where: { id: user.id },
+            data: { phone: phoneFromCheckout },
+          });
+          user = { ...user, phone: phoneFromCheckout };
+        }
+
+        // Tier 8.1 — Mark any matching Lead rows as converted. This populates
+        // Lead.convertedAt + Lead.userId so the /admin/lead-insights page can
+        // compute real per-source conversion rates (previously always 0%).
+        // We update ALL Lead rows for this email since a visitor can be
+        // captured on multiple surfaces (calculator, qualify bridge, exit
+        // intent) before converting — all attribution points deserve credit.
+        try {
+          await db.lead.updateMany({
+            where: { email, convertedAt: null },
+            data: { convertedAt: new Date(), userId: user.id },
+          });
+        } catch (err) {
+          safeError("[Webhook] Lead convertedAt update failed", err);
+          // Non-blocking — conversion attribution is secondary to the signup
         }
 
         // Link Stripe customer
@@ -231,6 +268,85 @@ export async function POST(req: NextRequest) {
           });
         } catch (metaErr) {
           safeError("[Webhook] Meta CAPI Purchase event failed", metaErr);
+        }
+
+        // Tier 10.1 — Reseller commission attribution.
+        // If the checkout carried a `resellerAttr` metadata field (set by
+        // the reseller click-attribution cookie middleware in Tier 9.4),
+        // credit the matching ResellerProfile with a PENDING commission.
+        //
+        // Reseller compensation is strictly sale-based (FTC-compliant per
+        // the schema docs). We create the commission as PENDING so admin
+        // reviews it before payout. Payout logic lives in its own cron.
+        try {
+          const resellerAttr = session.metadata?.resellerAttr;
+          if (resellerAttr) {
+            const reseller = await db.resellerProfile.findFirst({
+              where: {
+                referralCode: resellerAttr,
+                status: "ACTIVE",
+              },
+              select: {
+                id: true,
+                commissionType: true,
+                commissionPct: true,
+                commissionFlat: true,
+              },
+            });
+            if (reseller) {
+              // Link the subscription to the reseller for downstream
+              // recurring-commission logic (subscriptionCommissionEnabled)
+              const dbSubForAttr = await db.subscription.findUnique({
+                where: { stripeSubscriptionId: subscriptionId },
+                select: { id: true, referredByReseller: true },
+              });
+              if (dbSubForAttr && !dbSubForAttr.referredByReseller) {
+                await db.subscription.update({
+                  where: { id: dbSubForAttr.id },
+                  data: { referredByReseller: reseller.id },
+                });
+              }
+
+              const amountCents = session.amount_total || 0;
+              const commissionCents =
+                reseller.commissionType === "FLAT"
+                  ? reseller.commissionFlat ?? 0
+                  : Math.round(
+                      (amountCents * (reseller.commissionPct ?? 10)) / 100,
+                    );
+
+              if (commissionCents > 0) {
+                await db.commission.create({
+                  data: {
+                    resellerId: reseller.id,
+                    subscriptionId: dbSubForAttr?.id,
+                    customerId: user.id,
+                    type: "INITIAL_SALE",
+                    amountCents: commissionCents,
+                    status: "PENDING",
+                    notes: `Initial-sale commission · ${reseller.commissionType} · checkout ${session.id}`,
+                  },
+                });
+                await db.resellerProfile.update({
+                  where: { id: reseller.id },
+                  data: {
+                    totalSales: { increment: 1 },
+                    totalRevenue: { increment: amountCents },
+                    totalCommission: { increment: commissionCents },
+                    totalCustomers: { increment: 1 },
+                    lastSaleAt: new Date(),
+                  },
+                });
+                safeLog("[Webhook]", "Reseller commission created", {
+                  reseller: reseller.id,
+                  commissionCents,
+                });
+              }
+            }
+          }
+        } catch (resErr) {
+          safeError("[Webhook] Reseller commission failed", resErr);
+          // Non-blocking — core signup already succeeded
         }
 
         safeLog("[Webhook]", "Checkout completed and persisted");

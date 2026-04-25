@@ -6,6 +6,8 @@ import { SectionShell } from "@/components/shared/section-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { CalculatorLeadCapture } from "@/components/calculators/calculator-lead-capture";
+import { ViewContentTracker } from "@/components/shared/view-content-tracker";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -77,6 +79,8 @@ export default async function ComparePage() {
           { name: "Compare Programs", href: "/compare" },
         ]}
       />
+      {/* Tier 7.2 — retarget high-intent competitor searchers */}
+      <ViewContentTracker contentName="Compare Programs Hub" contentCategory="compare" />
 
       {/* Hero */}
       <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
@@ -194,6 +198,19 @@ export default async function ComparePage() {
               </details>
             ))}
           </div>
+        </SectionShell>
+      </section>
+
+      {/* Tier 7.2 — lead capture for comparison-shoppers who aren't ready to
+          commit to /qualify yet. We email them a personalized program
+          recommendation and a competitor breakdown. */}
+      <section className="py-10 bg-gradient-to-br from-teal-50/40 to-white border-t border-navy-100/40">
+        <SectionShell className="max-w-2xl">
+          <CalculatorLeadCapture
+            source="compare_hub"
+            headline="Still comparing? We'll email a side-by-side for your situation."
+            subCopy="Tell us your email — we'll send a 1-page comparison of Nature's Journey vs the top GLP-1 programs for your BMI and state, plus our $50-off welcome code."
+          />
         </SectionShell>
       </section>
 

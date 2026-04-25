@@ -73,6 +73,24 @@ export function UpsellModal({ show, onClose, offer }: UpsellModalProps) {
     }
   }, [show, offerId, currentOffer.productSlug]);
 
+  // Escape key dismisses + lock body scroll while open
+  useEffect(() => {
+    if (!show) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        track(ANALYTICS_EVENTS.UPSELL_DISMISS, { offer: offerId });
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [show, offerId, onClose]);
+
   function handleDismiss() {
     track(ANALYTICS_EVENTS.UPSELL_DISMISS, { offer: offerId });
     onClose();
@@ -106,15 +124,24 @@ export function UpsellModal({ show, onClose, offer }: UpsellModalProps) {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="upsell-modal-title"
+    >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-navy/40 backdrop-blur-sm" onClick={handleDismiss} />
+      <div className="absolute inset-0 bg-navy/40 backdrop-blur-sm" onClick={handleDismiss} aria-hidden="true" />
 
-      {/* Modal */}
+      {/* Modal — bottom-sheet on mobile, centered card on desktop */}
       <div className={cn(
-        "relative w-full max-w-md rounded-2xl bg-white shadow-premium-xl border border-navy-100/60",
-        "animate-slide-up"
+        "relative w-full max-w-md bg-white shadow-premium-xl border border-navy-100/60 max-h-[90dvh] overflow-y-auto scroll-container",
+        "rounded-t-3xl rounded-b-none sm:rounded-2xl",
+        "pb-[env(safe-area-inset-bottom)] sm:pb-0",
+        "animate-slide-up ease-spring"
       )}>
+        {/* iOS-style drag handle (mobile only) */}
+        <div className="sm:hidden mx-auto mt-2 mb-1 h-1 w-10 rounded-full bg-navy-200/60" aria-hidden="true" />
         <button
           onClick={handleDismiss}
           className="absolute right-4 top-4 rounded-lg p-1.5 text-graphite-400 hover:bg-navy-50 hover:text-navy transition-colors"

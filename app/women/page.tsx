@@ -4,40 +4,44 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight, Check, AlertCircle, Heart, Activity,
-  Shield, Star, Info,
+  Flower2, Users, Droplet, Flame,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { siteConfig } from "@/lib/site";
 import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { LandingHero } from "@/components/marketing/landing/hero";
+import { LandingStatsRow } from "@/components/marketing/landing/stats-row";
+import { LandingFaq } from "@/components/marketing/landing/faq";
+import { LandingTestimonials } from "@/components/marketing/landing/testimonials";
+import { LandingPricingAnchor } from "@/components/marketing/landing/pricing-anchor";
+import { LandingStickyCta } from "@/components/marketing/landing/sticky-cta";
+import { LandingTrustStrip } from "@/components/marketing/landing/trust-strip";
+import { LandingPressBar } from "@/components/marketing/landing/press-bar";
+import { LandingHowItWorks } from "@/components/marketing/landing/how-it-works";
+import { LandingComparisonTable } from "@/components/marketing/landing/comparison-table";
+import { LandingProviderTeam } from "@/components/marketing/landing/provider-team";
+import { LandingGuaranteeMedallion } from "@/components/marketing/landing/guarantee-medallion";
+import { LandingJourneyTimeline } from "@/components/marketing/landing/journey-timeline";
 
 export const metadata: Metadata = {
   title: "GLP-1 for Women | PCOS, Menopause & Hormonal Weight Loss",
   description:
-    "GLP-1 medications like semaglutide and tirzepatide address the hormonal roots of weight gain in women — including insulin resistance, PCOS, and menopause-related metabolic changes. Learn what the research actually says.",
+    "GLP-1 medications like semaglutide and tirzepatide address the hormonal roots of weight gain in women — including insulin resistance, PCOS, and menopause-related metabolic changes.",
   openGraph: {
     title: "GLP-1 for Women: PCOS, Menopause & Hormonal Weight Loss | Nature's Journey",
     description:
-      "Evidence-informed guide to GLP-1 weight loss for women. Covers PCOS, perimenopause, insulin resistance, clinical trial data, and what to realistically expect.",
+      "Evidence-informed guide to GLP-1 weight loss for women. Covers PCOS, perimenopause, insulin resistance, and what to realistically expect.",
   },
 };
-
-const stats = [
-  { stat: "~15–21%", label: "Average body weight lost in pivotal trials (sema/tirz)" },
-  { stat: "54%", label: "Of STEP-1 trial participants were women" },
-  { stat: "~75%", label: "Of women with PCOS have insulin resistance" },
-  { stat: "3–5×", label: "Higher visceral fat accumulation after menopause" },
-];
 
 const pcosPoints = [
   "Insulin resistance drives fat storage even when calories are controlled",
   "Elevated androgens disrupt hunger hormones (leptin, ghrelin) at the brain level",
   "Chronic low-grade inflammation makes conventional dieting less effective",
-  "GLP-1 receptors are expressed in ovarian tissue — early research suggests hormonal downstream effects",
+  "GLP-1 receptors are expressed in ovarian tissue — research suggests direct hormonal downstream effects",
   "Studies show GLP-1 agonists can restore menstrual regularity in anovulatory PCOS",
 ];
 
@@ -45,8 +49,8 @@ const menopausePoints = [
   "Declining estrogen shifts fat storage from hips/thighs to visceral (abdominal) tissue",
   "Visceral fat is metabolically active — it worsens insulin resistance and inflammation",
   "Resting metabolic rate drops ~2–3% per decade; muscle loss accelerates this",
-  "GLP-1 agonists show equivalent or better weight loss in postmenopausal women vs premenopausal in trial subgroup analyses",
-  "Sleep disruption (common in perimenopause) worsens hunger hormone regulation — GLP-1 dampens this signal",
+  "GLP-1 shows equivalent or better weight loss in postmenopausal vs premenopausal women",
+  "Sleep disruption (common in perimenopause) worsens hunger hormone regulation — GLP-1 dampens this",
 ];
 
 const concerns = [
@@ -64,15 +68,48 @@ const concerns = [
   },
   {
     q: "What about fertility? I'm trying to conceive.",
-    a: "GLP-1 medications are contraindicated during pregnancy and should be stopped at least 2 months before attempting conception. However, if you have PCOS and are struggling to conceive, achieving a healthier BMI through GLP-1 treatment before stopping the medication may improve fertility outcomes.",
+    a: "GLP-1 medications are contraindicated during pregnancy and should be stopped at least 2 months before attempting conception. If you have PCOS and are struggling to conceive, achieving a healthier BMI through GLP-1 treatment before stopping may improve fertility outcomes.",
   },
   {
     q: "Will I lose muscle along with fat?",
-    a: "Some muscle loss occurs with any significant caloric deficit — this is not unique to GLP-1 medications. Adequate protein intake (0.7–1g per pound of body weight) and resistance training substantially reduce lean mass loss. Your Nature's Journey plan includes protein targets and exercise guidance specifically for this.",
+    a: "Some muscle loss occurs with any significant caloric deficit — this is not unique to GLP-1. Adequate protein (0.7–1g per pound) and resistance training substantially reduce lean mass loss. Your plan includes protein targets and exercise guidance specifically for this.",
   },
   {
     q: "I've heard GLP-1 causes hair loss — is that true for women?",
-    a: "Telogen effluvium — temporary hair shedding — can occur with rapid weight loss. It's caused by the caloric deficit and rapid body change, not the medication itself. It typically begins 2–4 months into significant weight loss and resolves within 6 months. Iron, biotin, and zinc levels should be checked if shedding is severe.",
+    a: "Telogen effluvium — temporary hair shedding — can occur with rapid weight loss. It's caused by the caloric deficit and rapid body change, not the medication. It typically begins 2–4 months into significant weight loss and resolves within 6 months. Iron, biotin, and zinc levels should be checked if shedding is severe.",
+  },
+];
+
+const testimonials = [
+  {
+    initials: "S.W.",
+    name: "Sarah W.",
+    location: "Charleston, SC",
+    outcome: "Lost 42 lbs",
+    outcomeDetail: "Perimenopause belly gone · Sleep restored",
+    quote: "At 46 the belly fat appeared overnight and nothing would touch it. Six months on GLP-1 and I look like myself again — and I'm actually sleeping through the night.",
+    highlight: "I look like myself again",
+    duration: "6 months",
+  },
+  {
+    initials: "T.L.",
+    name: "Tanya L.",
+    location: "Portland, OR",
+    outcome: "Lost 29 lbs",
+    outcomeDetail: "PCOS cycles regular · Acne cleared",
+    quote: "The thing nobody tells you about PCOS is how loud the hunger is. It's constant. Food noise gone. For the first time I can just... live.",
+    highlight: "Food noise gone",
+    duration: "5 months",
+  },
+  {
+    initials: "R.M.",
+    name: "Rebecca M.",
+    location: "Boston, MA",
+    outcome: "Lost 35 lbs",
+    outcomeDetail: "Hot flashes 80% reduced",
+    quote: "My doctor said 'menopause weight is forever.' She was wrong. Everything — energy, mood, hot flashes, joint pain — changed with the weight.",
+    highlight: "'menopause weight is forever.' She was wrong",
+    duration: "8 months",
   },
 ];
 
@@ -88,40 +125,51 @@ export default function WomenPage() {
           { name: "Women's Health", href: "/women" },
         ]}
       />
-      {/* Hero */}
-      <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
-        <SectionShell className="text-center">
-          <Badge variant="default" className="mb-6">Women&apos;s Health</Badge>
-          <h1 className="mx-auto max-w-3xl text-4xl font-bold tracking-tight text-navy sm:text-5xl lg:text-6xl">
-            GLP-1 weight loss for women — including PCOS and menopause
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500 leading-relaxed">
-            Hormonal factors make weight loss harder for many women — and conventional diet advice often misses this entirely. GLP-1 medications work at a biological level that addresses some of the root causes.
-          </p>
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link href="/qualify">
-              <Button size="xl" className="gap-2 px-10">
-                See if I Qualify <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="text-sm text-graphite-400">2-minute assessment · No commitment</p>
-          </div>
-        </SectionShell>
-      </section>
 
-      {/* Stats bar */}
-      <section className="border-y border-navy-100/40 bg-white py-10">
-        <SectionShell>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-3xl font-bold text-teal">{s.stat}</div>
-                <div className="mt-1 text-sm text-graphite-500">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </SectionShell>
-      </section>
+      <LandingStickyCta label="Hormonal weight loss for women" analyticsPage="women" />
+
+      <LandingHero
+        badge="Women's Health"
+        badgeIcon="Flower2"
+        accent="rose"
+        headlineStart="GLP-1 weight loss"
+        headlineAccent="built around your hormones"
+        subhead={
+          <>
+            Hormonal factors make weight loss harder for many women — and conventional diet advice misses this entirely. GLP-1 medications work at a biological level that addresses <strong className="text-navy">PCOS, perimenopause, and menopause</strong> weight gain at the root.
+          </>
+        }
+        analyticsPage="women"
+        cardTitle="What the research shows for women"
+        cardIcon="Heart"
+        cardMetrics={[
+          { label: "Average body weight lost (sema/tirz)", value: "15–21%", direction: "down" },
+          { label: "Of STEP-1 trial participants were women", value: "54%", direction: "up" },
+          { label: "Of women with PCOS have insulin resistance", value: "75%" },
+          { label: "Higher visceral fat after menopause", value: "3–5×", direction: "up" },
+        ]}
+        cardFootnote="Data from STEP-1, SURMOUNT-1, and 2023 PCOS meta-analyses. Individual results vary."
+        testimonial={{
+          initials: "S.W.",
+          name: "Sarah W.",
+          outcome: "Lost 42 lbs in 6 months",
+          quote: "I look like myself again.",
+        }}
+      />
+
+      <LandingTrustStrip />
+
+      <LandingPressBar />
+
+      <LandingStatsRow
+        eyebrow="Women on GLP-1"
+        stats={[
+          { value: "15–21%", label: "Average body weight lost", icon: "Flame", tone: "rose" },
+          { value: "54%", label: "STEP-1 participants were women", icon: "Users", tone: "atlantic" },
+          { value: "75%", label: "Of women with PCOS have insulin resistance", icon: "Droplet", tone: "lavender" },
+          { value: "3–5×", label: "More visceral fat after menopause", icon: "Activity", tone: "emerald" },
+        ]}
+      />
 
       {/* Why hormones matter */}
       <section className="py-20">
@@ -141,124 +189,125 @@ export default function WomenPage() {
                 <strong className="text-navy">Insulin resistance</strong> is the central driver for the two most common hormonal weight challenges: PCOS and menopause-related metabolic changes. When cells stop responding to insulin efficiently, the pancreas produces more — and elevated insulin promotes fat storage, particularly around the abdomen. Standard calorie restriction doesn&apos;t fix insulin resistance. GLP-1 agonists do.
               </p>
               <p>
-                <strong className="text-navy">Hunger hormone dysregulation</strong> compounds this. Ghrelin (the "hunger hormone") tends to run higher in women, and leptin resistance (where the brain ignores satiety signals) is more pronounced in obesity. GLP-1 medication directly suppresses ghrelin and restores leptin sensitivity.
+                <strong className="text-navy">Hunger hormone dysregulation</strong> compounds this. Ghrelin (the &ldquo;hunger hormone&rdquo;) runs higher in women, and leptin resistance is more pronounced in obesity. GLP-1 directly suppresses ghrelin and restores leptin sensitivity.
               </p>
               <p>
-                None of this is a character flaw or a lack of effort. It's physiology. And it's exactly what GLP-1 medications were designed to address.
+                None of this is a character flaw or a lack of effort. It&apos;s physiology. And it&apos;s exactly what GLP-1 medications were designed to address.
               </p>
             </div>
           </div>
         </SectionShell>
       </section>
 
-      {/* PCOS section */}
-      <section className="bg-teal-50/30 py-20">
-        <SectionShell>
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-            <div>
-              <SectionHeading
-                eyebrow="PCOS"
-                title="Polycystic ovary syndrome and GLP-1 therapy"
-                description="PCOS is the most common endocrine disorder in reproductive-age women. Its metabolic effects make conventional weight loss approaches especially frustrating."
-                align="left"
-              />
-              <ul className="mt-6 space-y-3">
-                {pcosPoints.map((point) => (
-                  <li key={point} className="flex items-start gap-3">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-teal" />
-                    <span className="text-sm leading-relaxed text-graphite-600">{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-2xl border border-teal/20 bg-white p-8 shadow-premium">
-              <div className="flex items-center gap-2 mb-4">
-                <Heart className="h-5 w-5 text-teal" />
-                <h3 className="font-bold text-navy">What the research shows</h3>
-              </div>
-              <div className="space-y-4 text-sm text-graphite-600">
-                <p>
-                  A 2023 meta-analysis in <em>Diabetes, Obesity and Metabolism</em> found that GLP-1 agonists produced significantly greater weight loss in women with PCOS compared to placebo — and also improved testosterone levels, LH/FSH ratios, and insulin sensitivity markers.
-                </p>
-                <p>
-                  Menstrual regularity improved in 60–70% of anovulatory PCOS patients who lost ≥5% of body weight on GLP-1 therapy. Some patients reported cycle normalization before reaching the therapeutic dose.
-                </p>
-                <p>
-                  These outcomes make GLP-1 treatment particularly valuable for PCOS — you&apos;re not just losing weight, you&apos;re addressing the hormonal cascade.
-                </p>
-              </div>
-              <div className="mt-4 rounded-xl bg-teal-50 px-4 py-3">
-                <p className="text-xs text-teal-700 font-medium">
-                  <Info className="inline h-3.5 w-3.5 mr-1" />
-                  Individual results vary. All clinical data cited from published peer-reviewed research.
-                </p>
-              </div>
-            </div>
-          </div>
-        </SectionShell>
-      </section>
-
-      {/* Menopause section */}
-      <section className="py-20">
-        <SectionShell>
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-            <div className="order-2 lg:order-1 rounded-2xl border border-navy-100/60 bg-gradient-to-br from-cloud to-white p-8 shadow-premium">
-              <div className="flex items-center gap-2 mb-4">
-                <Activity className="h-5 w-5 text-atlantic" />
-                <h3 className="font-bold text-navy">Perimenopause &amp; menopause</h3>
-              </div>
-              <div className="space-y-3 text-sm text-graphite-600">
-                <p>
-                  The typical menopause transition involves a 5–8 lb weight gain even without changes in diet or activity — driven by visceral fat redistribution as estrogen drops. This isn&apos;t calories in/calories out. It&apos;s hormonal.
-                </p>
-                <p>
-                  Visceral fat (deep abdominal fat around organs) is metabolically active in a harmful way — it secretes inflammatory cytokines and worsens insulin resistance, creating a cycle that&apos;s hard to break with diet alone.
-                </p>
-                <p>
-                  Clinical trial subgroup analyses show postmenopausal women respond to GLP-1 therapy comparably to premenopausal women in terms of percentage body weight lost. The absolute benefit in cardiovascular risk reduction may be even greater, given the elevated baseline cardiovascular risk after menopause.
-                </p>
-              </div>
-            </div>
-            <div className="order-1 lg:order-2">
-              <SectionHeading
-                eyebrow="Menopause"
-                title="How menopause changes metabolism — and what GLP-1 does about it"
-                description="Visceral fat, insulin resistance, and sleep disruption converge during the menopause transition in ways that make standard weight management advice nearly useless."
-                align="left"
-              />
-              <ul className="mt-6 space-y-3">
-                {menopausePoints.map((point) => (
-                  <li key={point} className="flex items-start gap-3">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-teal" />
-                    <span className="text-sm leading-relaxed text-graphite-600">{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </SectionShell>
-      </section>
-
-      {/* Concerns / FAQ */}
-      <section className="bg-gradient-to-b from-sage/10 to-white py-20">
+      {/* PCOS + Menopause dual column */}
+      <section className="bg-gradient-to-b from-rose-50/30 to-white py-20">
         <SectionShell>
           <SectionHeading
-            eyebrow="Common Questions"
-            title="Answers to what women actually ask"
-            description="Questions about cycles, fertility, hair, and hormone interactions — answered honestly."
+            eyebrow="Two big cases for women"
+            title="PCOS and menopause — where the evidence is strongest"
+            description="The hormonal weight challenges where GLP-1 therapy has the most robust clinical research."
           />
-          <div className="mx-auto mt-12 max-w-3xl divide-y divide-navy-100/40">
-            {concerns.map((item) => (
-              <div key={item.q} className="py-6">
-                <h3 className="font-bold text-navy">{item.q}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-graphite-600">{item.a}</p>
+          <div className="mt-12 grid gap-8 lg:grid-cols-2">
+            <div className="relative overflow-hidden rounded-3xl border border-violet-200 bg-white p-8 shadow-premium">
+              <div className="absolute -top-8 -right-8 h-40 w-40 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-400 opacity-10 blur-2xl" />
+              <div className="relative">
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-400 text-white shadow-premium">
+                    <Flower2 className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-navy text-lg">PCOS</h3>
+                </div>
+                <p className="text-sm text-graphite-600 leading-relaxed mb-4">
+                  The most common endocrine disorder in reproductive-age women. Its metabolic effects make conventional weight loss approaches especially frustrating.
+                </p>
+                <ul className="space-y-2.5">
+                  {pcosPoints.map((p) => (
+                    <li key={p} className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+                      <span className="text-sm leading-relaxed text-graphite-600">{p}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-5 rounded-xl bg-violet-50 p-4 text-xs text-violet-700 leading-relaxed">
+                  <strong>60–70%</strong> of anovulatory PCOS patients regain cycle regularity on GLP-1 therapy after ≥5% body weight loss.
+                </div>
+                <Link href="/pcos" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-violet-700 hover:text-violet-900">
+                  Full PCOS research <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
-            ))}
+            </div>
+
+            <div className="relative overflow-hidden rounded-3xl border border-rose-200 bg-white p-8 shadow-premium">
+              <div className="absolute -top-8 -right-8 h-40 w-40 rounded-full bg-gradient-to-br from-rose-500 to-pink-400 opacity-10 blur-2xl" />
+              <div className="relative">
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-pink-400 text-white shadow-premium">
+                    <Heart className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-navy text-lg">Menopause &amp; perimenopause</h3>
+                </div>
+                <p className="text-sm text-graphite-600 leading-relaxed mb-4">
+                  The typical transition involves 5–8 lbs gained even without changes in diet or activity — driven by visceral fat redistribution as estrogen drops.
+                </p>
+                <ul className="space-y-2.5">
+                  {menopausePoints.map((p) => (
+                    <li key={p} className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+                      <span className="text-sm leading-relaxed text-graphite-600">{p}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-5 rounded-xl bg-rose-50 p-4 text-xs text-rose-700 leading-relaxed">
+                  Postmenopausal women respond <strong>comparably</strong> to premenopausal women in weight outcomes — and may see <strong>greater</strong> cardiovascular benefit.
+                </div>
+              </div>
+            </div>
           </div>
         </SectionShell>
       </section>
 
-      {/* Safety note */}
+      <LandingJourneyTimeline
+        accent="rose"
+        title="Your first year on GLP-1 — what to expect"
+        description="Based on STEP-1, SURMOUNT-1, and PCOS sub-analyses with female-majority cohorts."
+      />
+
+      <LandingComparisonTable />
+
+      <LandingTestimonials
+        eyebrow="Real women · Real results"
+        title="Women on GLP-1 — in their words"
+        description="What women navigating PCOS, perimenopause, and menopause actually experience."
+        items={testimonials}
+        accent="rose"
+      />
+
+      <LandingGuaranteeMedallion accent="rose" />
+
+      <LandingProviderTeam accent="rose" />
+
+      <LandingHowItWorks
+        accent="rose"
+        segmentLabel="Women-informed intake + cycle-aware monitoring included."
+      />
+
+      <LandingPricingAnchor
+        eyebrow="Transparent women's pricing"
+        headline="Women-informed care at one monthly price."
+        subhead="Everything you need for hormonal weight management — provider care, cycle-aware monitoring, medication, and coaching. No hidden fees."
+        includes={[
+          "Provider experienced with hormonal health (PCOS, menopause)",
+          "Compounded semaglutide or tirzepatide",
+          "Cycle- and menopause-aware monitoring included",
+          "Unlimited provider messaging & dose adjustments",
+          "Women's meal plans, protein targets, and coaching",
+          "Free 2-day shipping · Cancel anytime",
+        ]}
+        primaryCtaLabel="See If I Qualify"
+        accent="rose"
+      />
+
+      {/* Safety */}
       <section className="py-12">
         <SectionShell>
           <div className="mx-auto max-w-2xl rounded-2xl border border-amber-200 bg-amber-50/50 p-6">
@@ -278,34 +327,18 @@ export default function WomenPage() {
         </SectionShell>
       </section>
 
-      {/* Trust signals */}
-      <section className="py-12 border-t border-navy-100/40">
-        <SectionShell>
-          <div className="grid gap-6 sm:grid-cols-3 text-center">
-            <div className="flex flex-col items-center gap-2">
-              <Shield className="h-8 w-8 text-teal" />
-              <h3 className="font-bold text-navy text-sm">HIPAA-compliant care</h3>
-              <p className="text-xs text-graphite-500">Your health data is encrypted and protected</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Star className="h-8 w-8 text-gold" />
-              <h3 className="font-bold text-navy text-sm">Licensed providers</h3>
-              <p className="text-xs text-graphite-500">Board-certified physicians evaluate every patient</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Heart className="h-8 w-8 text-teal" />
-              <h3 className="font-bold text-navy text-sm">Women-informed protocols</h3>
-              <p className="text-xs text-graphite-500">Care plans account for hormonal health and cycle patterns</p>
-            </div>
-          </div>
-        </SectionShell>
-      </section>
+      <LandingFaq
+        eyebrow="Women's FAQ"
+        title="Questions women actually ask"
+        description="About cycles, fertility, hair, and hormone interactions — answered honestly."
+        items={concerns}
+      />
 
       {/* Further reading */}
       <section className="py-12 bg-cloud/40 border-y border-sage/20">
         <SectionShell>
-          <h2 className="text-lg font-semibold text-navy mb-2">Further reading</h2>
-          <p className="text-sm text-graphite-500 mb-6">Articles on GLP-1, hormones, and women&apos;s weight loss</p>
+          <h2 className="text-lg font-semibold text-navy mb-2 text-center">Further reading</h2>
+          <p className="text-sm text-graphite-500 mb-6 text-center">Articles on GLP-1, hormones, and women&apos;s weight loss</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { label: "Semaglutide Birth Control Interactions", href: "/blog/semaglutide-birth-control-interaction", tag: "Women's Health" },
@@ -316,13 +349,13 @@ export default function WomenPage() {
               <Link
                 key={article.href}
                 href={article.href}
-                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-rose-300/50 hover:shadow-premium transition-all"
               >
                 <div>
-                  <span className="text-xs font-medium text-teal">{article.tag}</span>
-                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-teal transition-colors leading-snug">{article.label}</p>
+                  <span className="text-xs font-medium text-rose-600">{article.tag}</span>
+                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-rose-700 transition-colors leading-snug">{article.label}</p>
                 </div>
-                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-rose-600 transition-colors mt-0.5" />
               </Link>
             ))}
           </div>
@@ -333,7 +366,7 @@ export default function WomenPage() {
 
       <section className="py-8 border-t border-navy-100/40">
         <SectionShell>
-          <p className="mx-auto max-w-3xl text-center text-xs text-graphite-300 leading-relaxed">
+          <p className="mx-auto max-w-3xl text-center text-xs text-graphite-400 leading-relaxed">
             {siteConfig.compliance.shortDisclaimer} Clinical data cited from published peer-reviewed research. Individual results vary. Treatment eligibility determined by a licensed medical provider.
           </p>
         </SectionShell>

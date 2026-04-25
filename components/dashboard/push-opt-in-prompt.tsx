@@ -40,10 +40,24 @@ export function PushOptInPrompt() {
       return;
     }
 
+    // Don't ask on visit #1 or #2 (low yield + trains users to dismiss).
+    // Persistent cooldown across sessions: 7 days between asks.
+    const VISIT_KEY = "push-opt-in-visit-count";
+    const LAST_SHOWN_KEY = "push-opt-in-last-shown-at";
+    const VISITS_REQUIRED = 3;
+    const COOLDOWN_DAYS = 7;
+    const visits = parseInt(localStorage.getItem(VISIT_KEY) || "0", 10) + 1;
+    localStorage.setItem(VISIT_KEY, String(visits));
+    if (visits < VISITS_REQUIRED) return;
+    const lastShownAt = parseInt(localStorage.getItem(LAST_SHOWN_KEY) || "0", 10);
+    const daysSince = lastShownAt ? (Date.now() - lastShownAt) / 86_400_000 : Infinity;
+    if (daysSince < COOLDOWN_DAYS) return;
+
     // Reveal after 10s
     const timer = setTimeout(() => {
       setShow(true);
-      track("push_opt_in_view");
+      localStorage.setItem(LAST_SHOWN_KEY, String(Date.now()));
+      track("push_opt_in_view", { visits });
     }, 10_000);
     return () => clearTimeout(timer);
   }, []);
@@ -111,7 +125,11 @@ export function PushOptInPrompt() {
   if (!show || state === "unsupported") return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-md rounded-2xl border border-navy-100/60 bg-white shadow-premium-xl animate-fade-in-up sm:bottom-6">
+    <div
+      role="region"
+      aria-labelledby="push-opt-in-title"
+      className="fixed left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-md rounded-2xl border border-navy-100/60 bg-white shadow-premium-xl animate-fade-in-up bottom-[calc(env(safe-area-inset-bottom,0px)+6rem)] sm:bottom-6"
+    >
       <button
         onClick={handleDismiss}
         className="absolute right-3 top-3 rounded-lg p-1.5 text-graphite-400 hover:bg-navy-50 hover:text-navy transition-colors"
@@ -136,7 +154,7 @@ export function PushOptInPrompt() {
               <Bell className="h-5 w-5" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-navy">
+              <p id="push-opt-in-title" className="text-sm font-bold text-navy">
                 Text-speed updates from your care team
               </p>
               <p className="mt-1 text-xs text-graphite-500 leading-relaxed">

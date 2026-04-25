@@ -113,17 +113,17 @@ export default async function ComparisonPage({ params }: PageProps) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-navy-100/40 bg-navy-50/30">
-                    <th className="px-6 py-4 text-left font-semibold text-navy">Feature</th>
-                    <th className="px-6 py-4 text-center font-semibold text-teal">Nature&apos;s Journey</th>
-                    <th className="px-6 py-4 text-center font-semibold text-graphite-500">Competitor</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs sm:text-sm font-semibold text-navy">Feature</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 text-center text-xs sm:text-sm font-semibold text-teal">Nature&apos;s Journey</th>
+                    <th className="px-3 py-3 sm:px-6 sm:py-4 text-center text-xs sm:text-sm font-semibold text-graphite-500">Competitor</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-navy-100/30">
                   {features.map((row, i) => (
                     <tr key={i} className="hover:bg-navy-50/20 transition-colors">
-                      <td className="px-6 py-3 text-graphite-600">{row.feature}</td>
+                      <td className="px-3 py-3 sm:px-6 text-xs sm:text-sm text-graphite-600">{row.feature}</td>
                       {[row.us, row.them].map((val, j) => (
-                        <td key={j} className="px-6 py-3 text-center">
+                        <td key={j} className="px-3 py-3 sm:px-6 text-center">
                           {val === true ? <Check className="mx-auto h-4 w-4 text-teal" /> :
                            val === false ? <X className="mx-auto h-4 w-4 text-graphite-300" /> :
                            <span className="text-xs text-graphite-500">{String(val)}</span>}

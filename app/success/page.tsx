@@ -4,7 +4,9 @@ import { UpsellModal } from "@/components/checkout/upsell-modal";
 import { ReferralPrompt } from "@/components/checkout/referral-prompt";
 import { ProviderPreview } from "@/components/checkout/provider-preview";
 import { OnboardingSteps } from "@/components/checkout/onboarding-steps";
+import { RequestPhoneCard } from "@/components/checkout/request-phone-card";
 import { PushOptInPrompt } from "@/components/dashboard/push-opt-in-prompt";
+import { readLpAttribution } from "@/components/shared/lp-attribution-tracker";
 import { useSearchParams } from "next/navigation";
 
 import { useState, useEffect, useMemo } from "react";
@@ -140,6 +142,9 @@ export default function SuccessPage() {
       // Non-blocking — telemetry is best-effort
     }
 
+    // Tier 8.8 — enrich conversion event with first-touch LP attribution
+    const lpAttr = readLpAttribution();
+
     track(ANALYTICS_EVENTS.CHECKOUT_COMPLETE, {
       source: "success_page",
       session_id: searchParams?.get("session_id") || undefined,
@@ -148,6 +153,11 @@ export default function SuccessPage() {
       addons: addOns.join(",") || undefined,
       value: estimatedValue,
       currency: "USD",
+      lp_attr_theme: lpAttr?.theme,
+      lp_attr_path: lpAttr?.path,
+      lp_attr_days_ago: lpAttr
+        ? Math.floor((Date.now() - lpAttr.firstSeen) / 86400000)
+        : undefined,
     });
 
     // GA4 ecommerce purchase event (separate from PostHog) — powers GA4 revenue reporting
@@ -200,6 +210,10 @@ export default function SuccessPage() {
         <p className="mt-4 text-lg text-graphite-500">
           Your membership is active. Here&apos;s what happens next.
         </p>
+
+        {/* Tier 6.8 — Request phone if not already on file
+            (rendered early so it's prominent; self-hides if phone exists) */}
+        <RequestPhoneCard />
 
         {/* Email confirmation notice */}
         <div className="mt-6 flex items-center gap-3 rounded-2xl border border-teal-200 bg-teal-50/60 px-5 py-3.5 text-left">
@@ -286,12 +300,14 @@ export default function SuccessPage() {
               with the program. Add it now and get your first month at 20% off.
             </p>
             <div className="mt-4">
-              <Button variant="gold" className="gap-2">
-                Add Meal Plans &mdash; $15/mo first month
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              <Link href="/dashboard/settings?tab=addons&upsell=meal-plans" className="inline-block w-full sm:w-auto">
+                <Button variant="gold" className="gap-2 w-full sm:w-auto">
+                  Add Meal Plans &mdash; $15/mo first month
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
             </div>
-            <p className="mt-2 text-[10px] text-graphite-300">
+            <p className="mt-2 text-xs text-graphite-400">
               Regular price $19/mo after first month. Cancel anytime.
             </p>
           </CardContent>

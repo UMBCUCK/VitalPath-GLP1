@@ -3,7 +3,8 @@ import { z } from "zod";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
-import { safeError } from "@/lib/logger";
+import { createTelehealthService } from "@/lib/services/telehealth";
+import { safeError, safeLog } from "@/lib/logger";
 
 const adverseEventSchema = z.object({
   severity: z.enum(["MILD", "MODERATE", "SEVERE", "LIFE_THREATENING"]),
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     const { severity, description, medicationName, onsetDate } = parsed.data;
 
-    // Create the adverse event report
+    // Create the local adverse event report (primary record of truth).
     await db.adverseEventReport.create({
       data: {
         userId: session.userId,
@@ -52,6 +53,32 @@ export async function POST(req: NextRequest) {
         onsetDate: onsetDate ? new Date(onsetDate) : null,
       },
     });
+
+    // Tier 12.3 — File the adverse event with the prescribing telehealth
+    // provider's pharmacovigilance system (OpenLoop). Required for FDA
+    // MedWatch compliance. Non-blocking: if the API call fails, the local
+    // report still exists for admin review.
+    try {
+      const profile = await db.patientProfile.findUnique({
+        where: { userId: session.userId },
+        select: { telehealthPatientId: true },
+      });
+      if (profile?.telehealthPatientId) {
+        const telehealth = createTelehealthService();
+        await telehealth.reportAdverseEvent({
+          patientExternalId: profile.telehealthPatientId,
+          severity,
+          description,
+          medicationName: medicationName || undefined,
+          onsetDate: onsetDate ? new Date(onsetDate) : undefined,
+        });
+        safeLog("[Adverse Events]", `Filed ${severity} report with telehealth vendor for ${session.userId}`);
+      }
+    } catch (telehealthErr) {
+      safeError("[Adverse Events] Telehealth filing failed", telehealthErr);
+      // Non-blocking — local report stays as the primary record. Admin
+      // sees it in the queue and can manually escalate to OpenLoop.
+    }
 
     // Create a confirmation notification for the user
     await db.notification.create({

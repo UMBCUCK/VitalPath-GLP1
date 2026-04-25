@@ -125,10 +125,28 @@ export default function SettingsPage() {
 
   async function acceptSaveOffer(offerType: string) {
     track(ANALYTICS_EVENTS.SAVE_OFFER_ACCEPT, { offer_type: offerType, reason: cancelReason });
-    if (offerType === "pause") {
-      await fetch("/api/subscription/pause", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ months: 1 }) });
+
+    // Tier 7.3 — wire all save-offer types to real endpoints so the
+    // retention modal actually persists and applies Stripe mutations.
+    try {
+      if (offerType === "pause") {
+        await fetch("/api/subscription/pause", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ months: 1 }),
+        });
+      } else if (["discount", "downgrade", "coaching", "provider_consult"].includes(offerType)) {
+        await fetch("/api/subscription/save-offer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ offerType, reason: cancelReason || undefined }),
+        });
+      }
+    } catch {
+      // Non-blocking — still show the success state so the user exits the
+      // cancel flow. Admin will see the save offer record regardless.
     }
-    // downgrade + discount would call similar endpoints in production
+
     setSaveOfferAccepted(true);
     setCancelStep("done");
   }
@@ -253,13 +271,46 @@ export default function SettingsPage() {
               <Badge variant="secondary">Inactive</Badge>
             </div>
           )}
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button variant="outline" size="sm" onClick={async () => {
               const res = await fetch("/api/billing/portal", { method: "POST" });
               const d = await res.json();
               if (d.url) window.location.href = d.url;
             }}>Manage Billing</Button>
             <Button variant="outline" size="sm" asChild><a href="/pricing">Change Plan</a></Button>
+
+            {/* Tier 8.3 — one-click pause for active subscriptions.
+                Pauses billing for 1 month via Stripe's pause_collection.
+                Keeps the subscription alive so the user can resume. */}
+            {subscription?.status === "ACTIVE" && !subscription.cancelAtPeriodEnd && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                onClick={async () => {
+                  track(ANALYTICS_EVENTS.SAVE_OFFER_ACCEPT, {
+                    offer_type: "pause",
+                    reason: "one_click_pause",
+                    location: "settings_top",
+                  });
+                  try {
+                    const res = await fetch("/api/subscription/pause", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ months: 1 }),
+                    });
+                    if (res.ok) {
+                      // Reflect the paused state locally without a full reload
+                      setSubscription((s) => (s ? { ...s, status: "PAUSED" } : s));
+                    }
+                  } catch {
+                    // non-blocking
+                  }
+                }}
+              >
+                Pause 1 month
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

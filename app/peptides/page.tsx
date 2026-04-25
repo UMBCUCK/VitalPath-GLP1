@@ -237,7 +237,7 @@ export default function PeptidesPage() {
             </Link>
           </div>
 
-          <p className="mt-4 text-xs text-white/60">
+          <p className="mt-4 text-xs leading-relaxed text-white/85">
             Eligibility, protocol, and dosing determined by a licensed provider based on your
             individual health profile. Compounded peptides are not FDA-approved products.
           </p>
@@ -358,6 +358,105 @@ export default function PeptidesPage() {
               </div>
             ))}
           </div>
+        </SectionShell>
+      </section>
+
+      {/* Tier 6.7 — Pre-built peptide stacks.
+          Curated 2-peptide bundles reduce decision fatigue for first-time
+          peptide buyers and anchor AOV higher than single-SKU browsing. */}
+      <section className="py-14 bg-white">
+        <SectionShell className="max-w-5xl">
+          <div className="text-center mb-8">
+            <Badge variant="gold" className="mb-3">Stacks</Badge>
+            <h2 className="text-2xl font-bold text-navy sm:text-3xl">
+              Pre-built stacks — provider-reviewed combinations
+            </h2>
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-graphite-500">
+              Not sure where to start? These are the most-prescribed peptide pairings at your
+              life stage. Your provider confirms the combination fits your profile before any
+              prescription is issued.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              {
+                slug: "recovery",
+                name: "The Recovery Stack",
+                subtitle: "For active adults + GLP-1 month 1",
+                pieces: ["BPC-157", "Thymosin Beta-4"],
+                priceCents: 28900,
+                originalCents: 30800,
+                note: "Most popular add-on to GLP-1",
+                accent: "teal",
+              },
+              {
+                slug: "longevity",
+                name: "The Longevity Stack",
+                subtitle: "For adults 40+ focused on aging well",
+                pieces: ["NAD+", "Sermorelin"],
+                priceCents: 32900,
+                originalCents: 34800,
+                note: "Best for sleep, energy, recovery",
+                accent: "gold",
+              },
+              {
+                slug: "glow",
+                name: "The Glow Stack+",
+                subtitle: "For rapid weight-loss journeys",
+                pieces: ["Glow Stack", "BPC-157"],
+                priceCents: 20900,
+                originalCents: 21800,
+                note: "Targets skin, hair & digestion",
+                accent: "rose",
+              },
+            ].map((stack) => (
+              // Tier 8.2 — link to the new /peptides/stacks/[slug] detail
+              // page instead of jumping straight into /qualify. The detail
+              // page has the full rationale + FAQ that high-intent stack
+              // shoppers want to read before committing.
+              <Link
+                key={stack.slug}
+                href={`/peptides/stacks/${stack.slug}`}
+                className="group relative rounded-2xl border border-navy-100/60 bg-white p-5 shadow-premium-sm transition-all hover:shadow-premium-lg hover:border-teal/40"
+              >
+                <Badge
+                  variant={stack.accent === "gold" ? "gold" : "default"}
+                  className="absolute -top-2 left-4 text-[9px] uppercase tracking-wider"
+                >
+                  {stack.note}
+                </Badge>
+                <p className="mt-2 text-[11px] font-semibold uppercase tracking-wider text-teal">
+                  {stack.subtitle}
+                </p>
+                <h3 className="mt-1 text-lg font-bold text-navy">{stack.name}</h3>
+                <ul className="mt-3 space-y-1">
+                  {stack.pieces.map((piece) => (
+                    <li key={piece} className="flex items-center gap-2 text-sm text-graphite-600">
+                      <Check className="h-3.5 w-3.5 shrink-0 text-teal" />
+                      <span>{piece}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-4 flex items-baseline justify-between border-t border-navy-100/40 pt-3">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xs text-graphite-400 line-through">
+                      ${(stack.originalCents / 100).toFixed(0)}
+                    </span>
+                    <span className="text-xl font-bold text-navy">
+                      ${(stack.priceCents / 100).toFixed(0)}
+                      <span className="text-xs font-normal text-graphite-400">/mo</span>
+                    </span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-graphite-400 group-hover:text-teal transition-colors" />
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <p className="mt-6 text-center text-[11px] text-graphite-400">
+            Stack pricing is indicative. Actual prescription + pricing confirmed at provider evaluation.
+          </p>
         </SectionShell>
       </section>
 

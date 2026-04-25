@@ -207,14 +207,14 @@ export function ProgressClient({ data }: { data: ProgressData }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <h2 className="text-2xl font-bold text-navy">Progress</h2>
           <p className="text-sm text-graphite-400">
             {weightData.length} entries · tracking weight, habits &amp; measurements
           </p>
         </div>
-        <Button className="gap-2" onClick={() => setShowLogForm(!showLogForm)}>
+        <Button className="w-full sm:w-auto gap-2" onClick={() => setShowLogForm(!showLogForm)}>
           <Plus className="h-4 w-4" /> Log Today
         </Button>
       </div>

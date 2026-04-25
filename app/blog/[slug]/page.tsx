@@ -8,6 +8,7 @@ import { MarketingShell } from "@/components/layout/marketing-shell";
 import { ShareButtons } from "@/components/shared/share-buttons";
 import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { TableOfContents } from "@/components/blog/table-of-contents";
+import { NewsletterSignup } from "@/components/marketing/newsletter-signup";
 import { providers } from "@/lib/content";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
@@ -398,9 +399,9 @@ export default async function BlogPostPage({ params }: PageProps) {
                 </div>
               )}
 
-              {/* Article content */}
+              {/* Article content — 16px body on mobile (readability), 14px on desktop */}
               <div
-                className="mt-4 prose prose-navy prose-sm max-w-none
+                className="mt-4 prose prose-navy prose-base sm:prose-sm max-w-none
                   prose-headings:text-navy prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-4
                   prose-headings:scroll-mt-24
                   prose-p:text-graphite-600 prose-p:leading-relaxed prose-p:mb-4
@@ -514,6 +515,17 @@ export default async function BlogPostPage({ params }: PageProps) {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Tier 11.5 — Newsletter card immediately under the article body.
+                Contextual ("Liked this? Get the next one") + flexible variant. */}
+            <div className="mt-10">
+              <NewsletterSignup
+                variant="card"
+                placement="blog_post_end"
+                headline="Liked this? Get next week's article"
+                subCopy="One Tuesday email with a new GLP-1 deep-dive — protein, side effects, dose timing, all written for real life. No spam, unsubscribe anytime."
+              />
             </div>
 
             {/* ── Desktop sticky TOC sidebar ── */}

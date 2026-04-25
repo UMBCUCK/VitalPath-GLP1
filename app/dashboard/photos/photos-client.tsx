@@ -195,7 +195,7 @@ export function PhotosClient({ photos: initialPhotos }: PhotosClientProps) {
         <Card>
           <CardHeader><CardTitle className="text-base">Before &amp; After Comparison</CardTitle></CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
               {[
                 { label: "Earliest", photo: earliest, variant: "secondary" as const },
                 { label: "Latest", photo: latest, variant: "default" as const },
@@ -207,6 +207,8 @@ export function PhotosClient({ photos: initialPhotos }: PhotosClientProps) {
                       <img
                         src={photo.imageUrl}
                         alt={`${label} progress photo`}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-cover"
                       />
                     ) : (

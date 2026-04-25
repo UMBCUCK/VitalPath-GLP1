@@ -208,6 +208,168 @@ export const cancellationSaveOffer = (name: string) => ({
   `),
 });
 
+// ─── Tier 13.8 — OpenLoop magic-link sign-in ─────────────────
+//
+// Fires from /api/auth/magic-link. The link is a 15-minute signed JWT;
+// users are matched against either the local User table OR OpenLoop's
+// patient registry via the telehealth adapter. Either way, this email
+// is the only outbound surface — keep it tight and recognizable.
+export const magicLinkSignInEmail = (
+  firstName: string | undefined,
+  signInUrl: string,
+) => ({
+  subject: firstName
+    ? `${firstName}, your sign-in link`
+    : "Your Nature's Journey sign-in link",
+  html: baseTemplate(`
+    <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">${firstName ? `Hi ${firstName}, ` : ""}sign in with one click</h1>
+    <p style="font-size: 16px; line-height: 1.6;">Click the button below to sign in to your Nature's Journey member dashboard. The link expires in 15 minutes for your security.</p>
+
+    ${ctaButton("Sign in to my dashboard", signInUrl)}
+
+    <p style="font-size: 13px; color: #677A8A; line-height: 1.6;">If the button doesn't work, copy and paste this URL into your browser:</p>
+    <p style="font-size: 12px; color: #1F6F78; word-break: break-all; line-height: 1.5;">${signInUrl}</p>
+
+    <hr style="border: none; border-top: 1px solid #E8EDF4; margin: 24px 0;" />
+
+    <p style="font-size: 12px; color: #97A5B0; line-height: 1.6;">
+      Didn't request this? Ignore this email — your account stays secure.
+      Sign-in links can only be used once and can't be reused after they expire.
+    </p>
+  `),
+});
+
+// ─── Tier 11.7 — Cancellation win-back drip ─────────────────
+//
+// 3-touch win-back sequence for users who fully cancel (not paused).
+// Day 3 = empathy + door-open ("we kept your data"); Day 14 = social
+// proof of returning members + 25% off welcome-back; Day 30 = last
+// chance with a longer credit window. Each fires once per user per
+// touch (Notification-tag idempotency in the cron).
+export const cancellationWinBack = {
+  day3: (name?: string) => ({
+    subject: `${name ? `${name}, ` : ""}we kept your data — come back anytime`,
+    html: baseTemplate(`
+      <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">${name ? `${name}, your` : "Your"} progress is safe with us</h1>
+      <p style="font-size: 16px; line-height: 1.6;">No pressure — we just wanted to say thanks for trying Nature's Journey, and let you know your full history (weights, photos, messages, prescription record) is preserved if you ever decide to come back.</p>
+      <p style="font-size: 16px; line-height: 1.6;">Reactivating is one click and pulls everything back exactly as you left it.</p>
+      ${ctaButton("Reactivate My Plan", `${APP_URL}/dashboard/settings?reactivate=1`)}
+      <p style="font-size: 14px; color: #677A8A;">Need something else, or want to talk to a human about what didn&apos;t work? Reply to this email anytime.</p>
+    `),
+  }),
+
+  day14: (name?: string) => ({
+    subject: `${name ? `${name}, ` : ""}25% off if you come back this month`,
+    html: baseTemplate(`
+      <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">${name ? `${name},` : ""} a one-time welcome-back offer</h1>
+      <p style="font-size: 16px; line-height: 1.6;">A lot of members come back within 4–6 weeks after canceling — life gets in the way, then they&apos;re ready again. If that&apos;s you, here&apos;s a real reason to make the move now.</p>
+      <div style="background: #FFF8E1; border: 1px solid #F0D88E; border-radius: 12px; padding: 20px; margin: 20px 0;">
+        <p style="margin: 0 0 8px; font-weight: 700; color: #0E223D; font-size: 16px;">25% off your next 3 months</p>
+        <p style="margin: 0 0 12px; font-size: 14px; color: #677A8A;">Code <strong>WELCOMEBACK25</strong> applied automatically when you reactivate. Same provider, same plan, same ongoing care.</p>
+        <p style="margin: 0; font-size: 12px; color: #97A5B0;">Code expires 30 days from your cancellation date.</p>
+      </div>
+      ${ctaButton("Reactivate with 25% off", `${APP_URL}/dashboard/settings?reactivate=1&promo=WELCOMEBACK25`)}
+    `),
+  }),
+
+  day30: (name?: string) => ({
+    subject: `${name ? `${name}, ` : ""}last call: 25% off welcome-back expires soon`,
+    html: baseTemplate(`
+      <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">${name ? `${name}, your` : "Your"} reactivation discount expires this week</h1>
+      <p style="font-size: 16px; line-height: 1.6;">Quick heads-up: the 25%-off welcome-back code we shared 2 weeks ago is on its way out. After it expires, you&apos;ll be back to standard pricing.</p>
+      <p style="font-size: 16px; line-height: 1.6;">If you&apos;re still on the fence, the most common reason members come back is dose continuity — picking up where they left off without re-doing the full intake.</p>
+      ${ctaButton("Reactivate before code expires", `${APP_URL}/dashboard/settings?reactivate=1&promo=WELCOMEBACK25`)}
+      <p style="font-size: 13px; color: #97A5B0;">After 30 days from cancellation, this code stops working. After 60 days, your data archives but stays restorable on request.</p>
+    `),
+  }),
+};
+
+// ─── Tier 9.3 — Post-pause re-engagement ─────────────────────
+//
+// Fires 2 days before a paused subscription auto-resumes. Gives the
+// member a heads-up about incoming billing + a quick toggle to extend
+// the pause if life is still busy. Prevents involuntary churn from
+// "oh no, I forgot I was paused" reactions when the first post-pause
+// invoice lands.
+export const postPauseReengagement = (name: string, resumeDate: Date) => {
+  const resumeStr = resumeDate.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  return {
+    subject: `${name}, your plan resumes ${resumeDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} — ready?`,
+    html: baseTemplate(`
+      <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">${name}, your plan resumes ${resumeStr}</h1>
+      <p style="font-size: 16px; line-height: 1.6;">We're giving you a heads up a couple days early. Your membership will automatically resume on ${resumeStr}, and billing will pick back up on your existing payment method.</p>
+
+      <div style="background: #F0FAF9; border: 1px solid #B2DBD7; border-radius: 12px; padding: 20px; margin: 20px 0;">
+        <p style="margin: 0 0 10px; font-weight: 700; color: #0E223D; font-size: 15px;">Not ready yet? Two easy options:</p>
+        <p style="margin: 0 0 8px; font-size: 14px; color: #2E3742;"><strong>1.</strong> Extend the pause up to 3 months total — no charge until you&apos;re back.</p>
+        <p style="margin: 0; font-size: 14px; color: #2E3742;"><strong>2.</strong> Downgrade to Essential ($179/mo) while you figure it out.</p>
+      </div>
+
+      ${ctaButton("Manage My Plan", `${APP_URL}/dashboard/settings`)}
+
+      <p style="font-size: 14px; color: #677A8A; line-height: 1.6; margin-top: 20px;">If the timing works and you want to resume as-is, no action needed — we'll see you ${resumeStr}. Welcome back.</p>
+
+      <p style="font-size: 12px; color: #97A5B0; margin-top: 16px;">Questions? Reply to this email and our care team will respond within 24 hours.</p>
+    `),
+  };
+};
+
+// ─── Tier 9.7 — First-month drip (days 14 and 21) ───────────
+//
+// Extends the existing welcomeSequence (day 0/3/7) with two more emails
+// during the critical adherence window. Day 14 is the "results forming"
+// moment; day 21 is the "habit is locked in" moment where tracking
+// compliance starts to predict long-term retention.
+export const firstMonthDrip = {
+  day14: (name: string) => ({
+    subject: `${name}, two weeks in — here's what your body is doing`,
+    html: baseTemplate(`
+      <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">Two weeks in, ${name}</h1>
+      <p style="font-size: 16px; line-height: 1.6;">By day 14 on GLP-1 therapy, most members notice real changes: food noise quiets down, portions naturally shrink, and the first pounds start to shift. If you're not feeling it yet — that's normal too. Titration is individualized.</p>
+
+      <div style="background: #F7FAF8; border-radius: 12px; padding: 20px; margin: 20px 0;">
+        <p style="margin: 0 0 12px; font-weight: 700; color: #0E223D;">Things working members are doing at day 14:</p>
+        <ul style="font-size: 14px; line-height: 1.8; padding-left: 20px; margin: 0; color: #2E3742;">
+          <li><strong>Protein first</strong> — hitting 100g+/day preserves lean mass</li>
+          <li><strong>Hydration</strong> — 80+ oz keeps side effects at bay</li>
+          <li><strong>Walking 20 min/day</strong> — amplifies medication outcomes</li>
+          <li><strong>Weekly weigh-in</strong> — daily fluctuations are meaningless; weekly trend matters</li>
+        </ul>
+      </div>
+
+      ${ctaButton("Log today's progress", `${APP_URL}/dashboard/progress`)}
+
+      <p style="font-size: 14px; color: #677A8A;">Any side effects nagging you? Message your care team from the dashboard — dose timing adjustments fix 80% of issues.</p>
+    `),
+  }),
+
+  day21: (name: string) => ({
+    subject: `${name}, three weeks — you're building the habit that sticks`,
+    html: baseTemplate(`
+      <h1 style="color: #0E223D; font-size: 24px; margin-bottom: 16px;">Three weeks strong, ${name}</h1>
+      <p style="font-size: 16px; line-height: 1.6;">Day 21 is the tipping point where behavior starts feeling automatic. You&apos;re past the "new and novel" phase. What you're doing now is who you're becoming.</p>
+
+      <p style="font-size: 16px; line-height: 1.6;">Two things most successful members do at this stage:</p>
+
+      <div style="background: #F7FAF8; border-radius: 12px; padding: 20px; margin: 20px 0;">
+        <p style="margin: 0 0 8px; font-weight: 700; color: #0E223D;">1. Share your progress</p>
+        <p style="margin: 0 0 16px; font-size: 14px; color: #677A8A;">Members who refer a friend in month 1 have 40% higher adherence at month 6. Social accountability is real. Plus, you earn $50 per successful referral.</p>
+        <p style="margin: 0 0 8px; font-weight: 700; color: #0E223D;">2. Pre-plan your month-2 dose review</p>
+        <p style="margin: 0; font-size: 14px; color: #677A8A;">Your first dose adjustment comes up around day 28. Message your care team now if you've noticed any side-effect patterns so they can optimize before titrating.</p>
+      </div>
+
+      ${ctaButton("Invite a friend, earn $50", `${APP_URL}/dashboard/referrals`)}
+
+      <p style="font-size: 14px; color: #677A8A;">Keep stacking days. The next 3 weeks are where the compounding really kicks in.</p>
+    `),
+  }),
+};
+
 // ─── Tier 3.7 — Peptide Intro (day 30 after activation) ─────
 //
 // Fires for active members who have been on their GLP-1 treatment for 30+

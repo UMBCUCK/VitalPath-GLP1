@@ -17,13 +17,19 @@ export function BillingToggle({ value, onChange }: BillingToggleProps) {
   ];
 
   return (
-    <div className="inline-flex rounded-xl border border-navy-200 bg-white p-1 shadow-premium">
+    <div
+      role="tablist"
+      aria-label="Billing interval"
+      className="inline-flex w-full max-w-sm rounded-xl border border-navy-200 bg-white p-1 shadow-premium sm:w-auto"
+    >
       {options.map((opt) => (
         <button
           key={opt.value}
+          role="tab"
+          aria-selected={value === opt.value}
           onClick={() => onChange(opt.value)}
           className={cn(
-            "relative rounded-lg px-4 py-2 text-sm font-medium transition-all",
+            "relative flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-all sm:flex-none",
             value === opt.value
               ? "bg-navy text-white shadow-sm"
               : "text-graphite-500 hover:text-navy"
@@ -31,7 +37,7 @@ export function BillingToggle({ value, onChange }: BillingToggleProps) {
         >
           {opt.label}
           {opt.savings && value === opt.value && (
-            <span className="absolute -top-2 -right-1 rounded-full bg-teal px-1.5 py-0.5 text-[9px] font-bold text-white">
+            <span className="absolute -top-2 -right-1 rounded-full bg-teal px-1.5 py-0.5 text-[10px] font-bold text-white">
               {opt.savings}
             </span>
           )}

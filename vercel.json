@@ -16,6 +16,8 @@
     { "path": "/api/lifecycle?trigger=quiz_abandonment", "schedule": "0 14 * * *" },
     { "path": "/api/lifecycle?trigger=reactivation", "schedule": "0 8 * * 1" },
     { "path": "/api/lifecycle?trigger=checkout_abandonment", "schedule": "0 */4 * * *" },
-    { "path": "/api/cron/lifecycle", "schedule": "15 * * * *" }
+    { "path": "/api/cron/lifecycle", "schedule": "15 * * * *" },
+    { "path": "/api/cron/admin-digest", "schedule": "0 13 * * *" },
+    { "path": "/api/cron/openloop-sync", "schedule": "*/30 * * * *" }
   ]
 }

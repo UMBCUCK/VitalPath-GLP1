@@ -1,18 +1,33 @@
 // VitalPath Service Worker
 // Cache-first for static assets, network-first for API/pages, push notification support.
 
-const CACHE_NAME = "vitalpath-v1";
-const STATIC_CACHE = "vitalpath-static-v1";
+// Bumped to v2 to evict the broken v1 install (which tried to pre-cache /offline
+// — a route that didn't exist — causing addAll() to reject and the install to
+// fail repeatedly. That made browsers display "NetworkError when attempting
+// to fetch resource" because the failed-install SW would intercept and abort
+// random page fetches.)
+const CACHE_NAME = "vitalpath-v2";
+const STATIC_CACHE = "vitalpath-static-v2";
 
-// Assets to pre-cache on install
-const PRECACHE_URLS = ["/dashboard", "/offline"];
+// Assets to pre-cache on install. Use addAll-tolerant install (each URL is
+// fetched individually so a single 404 cannot fail the whole install).
+const PRECACHE_URLS = ["/offline"];
 
 // ─── Install ───────────────────────────────────────────────
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
-      .open(PRECACHE_URLS.length ? STATIC_CACHE : CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .open(STATIC_CACHE)
+      .then((cache) =>
+        // Tolerant: if any URL 404s, log and continue rather than aborting install.
+        Promise.all(
+          PRECACHE_URLS.map((url) =>
+            cache.add(url).catch((err) => {
+              console.warn("[sw] precache miss for", url, err && err.message);
+            })
+          )
+        )
+      )
       .then(() => self.skipWaiting())
   );
 });

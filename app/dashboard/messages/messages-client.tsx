@@ -163,17 +163,24 @@ export function MessagesClient({ messages: initialMessages }: { messages: Messag
                   if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) sendMessage();
                 }}
                 placeholder="Type your message to your care team…"
-                className="calculator-input min-h-[88px] resize-y w-full"
+                autoCapitalize="sentences"
+                autoCorrect="on"
+                spellCheck
+                enterKeyHint="send"
+                className="calculator-input min-h-[72px] sm:min-h-[88px] resize-y w-full text-base"
               />
-              <div className="flex items-center justify-between">
-                <p className="text-[11px] text-graphite-300">
+              <div className="flex items-center justify-between gap-3">
+                <p className="hidden sm:block text-[11px] text-graphite-300">
                   <kbd className="rounded border border-graphite-200 bg-graphite-50 px-1 py-0.5 text-[10px]">{isMac ? "⌘+Return" : "Ctrl+Enter"}</kbd> to send
                 </p>
+                <span className="sm:hidden text-[11px] text-graphite-400">
+                  Care team responds within 24h
+                </span>
                 <Button
                   onClick={sendMessage}
                   disabled={!newMessage.trim() || sending}
-                  className="gap-2"
-                  size="sm"
+                  className="gap-2 shrink-0"
+                  size="default"
                 >
                   {sending ? (
                     <>Sending…</>

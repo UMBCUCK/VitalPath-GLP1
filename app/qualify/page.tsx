@@ -23,7 +23,10 @@ import { recommendPlanFromQualify, assignPersona } from "@/lib/funnel";
 import { PersonaResultCard } from "@/components/marketing/persona-result-card";
 import { QualifyLeadBridge } from "@/components/marketing/qualify-lead-bridge";
 import { TextMeLink } from "@/components/marketing/text-me-link";
+import { QualifyStep0Commitment } from "@/components/marketing/qualify-step0-commitment";
+import { SaveAndEmailLink } from "@/components/marketing/save-and-email-link";
 import { ViewContentTracker } from "@/components/shared/view-content-tracker";
+import { getVariant, trackExperiment, QUALIFY_STEP1_COPY } from "@/lib/experiments";
 import { generateProjection, type ProjectionResult } from "@/lib/weight-projection";
 import { calculateBMI, bmiCategory, formatPrice } from "@/lib/utils";
 import { plans } from "@/lib/pricing";
@@ -198,6 +201,45 @@ function QualifyPageInner() {
   const [showExitModal, setShowExitModal] = useState(false);
   const [showLeadBridge, setShowLeadBridge] = useState(false);
   const leadBridgeShown = useRef(false);
+
+  // Tier 8.6 — Qualify step-1 copy A/B test (heading + sub-heading).
+  // Assigned once per session via experiments lib; exposure fires once.
+  const [step1Copy, setStep1Copy] = useState(QUALIFY_STEP1_COPY.control);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SESSION_KEY = "nj-exp-qualify-step1";
+    let anonymousId = sessionStorage.getItem(SESSION_KEY);
+    if (!anonymousId) {
+      anonymousId = `anon_${Math.random().toString(36).slice(2, 10)}`;
+      sessionStorage.setItem(SESSION_KEY, anonymousId);
+    }
+    const variant = getVariant("qualify_step1_copy", anonymousId);
+    const copy = QUALIFY_STEP1_COPY[variant] ?? QUALIFY_STEP1_COPY.control;
+    setStep1Copy(copy);
+    if (!sessionStorage.getItem(`${SESSION_KEY}-exposed`)) {
+      trackExperiment("qualify_step1_copy", variant);
+      sessionStorage.setItem(`${SESSION_KEY}-exposed`, "1");
+    }
+  }, []);
+
+  // Tier 10.7 — Step-0 commitment gate experiment (off/on).
+  // When "on", QualifyStep0Commitment renders on first visit.
+  const [step0Active, setStep0Active] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SESSION_KEY = "nj-exp-qualify-step0";
+    let anonymousId = sessionStorage.getItem(SESSION_KEY);
+    if (!anonymousId) {
+      anonymousId = `anon_${Math.random().toString(36).slice(2, 10)}`;
+      sessionStorage.setItem(SESSION_KEY, anonymousId);
+    }
+    const variant = getVariant("qualify_step0_gate", anonymousId);
+    setStep0Active(variant === "on");
+    if (!sessionStorage.getItem(`${SESSION_KEY}-exposed`)) {
+      trackExperiment("qualify_step0_gate", variant);
+      sessionStorage.setItem(`${SESSION_KEY}-exposed`, "1");
+    }
+  }, []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [exitEmail, setExitEmail] = useState("");
@@ -746,6 +788,33 @@ function QualifyPageInner() {
       {/* Tier 5.1 — Meta CAPI ViewContent for retargeting pool */}
       <ViewContentTracker contentName="Qualify Funnel" contentCategory="funnel" />
 
+      {/* Tier 10.7 — Step-0 commitment modal (first-visit, feature-flagged) */}
+      <QualifyStep0Commitment
+        active={step0Active}
+        onAnswered={(range) => {
+          if (!range) return;
+          // Pre-fill the existing weightLbs slider based on range midpoint so
+          // step 1 feels already-filled and the user keeps momentum.
+          const midpoint = range.value === "10-25"
+            ? 160 + 12 // ~172
+            : range.value === "26-50"
+              ? 180 + 20 // ~200
+              : range.value === "51-75"
+                ? 220 + 25 // ~245
+                : 280;
+          setForm((prev) => ({
+            ...prev,
+            weightLbs: prev.weightLbs || String(midpoint),
+          }));
+          updateFunnel({
+            qualify: {
+              ...(funnelState.qualify ?? {}),
+              weightLbs: midpoint,
+            },
+          });
+        }}
+      />
+
       {/* Tier 1.1 — Soft email/phone capture between step 2 and 3 */}
       <QualifyLeadBridge
         show={showLeadBridge}
@@ -786,7 +855,7 @@ function QualifyPageInner() {
                <><Lock className="h-3 w-3" /> Secure Medical Intake</>}
             </Badge>
             <h1 className="text-2xl font-bold text-navy sm:text-3xl">
-              {step === 1 && "See if you qualify for GLP-1 treatment"}
+              {step === 1 && step1Copy.heading}
               {step === 2 && (form.heightFeet ? `Great${bmi >= 27 ? " — you may qualify!" : ""}. Tell us about your goals.` : "Tell us about your goals")}
               {step === 3 && `${form.firstName || "Almost there"} — help your provider prepare`}
               {step === 4 && "Quick safety check"}
@@ -880,8 +949,11 @@ function QualifyPageInner() {
                 {step === 1 && (
                   <div className="space-y-6">
                     <div>
-                      <h2 className="text-lg font-bold text-navy mb-1">Let&apos;s start with your basics</h2>
-                      <p className="text-sm text-graphite-400 mb-5">This helps us calculate your BMI and personalize your results.</p>
+                      {/* Tier 8.6 — experiment-driven subheading */}
+                      <h2 className="text-lg font-bold text-navy mb-1">{step1Copy.subheading}</h2>
+                      <p className="text-sm text-graphite-400 mb-5">
+                        This helps us calculate your BMI and personalize your results.
+                      </p>
                     </div>
 
                     <div data-error={!!fieldErrors.heightFeet || undefined}>
@@ -1676,32 +1748,32 @@ function QualifyPageInner() {
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div data-error={!!fieldErrors.firstName || undefined}>
                         <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.firstName ? "text-red-500" : "text-navy")}>First Name {fieldErrors.firstName && <span className="font-normal">*</span>}</label>
-                        <Input value={form.firstName} onChange={(e) => setField("firstName", e.target.value)} className={cn(fieldErrors.firstName && "!border-red-400 ring-2 ring-red-100")} required />
+                        <Input value={form.firstName} onChange={(e) => setField("firstName", e.target.value)} className={cn(fieldErrors.firstName && "!border-red-400 ring-2 ring-red-100")} autoComplete="given-name" autoCapitalize="words" required />
                       </div>
                       <div data-error={!!fieldErrors.lastName || undefined}>
                         <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.lastName ? "text-red-500" : "text-navy")}>Last Name {fieldErrors.lastName && <span className="font-normal">*</span>}</label>
-                        <Input value={form.lastName} onChange={(e) => setField("lastName", e.target.value)} className={cn(fieldErrors.lastName && "!border-red-400 ring-2 ring-red-100")} required />
+                        <Input value={form.lastName} onChange={(e) => setField("lastName", e.target.value)} className={cn(fieldErrors.lastName && "!border-red-400 ring-2 ring-red-100")} autoComplete="family-name" autoCapitalize="words" required />
                       </div>
                     </div>
 
                     <div data-error={!!fieldErrors.email || undefined}>
                       <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.email ? "text-red-500" : "text-navy")}>Email {fieldErrors.email && <span className="font-normal">*</span>}</label>
-                      <Input type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} className={cn(fieldErrors.email && "!border-red-400 ring-2 ring-red-100")} required />
+                      <Input type="email" inputMode="email" autoComplete="email" autoCapitalize="off" spellCheck={false} value={form.email} onChange={(e) => setField("email", e.target.value)} className={cn(fieldErrors.email && "!border-red-400 ring-2 ring-red-100")} required />
                     </div>
 
                     <div data-error={!!fieldErrors.phone || undefined}>
                       <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.phone ? "text-red-500" : "text-navy")}>Phone {fieldErrors.phone && <span className="font-normal">*</span>}</label>
-                      <Input type="tel" value={form.phone} onChange={(e) => setField("phone", e.target.value)} className={cn(fieldErrors.phone && "!border-red-400 ring-2 ring-red-100")} placeholder="(555) 123-4567" required />
+                      <Input type="tel" inputMode="tel" autoComplete="tel-national" value={form.phone} onChange={(e) => setField("phone", e.target.value)} className={cn(fieldErrors.phone && "!border-red-400 ring-2 ring-red-100")} placeholder="(555) 123-4567" required />
                     </div>
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div data-error={!!fieldErrors.dateOfBirth || undefined}>
                         <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.dateOfBirth ? "text-red-500" : "text-navy")}>Date of Birth {fieldErrors.dateOfBirth && <span className="font-normal">*</span>}</label>
-                        <Input type="date" value={form.dateOfBirth} onChange={(e) => setField("dateOfBirth", e.target.value)} className={cn(fieldErrors.dateOfBirth && "!border-red-400 ring-2 ring-red-100")} required />
+                        <Input type="date" autoComplete="bday" max={new Date(Date.now() - 18 * 365.25 * 86400000).toISOString().split("T")[0]} value={form.dateOfBirth} onChange={(e) => setField("dateOfBirth", e.target.value)} className={cn(fieldErrors.dateOfBirth && "!border-red-400 ring-2 ring-red-100")} required />
                       </div>
                       <div data-error={!!fieldErrors.state || undefined}>
                         <label className={cn("block text-sm font-semibold mb-1.5 transition-colors", fieldErrors.state ? "text-red-500" : "text-navy")}>State {fieldErrors.state && <span className="font-normal">*</span>}</label>
-                        <select value={form.state} onChange={(e) => setField("state", e.target.value)} className={cn("calculator-input", fieldErrors.state && "!border-red-400 ring-2 ring-red-100")} required>
+                        <select value={form.state} onChange={(e) => setField("state", e.target.value)} className={cn("calculator-input", fieldErrors.state && "!border-red-400 ring-2 ring-red-100")} autoComplete="address-level1" required>
                           <option value="">Select your state</option>
                           {US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
@@ -1722,7 +1794,7 @@ function QualifyPageInner() {
                     <div>
                       <label className="block text-sm font-semibold text-navy mb-1.5">Goal Weight (optional)</label>
                       <div className="relative">
-                        <input type="number" value={form.goalWeightLbs} onChange={(e) => setField("goalWeightLbs", e.target.value)} className="calculator-input pr-12" placeholder={projection ? `Suggested: ${Math.round(projection.summary.projectedWeightWithPlan)}` : "e.g. 165"} />
+                        <input type="number" inputMode="numeric" pattern="[0-9]*" value={form.goalWeightLbs} onChange={(e) => setField("goalWeightLbs", e.target.value)} className="calculator-input pr-12 text-base" placeholder={projection ? `Suggested: ${Math.round(projection.summary.projectedWeightWithPlan)}` : "e.g. 165"} />
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-graphite-400">lbs</span>
                       </div>
                       {projection && !form.goalWeightLbs && (
@@ -1743,7 +1815,7 @@ function QualifyPageInner() {
                         </div>
                         <div data-error={!!fieldErrors.emergencyContactPhone || undefined}>
                           <label className={cn("block text-xs font-semibold mb-1 transition-colors", fieldErrors.emergencyContactPhone ? "text-red-500" : "text-navy")}>Phone Number {fieldErrors.emergencyContactPhone && <span className="font-normal">*</span>}</label>
-                          <Input type="tel" value={form.emergencyContactPhone} onChange={(e) => setField("emergencyContactPhone", e.target.value)} className={cn(fieldErrors.emergencyContactPhone && "!border-red-400 ring-2 ring-red-100")} placeholder="(555) 123-4567" required />
+                          <Input type="tel" inputMode="tel" value={form.emergencyContactPhone} onChange={(e) => setField("emergencyContactPhone", e.target.value)} className={cn(fieldErrors.emergencyContactPhone && "!border-red-400 ring-2 ring-red-100")} placeholder="(555) 123-4567" required />
                         </div>
                         <div data-error={!!fieldErrors.emergencyContactRelation || undefined}>
                           <label className={cn("block text-xs font-semibold mb-1 transition-colors", fieldErrors.emergencyContactRelation ? "text-red-500" : "text-navy")}>Relationship {fieldErrors.emergencyContactRelation && <span className="font-normal">*</span>}</label>
@@ -1973,7 +2045,8 @@ function QualifyPageInner() {
               </div>
             )}
 
-            <div className="mt-4 flex items-center justify-between">
+            {/* Inline footer — desktop only (mobile uses sticky bar below) */}
+            <div className="mt-4 hidden sm:flex items-center justify-between">
               <Button variant="ghost" onClick={prevStep} disabled={step === 1} className="gap-1">
                 <ArrowLeft className="h-4 w-4" /> Back
               </Button>
@@ -1996,6 +2069,68 @@ function QualifyPageInner() {
                 </Button>
               )}
             </div>
+
+            {/* Mobile sticky action bar — always visible above iOS home indicator.
+                Critical for step 7 (14-field form) and step 8 (long consent block)
+                where users would otherwise have to scroll-hunt for Continue. */}
+            <div className="sm:hidden">
+              {/* Spacer prevents the last bit of step content from sitting under the bar */}
+              <div aria-hidden="true" className="h-24" />
+              <div
+                className="fixed inset-x-0 bottom-0 z-40 border-t border-navy-100/60 bg-white/95 backdrop-blur-md px-4 pt-3 pb-[max(env(safe-area-inset-bottom),0.75rem)]"
+                role="group"
+                aria-label="Step navigation"
+              >
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={prevStep}
+                    disabled={step === 1}
+                    className="h-12 px-4 gap-1 shrink-0"
+                    aria-label="Previous step"
+                  >
+                    <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                  {step < 8 ? (
+                    <Button
+                      onClick={nextStep}
+                      disabled={(step === 6 && !projectionRevealed) || (step === 4 && hasHardContraindication)}
+                      className="h-12 flex-1 gap-1.5 text-base font-semibold active:scale-[0.99]"
+                    >
+                      {step === 1 && "Check My Results"}
+                      {step === 2 && "Continue"}
+                      {step === 3 && "Continue"}
+                      {step === 4 && (hasHardContraindication ? "Not Eligible" : "Continue")}
+                      {step === 5 && "See My Projection"}
+                      {step === 6 && "Claim My Plan"}
+                      {step === 7 && "Review My Plan"}
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={loading}
+                      className="h-12 flex-1 gap-1.5 text-base font-semibold shadow-glow active:scale-[0.99]"
+                    >
+                      {loading ? "Submitting..." : `Start ${plan.name} Plan`}
+                      {!loading && <ArrowRight className="h-4 w-4" aria-hidden="true" />}
+                    </Button>
+                  )}
+                </div>
+                <p className="mt-1.5 text-center text-[11px] text-graphite-400">Step {step} of 8</p>
+              </div>
+            </div>
+
+            {/* Tier 11.3 — "Save & email me later" — captures email from
+                hesitant users who want to bail mid-funnel. Hides on step 1
+                (no progress to save) and step 8 (already submitting). */}
+            {step >= 2 && step <= 7 && (
+              <SaveAndEmailLink
+                currentStep={step}
+                totalSteps={TOTAL_STEPS}
+                hasEmail={!!form.email}
+              />
+            )}
 
             {/* Micro-timeline on step 8 */}
             {step === 8 && (

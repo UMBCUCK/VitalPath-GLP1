@@ -574,9 +574,9 @@ export default function MedicationsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-navy-100/40">
-                  <th className="px-6 py-4 text-left font-semibold text-navy">Factor</th>
-                  <th className="px-6 py-4 text-center font-semibold text-teal">Semaglutide</th>
-                  <th className="px-6 py-4 text-center font-semibold text-indigo-600">Tirzepatide</th>
+                  <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs sm:text-sm font-semibold text-navy">Factor</th>
+                  <th className="px-3 py-3 sm:px-6 sm:py-4 text-center text-xs sm:text-sm font-semibold text-teal">Semaglutide</th>
+                  <th className="px-3 py-3 sm:px-6 sm:py-4 text-center text-xs sm:text-sm font-semibold text-indigo-600">Tirzepatide</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-navy-100/30">
@@ -591,15 +591,15 @@ export default function MedicationsPage() {
                   ["Clinical trial", "STEP (Novo Nordisk)", "SURMOUNT (Eli Lilly)"],
                 ].map(([factor, sem, tir]) => (
                   <tr key={factor} className="hover:bg-navy-50/20 transition-colors">
-                    <td className="px-6 py-3 font-medium text-navy">{factor}</td>
-                    <td className="px-6 py-3 text-center text-graphite-600">{sem}</td>
-                    <td className="px-6 py-3 text-center text-graphite-600">{tir}</td>
+                    <td className="px-3 py-3 sm:px-6 text-xs sm:text-sm font-medium text-navy">{factor}</td>
+                    <td className="px-3 py-3 sm:px-6 text-center text-xs sm:text-sm text-graphite-600">{sem}</td>
+                    <td className="px-3 py-3 sm:px-6 text-center text-xs sm:text-sm text-graphite-600">{tir}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="mt-4 text-center text-[10px] text-graphite-400">
+          <p className="mt-4 text-center text-xs text-graphite-400">
             *Based on published clinical trial data. Individual results vary. Your provider will recommend the best option for your health profile.
           </p>
         </SectionShell>

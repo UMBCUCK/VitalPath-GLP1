@@ -258,7 +258,7 @@ export default async function TreatmentPage() {
                       </div>
                       {i < 3 && <div className={`h-0.5 flex-1 ${i < 1 ? "bg-teal" : "bg-navy-200"}`} />}
                     </div>
-                    <p className={`mt-2 text-xs truncate ${i <= 1 ? "text-navy font-medium" : "text-graphite-400"}`}>{step}</p>
+                    <p className={`mt-2 text-[10px] leading-tight sm:text-xs ${i <= 1 ? "text-navy font-medium" : "text-graphite-400"}`}>{step}</p>
                   </div>
                 ))}
               </div>
@@ -278,7 +278,7 @@ export default async function TreatmentPage() {
                       </div>
                       {i < 3 && <div className="h-0.5 flex-1 bg-teal" />}
                     </div>
-                    <p className="mt-2 text-xs truncate text-navy font-medium">{step}</p>
+                    <p className="mt-2 text-[10px] leading-tight sm:text-xs text-navy font-medium">{step}</p>
                   </div>
                 ))}
               </div>

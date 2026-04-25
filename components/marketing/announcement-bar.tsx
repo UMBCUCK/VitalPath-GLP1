@@ -20,7 +20,7 @@ export function AnnouncementBar() {
 
   return (
     <div className="relative bg-gradient-to-r from-[#0077A8] via-[#0098D4] to-[#0077A8] text-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-center gap-x-3 px-4 py-2.5 sm:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-center gap-x-3 px-4 py-2.5 pr-12 sm:px-6 sm:pr-14">
         <Zap className="h-4 w-4 shrink-0 text-gold animate-pulse" />
         <p className="text-center text-xs font-medium sm:text-sm">
           <span className="hidden sm:inline">Limited time: </span>

@@ -250,6 +250,55 @@ export default async function MedicationPage({ params }: PageProps) {
         </SectionShell>
       </section>
 
+      {/* Tier 6.4 — Peptide cross-sell strip.
+          People comparing GLP-1s are in the same anti-aging / optimization
+          mindset as peptide buyers. We tease the category + link out to
+          /peptides without distracting from the primary GLP-1 CTA. */}
+      <section className="py-10 bg-gradient-to-br from-sage/20 to-white">
+        <SectionShell className="max-w-4xl">
+          <div className="rounded-3xl border border-teal-100 bg-white p-6 shadow-premium-sm sm:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6">
+              <div className="flex-1">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-teal">
+                  Unlocks at day 30
+                </p>
+                <h3 className="mt-2 text-xl font-bold text-navy">
+                  Already thinking beyond weight loss?
+                </h3>
+                <p className="mt-2 text-sm text-graphite-500">
+                  Many members add peptide therapy — NAD+, BPC-157, Sermorelin, Ipamorelin —
+                  once they're stabilized on GLP-1. Same provider, same pharmacy, one monthly invoice.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {[
+                    { slug: "nad-plus", label: "NAD+", price: 149 },
+                    { slug: "bpc-157", label: "BPC-157", price: 129 },
+                    { slug: "glow-stack", label: "Glow Stack", price: 89 },
+                    { slug: "sermorelin", label: "Sermorelin", price: 199 },
+                  ].map((p) => (
+                    <Link
+                      key={p.slug}
+                      href={`/peptides/${p.slug}`}
+                      className="rounded-lg border border-navy-100/60 bg-white px-2.5 py-1.5 text-xs font-medium text-navy transition-all hover:border-teal hover:text-teal"
+                    >
+                      {p.label} · from ${p.price}/mo
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-4 sm:mt-0 shrink-0">
+                <Link href="/peptides">
+                  <Button variant="outline" size="lg" className="gap-2 rounded-full">
+                    Explore peptides
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </SectionShell>
+      </section>
+
       {/* Disclaimer */}
       <section className="py-6">
         <SectionShell className="max-w-3xl">

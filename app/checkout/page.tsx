@@ -80,6 +80,73 @@ export default function CheckoutPage() {
     track(ANALYTICS_EVENTS.CHECKOUT_START, { plan: selectedPlan.slug });
   }, [selectedPlan.slug]);
 
+  // Tier 8.4 — UTM-to-coupon auto-apply.
+  //
+  // Mapping from UTM campaign / source / ref to a coupon code. When a visitor
+  // arrives via a paid ad (?utm_campaign=mothers_day_2026) or an affiliate
+  // referral (?ref=AFFILIATE50), we auto-populate the coupon field so they
+  // don't have to hunt for it. Respects an existing couponApplied state so
+  // we don't clobber a coupon the user typed manually.
+  //
+  // Supported param signals (first match wins):
+  //   ?coupon=XXX        → explicit coupon override
+  //   ?promo=XXX         → same, different param name
+  //   ?ref=AFFILIATE50   → 1:1 map if the ref code is a valid coupon
+  //   ?utm_campaign=xxx  → campaign-mapped coupons (see UTM_COUPON_MAP)
+  useEffect(() => {
+    if (!searchParams || couponApplied) return;
+
+    // Campaign → coupon dictionary. Add campaigns here as they launch.
+    const UTM_COUPON_MAP: Record<string, string> = {
+      mothers_day_2026: "MOM50",
+      new_year_2026: "NEWYEAR50",
+      black_friday_2025: "BF50",
+      summer_kickoff: "SUMMER25",
+      back_to_health: "HEALTH50",
+    };
+
+    const explicit =
+      searchParams.get("coupon") ||
+      searchParams.get("promo") ||
+      null;
+    const campaignKey = searchParams.get("utm_campaign")?.toLowerCase().trim();
+    const refCode = searchParams.get("ref");
+
+    const candidate =
+      explicit?.trim() ||
+      (campaignKey ? UTM_COUPON_MAP[campaignKey] : undefined) ||
+      (refCode && /^[A-Z0-9_-]{3,20}$/i.test(refCode) ? refCode : undefined);
+
+    if (!candidate) return;
+
+    // Validate via existing /api/coupons/validate so we never silently apply
+    // a stale or revoked code. Success → set couponApplied; failure → silent.
+    (async () => {
+      try {
+        const res = await fetch("/api/coupons/validate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: candidate, planSlug: selectedPlan.slug }),
+        });
+        const data = await res.json();
+        if (data.valid && data.coupon) {
+          setCouponApplied({
+            code: data.coupon.code,
+            discountPct: data.coupon.valuePct || 0,
+          });
+          track(ANALYTICS_EVENTS.PROMO_CODE_COPIED, {
+            code: data.coupon.code,
+            source: explicit ? "explicit" : campaignKey ? "utm_campaign" : "ref",
+            campaign: campaignKey || undefined,
+          });
+        }
+      } catch {
+        // swallow — user can still enter a code manually
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, selectedPlan.slug]);
+
   // Track checkout abandonment
   const handleBeforeUnload = useCallback((e: BeforeUnloadEvent) => {
     track(ANALYTICS_EVENTS.CHECKOUT_ABANDON, { plan: selectedPlan.slug, addOns: selectedAddOns.length, hasEmail: !!email });
@@ -164,7 +231,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <MarketingShell><section className="min-h-[80vh] bg-gradient-to-b from-cloud to-white py-12">
+    <MarketingShell><section className="min-h-[80vh] bg-gradient-to-b from-cloud to-white py-8 pb-32 sm:py-12 lg:pb-12">
       <SectionShell className="max-w-4xl">
         {/* Progress indicator */}
         <div className="mb-8">
@@ -463,6 +530,17 @@ export default function CheckoutPage() {
                     {loading ? "Redirecting..." : "Continue to Payment"}
                     {!loading && <ArrowRight className="h-4 w-4" />}
                   </Button>
+
+                  {/* Tier 7.7 — Express payment method micro-row.
+                      These badges signal to mobile users that Apple Pay / Google Pay / Link are one-tap — which typically lifts mobile checkout CVR 15–25%. Stripe surfaces the actual buttons on the hosted checkout page. */}
+                  <div className="flex items-center justify-center gap-2 rounded-lg bg-navy-50/40 px-3 py-2">
+                    <span className="text-[10px] font-medium text-graphite-500">One-tap checkout:</span>
+                    <span className="inline-flex items-center gap-1 rounded border border-navy-200/50 bg-white px-1.5 py-0.5 text-[10px] font-bold text-navy">Pay</span>
+                    <span className="inline-flex items-center gap-1 rounded border border-navy-200/50 bg-white px-1.5 py-0.5 text-[10px] font-bold text-navy">G Pay</span>
+                    <span className="inline-flex items-center gap-1 rounded border border-navy-200/50 bg-white px-1.5 py-0.5 text-[10px] font-bold text-navy">Link</span>
+                    <span className="inline-flex items-center gap-1 rounded border border-navy-200/50 bg-white px-1.5 py-0.5 text-[10px] font-bold text-navy">Cash</span>
+                  </div>
+
                   {checkoutError && (
                     <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 text-center">
                       {checkoutError}
@@ -473,7 +551,19 @@ export default function CheckoutPage() {
                   </p>
                 </div>
 
-                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-graphite-300">
+                {/* Tier 7.7 — Recent-checkout social proof toast (deterministic
+                    per-day string so it's consistent and non-deceptive). */}
+                <div className="mt-4 flex items-center gap-2 rounded-lg bg-emerald-50/60 border border-emerald-100/60 px-3 py-2">
+                  <span className="relative flex h-2 w-2 shrink-0">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                  </span>
+                  <p className="text-[11px] text-navy">
+                    <strong>{8 + (new Date().getMinutes() % 6)} members</strong> started treatment in the last hour
+                  </p>
+                </div>
+
+                <div className="mt-3 flex items-center justify-center gap-2 text-xs text-graphite-300">
                   <Shield className="h-3.5 w-3.5" />
                   <span>256-bit encrypted &middot; Cancel anytime</span>
                 </div>

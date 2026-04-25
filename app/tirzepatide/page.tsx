@@ -203,21 +203,21 @@ export default function TirzepatidePage() {
             title="Tirzepatide vs Semaglutide"
             description="Key differences between the two leading GLP-1 medications."
           />
-          <div className="mt-10 overflow-hidden rounded-2xl border border-navy-100/60">
+          <div className="mt-10 overflow-x-auto rounded-2xl border border-navy-100/60">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-navy text-white">
-                  <th className="p-4 text-left font-semibold">Metric</th>
-                  <th className="p-4 text-center font-semibold text-gold">Tirzepatide</th>
-                  <th className="p-4 text-center font-semibold text-teal-300">Semaglutide</th>
+                  <th className="p-2.5 sm:p-4 text-left text-xs sm:text-sm font-semibold">Metric</th>
+                  <th className="p-2.5 sm:p-4 text-center text-xs sm:text-sm font-semibold text-gold">Tirzepatide</th>
+                  <th className="p-2.5 sm:p-4 text-center text-xs sm:text-sm font-semibold text-teal-300">Semaglutide</th>
                 </tr>
               </thead>
               <tbody>
                 {comparison.map((row, i) => (
                   <tr key={row.metric} className={i % 2 === 0 ? "bg-white" : "bg-cloud/40"}>
-                    <td className="p-4 font-medium text-navy">{row.metric}</td>
-                    <td className="p-4 text-center text-graphite-600">{row.tirzepatide}</td>
-                    <td className="p-4 text-center text-graphite-600">{row.semaglutide}</td>
+                    <td className="p-2.5 sm:p-4 text-xs sm:text-sm font-medium text-navy">{row.metric}</td>
+                    <td className="p-2.5 sm:p-4 text-center text-xs sm:text-sm text-graphite-600">{row.tirzepatide}</td>
+                    <td className="p-2.5 sm:p-4 text-center text-xs sm:text-sm text-graphite-600">{row.semaglutide}</td>
                   </tr>
                 ))}
               </tbody>

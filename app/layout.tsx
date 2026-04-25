@@ -1,9 +1,14 @@
-export const dynamic = "force-dynamic";
+// PERF: removed root-level `force-dynamic` so LPs (and any static pages) can
+// be statically optimized / cached at the edge. Pages that genuinely need
+// per-request rendering (auth, admin, dashboard) opt-in individually with
+// their own `export const dynamic = "force-dynamic"`. Marketing/LP pages are
+// the LCP-sensitive surface and benefit massively from CDN caching.
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import { ToastProvider } from "@/components/ui/toast";
 import { ThemeProvider } from "@/components/shared/theme-provider";
+import { RouteAnnouncer } from "@/components/shared/route-announcer";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -71,8 +76,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://api.stripe.com" />
       </head>
-      <body className="min-h-screen font-sans antialiased">
+      <body className="min-h-[100dvh] font-sans antialiased">
         <ThemeProvider />
+        <RouteAnnouncer />
         <ToastProvider>
           {children}
         </ToastProvider>

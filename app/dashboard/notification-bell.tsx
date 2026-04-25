@@ -21,17 +21,28 @@ export function NotificationBell({ initialCount }: { initialCount: number }) {
   const [unreadCount, setUnreadCount] = useState(initialCount);
   const [loaded, setLoaded] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Close on outside click
+  // Close on outside click + Escape, with focus restore to the trigger button
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape" && open) {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    }
     document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [open]);
 
   async function loadNotifications() {
     if (loaded) return;
@@ -74,10 +85,12 @@ export function NotificationBell({ initialCount }: { initialCount: number }) {
   return (
     <div className="relative" ref={ref}>
       <button
+        ref={triggerRef}
         onClick={toggleOpen}
         className="relative rounded-lg p-2 text-graphite-400 hover:bg-navy-50 transition-colors"
         aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ""}`}
         aria-expanded={open}
+        aria-haspopup="dialog"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
@@ -87,9 +100,15 @@ export function NotificationBell({ initialCount }: { initialCount: number }) {
         )}
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown — full-width sheet on mobile, anchored dropdown on desktop */}
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl border border-navy-100/60 bg-white shadow-premium-xl z-50" role="menu">
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-navy/30 backdrop-blur-sm sm:hidden"
+            aria-hidden="true"
+            onClick={() => setOpen(false)}
+          />
+          <div className="fixed left-2 right-2 top-16 z-50 max-h-[calc(100vh-5rem)] overflow-hidden rounded-2xl border border-navy-100/60 bg-white shadow-premium-xl sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:mt-2 sm:w-80 sm:max-h-none" role="menu">
           <div className="flex items-center justify-between border-b border-navy-100/40 px-4 py-3">
             <p className="text-sm font-bold text-navy">Notifications</p>
             <div className="flex items-center gap-2">
@@ -104,7 +123,7 @@ export function NotificationBell({ initialCount }: { initialCount: number }) {
             </div>
           </div>
 
-          <div className="max-h-80 overflow-y-auto">
+          <div className="max-h-[calc(100vh-10rem)] sm:max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="py-8 text-center">
                 <Bell className="mx-auto h-8 w-8 text-graphite-200" />
@@ -139,6 +158,7 @@ export function NotificationBell({ initialCount }: { initialCount: number }) {
             )}
           </div>
         </div>
+        </>
       )}
     </div>
   );

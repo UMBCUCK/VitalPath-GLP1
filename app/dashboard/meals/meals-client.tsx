@@ -148,7 +148,7 @@ export function MealsClient({ recipes }: { recipes: Recipe[] }) {
                     <CardContent className="border-t border-navy-100/40 pt-4">
                       <div className="grid gap-6 sm:grid-cols-2">
                         {/* Macros */}
-                        <div className="grid grid-cols-4 gap-2 text-center">
+                        <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
                           {[
                             { label: "Calories", value: recipe.calories },
                             { label: "Protein", value: recipe.proteinG ? `${recipe.proteinG}g` : null },
@@ -156,7 +156,7 @@ export function MealsClient({ recipes }: { recipes: Recipe[] }) {
                             { label: "Fat", value: recipe.fatG ? `${recipe.fatG}g` : null },
                           ].map((m) => (
                             <div key={m.label} className="rounded-lg bg-navy-50/50 p-2">
-                              <p className="text-[10px] text-graphite-400">{m.label}</p>
+                              <p className="text-[11px] text-graphite-400">{m.label}</p>
                               <p className="text-sm font-bold text-navy">{m.value || "—"}</p>
                             </div>
                           ))}
@@ -173,7 +173,7 @@ export function MealsClient({ recipes }: { recipes: Recipe[] }) {
                       {ingredients.length > 0 && (
                         <div className="mt-4">
                           <p className="text-xs font-bold text-navy mb-2">Ingredients</p>
-                          <ul className="grid grid-cols-2 gap-1">
+                          <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
                             {ingredients.map((ing, i) => (
                               <li key={i} className="flex items-start gap-1.5 text-xs text-graphite-600">
                                 <Check className="mt-0.5 h-3 w-3 shrink-0 text-teal" />{ing}

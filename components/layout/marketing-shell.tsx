@@ -4,6 +4,8 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { MobileStickyCta } from "@/components/layout/mobile-sticky-cta";
 import { AnnouncementBar } from "@/components/marketing/announcement-bar";
 import { CookieConsent } from "@/components/shared/cookie-consent";
+import { MarketingAttributor } from "@/components/shared/marketing-attributor";
+import { EngagementTracker } from "@/components/shared/engagement-tracker";
 
 // Lazy-load engagement widgets — deferred JS chunk, not needed for initial render.
 // loading: () => null prevents these from triggering a Suspense fallback.
@@ -34,10 +36,16 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
       <a href="#main-content" className="skip-to-content">
         Skip to content
       </a>
+      {/* Tier 8.8 — first-touch LP attribution across every marketing surface */}
+      <MarketingAttributor />
+
+      {/* Tier 11.8 — scroll-depth + time-on-page milestones */}
+      <EngagementTracker />
+
       <UrgencyBanner />
       <AnnouncementBar />
       <SiteHeader />
-      <main id="main-content" className="flex-1">
+      <main id="main-content" className="flex-1 pb-24 md:pb-0">
         {children}
       </main>
       <SiteFooter />

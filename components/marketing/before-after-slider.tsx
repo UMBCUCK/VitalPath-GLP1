@@ -86,17 +86,31 @@ export function BeforeAfterSlider({
           </div>
         </div>
 
-        {/* Divider */}
+        {/* Divider + handle — keyboard + screen reader accessible */}
         <div
           className="absolute top-0 bottom-0 z-10 flex items-center"
           style={{ left: `${position}%`, transform: "translateX(-50%)" }}
         >
-          <div className="h-full w-0.5 bg-white shadow-lg" />
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-navy/80 shadow-lg">
-            <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div className="h-full w-0.5 bg-white shadow-lg" aria-hidden="true" />
+          <button
+            type="button"
+            role="slider"
+            aria-label={`Before/after comparison slider — ${Math.round(position)}%`}
+            aria-valuenow={Math.round(position)}
+            aria-valuemin={5}
+            aria-valuemax={95}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowLeft") { e.preventDefault(); setPosition((p) => Math.max(5, p - 5)); }
+              if (e.key === "ArrowRight") { e.preventDefault(); setPosition((p) => Math.min(95, p + 5)); }
+              if (e.key === "Home") { e.preventDefault(); setPosition(5); }
+              if (e.key === "End") { e.preventDefault(); setPosition(95); }
+            }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-navy/80 shadow-lg cursor-ew-resize focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2"
+          >
+            <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M8 4l-6 8 6 8M16 4l6 8-6 8" />
             </svg>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -106,7 +120,7 @@ export function BeforeAfterSlider({
           <p className="text-sm font-bold text-navy">{name}</p>
           <p className="text-xs text-graphite-400">Lost {parseInt(beforeWeight) - parseInt(afterWeight)} lbs in {duration}</p>
         </div>
-        <p className="text-[10px] text-graphite-300">Drag to compare · Artistic simulation · Not actual photos</p>
+        <p className="text-[11px] text-graphite-400">Drag to compare · Artistic simulation · Not actual photos</p>
       </div>
     </div>
   );

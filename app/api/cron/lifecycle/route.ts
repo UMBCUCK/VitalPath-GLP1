@@ -31,9 +31,13 @@ import {
   qualifyResumeEmail,
   welcomeSequence,
   checkoutAbandonment,
+  firstMonthDrip,
+  postPauseReengagement,
+  cancellationWinBack,
   sendLifecycleEmail,
   sendPeptideIntro,
 } from "@/lib/services/lifecycle-emails";
+import { createSmsService, smsTemplates } from "@/lib/services/sms";
 import { safeError, safeLog } from "@/lib/logger";
 
 const RESUME_TOKEN_TTL = 60 * 60 * 24 * 14; // 14 days
@@ -68,10 +72,102 @@ async function runLifecycle(req: NextRequest) {
     peptide_intro: 0,
     welcome_day3: 0,
     welcome_day7: 0,
+    welcome_day14: 0,
+    welcome_day21: 0,
     checkout_abandon_1h: 0,
     checkout_abandon_24h: 0,
+    sms_intake_reminder: 0,
+    post_pause_reengagement: 0,
+    blog_posts_published: 0,
+    commissions_auto_approved: 0,
+    cancel_winback_3d: 0,
+    cancel_winback_14d: 0,
+    cancel_winback_30d: 0,
   };
   const errors: string[] = [];
+
+  // ─── Trigger 0b: Reseller commission auto-approval (Tier 11.1) ──
+  // Commissions created at signup land in PENDING. After a 14-day
+  // chargeback / refund hold window with no reversals, auto-promote
+  // them to APPROVED so admin doesn't bottleneck the payout queue.
+  // Admin can still manually approve early or reject at any time.
+  try {
+    const holdWindow = new Date(now - 14 * 24 * 60 * 60 * 1000);
+    // Find commissions that:
+    //   • are still PENDING
+    //   • are older than 14 days
+    //   • do NOT have any refunded order or canceled subscription
+    //     attached (lightweight check via subscription status)
+    const ageingPending = await db.commission.findMany({
+      where: {
+        status: "PENDING",
+        createdAt: { lte: holdWindow },
+      },
+      select: {
+        id: true,
+        subscriptionId: true,
+        amountCents: true,
+      },
+      take: 200,
+    });
+
+    for (const c of ageingPending) {
+      // Reject if linked subscription is canceled/refunded
+      let shouldReject = false;
+      if (c.subscriptionId) {
+        const sub = await db.subscription.findUnique({
+          where: { id: c.subscriptionId },
+          select: { status: true, canceledAt: true },
+        });
+        if (
+          sub?.status === "CANCELED" ||
+          sub?.status === "EXPIRED" ||
+          sub?.canceledAt
+        ) {
+          shouldReject = true;
+        }
+      }
+      try {
+        await db.commission.update({
+          where: { id: c.id },
+          data: {
+            status: shouldReject ? "REJECTED" : "APPROVED",
+            notes: shouldReject
+              ? "Auto-rejected: subscription canceled within 14d hold window"
+              : "Auto-approved after 14d clean hold window",
+          },
+        });
+        if (!shouldReject) sent.commissions_auto_approved++;
+      } catch (err) {
+        errors.push(`commission_auto_approve:${c.id}`);
+        safeError("[Cron commission_auto_approve]", err);
+      }
+    }
+  } catch (err) {
+    errors.push("commission_auto_approve:batch");
+    safeError("[Cron commission_auto_approve batch]", err);
+  }
+
+  // ─── Trigger 0: Publish scheduled blog posts (Tier 10.6) ─────
+  // Flip any BlogPost where isPublished=false + publishedAt <= now()
+  // to isPublished=true. Admin can schedule posts by setting a future
+  // publishedAt without needing a schema change.
+  try {
+    const result = await db.blogPost.updateMany({
+      where: {
+        isPublished: false,
+        publishedAt: { not: null, lte: new Date(now) },
+      },
+      data: { isPublished: true },
+    });
+    sent.blog_posts_published = result.count;
+    if (result.count > 0) {
+      safeLog("[Cron blog]", `Published ${result.count} scheduled posts`);
+    }
+  } catch (err) {
+    errors.push("blog_scheduled_publish:batch");
+    safeError("[Cron blog_scheduled_publish]", err);
+  }
 
   // ─── Trigger 1: Qualify abandonment ──────────────────────────
   // Leads older than 2h, not yet converted, no prior recovery record.
@@ -120,6 +216,69 @@ async function runLifecycle(req: NextRequest) {
   } catch (err) {
     errors.push("qualify_resume:batch");
     safeError("[Cron qualify_resume batch]", err);
+  }
+
+  // ─── Trigger 1b: SMS intake reminder (Tier 9.1) ──────────────
+  // Lead abandoned with SMS consent + a 10-digit phone captured.
+  // Fires once at 6–10h after lead capture so we don't buzz at 3am.
+  // Only runs when Twilio is configured (adapter mocks silently otherwise).
+  try {
+    const smsWindowStart = new Date(now - 10 * 60 * 60 * 1000);
+    const smsWindowEnd = new Date(now - 6 * 60 * 60 * 1000);
+    const smsLeads = await db.lead.findMany({
+      where: {
+        createdAt: { gte: smsWindowStart, lt: smsWindowEnd },
+        convertedAt: null,
+        phone: { not: null },
+        source: {
+          in: [
+            "qualify_bridge_step2",
+            "qualify_text_link",
+            "exit_intent",
+            "calculator_bmi",
+            "calculator_tdee",
+            "calculator_protein",
+            "calculator_hydration",
+            "homepage_eligibility_checker",
+            "pricing_help_card",
+            "nurse_text_widget",
+          ],
+        },
+      },
+      select: { id: true, name: true, phone: true, metadata: true, email: true },
+      take: 150,
+    });
+
+    const sms = createSmsService();
+    for (const lead of smsLeads) {
+      if (!lead.phone || lead.phone.replace(/\D/g, "").length !== 10) continue;
+      const meta = (lead.metadata as Record<string, unknown> | null) ?? {};
+      if ((meta as { smsReminderSent?: boolean }).smsReminderSent) continue;
+
+      try {
+        await sms.send({
+          to: lead.phone,
+          body: smsTemplates.qualifyIntakeReminder(lead.name ?? undefined),
+        });
+        await db.lead.update({
+          where: { id: lead.id },
+          data: {
+            metadata: {
+              ...meta,
+              smsReminderSent: true,
+              smsReminderSentAt: new Date().toISOString(),
+            },
+          },
+        });
+        sent.sms_intake_reminder++;
+      } catch (err) {
+        errors.push(`sms_intake_reminder:${lead.id}`);
+        safeError("[Cron sms_intake_reminder]", err);
+      }
+    }
+  } catch (err) {
+    errors.push("sms_intake_reminder:batch");
+    safeError("[Cron sms_intake_reminder batch]", err);
   }
 
   // ─── Trigger 2: Peptide intro at day 30 ──────────────────────
@@ -251,6 +410,9 @@ async function runLifecycle(req: NextRequest) {
   for (const { day, key, template } of [
     { day: 3, key: "welcome_day3" as const, template: welcomeSequence.day3 },
     { day: 7, key: "welcome_day7" as const, template: welcomeSequence.day7 },
+    // Tier 9.7 — first-month drip continuation (adherence-critical window)
+    { day: 14, key: "welcome_day14" as const, template: firstMonthDrip.day14 },
+    { day: 21, key: "welcome_day21" as const, template: firstMonthDrip.day21 },
   ]) {
     try {
       const windowStart = new Date(now - (day + 1) * 24 * 60 * 60 * 1000);
@@ -296,6 +458,141 @@ async function runLifecycle(req: NextRequest) {
     } catch (err) {
       errors.push(`welcome_day${day}:batch`);
       safeError(`[Cron welcome_day${day} batch]`, err);
+    }
+  }
+
+  // ─── Trigger 4: Post-pause re-engagement (Tier 9.3) ─────────
+  // Find paused subscriptions whose pausedUntil is 2 days from now.
+  // Fire the "heads-up your plan resumes" email so members don't
+  // involuntarily churn when the first post-pause invoice lands.
+  try {
+    const twoDaysAhead = new Date(now + 2 * 24 * 60 * 60 * 1000);
+    const oneDayAhead = new Date(now + 1 * 24 * 60 * 60 * 1000);
+    const paused = await db.subscription.findMany({
+      where: {
+        status: "PAUSED",
+        pausedUntil: { gte: oneDayAhead, lte: twoDaysAhead },
+      },
+      select: {
+        id: true,
+        userId: true,
+        pausedUntil: true,
+        user: { select: { email: true, firstName: true } },
+      },
+      take: 100,
+    });
+
+    for (const sub of paused) {
+      if (!sub.user?.email || !sub.pausedUntil) continue;
+      const tag = "post_pause_reengagement";
+      const already = await db.notification.findFirst({
+        where: {
+          userId: sub.userId,
+          type: "SYSTEM",
+          metadata: { path: ["tag"], equals: tag } as unknown as object,
+        },
+      });
+      if (already) continue;
+
+      try {
+        const template = postPauseReengagement(
+          sub.user.firstName || "there",
+          sub.pausedUntil,
+        );
+        await sendLifecycleEmail(sub.user.email, template, [tag]);
+        await db.notification.create({
+          data: {
+            userId: sub.userId,
+            type: "SYSTEM",
+            title: "Plan resumes soon",
+            body: `Your membership resumes ${sub.pausedUntil.toLocaleDateString("en-US", { month: "short", day: "numeric" })}.`,
+            link: "/dashboard/settings",
+            metadata: { tag },
+          },
+        });
+        sent.post_pause_reengagement++;
+      } catch (err) {
+        errors.push(`post_pause:${sub.userId}`);
+        safeError("[Cron post_pause]", err);
+      }
+    }
+  } catch (err) {
+    errors.push("post_pause:batch");
+    safeError("[Cron post_pause batch]", err);
+  }
+
+  // ─── Trigger 5: Cancellation win-back drip (Tier 11.7) ──────
+  // 3-touch sequence at days 3 / 14 / 30 after canceledAt for users who
+  // fully canceled. Each fires at most once per user per touch.
+  for (const { day, key, template, tag } of [
+    { day: 3, key: "cancel_winback_3d" as const, template: cancellationWinBack.day3, tag: "cancel_winback_3d" },
+    { day: 14, key: "cancel_winback_14d" as const, template: cancellationWinBack.day14, tag: "cancel_winback_14d" },
+    { day: 30, key: "cancel_winback_30d" as const, template: cancellationWinBack.day30, tag: "cancel_winback_30d" },
+  ]) {
+    try {
+      const windowStart = new Date(now - (day + 1) * 24 * 60 * 60 * 1000);
+      const windowEnd = new Date(now - day * 24 * 60 * 60 * 1000);
+      const cancellations = await db.subscription.findMany({
+        where: {
+          status: "CANCELED",
+          canceledAt: { gte: windowStart, lt: windowEnd },
+        },
+        select: {
+          id: true,
+          userId: true,
+          user: { select: { email: true, firstName: true } },
+        },
+        take: 200,
+      });
+
+      for (const sub of cancellations) {
+        if (!sub.user?.email) continue;
+        // Skip if the user already reactivated (has any newer ACTIVE sub)
+        const hasReactivated = await db.subscription.findFirst({
+          where: { userId: sub.userId, status: { in: ["ACTIVE", "TRIALING"] } },
+          select: { id: true },
+        });
+        if (hasReactivated) continue;
+
+        const already = await db.notification.findFirst({
+          where: {
+            userId: sub.userId,
+            type: "SYSTEM",
+            metadata: { path: ["tag"], equals: tag } as unknown as object,
+          },
+        });
+        if (already) continue;
+
+        try {
+          await sendLifecycleEmail(
+            sub.user.email,
+            template(sub.user.firstName ?? undefined),
+            [tag],
+          );
+          await db.notification.create({
+            data: {
+              userId: sub.userId,
+              type: "SYSTEM",
+              title:
+                day === 3
+                  ? "We kept your data — come back anytime"
+                  : day === 14
+                    ? "25% off welcome back"
+                    : "Last chance: welcome-back code expiring",
+              body: null,
+              link: "/dashboard/settings?reactivate=1",
+              metadata: { tag },
+            },
+          });
+          sent[key]++;
+        } catch (err) {
+          errors.push(`${tag}:${sub.userId}`);
+          safeError(`[Cron ${tag}]`, err);
+        }
+      }
+    } catch (err) {
+      errors.push(`${tag}:batch`);
+      safeError(`[Cron ${tag} batch]`, err);
     }
   }
 

@@ -61,7 +61,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cloud to-sage/20 flex items-center justify-center py-12">
+    <div className="min-h-dvh bg-gradient-to-b from-cloud to-sage/20 flex items-center justify-center py-12">
       <SectionShell className="max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5 mb-6">

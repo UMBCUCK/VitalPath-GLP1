@@ -25,27 +25,41 @@ export function SocialProofToasts() {
   useEffect(() => {
     if (dismissed) return;
 
-    // First notification after 8 seconds, then every 25-40 seconds
-    const initialDelay = setTimeout(() => {
-      const idx = Math.floor(Math.random() * notifications.length);
-      setCurrent(idx);
-      setVisible(true);
+    // Honor reduced-motion: don't auto-display moving social proof.
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
 
-      // Auto-hide after 5 seconds
-      setTimeout(() => setVisible(false), 5000);
-    }, 8000);
+    let initialTimer: ReturnType<typeof setTimeout> | null = null;
+    let intervalTimer: ReturnType<typeof setInterval> | null = null;
+    let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const interval = setInterval(() => {
+    function scheduleNext(delay: number) {
       if (dismissed) return;
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      hideTimer = setTimeout(() => setVisible(false), 5000);
       const idx = Math.floor(Math.random() * notifications.length);
       setCurrent(idx);
       setVisible(true);
-      setTimeout(() => setVisible(false), 5000);
+    }
+
+    // First notification after 8 seconds
+    initialTimer = setTimeout(() => scheduleNext(8000), 8000);
+
+    // Recurring — pause when tab hidden (saves battery + avoids "popping in" mid-stream)
+    intervalTimer = setInterval(() => {
+      if (dismissed) return;
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      const idx = Math.floor(Math.random() * notifications.length);
+      setCurrent(idx);
+      setVisible(true);
+      hideTimer = setTimeout(() => setVisible(false), 5000);
     }, 25000 + Math.random() * 15000);
 
     return () => {
-      clearTimeout(initialDelay);
-      clearInterval(interval);
+      if (initialTimer) clearTimeout(initialTimer);
+      if (intervalTimer) clearInterval(intervalTimer);
+      if (hideTimer) clearTimeout(hideTimer);
     };
   }, [dismissed]);
 
@@ -55,8 +69,11 @@ export function SocialProofToasts() {
 
   return (
     <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
       className={cn(
-        "fixed bottom-20 left-4 z-50 max-w-sm transition-all duration-500 md:bottom-6",
+        "fixed left-4 right-4 z-50 max-w-sm transition-all duration-500 bottom-[calc(env(safe-area-inset-bottom)+5rem)] sm:right-auto sm:bottom-6 md:bottom-6",
         visible
           ? "translate-y-0 opacity-100"
           : "translate-y-4 opacity-0 pointer-events-none"

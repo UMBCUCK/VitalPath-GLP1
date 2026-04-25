@@ -40,6 +40,7 @@ function AnimatedStatValue({ target, suffix = "" }: { target: string; suffix: st
     if (!animatable) return;
     const el = ref.current;
     if (!el) return;
+    let rafId = 0;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasAnimated.current) {
@@ -49,13 +50,16 @@ function AnimatedStatValue({ target, suffix = "" }: { target: string; suffix: st
           const hasComma = target.includes(",");
           const isPercent = target.includes("%");
           const duration = 1500;
-          const steps = 40;
-          const stepDuration = duration / steps;
-          let step = 0;
+          const start = performance.now();
 
-          const interval = setInterval(() => {
-            step++;
-            const progress = step / steps;
+          // PERF: requestAnimationFrame instead of setInterval. setInterval
+          // ticks on its own clock, off the browser's compositor frame
+          // schedule, which produced visible jank on the homepage stats and
+          // contributed to a worse INP score. rAF is paint-aligned, idles
+          // when the tab is hidden, and only updates the DOM once per frame.
+          const step = (now: number) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
             const eased = 1 - Math.pow(1 - progress, 3);
             let current = Math.round(num * eased * 10) / 10;
             if (num >= 100) current = Math.round(current);
@@ -71,17 +75,22 @@ function AnimatedStatValue({ target, suffix = "" }: { target: string; suffix: st
             formatted += suffix;
             setDisplay(formatted);
 
-            if (step >= steps) {
-              clearInterval(interval);
+            if (progress < 1) {
+              rafId = requestAnimationFrame(step);
+            } else {
               setDisplay(target + suffix);
             }
-          }, stepDuration);
+          };
+          rafId = requestAnimationFrame(step);
         }
       },
       { rootMargin: "0px" }
     );
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, [target, suffix, animatable]);
 
   return <span ref={ref}>{display}</span>;
@@ -93,17 +102,20 @@ interface LpAnimatedStatsProps {
 }
 
 export function LpAnimatedStats({ stats, className }: LpAnimatedStatsProps) {
+  // CLS fix: stat cards previously rendered with `opacity-0 animate-fade-in-up`
+  // and per-card animationDelay 0.2s..0.5s. While the cards reserve their
+  // grid space (so geometric CLS is small), the staggered opacity flip
+  // produces unstable LCP candidate selection on slower devices and forces
+  // 4 extra style recalcs during the critical hero render. They now render
+  // visible from first paint; the count-up animation alone provides the
+  // motion polish.
   return (
     <div className={`grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 ${className ?? ""}`}>
       {stats.map((stat, i) => (
         <div
           key={i}
-          className="rounded-xl border bg-[var(--lp-card-bg,#fff)] p-4 text-center opacity-0 animate-fade-in-up"
-          style={{
-            borderColor: "var(--lp-stat-border)",
-            animationDelay: `${0.2 + i * 0.1}s`,
-            animationFillMode: "forwards",
-          }}
+          className="rounded-xl border bg-[var(--lp-card-bg,#fff)] p-4 text-center"
+          style={{ borderColor: "var(--lp-stat-border)" }}
         >
           <div className="text-2xl font-bold text-lp-heading sm:text-3xl">
             <AnimatedStatValue target={stat.value} suffix={stat.suffix ?? ""} />

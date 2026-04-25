@@ -11,6 +11,10 @@ import { UpsellCards } from "@/components/dashboard/upsell-cards";
 import { MilestoneShare } from "@/components/dashboard/milestone-share";
 import { AnnualNudge } from "@/components/dashboard/annual-nudge";
 import { StreakCounter } from "@/components/dashboard/streak-counter";
+import { StreakTierUpModal } from "@/components/dashboard/streak-tier-up-modal";
+import { NextActionCard } from "@/components/dashboard/next-action-card";
+import { DaysToGoalChip } from "@/components/dashboard/days-to-goal-chip";
+import { OpenLoopConnectPrompt } from "@/components/dashboard/openloop-connect-prompt";
 import { WeeklyCelebration } from "@/components/dashboard/weekly-celebration";
 import { MilestoneBadges } from "@/components/dashboard/milestone-badges";
 import { BehavioralInsights } from "@/components/dashboard/behavioral-insights";
@@ -133,6 +137,9 @@ export function DashboardClient({ data, streak, badges, weeklyProgress }: Dashbo
 
   return (
     <>
+      {/* Tier 7.4 — fires at most once per milestone tier per user */}
+      <StreakTierUpModal streak={streak} userEmail={data.user?.email} />
+
       {/* Reseller modal */}
       <ResellerPromoModal
         open={resellerOpen}
@@ -141,6 +148,34 @@ export function DashboardClient({ data, streak, badges, weeklyProgress }: Dashbo
       />
 
       <div className="space-y-6">
+        {/* Tier 13.6 — Connect-to-OpenLoop prompt for orphaned accounts.
+            Renders nothing if the member is already linked. */}
+        <OpenLoopConnectPrompt />
+
+        {/* Tier 10.2 — Personalized "next action" — picks the single most
+            valuable thing the member should do right now based on their
+            state (onboarding, refill, provider check-in, upsell, referral). */}
+        <NextActionCard
+          input={{
+            onboarding: {
+              hasFirstWeight: data.onboarding.hasFirstWeight,
+              hasViewedMeals: data.onboarding.hasViewedMeals,
+            },
+            treatment: data.treatment
+              ? {
+                  nextRefillDaysAway: data.treatment.nextRefillDaysAway,
+                  nextCheckInDaysAway:
+                    (data.treatment as { nextCheckInDaysAway?: number | null })
+                      .nextCheckInDaysAway ?? null,
+                }
+              : null,
+            upsellSuggestions: data.upsellSuggestions,
+            referralsSent: data.referralCode?.totalReferred ?? 0,
+            daysInProgram: stats.monthNumber * 30,
+            stats: { logsThisWeek: stats.logsThisWeek },
+          }}
+        />
+
         {/* Onboarding checklist — shows for new users */}
         <OnboardingChecklist
           hasProfile={data.onboarding.hasProfile}
@@ -150,18 +185,18 @@ export function DashboardClient({ data, streak, badges, weeklyProgress }: Dashbo
           hasViewedMeals={data.onboarding.hasViewedMeals}
         />
 
-        {/* Welcome banner */}
-        <div className="rounded-2xl bg-gradient-to-r from-navy to-atlantic p-6 text-white">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <p className="text-sm text-navy-300">Month {stats.monthNumber} of your journey</p>
+        {/* Welcome banner — WCAG AA contrast on text/numbers over the navy gradient */}
+        <div className="rounded-2xl bg-gradient-to-r from-navy to-atlantic p-5 sm:p-6 text-white">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <p className="text-xs sm:text-sm font-medium text-white/80">Month {stats.monthNumber} of your journey</p>
                 <StreakCounter streak={streak} />
               </div>
-              <h2 className="mt-1 text-2xl font-bold">Welcome back, {name}</h2>
+              <h2 className="mt-1.5 text-xl sm:text-2xl font-bold leading-tight">Welcome back, {name}</h2>
               {stats.weightLost > 0 && (
-                <p className="mt-2 text-sm text-navy-300">
-                  You&apos;ve lost {Math.round(stats.weightLost * 10) / 10} lbs so far. Keep building momentum.
+                <p className="mt-2 text-sm font-medium text-white/90">
+                  <span className="text-gold-300 font-bold">{Math.round(stats.weightLost * 10) / 10} lbs</span> lost — keep building momentum.
                 </p>
               )}
             </div>
@@ -169,18 +204,29 @@ export function DashboardClient({ data, streak, badges, weeklyProgress }: Dashbo
           </div>
 
           {stats.goalWeight > 0 && stats.startWeight > 0 && (
-            <div className="mt-6">
-              <div className="flex items-center justify-between text-xs">
-                <span>Start: {Math.round(stats.startWeight)} lbs</span>
-                <span>Goal: {stats.goalWeight} lbs</span>
+            <div className="mt-5">
+              <div className="flex items-center justify-between text-[11px] sm:text-xs font-medium text-white/80">
+                <span>Start <span className="font-semibold text-white">{Math.round(stats.startWeight)} lbs</span></span>
+                <span>Goal <span className="font-semibold text-gold-300">{stats.goalWeight} lbs</span></span>
               </div>
-              <div className="mt-2 h-2 rounded-full bg-white/20">
-                <div className="h-full rounded-full bg-gradient-to-r from-gold to-gold-400 transition-all duration-700" style={{ width: `${Math.min(100, Math.max(0, weightProgress))}%` }} />
+              <div className="mt-2 h-2.5 rounded-full bg-white/15 overflow-hidden">
+                <div className="h-full rounded-full bg-gradient-to-r from-gold-300 to-gold transition-all duration-700" style={{ width: `${Math.min(100, Math.max(0, weightProgress))}%` }} />
               </div>
-              <p className="mt-2 text-center text-xs text-navy-300">
-                {Math.round(Math.max(0, weightProgress))}% toward your goal
-                {stats.goalWeight < stats.currentWeight && ` · ${Math.round(stats.currentWeight - stats.goalWeight)} lbs to go`}
+              <p className="mt-2.5 text-center text-sm font-semibold text-white">
+                {Math.round(Math.max(0, weightProgress))}% there
+                {stats.goalWeight < stats.currentWeight && (
+                  <span className="ml-1.5 font-normal text-white/80">· {Math.round(stats.currentWeight - stats.goalWeight)} lbs to go</span>
+                )}
               </p>
+
+              {/* Tier 11.4 — projected days-to-goal chip based on rolling 14d weight loss rate */}
+              <div className="mt-3 flex justify-center">
+                <DaysToGoalChip
+                  currentWeight={stats.currentWeight}
+                  goalWeight={stats.goalWeight}
+                  recentEntries={data.weightChartData}
+                />
+              </div>
             </div>
           )}
         </div>

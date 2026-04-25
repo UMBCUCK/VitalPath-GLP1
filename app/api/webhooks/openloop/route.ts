@@ -362,6 +362,90 @@ export async function POST(req: NextRequest) {
           break;
         }
 
+        // Tier 12.1 — Provider-side message arrives from OpenLoop. Mirror
+        // it into our local Message inbox so the patient sees it on
+        // /dashboard/messages without a refresh delay.
+        case "message.received": {
+          const data = (body as unknown as { data: {
+            patientId: string;
+            providerName?: string;
+            body: string;
+            sentAt?: string;
+          } }).data;
+
+          const profile = await db.patientProfile.findFirst({
+            where: { telehealthPatientId: data.patientId },
+            select: { userId: true, user: { select: { email: true, firstName: true } } },
+          });
+          if (profile?.userId) {
+            await db.message.create({
+              data: {
+                userId: profile.userId,
+                direction: "INBOUND",
+                channel: "APP",
+                body: data.body,
+                createdAt: data.sentAt ? new Date(data.sentAt) : undefined,
+                metadata: { senderName: data.providerName ?? "Care team" },
+              },
+            });
+            await db.notification.create({
+              data: {
+                userId: profile.userId,
+                type: "PROVIDER_MESSAGE",
+                title: `New message from ${data.providerName ?? "your care team"}`,
+                body: data.body.slice(0, 160),
+                link: "/dashboard/messages",
+              },
+            });
+          }
+          break;
+        }
+
+        // Tier 12.1 — Provider-flagged adverse event mirrors into our
+        // AdverseEventReport ledger and notifies admins for review.
+        case "adverse_event.flagged": {
+          const data = (body as unknown as { data: {
+            patientId: string;
+            severity: string;
+            description: string;
+            medicationName?: string;
+          } }).data;
+
+          const profile = await db.patientProfile.findFirst({
+            where: { telehealthPatientId: data.patientId },
+            select: { userId: true },
+          });
+          if (profile?.userId) {
+            await db.adverseEventReport.create({
+              data: {
+                userId: profile.userId,
+                severity: data.severity || "MILD",
+                description: data.description,
+                medicationName: data.medicationName,
+              },
+            });
+
+            // Page admins so a human triages high-severity events fast
+            const admins = await db.user.findMany({
+              where: { role: "ADMIN" },
+              select: { id: true },
+              take: 5,
+            });
+            for (const a of admins) {
+              await db.notification.create({
+                data: {
+                  userId: a.id,
+                  type: "SYSTEM",
+                  title: `Adverse event flagged · ${data.severity}`,
+                  body: data.description.slice(0, 160),
+                  link: "/admin/adverse-events",
+                },
+              });
+            }
+          }
+          break;
+        }
+
         default:
           safeLog("[OpenLoop Webhook]", `Unhandled event: ${event}`);
       }

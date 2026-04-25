@@ -14,6 +14,7 @@ import {
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { ResellerPromoModal } from "@/components/dashboard/reseller-promo-modal";
+import { ReferralQrCard } from "@/components/dashboard/referral-qr-card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 interface ReferralData {
@@ -668,6 +669,9 @@ export default function ReferralDashboardPage() {
         {/* ── OVERVIEW TAB ─────────────────────────────────────── */}
         {tab === "overview" && (
           <div className="space-y-6">
+            {/* Tier 9.5 — in-person QR code for the user's real referral code */}
+            {data?.code && <ReferralQrCard referralCode={data.code} />}
+
             {/* Referral link */}
             <Card>
               <CardHeader>
@@ -676,20 +680,22 @@ export default function ReferralDashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-2">
-                  <div className="flex-1 rounded-xl border border-navy-200 bg-navy-50/30 px-4 py-3 overflow-hidden min-w-0">
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <div className="w-full flex-1 rounded-xl border border-navy-200 bg-navy-50/30 px-4 py-3 overflow-hidden min-w-0">
                     <p className="text-sm font-mono text-navy truncate">{referralLink || "Loading..."}</p>
                   </div>
-                  <Button onClick={() => copyText(referralLink, "link")} className="gap-2 shrink-0">
-                    {copied === "link" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    {copied === "link" ? "Copied!" : "Copy"}
-                  </Button>
-                  {canShare && (
-                    <Button variant="outline" onClick={nativeShare} className="gap-2 shrink-0" title="Share via device">
-                      <Share2 className="h-4 w-4" />
-                      <span className="hidden sm:inline">Share</span>
+                  <div className="flex gap-2">
+                    <Button onClick={() => copyText(referralLink, "link")} className="flex-1 sm:flex-none gap-2 shrink-0">
+                      {copied === "link" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      {copied === "link" ? "Copied!" : "Copy"}
                     </Button>
-                  )}
+                    {canShare && (
+                      <Button variant="outline" onClick={nativeShare} className="flex-1 sm:flex-none gap-2 shrink-0" title="Share via device">
+                        <Share2 className="h-4 w-4" />
+                        Share
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a
@@ -698,7 +704,7 @@ export default function ReferralDashboardPage() {
                     className="flex items-center gap-1.5 rounded-lg bg-[#1da1f2]/10 px-3 py-1.5 text-xs font-semibold text-[#1da1f2] hover:bg-[#1da1f2]/20 transition-colors"
                   >
                     <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.732-8.857L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    Share on X
+                    <span className="hidden sm:inline">Share on </span>X
                   </a>
                   <a
                     href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`}
@@ -706,13 +712,13 @@ export default function ReferralDashboardPage() {
                     className="flex items-center gap-1.5 rounded-lg bg-[#1877f2]/10 px-3 py-1.5 text-xs font-semibold text-[#1877f2] hover:bg-[#1877f2]/20 transition-colors"
                   >
                     <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                    Share on Facebook
+                    <span className="hidden sm:inline">Share on </span>Facebook
                   </a>
                   <a
                     href={`mailto:?subject=Try%20Nature's Journey%20GLP-1&body=Hey%2C%20I%27ve%20been%20using%20Nature's Journey%20for%20medical%20weight%20loss%20and%20wanted%20to%20share%20it.%20Use%20my%20link%3A%20${encodeURIComponent(referralLink)}`}
                     className="flex items-center gap-1.5 rounded-lg bg-navy-50 px-3 py-1.5 text-xs font-semibold text-navy hover:bg-navy-100 transition-colors"
                   >
-                    <Mail className="h-3 w-3" /> Share via Email
+                    <Mail className="h-3 w-3" /> <span className="hidden sm:inline">Share via </span>Email
                   </a>
                 </div>
                 <div className="mt-3 flex items-center justify-between">

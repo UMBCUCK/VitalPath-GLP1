@@ -13,7 +13,7 @@ const providerNav = [
 
 export default function ProviderLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen bg-linen/30">
+    <div className="flex min-h-dvh bg-linen/30">
       <aside className="hidden w-64 shrink-0 border-r border-navy-100/40 bg-white lg:block">
         <div className="flex h-16 items-center gap-2.5 border-b border-navy-100/40 px-6">
           <Link href="/" className="flex items-center gap-2.5">

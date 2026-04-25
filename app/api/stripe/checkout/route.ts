@@ -65,20 +65,43 @@ export async function POST(req: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "development" ? "http://localhost:3000" : "");
 
-    // Build Stripe checkout session options
+    // Build Stripe checkout session options.
+    //
+    // Tier 7.1 — Express wallet payments:
+    //   • `card` is the primary method. Apple Pay and Google Pay ride on
+    //     top of the card rail and surface automatically when the user's
+    //     browser + device supports them (iOS Safari → Apple Pay;
+    //     Chrome/Android → Google Pay). No extra config needed beyond
+    //     having domains verified in Stripe Dashboard → Settings → Apple Pay.
+    //   • `link` enables Stripe Link one-click checkout (auto-fills card
+    //     for repeat Link users — big mobile-conversion win).
+    //   • `cashapp` enables Cash App Pay (US-only, popular with 18–34 demo).
+    //
+    // We also turn on phone_number_collection so Stripe captures the best
+    // contact number at payment time — feeds into Meta CAPI advanced
+    // matching and our SMS lifecycle automations.
     const checkoutOptions: Parameters<typeof stripe.checkout.sessions.create>[0] = {
       mode: "subscription",
-      payment_method_types: ["card"],
+      payment_method_types: ["card", "link", "cashapp"],
       line_items: lineItems,
       customer_email: email || undefined,
       success_url: `${appUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/pricing?canceled=true`,
+      billing_address_collection: "auto",
+      phone_number_collection: { enabled: true },
       metadata: {
         planSlug: plan.slug,
         planName: plan.name,
         interval,
         addOns: addOnSlugs.join(","),
         ...(referralCode ? { referralCode } : {}),
+        // Tier 9.4 — reseller click-attribution (first-touch, 60-day cookie
+        // set by middleware when a visitor lands with ?rx=CODE). Stored on
+        // the Stripe session so the webhook can credit the reseller at
+        // conversion time, even if the cookie expired between click + buy.
+        ...(req.cookies.get("nj-rx-attr")?.value
+          ? { resellerAttr: req.cookies.get("nj-rx-attr")!.value }
+          : {}),
       },
       subscription_data: {
         metadata: {

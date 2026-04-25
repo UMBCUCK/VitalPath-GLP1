@@ -95,7 +95,7 @@ export function ObjectionHandler() {
                     openIndex === i ? "bg-teal text-white" : "bg-navy-50 text-navy"
                   )}
                 >
-                  <obj.icon className="h-4.5 w-4.5" />
+                  <obj.icon className="h-5 w-5" />
                 </div>
                 <span className="flex-1 text-sm font-bold text-navy">{obj.question}</span>
                 <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-0.5 mr-2">

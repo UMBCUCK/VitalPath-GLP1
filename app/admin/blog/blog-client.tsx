@@ -177,17 +177,34 @@ export function BlogClient({ initialPosts, total, page, limit, search, category,
       key: "publishedAt",
       header: "Published Date",
       sortable: true,
-      render: (row) => (
-        <span className="text-xs text-graphite-500">
-          {row.publishedAt
-            ? new Date(row.publishedAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })
-            : "--"}
-        </span>
-      ),
+      render: (row) => {
+        // Tier 10.6 — visual distinction between past-published, scheduled,
+        // and draft posts. Scheduled = isPublished=false + publishedAt in the future.
+        // The lifecycle cron flips them to isPublished=true automatically.
+        const date = row.publishedAt ? new Date(row.publishedAt) : null;
+        const isScheduled = !row.isPublished && !!date && date > new Date();
+        return (
+          <span
+            className={
+              isScheduled
+                ? "inline-flex items-center gap-1 text-xs font-semibold text-amber-700"
+                : "text-xs text-graphite-500"
+            }
+          >
+            {isScheduled && (
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+            )}
+            {date
+              ? date.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : "--"}
+            {isScheduled && <span className="ml-1 uppercase tracking-wider">scheduled</span>}
+          </span>
+        );
+      },
     },
     {
       key: "seo",

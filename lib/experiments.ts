@@ -74,6 +74,59 @@ export const EXPERIMENTS: Record<string, Experiment> = {
     defaultVariant: "show",
     description: "Show/hide persona result card in qualify flow",
   },
+  // Tier 6.6 — Hero primary CTA button copy test
+  hero_cta_copy: {
+    key: "hero_cta_copy",
+    variants: ["control", "start_free", "check_qualify", "begin_2min"],
+    defaultVariant: "control",
+    description:
+      "Hero primary button copy. control='See If I Qualify', start_free='Start My Free Assessment', check_qualify='Check My Eligibility', begin_2min='Begin 2-Minute Assessment'.",
+  },
+  // Tier 8.6 — Qualify step 1 opening copy (heading + subheading)
+  qualify_step1_copy: {
+    key: "qualify_step1_copy",
+    variants: ["control", "weight_first", "plan_first"],
+    defaultVariant: "control",
+    description:
+      "Qualify step-1 heading copy. control='See if you qualify for GLP-1 treatment', weight_first='How much weight do you want to lose?', plan_first='Get your personalized weight-loss plan'.",
+  },
+  // Tier 10.7 — Show a "how much weight do you want to lose?" commitment
+  // screen BEFORE step 1. 4 chip answers (10–25 / 26–50 / 51–75 / 76+).
+  // Creates a psychological commitment before the heavier form.
+  qualify_step0_gate: {
+    key: "qualify_step0_gate",
+    variants: ["off", "on"],
+    defaultVariant: "off",
+    description:
+      "Show a pre-step commitment screen ('How much weight do you want to lose?') before qualify step 1. Off=control, on=shows the modal.",
+  },
+};
+
+// Tier 6.6 — Hero CTA copy variants, used by HeroSection
+export const HERO_CTA_COPY: Record<string, string> = {
+  control: "See If I Qualify",
+  start_free: "Start My Free Assessment",
+  check_qualify: "Check My Eligibility",
+  begin_2min: "Begin 2-Minute Assessment",
+};
+
+// Tier 8.6 — Qualify step 1 copy variants
+export const QUALIFY_STEP1_COPY: Record<
+  string,
+  { heading: string; subheading: string }
+> = {
+  control: {
+    heading: "See if you qualify for GLP-1 treatment",
+    subheading: "Let's start with your basics",
+  },
+  weight_first: {
+    heading: "How much weight do you want to lose?",
+    subheading: "We'll tailor your plan in 90 seconds",
+  },
+  plan_first: {
+    heading: "Get your personalized weight-loss plan",
+    subheading: "Tell us a few things and we'll match you to the right treatment",
+  },
 };
 
 // ─── Hero headline variants ─────────────────────────────────

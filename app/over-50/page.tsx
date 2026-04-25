@@ -7,108 +7,144 @@ import {
   Check,
   Heart,
   Activity,
-  Shield,
-  Star,
-  Info,
   Dumbbell,
   TrendingUp,
   AlertCircle,
   Clock,
+  Flame,
+  Gauge,
+  Leaf,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { SectionShell } from "@/components/shared/section-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { siteConfig } from "@/lib/site";
 import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { LandingHero } from "@/components/marketing/landing/hero";
+import { LandingStatsRow } from "@/components/marketing/landing/stats-row";
+import { LandingFaq } from "@/components/marketing/landing/faq";
+import { LandingTestimonials } from "@/components/marketing/landing/testimonials";
+import { LandingPricingAnchor } from "@/components/marketing/landing/pricing-anchor";
+import { LandingStickyCta } from "@/components/marketing/landing/sticky-cta";
+import { LandingTrustStrip } from "@/components/marketing/landing/trust-strip";
+import { LandingPressBar } from "@/components/marketing/landing/press-bar";
+import { LandingHowItWorks } from "@/components/marketing/landing/how-it-works";
+import { LandingComparisonTable } from "@/components/marketing/landing/comparison-table";
+import { LandingProviderTeam } from "@/components/marketing/landing/provider-team";
+import { LandingGuaranteeMedallion } from "@/components/marketing/landing/guarantee-medallion";
 
 export const metadata: Metadata = {
   title: "GLP-1 Weight Loss After 50 | Menopause, Testosterone & Metabolic Changes",
   description:
-    "Weight loss after 50 is harder — slower metabolism, hormonal changes, muscle loss, and years of diet failures. GLP-1 medications work differently from calorie restriction and are equally effective in older adults. Here's what to know.",
+    "Weight loss after 50 is harder — slower metabolism, hormonal changes, muscle loss. GLP-1 medications work differently from calorie restriction and are equally effective in older adults.",
   openGraph: {
-    title: "GLP-1 Weight Loss After 50 | Menopause, Testosterone & Metabolic Changes | Nature's Journey",
+    title: "GLP-1 Weight Loss After 50 | Nature's Journey",
     description:
-      "Weight loss after 50 is harder — slower metabolism, hormonal changes, muscle loss, and years of diet failures. GLP-1 medications work differently from calorie restriction and are equally effective in older adults. Here's what to know.",
+      "Weight loss after 50 is harder — slower metabolism, hormonal changes, muscle loss, years of diet failures. GLP-1 medications work differently.",
   },
 };
-
-const stats = [
-  { stat: "Equivalent", label: "Weight loss outcomes in adults 50+ vs younger adults in trial subanalyses" },
-  { stat: "0.5–1%", label: "Muscle mass lost per year after age 40 without intervention (sarcopenia)" },
-  { stat: "~35%", label: "Lower free testosterone in men 50–70 with obesity vs healthy weight peers" },
-  { stat: "3–5×", label: "Higher visceral fat accumulation in postmenopausal vs premenopausal women" },
-];
 
 const musclePreservationSteps = [
   {
     title: "Protein: 0.7–1g per pound of body weight daily",
     description:
-      "This is the single most important factor in muscle preservation during weight loss. Older adults have higher protein needs than younger adults for the same amount of lean mass preservation — a phenomenon called 'anabolic resistance.' Distribute intake across 3–4 meals rather than concentrating it in one sitting.",
+      "The single most important factor in muscle preservation during weight loss. Older adults have higher protein needs than younger adults for the same amount of lean mass preservation — 'anabolic resistance.' Distribute across 3–4 meals.",
   },
   {
     title: "Resistance training: 2–3 sessions per week minimum",
     description:
-      "Progressive resistance exercise provides the mechanical signal for muscle protein synthesis. Without this signal, even adequate protein intake is less effective at maintaining lean mass. Compound movements (squats, rows, presses, deadlifts) recruit the most muscle and provide the strongest anabolic stimulus.",
+      "Progressive resistance provides the mechanical signal for muscle protein synthesis. Compound movements — squats, rows, presses, deadlifts — recruit the most muscle and provide the strongest anabolic stimulus.",
   },
   {
     title: "Time protein around workouts",
     description:
-      "20–40g of high-quality protein within 2 hours of resistance training sessions maximizes the muscle protein synthesis window. Leucine content matters — whey, eggs, and meat are high-leucine sources; plant proteins may need to be consumed in higher quantities to match.",
+      "20–40g of high-quality protein within 2 hours of resistance training maximizes the muscle protein synthesis window. Leucine content matters — whey, eggs, and meat are high-leucine sources.",
   },
   {
     title: "Consider creatine monohydrate: 5g/day",
     description:
-      "Creatine is one of the most well-researched supplements available, and its benefits in older adults are particularly well-supported. A 2021 meta-analysis found creatine supplementation in adults over 50 combined with resistance training produced significantly greater lean mass gains than training alone. It is safe, inexpensive, and consistently beneficial.",
+      "One of the most well-researched supplements. A 2021 meta-analysis found creatine + resistance training in adults over 50 produced significantly greater lean mass gains than training alone. Safe, inexpensive, consistently beneficial.",
   },
   {
     title: "Track lean mass, not just total weight",
     description:
-      "Your Nature's Journey plan includes body composition guidance. The scale alone does not tell the full story — losing 20 lbs of fat while maintaining or gaining 2 lbs of muscle is an excellent outcome that a simple scale would report as losing only 18 lbs. Dual-energy X-ray absorptiometry (DEXA) scans or bioelectrical impedance scales with lean mass tracking are useful tools.",
+      "The scale alone doesn't tell the full story — losing 20 lbs of fat while maintaining 2 lbs of muscle is excellent, but the scale only shows 18 lbs. DEXA scans or bioimpedance scales with lean mass tracking are useful.",
   },
 ];
 
 const timelineExpectations = [
   {
     period: "Weeks 1–4",
-    expectation: "Side effect adjustment (nausea typically peaks and subsides), initial appetite suppression noticeable, early weight loss often 2–5 lbs including water weight.",
+    expectation: "Side effect adjustment (nausea typically peaks and subsides), appetite suppression noticeable, early weight loss often 2–5 lbs including water weight.",
   },
   {
     period: "Months 2–4",
-    expectation: "Metabolic adaptation begins — fat loss becomes the primary mechanism. Blood pressure, triglycerides, and fasting glucose often show measurable improvements by month 3. Weight loss rate: 0.5–1.5 lbs per week on average in this population.",
+    expectation: "Metabolic adaptation begins — fat loss becomes the primary mechanism. Blood pressure, triglycerides, and fasting glucose often show measurable improvements. Weight loss rate: 0.5–1.5 lbs/week.",
   },
   {
     period: "Months 4–9",
-    expectation: "Consistent fat loss phase. Energy levels often improve significantly. Sleep quality improvement common as sleep apnea markers reduce. Non-scale victories — joint pain reduction, mobility improvement, better blood pressure control — become more pronounced.",
+    expectation: "Consistent fat loss phase. Energy levels improve significantly. Sleep quality often improves as sleep apnea markers reduce. Non-scale wins — joint pain, mobility, blood pressure — become more pronounced.",
   },
   {
     period: "Months 9–18",
-    expectation: "Approaching plateau. Total weight loss in adults over 50 in trial subanalyses: 13–16% of body weight on average at one year, slightly below the 15–21% seen in younger adults, but in the same therapeutic range. Maintenance planning becomes the focus.",
+    expectation: "Approaching plateau. Total weight loss in 50+ in trial subanalyses: 13–16% of body weight at one year, slightly below but in the same range as younger adults. Maintenance planning becomes the focus.",
   },
 ];
 
 const faqs = [
   {
     q: "Is GLP-1 medication safe for people over 60 or 70?",
-    a: "Clinical trials included adults up to age 75 in meaningful numbers. The STEP and SURMOUNT trial populations included a substantial over-60 cohort, and safety and efficacy outcomes were broadly consistent with the overall trial population. The main considerations for older adults include: starting at lower doses and titrating more slowly to minimize GI side effects, monitoring kidney function (GLP-1 medications are generally renal-protective but hydration matters more with age), and assessing for sarcopenia risk to ensure protein and exercise guidance is followed. Age alone is not a contraindication.",
+    a: "Clinical trials included adults up to age 75 in meaningful numbers. The STEP and SURMOUNT trial populations included a substantial over-60 cohort, and safety and efficacy were broadly consistent with the overall trial population. Main considerations for older adults: starting at lower doses and titrating more slowly to minimize GI side effects, monitoring kidney function, and assessing for sarcopenia risk. Age alone is not a contraindication.",
   },
   {
     q: "I'm worried about losing muscle — is that a real risk?",
-    a: "It is a real concern, not a reason to avoid treatment. Some lean mass loss occurs with any significant caloric deficit — this is unavoidable biology. In the STEP-1 trial, approximately 10% of total weight loss was lean mass (vs 38% in purely calorie-restricted populations), which is favorable but not zero. The combination of adequate protein (0.7–1g/lb/day), resistance training, and GLP-1 treatment produces significantly better lean mass preservation than calorie restriction alone. Your Nature's Journey plan includes protein targets and resistance training guidance specifically optimized for this.",
+    a: "Real concern, not a reason to avoid treatment. Some lean mass loss occurs with any significant deficit. In STEP-1, approximately 10% of total weight loss was lean mass (vs 38% in purely calorie-restricted populations). The combination of adequate protein (0.7–1g/lb/day), resistance training, and GLP-1 produces significantly better lean mass preservation than calorie restriction alone.",
   },
   {
     q: "I take statins and blood pressure medications. Any interactions?",
-    a: "GLP-1 medications have no direct pharmacokinetic interactions with statins. The blood pressure reduction associated with GLP-1 therapy can compound with antihypertensive medications — meaning your blood pressure medication dose may need to be reduced over time as your weight and blood pressure improve. This is a good problem to have, but it requires monitoring. Some diabetes medications (sulfonylureas, insulin) combined with GLP-1 agonists carry a higher hypoglycemia risk — though this primarily applies to people with diabetes. Your provider will review your complete medication list and monitor appropriately.",
+    a: "GLP-1 medications have no direct pharmacokinetic interactions with statins. The blood pressure reduction associated with GLP-1 therapy can compound with antihypertensive medications — meaning your BP med dose may need to be reduced over time. This is a good problem, but requires monitoring.",
   },
   {
     q: "Should I be concerned about bone density?",
-    a: "Bone density is a legitimate consideration with significant weight loss at any age, and particularly relevant post-menopause in women. Weight loss of any kind can reduce bone mineral density, as mechanical loading on bones decreases. The mitigation strategy: resistance training (which provides direct osteogenic stimulus to bones), adequate calcium (1,200mg/day for adults over 50) and vitamin D (1,500–2,000 IU/day), and a baseline DEXA scan if you have not had one. GLP-1 medications themselves do not appear to have direct negative effects on bone — the density concern is related to weight loss generally, not the medication mechanism.",
+    a: "Legitimate consideration with any significant weight loss. Weight loss can reduce bone mineral density as mechanical loading decreases. Mitigation: resistance training (direct osteogenic stimulus), adequate calcium (1,200mg/day for adults over 50) and vitamin D (1,500–2,000 IU/day), and a baseline DEXA scan.",
   },
   {
     q: "My kidney function is reduced (CKD stage 2–3). Is GLP-1 safe?",
-    a: "Early data from the FLOW trial (semaglutide in chronic kidney disease) published in 2024 showed that semaglutide reduced kidney disease progression by 24% and reduced the risk of kidney failure in people with CKD and type 2 diabetes. For people without diabetes but with moderate CKD, renal safety appears favorable — GLP-1 medications may actually be renoprotective through reduced inflammation, blood pressure improvement, and reduced kidney hyperfiltration. However, GI side effects (nausea, reduced appetite) require careful monitoring for adequate hydration in CKD patients. Your provider will review your eGFR and creatinine before and during treatment.",
+    a: "Early data from the FLOW trial (semaglutide in CKD, 2024) showed semaglutide reduced kidney disease progression by 24% in people with CKD and T2D. Renal safety appears favorable — GLP-1 may actually be renoprotective. However, GI side effects require careful monitoring for adequate hydration in CKD patients.",
+  },
+];
+
+const testimonials = [
+  {
+    initials: "C.B.",
+    name: "Carol B.",
+    location: "Tampa, FL · Age 58",
+    outcome: "Lost 46 lbs",
+    outcomeDetail: "Joint pain gone · Off BP meds",
+    quote: "My doctor said 'after 50 you just lose the battle.' I'd been carrying 40 extra pounds for 15 years. Now my knees don't hurt, my blood pressure is 118 over 72, and I can actually play with my grandkids.",
+    highlight: "I can actually play with my grandkids",
+    duration: "11 months",
+  },
+  {
+    initials: "F.R.",
+    name: "Frank R.",
+    location: "Phoenix, AZ · Age 63",
+    outcome: "Lost 58 lbs",
+    outcomeDetail: "Sleep apnea resolved · Off CPAP",
+    quote: "I'd been on a CPAP for 8 years. Three months in I was down 30 lbs and my AHI dropped below 5. My cardiologist didn't believe it was the same patient.",
+    highlight: "cardiologist didn't believe it was the same patient",
+    duration: "14 months",
+  },
+  {
+    initials: "D.M.",
+    name: "Diane M.",
+    location: "Minneapolis, MN · Age 54",
+    outcome: "Lost 34 lbs",
+    outcomeDetail: "Post-menopause belly gone",
+    quote: "I'd gained all of it in my midsection after menopause, and nothing worked. The fat that came off first was exactly the fat I was worried about.",
+    highlight: "exactly the fat I was worried about",
+    duration: "8 months",
   },
 ];
 
@@ -116,47 +152,58 @@ export default function Over50Page() {
   return (
     <MarketingShell>
       <FAQPageJsonLd faqs={faqs.map((f) => ({ question: f.q, answer: f.a }))} />
-
       <BreadcrumbJsonLd
         items={[
           { name: "Home", href: "/" },
           { name: "Weight Loss After 50", href: "/over-50" },
         ]}
       />
-      {/* Hero */}
-      <section className="bg-gradient-to-b from-cloud to-sage/30 py-16 sm:py-24">
-        <SectionShell className="text-center">
-          <Badge variant="default" className="mb-6">Weight Loss After 50</Badge>
-          <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight text-navy sm:text-5xl lg:text-6xl">
-            Weight loss after 50 with GLP-1 medication — what actually changes, and what doesn&apos;t
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-graphite-500 leading-relaxed">
-            The metabolic changes that come with age are real. But clinical trial data shows GLP-1 medications are equally effective in adults over 50 — and the non-scale benefits are often even more pronounced.
-          </p>
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link href="/qualify">
-              <Button size="xl" className="gap-2 px-10">
-                See if I Qualify <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="text-sm text-graphite-400">2-minute assessment · No commitment</p>
-          </div>
-        </SectionShell>
-      </section>
 
-      {/* Stats bar */}
-      <section className="border-y border-navy-100/40 bg-white py-10">
-        <SectionShell>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-3xl font-bold text-teal">{s.stat}</div>
-                <div className="mt-1 text-sm text-graphite-500">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </SectionShell>
-      </section>
+      <LandingStickyCta label="Weight loss that works after 50" analyticsPage="over-50" />
+
+      <LandingHero
+        badge="Weight Loss After 50"
+        badgeIcon="Leaf"
+        accent="emerald"
+        headlineStart="After 50, weight loss"
+        headlineAccent="isn't about willpower —"
+        headlineEnd="it's about biology."
+        subhead={
+          <>
+            Sarcopenia, declining hormones, insulin resistance, decades of metabolic adaptation. The challenges are <strong className="text-navy">biological, not psychological</strong>. Clinical trial data shows GLP-1 medications are equally effective in adults over 50 — and the non-scale benefits are often more pronounced.
+          </>
+        }
+        analyticsPage="over-50"
+        cardTitle="Outcomes in adults 50+"
+        cardIcon="Gauge"
+        cardMetrics={[
+          { label: "Avg body weight lost at 68 weeks", value: "13–16%", direction: "down" },
+          { label: "Joint pain reduction (vs younger adults)", value: "Greater", direction: "up" },
+          { label: "Sleep apnea severity reduction", value: "–40–50%", direction: "down" },
+          { label: "Blood pressure reduction (absolute)", value: "Larger", direction: "down" },
+        ]}
+        cardFootnote="STEP-1 and SURMOUNT-1 subgroup analyses. Adults 50+ achieved outcomes in the same therapeutic range as younger adults, with greater absolute benefit on age-related conditions."
+        testimonial={{
+          initials: "C.B.",
+          name: "Carol B., 58",
+          outcome: "Lost 46 lbs",
+          quote: "I can play with my grandkids again.",
+        }}
+      />
+
+      <LandingTrustStrip />
+
+      <LandingPressBar />
+
+      <LandingStatsRow
+        eyebrow="Weight loss after 50"
+        stats={[
+          { value: "Equal", label: "Outcomes in 50+ vs younger adults in trials", icon: "Gauge", tone: "emerald" },
+          { value: "0.5–1%", label: "Muscle mass lost per year after 40 (sarcopenia)", icon: "Dumbbell", tone: "atlantic" },
+          { value: "35%", label: "Lower free testosterone in men 50–70 w/ obesity", icon: "Flame", tone: "gold" },
+          { value: "3–5×", label: "More visceral fat after menopause", icon: "Activity", tone: "rose" },
+        ]}
+      />
 
       {/* Why weight loss is harder after 50 */}
       <section className="py-20">
@@ -170,22 +217,19 @@ export default function Over50Page() {
             />
             <div className="mt-8 space-y-5 text-graphite-600 leading-relaxed">
               <p>
-                Adults over 50 who struggle to lose weight despite "doing everything right" are not wrong — the biology genuinely changes in ways that conventional diet advice does not account for. Understanding these changes is the first step to understanding why GLP-1 medications work when calorie restriction alone has failed.
+                Adults over 50 who struggle to lose weight despite &ldquo;doing everything right&rdquo; are not wrong — the biology genuinely changes. Understanding this is the first step to understanding why GLP-1 medications work when calorie restriction has failed.
               </p>
               <p>
-                <strong className="text-navy">Sarcopenia</strong> — age-related muscle loss — progresses at approximately 0.5–1% per year after age 40, accelerating after 60. This matters for weight management because muscle tissue is metabolically active: it burns calories at rest. Each pound of muscle lost reduces basal metabolic rate by approximately 6 calories per day. Over 10–15 years of adult aging, this accumulates to a meaningful reduction in daily caloric expenditure — which means the same food intake that maintained your weight at 35 promotes weight gain at 55.
+                <strong className="text-navy">Sarcopenia</strong> — age-related muscle loss — progresses at ~0.5–1% per year after 40, accelerating after 60. Muscle is metabolically active; each pound lost reduces basal metabolic rate by ~6 calories/day. Over 10–15 years this means the same food intake that maintained your weight at 35 promotes gain at 55.
               </p>
               <p>
-                <strong className="text-navy">Hormonal changes</strong> compound this at a biological level. In women, perimenopause and menopause involve declining estrogen, which shifts fat storage away from the hips and thighs (peripheral fat, which is metabolically less harmful) toward the abdomen and visceral compartment (which is metabolically active in a harmful way — secreting inflammatory cytokines and worsening insulin resistance). In men, testosterone levels decline approximately 1–2% per year after age 30, with obesity itself reducing free testosterone by up to 35% in some studies — creating a bidirectional relationship where low testosterone promotes abdominal fat gain, and abdominal fat reduces testosterone further.
+                <strong className="text-navy">Hormonal changes</strong> compound this. In women, declining estrogen shifts fat from peripheral storage (hips, thighs) to visceral (abdomen) — metabolically active in a harmful way. In men, testosterone declines ~1–2%/year after 30, and obesity reduces free testosterone up to 35% — a self-reinforcing cycle.
               </p>
               <p>
-                <strong className="text-navy">Insulin resistance accumulation</strong> is another key mechanism. Insulin sensitivity naturally declines with age due to reduced mitochondrial function in muscle cells, even in the absence of weight gain. When combined with the visceral fat accumulation of midlife hormonal changes, insulin resistance can become the dominant driver of weight management difficulty — and it does not respond well to calorie restriction.
+                <strong className="text-navy">Insulin resistance accumulation</strong> and <strong className="text-navy">sleep quality decline</strong> further reinforce the loop. Poor sleep increases ghrelin by 24% and reduces leptin by 18% — greater hunger, less control, reduced metabolic rate.
               </p>
               <p>
-                <strong className="text-navy">Sleep quality decline</strong> plays a role that is often underestimated. Adults over 50 experience less deep (slow-wave) sleep, more fragmented sleep, and higher rates of sleep disorders including sleep apnea. Poor sleep acutely increases ghrelin (hunger hormone) by 24% and reduces leptin (satiety hormone) by 18%, according to research from the University of Chicago. The result: greater hunger, less control over appetite, and reduced metabolic rate — all compounding the other age-related changes.
-              </p>
-              <p>
-                <strong className="text-navy">Metabolic adaptation</strong> to previous dieting also accumulates. Years or decades of calorie restriction cycles produce a progressively more adaptive metabolic response — the body becomes better at conserving energy during restriction, making successive diet attempts produce diminishing returns. This is not failure; it is biology doing exactly what it evolved to do.
+                <strong className="text-navy">Metabolic adaptation</strong> from years of dieting also accumulates. The body becomes better at conserving energy during restriction — successive diet attempts produce diminishing returns. This is biology doing exactly what it evolved to do.
               </p>
             </div>
           </div>
@@ -193,65 +237,60 @@ export default function Over50Page() {
       </section>
 
       {/* GLP-1 vs calorie restriction */}
-      <section className="bg-teal-50/30 py-20">
+      <section className="bg-gradient-to-b from-emerald-50/40 to-white py-20">
         <SectionShell>
           <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
             <div>
               <SectionHeading
                 eyebrow="What's Different"
-                title="What GLP-1 does differently than calorie restriction"
+                title="GLP-1 vs calorie restriction — why it matters after 50"
                 description="This distinction matters especially for adults over 50 — where the side effects of conventional dieting are most harmful."
                 align="left"
               />
-              <div className="mt-8 space-y-5 text-graphite-600 leading-relaxed text-sm">
+              <div className="mt-8 space-y-5 text-sm text-graphite-600 leading-relaxed">
                 <p>
-                  <strong className="text-navy">Calorie restriction worsens sarcopenia.</strong> When you lose weight through pure calorie deficit, approximately 20–40% of the weight lost is lean mass (muscle, bone mineral, organ tissue), depending on protein intake and exercise. This is particularly damaging in adults over 50, where baseline muscle mass is already declining. Every pound of muscle lost further reduces metabolic rate and functional capacity.
+                  <strong className="text-navy">Calorie restriction worsens sarcopenia.</strong> When you lose weight through pure calorie deficit, 20–40% of the weight lost is lean mass. Particularly damaging in adults over 50, where baseline muscle is already declining.
                 </p>
                 <p>
-                  <strong className="text-navy">GLP-1 medications preferentially reduce fat mass</strong> with a better lean mass ratio when protein intake and resistance training are maintained. In STEP-1 trial body composition data, approximately 85–90% of total weight loss was fat mass. This profile is significantly more favorable than calorie restriction alone.
+                  <strong className="text-navy">GLP-1 medications preferentially reduce fat mass.</strong> In STEP-1 body composition data, ~85–90% of total weight loss was fat mass. Significantly more favorable than calorie restriction alone.
                 </p>
                 <p>
-                  <strong className="text-navy">GLP-1 directly addresses insulin resistance</strong> — the core metabolic problem in most adults over 50 with obesity. Calorie restriction reduces insulin resistance secondarily, through weight loss. GLP-1 agonists improve insulin sensitivity directly, including through mechanisms independent of weight change. This makes them more effective for the underlying biology.
+                  <strong className="text-navy">GLP-1 directly addresses insulin resistance</strong> — the core metabolic problem in most adults over 50 with obesity. Calorie restriction addresses it secondarily, through weight loss. GLP-1 does both.
                 </p>
                 <p>
-                  <strong className="text-navy">GLP-1 preferentially reduces visceral fat</strong> — the most dangerous type, clustered around organs in the abdomen. This matters more in older adults, where visceral fat accumulation is the primary driver of cardiometabolic risk. The fat that comes off first with GLP-1 therapy tends to be visceral, which means cardiovascular risk markers improve disproportionately to the amount of total weight lost.
+                  <strong className="text-navy">GLP-1 preferentially reduces visceral fat</strong> — the most dangerous type. Cardiovascular risk markers improve disproportionately to the amount of total weight lost.
                 </p>
                 <p>
-                  <strong className="text-navy">GLP-1 does not require willpower against hunger.</strong> The central nervous system mechanism of GLP-1 agonists reduces appetite and food reward signaling at the hypothalamic level. This is not discipline — it is pharmacology. Adults over 50 who have "tried everything" are not lacking willpower; they are lacking the pharmacological tools to overcome the compounded metabolic resistance their body has developed.
+                  <strong className="text-navy">GLP-1 doesn't require willpower against hunger.</strong> Reduced appetite and food reward signaling at the hypothalamic level. This isn't discipline — it's pharmacology.
                 </p>
               </div>
             </div>
-            <div className="rounded-2xl border border-teal/20 bg-white p-8 shadow-premium">
-              <div className="flex items-center gap-2 mb-6">
-                <TrendingUp className="h-5 w-5 text-teal" />
+            <div className="rounded-3xl border border-emerald-200 bg-white p-8 shadow-premium">
+              <div className="mb-6 flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-emerald-600" />
                 <h3 className="font-bold text-navy">Trial data: adults 50+</h3>
               </div>
               <div className="space-y-5 text-sm text-graphite-600">
-                <p>
-                  Subgroup analyses from the STEP-1 and SURMOUNT-1 trials examined weight loss outcomes by age group. The key finding: <strong className="text-navy">adults over 50 achieved weight loss outcomes within the same range as younger adults</strong> — approximately 13–16% of body weight at 68 weeks on semaglutide, compared to 15–17% in younger participants. The difference was not statistically significant in most analyses.
+                <p className="leading-relaxed">
+                  Subgroup analyses from STEP-1 and SURMOUNT-1 examined outcomes by age group. Key finding: <strong className="text-navy">adults over 50 achieved weight loss in the same range as younger adults</strong> — approximately 13–16% at 68 weeks on semaglutide, compared to 15–17% in younger participants. Not statistically significant in most analyses.
                 </p>
-                <p>
-                  What differed was the non-scale benefit profile. Older adults showed proportionally greater improvements in:
-                </p>
-                <ul className="space-y-2 mt-3">
+                <p className="leading-relaxed">What differed was the <strong>non-scale benefit profile</strong>. Older adults showed proportionally greater improvements in:</p>
+                <ul className="space-y-2">
                   {[
-                    "Blood pressure control (larger absolute reduction from higher baseline)",
+                    "Blood pressure (larger absolute reduction from higher baseline)",
                     "Sleep apnea severity scores",
                     "Joint pain and mobility",
                     "Fasting glucose and insulin sensitivity",
-                    "Quality of life and physical function measures",
+                    "Quality of life and physical function",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-2">
-                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-teal" />
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
-                <div className="mt-4 rounded-xl bg-teal-50 px-4 py-3">
-                  <p className="text-xs text-teal-700 font-medium">
-                    <Info className="inline h-3.5 w-3.5 mr-1" />
-                    Source: STEP-1 subgroup analyses. Wilding JP et al., NEJM 2021.
-                  </p>
+                <div className="rounded-xl bg-emerald-50 p-3 text-xs font-medium text-emerald-700">
+                  Source: STEP-1 subgroup analyses. Wilding JP et al., NEJM 2021.
                 </div>
               </div>
             </div>
@@ -264,55 +303,43 @@ export default function Over50Page() {
         <SectionShell>
           <SectionHeading
             eyebrow="Men &amp; Women After 50"
-            title="Different hormonal challenges, same effective solution"
+            title="Different hormones, same effective solution"
             description="The metabolic changes of aging differ by sex — but GLP-1 therapy addresses both effectively."
           />
           <div className="mt-12 grid gap-8 lg:grid-cols-2">
-            {/* Women */}
-            <div className="rounded-2xl border border-teal/20 bg-white p-8 shadow-premium">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal/10">
-                  <Heart className="h-5 w-5 text-teal" />
+            <div className="relative overflow-hidden rounded-3xl border border-rose-200 bg-white p-8 shadow-premium">
+              <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-rose-400 opacity-10 blur-3xl" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-pink-400 text-white shadow-premium">
+                    <Heart className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-navy text-lg">Women over 50</h3>
                 </div>
-                <h3 className="font-bold text-navy text-lg">Women over 50</h3>
-              </div>
-              <div className="space-y-4 text-sm text-graphite-600 leading-relaxed">
-                <p>
-                  <strong className="text-navy">Menopause and estrogen decline</strong> produce the most dramatic metabolic shift most women experience in their lives. As estrogen drops, fat redistribution from the hips and thighs to the abdomen is rapid — some women report gaining visceral fat within months of menopause onset even with unchanged diet and exercise habits.
-                </p>
-                <p>
-                  <strong className="text-navy">Visceral fat is not just cosmetic</strong> — it is metabolically active tissue that secretes inflammatory cytokines, disrupts insulin signaling, and increases cardiovascular risk. The 3–5x higher visceral fat burden in postmenopausal women vs premenopausal women represents a significant metabolic load that GLP-1 medications address directly and preferentially.
-                </p>
-                <p>
-                  <strong className="text-navy">Hot flashes often improve</strong> with weight loss — obese women experience more frequent and severe vasomotor symptoms, and weight reduction of 5% or more has been shown to improve hot flash frequency. GLP-1-mediated weight loss may provide this benefit as part of the overall metabolic improvement.
-                </p>
-                <p>
-                  <strong className="text-navy">Joint pain reduction</strong> is frequently among the most life-changing outcomes for women over 50. Each pound of body weight reduction removes approximately 4 lbs of force from the knee joint — significant pain reduction often begins at 10–15 lbs of weight loss.
-                </p>
+                <div className="space-y-4 text-sm text-graphite-600 leading-relaxed">
+                  <p><strong className="text-navy">Menopause and estrogen decline</strong> produce the most dramatic metabolic shift most women experience. Fat redistribution from hips/thighs to abdomen is rapid — some women gain visceral fat within months of menopause onset.</p>
+                  <p><strong className="text-navy">Visceral fat is not cosmetic</strong> — it secretes inflammatory cytokines, disrupts insulin signaling, and increases CV risk. The 3–5× higher burden in postmenopausal vs premenopausal women is a significant metabolic load GLP-1 addresses directly.</p>
+                  <p><strong className="text-navy">Hot flashes often improve</strong> with weight loss — 5%+ reduction has been shown to improve vasomotor symptoms.</p>
+                  <p><strong className="text-navy">Joint pain reduction</strong> is frequently the most life-changing outcome. Each pound of body weight removes ~4 lbs of force from the knee. Pain reduction often begins at 10–15 lbs lost.</p>
+                </div>
               </div>
             </div>
 
-            {/* Men */}
-            <div className="rounded-2xl border border-navy-100/40 bg-gradient-to-br from-cloud to-white p-8 shadow-premium">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal/10">
-                  <Activity className="h-5 w-5 text-teal" />
+            <div className="relative overflow-hidden rounded-3xl border border-atlantic/20 bg-white p-8 shadow-premium">
+              <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-atlantic opacity-10 blur-3xl" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-atlantic to-teal text-white shadow-premium">
+                    <Activity className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-navy text-lg">Men over 50</h3>
                 </div>
-                <h3 className="font-bold text-navy text-lg">Men over 50</h3>
-              </div>
-              <div className="space-y-4 text-sm text-graphite-600 leading-relaxed">
-                <p>
-                  <strong className="text-navy">The testosterone-visceral fat cycle</strong> is one of the most clinically significant and underdiagnosed issues in men over 50 with obesity. Visceral fat contains high concentrations of aromatase, an enzyme that converts testosterone to estradiol (estrogen). Men with obesity and low testosterone are often in a self-reinforcing cycle: low testosterone reduces muscle mass and promotes fat storage, more fat storage further reduces testosterone.
-                </p>
-                <p>
-                  <strong className="text-navy">GLP-1 therapy breaks this cycle.</strong> As visceral fat reduces, aromatase activity decreases, testosterone-to-estradiol ratio improves, and free testosterone levels rise. Studies show 15–20% improvements in free testosterone in men with obesity following significant GLP-1-mediated weight loss — without testosterone supplementation.
-                </p>
-                <p>
-                  <strong className="text-navy">Sleep apnea reduction</strong> is often dramatic in men over 50, where sleep apnea prevalence exceeds 40% in those with obesity. Weight loss of 10–15% reduces apnea-hypopnea index (AHI) by 40–50% in many patients. Improved sleep has cascading benefits: better testosterone production, improved insulin sensitivity, lower cortisol, and more energy for exercise.
-                </p>
-                <p>
-                  <strong className="text-navy">Erectile function improvement</strong> with significant weight loss is well-documented — the mechanism involves improved vascular endothelial function, reduced inflammation, and restored testosterone balance. Men who lose 10–15% of body weight show measurable improvements in International Index of Erectile Function scores independent of testosterone treatment.
-                </p>
+                <div className="space-y-4 text-sm text-graphite-600 leading-relaxed">
+                  <p><strong className="text-navy">The testosterone-visceral fat cycle</strong> is the most clinically significant underdiagnosed issue in men over 50 with obesity. Aromatase in visceral fat converts testosterone to estradiol — a self-reinforcing cycle.</p>
+                  <p><strong className="text-navy">GLP-1 therapy breaks this cycle.</strong> As visceral fat reduces, aromatase activity decreases, and free testosterone rises. Studies show 15–20% improvements with significant GLP-1-mediated weight loss.</p>
+                  <p><strong className="text-navy">Sleep apnea reduction</strong> is often dramatic. Weight loss of 10–15% reduces AHI by 40–50% in many patients. Better sleep → better testosterone → better insulin sensitivity.</p>
+                  <p><strong className="text-navy">Erectile function improvement</strong> is well-documented with significant weight loss — improved vascular endothelial function, reduced inflammation, restored testosterone balance.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -320,35 +347,35 @@ export default function Over50Page() {
       </section>
 
       {/* Muscle preservation */}
-      <section className="bg-gradient-to-b from-sage/10 to-white py-20">
+      <section className="bg-gradient-to-b from-emerald-50/30 to-white py-20">
         <SectionShell>
           <div className="mx-auto max-w-3xl">
             <SectionHeading
               eyebrow="Muscle First"
               title="Muscle preservation — the most important consideration"
-              description="For adults over 50, protecting muscle mass during weight loss is as important as the weight loss itself. Here is exactly what that requires."
+              description="For adults over 50, protecting muscle during weight loss is as important as the weight loss itself."
               align="left"
             />
-            <div className="mt-8 space-y-5">
+            <div className="mt-8 space-y-4">
               {musclePreservationSteps.map((step, i) => (
-                <div key={i} className="flex items-start gap-4">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal text-white text-sm font-bold">
+                <div key={i} className="group relative flex items-start gap-4 rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm transition-all hover:shadow-premium hover:-translate-y-0.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald to-teal text-white font-bold shadow-premium">
                     {i + 1}
                   </div>
                   <div>
-                    <h3 className="font-bold text-navy text-sm">{step.title}</h3>
+                    <h3 className="font-bold text-navy">{step.title}</h3>
                     <p className="mt-1.5 text-sm leading-relaxed text-graphite-600">{step.description}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-8 rounded-2xl border border-teal/20 bg-teal-50/30 p-6">
+            <div className="mt-8 rounded-2xl bg-gradient-to-br from-navy to-atlantic p-6 text-white shadow-premium-lg">
               <div className="flex items-center gap-2 mb-3">
-                <Dumbbell className="h-4 w-4 text-teal" />
-                <span className="font-bold text-navy text-sm">The bottom line on muscle</span>
+                <Dumbbell className="h-5 w-5 text-teal-300" />
+                <span className="font-bold text-sm">The bottom line on muscle</span>
               </div>
-              <p className="text-sm text-graphite-600 leading-relaxed">
-                GLP-1 medication + adequate protein + resistance training is the evidence-based combination for adults over 50. No single element works as well alone. Patients who follow this protocol consistently report better energy, better function, and better long-term outcomes than weight loss alone would predict.
+              <p className="text-sm text-white/80 leading-relaxed">
+                GLP-1 + adequate protein + resistance training is the evidence-based combination for adults over 50. No single element works as well alone. Patients who follow this protocol consistently report better energy, better function, and better long-term outcomes.
               </p>
             </div>
           </div>
@@ -361,19 +388,22 @@ export default function Over50Page() {
           <SectionHeading
             eyebrow="What to Expect"
             title="What to realistically expect — month by month"
-            description="A practical timeline adjusted for the biology of adults over 50. Progress is real; the pace differs from younger adults."
+            description="A practical timeline adjusted for the biology of adults over 50."
           />
           <div className="mt-12 mx-auto max-w-3xl space-y-4">
-            {timelineExpectations.map((item) => (
+            {timelineExpectations.map((item, i) => (
               <div
                 key={item.period}
-                className="flex items-start gap-5 rounded-2xl border border-navy-100/40 bg-white p-6 shadow-premium"
+                className="relative flex items-start gap-5 rounded-2xl border border-navy-100/50 bg-white p-6 shadow-premium"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal/10">
-                  <Clock className="h-5 w-5 text-teal" />
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald to-teal text-white shadow-premium">
+                  <Clock className="h-5 w-5" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-navy">{item.period}</h3>
+                <div className="flex-1">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Phase {i + 1}</span>
+                    <h3 className="font-bold text-navy">{item.period}</h3>
+                  </div>
                   <p className="mt-2 text-sm leading-relaxed text-graphite-600">{item.expectation}</p>
                 </div>
               </div>
@@ -381,6 +411,41 @@ export default function Over50Page() {
           </div>
         </SectionShell>
       </section>
+
+      <LandingComparisonTable />
+
+      <LandingTestimonials
+        eyebrow="Real results · Real people"
+        title="Adults over 50 — in their words"
+        description="What the numbers actually look like when you're starting later."
+        items={testimonials}
+        accent="emerald"
+      />
+
+      <LandingGuaranteeMedallion accent="emerald" />
+
+      <LandingProviderTeam accent="emerald" />
+
+      <LandingHowItWorks
+        accent="emerald"
+        segmentLabel="Age-appropriate dose titration + coordination with your existing PCP."
+      />
+
+      <LandingPricingAnchor
+        eyebrow="Pricing designed for 50+"
+        headline="Age-aware treatment at one monthly price."
+        subhead="Everything you need for weight + metabolic health in your 50s, 60s, and beyond."
+        includes={[
+          "Provider evaluation + age-appropriate dose titration",
+          "Compounded semaglutide or tirzepatide",
+          "Muscle preservation protocol: protein, training, monitoring",
+          "Unlimited messaging + monthly check-ins",
+          "Coordination with your existing cardiologist / PCP",
+          "Free 2-day shipping · Cancel anytime",
+        ]}
+        primaryCtaLabel="See If I Qualify"
+        accent="emerald"
+      />
 
       {/* Safety */}
       <section className="py-12">
@@ -391,10 +456,10 @@ export default function Over50Page() {
               <div>
                 <h3 className="font-bold text-navy text-sm">Important monitoring notes for adults over 50</h3>
                 <ul className="mt-2 space-y-1.5 text-xs text-graphite-600 leading-relaxed">
-                  <li>• If you take blood pressure medications, your provider will monitor for hypotension as weight loss proceeds — dose reductions are common and expected.</li>
-                  <li>• If you take metformin or insulin for diabetes, monitoring for hypoglycemia is important, especially during the first 3 months.</li>
-                  <li>• Adequate hydration is particularly important for kidney function. GLP-1-related reduced appetite can also reduce fluid intake — aim for 6–8 glasses of water daily.</li>
-                  <li>• Baseline and annual DEXA scans are recommended for postmenopausal women to monitor bone density during significant weight loss.</li>
+                  <li>• If you take blood pressure medications, your provider will monitor for hypotension — dose reductions are common and expected.</li>
+                  <li>• If you take metformin or insulin for diabetes, monitoring for hypoglycemia is important during the first 3 months.</li>
+                  <li>• Adequate hydration is particularly important for kidney function — aim for 6–8 glasses of water daily.</li>
+                  <li>• Baseline and annual DEXA scans are recommended for postmenopausal women to monitor bone density.</li>
                 </ul>
               </div>
             </div>
@@ -402,53 +467,18 @@ export default function Over50Page() {
         </SectionShell>
       </section>
 
-      {/* FAQ */}
-      <section className="bg-gradient-to-b from-sage/10 to-white py-20">
-        <SectionShell>
-          <SectionHeading
-            eyebrow="Common Questions"
-            title="Questions from adults over 50, answered"
-            description="Specific answers to the concerns that matter most at this stage of life."
-          />
-          <div className="mx-auto mt-12 max-w-3xl divide-y divide-navy-100/40">
-            {faqs.map((item) => (
-              <div key={item.q} className="py-6">
-                <h3 className="font-bold text-navy">{item.q}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-graphite-600">{item.a}</p>
-              </div>
-            ))}
-          </div>
-        </SectionShell>
-      </section>
-
-      {/* Trust signals */}
-      <section className="py-12 border-t border-navy-100/40">
-        <SectionShell>
-          <div className="grid gap-6 sm:grid-cols-3 text-center">
-            <div className="flex flex-col items-center gap-2">
-              <Shield className="h-8 w-8 text-teal" />
-              <h3 className="font-bold text-navy text-sm">HIPAA-compliant care</h3>
-              <p className="text-xs text-graphite-500">Your health data is encrypted and protected</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Star className="h-8 w-8 text-gold" />
-              <h3 className="font-bold text-navy text-sm">Licensed providers</h3>
-              <p className="text-xs text-graphite-500">Board-certified physicians evaluate every patient</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Dumbbell className="h-8 w-8 text-teal" />
-              <h3 className="font-bold text-navy text-sm">Age-appropriate protocols</h3>
-              <p className="text-xs text-graphite-500">Care plans that account for muscle preservation and age-related factors</p>
-            </div>
-          </div>
-        </SectionShell>
-      </section>
+      <LandingFaq
+        eyebrow="50+ FAQ"
+        title="Questions from adults over 50, answered"
+        description="Specific answers to the concerns that matter most at this stage of life."
+        items={faqs}
+      />
 
       {/* Further reading */}
       <section className="py-12 bg-cloud/40 border-y border-sage/20">
         <SectionShell>
-          <h2 className="text-lg font-semibold text-navy mb-2">Further reading</h2>
-          <p className="text-sm text-graphite-500 mb-6">Articles relevant to GLP-1 treatment in older adults</p>
+          <h2 className="text-lg font-semibold text-navy mb-2 text-center">Further reading</h2>
+          <p className="text-sm text-graphite-500 mb-6 text-center">Articles relevant to GLP-1 in older adults</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { label: "GLP-1 Medications for Adults Over 65", href: "/blog/glp1-medications-for-seniors-over-65", tag: "Age 50+" },
@@ -459,13 +489,13 @@ export default function Over50Page() {
               <Link
                 key={article.href}
                 href={article.href}
-                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-teal/30 hover:shadow-premium transition-all"
+                className="group flex items-start justify-between gap-2 rounded-xl border border-navy-100/40 bg-white p-4 hover:border-emerald-300/50 hover:shadow-premium transition-all"
               >
                 <div>
-                  <span className="text-xs font-medium text-teal">{article.tag}</span>
-                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-teal transition-colors leading-snug">{article.label}</p>
+                  <span className="text-xs font-medium text-emerald-600">{article.tag}</span>
+                  <p className="mt-0.5 text-sm font-medium text-navy group-hover:text-emerald-700 transition-colors leading-snug">{article.label}</p>
                 </div>
-                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-teal transition-colors mt-0.5" />
+                <ArrowRight className="h-4 w-4 shrink-0 text-graphite-300 group-hover:text-emerald-600 transition-colors mt-0.5" />
               </Link>
             ))}
           </div>
@@ -476,7 +506,7 @@ export default function Over50Page() {
 
       <section className="py-8 border-t border-navy-100/40">
         <SectionShell>
-          <p className="mx-auto max-w-3xl text-center text-xs text-graphite-300 leading-relaxed">
+          <p className="mx-auto max-w-3xl text-center text-xs text-graphite-400 leading-relaxed">
             {siteConfig.compliance.shortDisclaimer} Clinical data cited from published peer-reviewed research. Individual results vary. Treatment eligibility determined by a licensed medical provider. Do not discontinue any prescribed medications without consulting your physician.
           </p>
         </SectionShell>

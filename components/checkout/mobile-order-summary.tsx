@@ -17,7 +17,7 @@ export function MobileOrderSummary({ planName, total, billingLabel, loading, onC
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-navy-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-navy-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] pb-[env(safe-area-inset-bottom)] lg:hidden">
       {/* Expandable details */}
       {expanded && (
         <div className="border-b border-navy-100/40 bg-navy-50/30 px-4 py-3 animate-in slide-in-from-bottom-2">
@@ -39,14 +39,17 @@ export function MobileOrderSummary({ planName, total, billingLabel, loading, onC
       {/* Sticky bar */}
       <div className="flex items-center gap-3 px-4 py-3">
         <button
+          type="button"
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-2"
+          aria-expanded={expanded}
+          aria-label={expanded ? "Hide order details" : "Show order details"}
+          className="flex items-center gap-2 rounded-lg -m-1 p-1 hover:bg-navy-50/50 transition-colors"
         >
-          <div>
+          <div className="text-left">
             <p className="text-xs text-graphite-500">Total</p>
             <p className="text-lg font-bold text-navy">{formatPrice(total)}<span className="text-xs font-normal text-graphite-400">{billingLabel}</span></p>
           </div>
-          <ChevronUp className={cn("h-4 w-4 text-graphite-400 transition-transform", expanded && "rotate-180")} />
+          <ChevronUp className={cn("h-4 w-4 text-graphite-400 transition-transform", expanded && "rotate-180")} aria-hidden="true" />
         </button>
 
         <Button

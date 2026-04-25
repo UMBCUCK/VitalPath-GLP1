@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { loginUser } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
-import { safeError } from "@/lib/logger";
+import { createTelehealthService } from "@/lib/services/telehealth";
+import { safeError, safeLog } from "@/lib/logger";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -34,6 +36,47 @@ export async function POST(req: NextRequest) {
 
     if (result.error) {
       return NextResponse.json({ error: result.error }, { status: 401 });
+    }
+
+    // Tier 13.5 — Auto-link OpenLoop patient on every login if missing.
+    // Best-effort, non-blocking: if the API call fails, the login still
+    // succeeds. The portal continues to function without an OpenLoop
+    // link until the next sync.
+    if (result.user?.id) {
+      const profile = await db.patientProfile.findUnique({
+        where: { userId: result.user.id },
+        select: { id: true, telehealthPatientId: true },
+      });
+      if (!profile?.telehealthPatientId) {
+        try {
+          const telehealth = createTelehealthService();
+          const olPatient = await telehealth.findPatientByEmail(
+            parsed.data.email.toLowerCase().trim(),
+          );
+          if (olPatient) {
+            if (profile) {
+              await db.patientProfile.update({
+                where: { id: profile.id },
+                data: { telehealthPatientId: olPatient.externalId },
+              });
+            } else {
+              await db.patientProfile.create({
+                data: {
+                  userId: result.user.id,
+                  telehealthPatientId: olPatient.externalId,
+                  state: olPatient.state || null,
+                },
+              });
+            }
+            safeLog(
+              "[Login]",
+              `Linked OpenLoop patient ${olPatient.externalId} for ${parsed.data.email}`,
+            );
+          }
+        } catch (err) {
+          safeError("[Login] OpenLoop backfill failed", err);
+        }
+      }
     }
 
     const response = NextResponse.json({ user: result.user });

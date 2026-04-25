@@ -136,7 +136,30 @@ export function ExitIntentModal() {
   const [phone, setPhone] = useState("");
   const [smsConsent, setSmsConsent] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  const [suppressed, setSuppressed] = useState(false);
   const hasTriggered = useRef(false);
+
+  // Tier 8.7 — Never fire the exit-intent lead-capture modal for users who
+  // are already logged in. They don't need the "$50 off your first month"
+  // pitch, and it creates a confusing experience for existing customers.
+  // We check via a cheap /api/auth/me call once on mount.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/auth/me", { cache: "no-store" });
+        if (res.ok && !cancelled) {
+          // Session exists — suppress the modal entirely
+          setSuppressed(true);
+        }
+      } catch {
+        // Network error → fall through and let the modal trigger normally
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function formatPhone(value: string): string {
     const digits = value.replace(/\D/g, "").slice(0, 10);
@@ -148,6 +171,8 @@ export function ExitIntentModal() {
   useEffect(() => {
     // Don't show if already dismissed this session
     if (typeof window !== "undefined" && sessionStorage.getItem("exit-dismissed")) return;
+    // Tier 8.7 — suppress for authed users
+    if (suppressed) return;
 
     const handleMouseLeave = (e: MouseEvent) => {
       // Only trigger when mouse moves to top of page (exit intent)
@@ -183,7 +208,7 @@ export function ExitIntentModal() {
       document.removeEventListener("mouseleave", handleMouseLeave);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [suppressed]);
 
   const handleDismiss = () => {
     setShow(false);

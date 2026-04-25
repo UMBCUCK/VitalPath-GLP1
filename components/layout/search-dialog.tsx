@@ -96,8 +96,13 @@ export function SearchDialog() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search pages, blog, recipes, FAQ..."
-            className="flex-1 bg-transparent text-sm text-navy outline-none placeholder:text-graphite-300"
+            type="search"
+            inputMode="search"
+            enterKeyHint="search"
+            className="flex-1 bg-transparent text-base sm:text-sm text-navy outline-none placeholder:text-graphite-300"
             autoComplete="off"
+            autoCapitalize="off"
+            spellCheck={false}
           />
           {query && (
             <button onClick={() => setQuery("")} className="text-graphite-400 hover:text-navy">

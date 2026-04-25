@@ -159,6 +159,83 @@ export default function HowItWorksPage() {
         </SectionShell>
       </section>
 
+      {/* Tier 12.8 — Telehealth transparency strip.
+          Surfaces the actual provider network powering prescriptions
+          (OpenLoop) + the pharmacy network (503A/503B) so the entire
+          care chain is visible, with a deep-link to the full sourcing page. */}
+      <section className="py-12 bg-cloud border-t border-navy-100/40">
+        <SectionShell className="max-w-3xl">
+          <div className="rounded-3xl border border-navy-100/60 bg-white p-6 sm:p-8 shadow-premium-sm">
+            <p className="text-xs font-bold uppercase tracking-wider text-teal mb-2">
+              Behind the scenes
+            </p>
+            <h2 className="text-xl font-bold text-navy">
+              The full care chain — visible end to end
+            </h2>
+            <p className="mt-2 text-sm text-graphite-500 leading-relaxed">
+              We build the patient-facing experience. The actual prescribing,
+              compounding, and shipping happen through audited regulated networks —
+              the same ones used by other major telehealth weight-management platforms.
+              Nothing is hidden.
+            </p>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl border border-navy-100/60 bg-cloud/60 p-4">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-teal">
+                  Provider network
+                </p>
+                <p className="mt-1 text-sm font-semibold text-navy">OpenLoop Health</p>
+                <p className="mt-1 text-[11px] text-graphite-500 leading-snug">
+                  US-licensed MDs, NPs, and PAs credentialed in your state. Full async
+                  + sync video options.
+                </p>
+              </div>
+              <div className="rounded-xl border border-navy-100/60 bg-cloud/60 p-4">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-teal">
+                  Pharmacy network
+                </p>
+                <p className="mt-1 text-sm font-semibold text-navy">503A &amp; 503B</p>
+                <p className="mt-1 text-[11px] text-graphite-500 leading-snug">
+                  FDA-registered outsourcing facilities + state-licensed compounding
+                  pharmacies. Per-batch CoAs.
+                </p>
+              </div>
+              <div className="rounded-xl border border-navy-100/60 bg-cloud/60 p-4">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-teal">
+                  Records
+                </p>
+                <p className="mt-1 text-sm font-semibold text-navy">HIPAA-compliant</p>
+                <p className="mt-1 text-[11px] text-graphite-500 leading-snug">
+                  Encrypted at rest + in transit. Provider notes, prescriptions, and
+                  consent records retained per state regulation.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-3 text-xs">
+              <Link
+                href="/sourcing"
+                className="rounded-full border border-navy-100/60 bg-white px-4 py-1.5 font-semibold text-navy hover:border-teal hover:text-teal transition-colors"
+              >
+                Pharmacy sourcing details →
+              </Link>
+              <Link
+                href="/legal/hipaa"
+                className="rounded-full border border-navy-100/60 bg-white px-4 py-1.5 font-semibold text-navy hover:border-teal hover:text-teal transition-colors"
+              >
+                Privacy &amp; HIPAA policy →
+              </Link>
+              <Link
+                href="/states"
+                className="rounded-full border border-navy-100/60 bg-white px-4 py-1.5 font-semibold text-navy hover:border-teal hover:text-teal transition-colors"
+              >
+                State availability →
+              </Link>
+            </div>
+          </div>
+        </SectionShell>
+      </section>
+
       <CtaSection />
     </MarketingShell>
   );

@@ -59,6 +59,38 @@ export interface TelehealthProvider {
   getConsultationStatus(consultationId: string): Promise<TelehealthConsultation>;
   getEligibilityDecision(consultationId: string): Promise<EligibilityDecision>;
   getPrescription(consultationId: string): Promise<TelehealthPrescription | null>;
+
+  /**
+   * Tier 12.3 — File an adverse-event report with the prescribing
+   * provider's pharmacovigilance system. Required for FDA MedWatch
+   * compliance when an adverse event is reported by the patient.
+   *
+   * Returns the provider-side reference ID so we can stamp it on the
+   * local AdverseEventReport row for two-way traceability.
+   */
+  reportAdverseEvent(data: {
+    patientExternalId: string;
+    severity: "MILD" | "MODERATE" | "SEVERE" | "LIFE_THREATENING";
+    description: string;
+    medicationName?: string;
+    onsetDate?: Date;
+    actionTaken?: string;
+  }): Promise<{ id: string }>;
+
+  /**
+   * Tier 13.1 — Look up a patient by email address. Returns null when no
+   * matching patient exists in the telehealth provider's system. Used by
+   * the OpenLoop-aware login flow to verify that a magic-link request
+   * comes from a real patient before sending the email.
+   */
+  findPatientByEmail(email: string): Promise<TelehealthPatient | null>;
+
+  /**
+   * Tier 13.1 — Fetch a patient by their telehealth-provider-side id
+   * (e.g. PatientProfile.telehealthPatientId). Used to hydrate the
+   * dashboard with real-time consultation + prescription status.
+   */
+  getPatient(patientExternalId: string): Promise<TelehealthPatient | null>;
 }
 
 // ─── Retry helper ──────────────────────────────────────────
@@ -86,6 +118,33 @@ async function fetchWithRetry(
     }
   }
   throw new Error("Unreachable");
+}
+
+// ─── Shared OpenLoop helpers ────────────────────────────────
+
+/**
+ * Tier 13.1 — Normalize OpenLoop's variable patient JSON shape into our
+ * TelehealthPatient interface. OpenLoop responses vary slightly between
+ * endpoints (snake_case fields, nested vs flat phone, etc.) — this keeps
+ * the noise contained in one place.
+ */
+function mapOpenLoopPatient(raw: Record<string, unknown>): TelehealthPatient {
+  const get = (k: string): string | undefined => {
+    const v = raw[k];
+    return typeof v === "string" ? v : undefined;
+  };
+  return {
+    id: String(raw.id ?? raw.patient_id ?? raw.uuid ?? ""),
+    externalId: String(
+      raw.external_id ?? raw.id ?? raw.patient_id ?? raw.uuid ?? "",
+    ),
+    firstName: get("first_name") ?? get("firstName") ?? "",
+    lastName: get("last_name") ?? get("lastName") ?? "",
+    email: get("email") ?? "",
+    phone: get("phone") ?? get("phone_number"),
+    dateOfBirth: get("date_of_birth") ?? get("dateOfBirth") ?? "",
+    state: get("state") ?? "",
+  };
 }
 
 // ─── OpenLoop adapter ───────────────────────────────────────
@@ -233,6 +292,75 @@ class OpenLoopAdapter implements TelehealthProvider {
       prescribedAt: new Date(result.prescribed_at),
     };
   }
+
+  // Tier 13.1 — Patient lookup by email (used by OpenLoop magic-link login)
+  async findPatientByEmail(email: string): Promise<TelehealthPatient | null> {
+    const url = new URL(`${this.baseUrl}/patients`);
+    url.searchParams.set("email", email);
+    const response = await fetchWithRetry(url.toString(), {
+      method: "GET",
+      headers: this.headers,
+    });
+    if (response.status === 404) return null;
+    if (!response.ok) {
+      safeError("[OpenLoop]", `findPatientByEmail failed: ${response.status}`);
+      // Return null on hard failure so the login flow can fall back to
+      // local-only auth without leaking the API outage to the user.
+      return null;
+    }
+    const result = (await response.json()) as {
+      patients?: Array<Record<string, unknown>>;
+      data?: Record<string, unknown>;
+    };
+    // OpenLoop endpoints variously return { patients: [...] } or { data: {...} }
+    const raw =
+      Array.isArray(result.patients) && result.patients.length > 0
+        ? result.patients[0]
+        : result.data;
+    if (!raw || typeof raw !== "object") return null;
+    return mapOpenLoopPatient(raw);
+  }
+
+  // Tier 13.1 — Get a single patient by their OpenLoop ID
+  async getPatient(patientExternalId: string): Promise<TelehealthPatient | null> {
+    const response = await fetchWithRetry(
+      `${this.baseUrl}/patients/${encodeURIComponent(patientExternalId)}`,
+      { method: "GET", headers: this.headers },
+    );
+    if (response.status === 404) return null;
+    if (!response.ok) {
+      safeError("[OpenLoop]", `getPatient failed: ${response.status}`);
+      return null;
+    }
+    const raw = (await response.json()) as Record<string, unknown>;
+    return mapOpenLoopPatient(raw);
+  }
+
+  // Tier 12.3 — File adverse event with OpenLoop's pharmacovigilance API
+  async reportAdverseEvent(
+    data: Parameters<TelehealthProvider["reportAdverseEvent"]>[0],
+  ): Promise<{ id: string }> {
+    const payload = {
+      patient_external_id: data.patientExternalId,
+      severity: data.severity,
+      description: data.description,
+      medication_name: data.medicationName,
+      onset_date: data.onsetDate?.toISOString(),
+      action_taken: data.actionTaken,
+    };
+    const response = await fetchWithRetry(`${this.baseUrl}/adverse-events`, {
+      method: "POST",
+      headers: this.headers,
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => "");
+      safeError("[OpenLoop]", `reportAdverseEvent failed: ${response.status} ${errorBody}`);
+      throw new Error(`OpenLoop reportAdverseEvent failed: ${response.status}`);
+    }
+    const result = (await response.json()) as { id: string };
+    return { id: result.id };
+  }
 }
 
 // ─── Mock adapter for development ───────────────────────────
@@ -282,6 +410,48 @@ class MockTelehealthAdapter implements TelehealthProvider {
       dosage: "0.25mg",
       frequency: "Weekly",
       prescribedAt: new Date(),
+    };
+  }
+
+  async reportAdverseEvent(
+    data: Parameters<TelehealthProvider["reportAdverseEvent"]>[0],
+  ): Promise<{ id: string }> {
+    safeLog("[Telehealth Mock]", `reportAdverseEvent: ${data.severity} for ${data.patientExternalId}`);
+    return { id: `mock_ae_${Date.now()}` };
+  }
+
+  // Tier 13.1 — Mock patient lookup. In dev, only seeded demo accounts
+  // resolve (jordan@example.com / admin@naturesjourneyhealth.com per CLAUDE.md).
+  async findPatientByEmail(email: string): Promise<TelehealthPatient | null> {
+    safeLog("[Telehealth Mock]", `findPatientByEmail: ${email}`);
+    const normalized = email.toLowerCase().trim();
+    if (
+      normalized === "jordan@example.com" ||
+      normalized === "admin@naturesjourneyhealth.com"
+    ) {
+      return {
+        id: `mock_patient_${normalized}`,
+        externalId: `mock_ext_${normalized}`,
+        firstName: normalized.split("@")[0],
+        lastName: "Demo",
+        email: normalized,
+        dateOfBirth: "1990-01-01",
+        state: "CA",
+      };
+    }
+    return null;
+  }
+
+  async getPatient(patientExternalId: string): Promise<TelehealthPatient | null> {
+    safeLog("[Telehealth Mock]", `getPatient: ${patientExternalId}`);
+    return {
+      id: patientExternalId,
+      externalId: patientExternalId,
+      firstName: "Mock",
+      lastName: "Patient",
+      email: "mock@example.com",
+      dateOfBirth: "1990-01-01",
+      state: "CA",
     };
   }
 }

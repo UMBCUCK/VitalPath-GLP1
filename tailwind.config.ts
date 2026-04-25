@@ -83,8 +83,9 @@ const config: Config = {
           DEFAULT: "#2A4A58",
           50: "#EDF2F5",
           100: "#D3DFE5",
-          200: "#B8CDD8",
-          300: "#7A96A6",
+          200: "#A4BCC8",
+          /* AA-compliant on white (~4.6:1) — was #7A96A6 (3.7:1) */
+          300: "#5A7A88",
           400: "#4A6A75",
           500: "#3A5A68",
           600: "#2A4A58",
